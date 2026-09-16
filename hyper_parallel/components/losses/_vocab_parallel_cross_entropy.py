@@ -30,6 +30,7 @@ DTensor wrapper are absorbed by :func:`_resolve_class_mesh_dim`.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Optional, Tuple, TYPE_CHECKING
 
 import torch
@@ -247,6 +248,97 @@ def distributed_nll_loss_forward(
     )
 
 
+@dataclass(frozen=True)
+class _CrossEntropyContext:
+    """State required by the custom cross-entropy backward pass."""
+
+    log_probs_local: Tensor
+    target: Tensor
+    weight: Optional[Tensor]
+    total_weight: Tensor
+    target_mask: Tensor
+    vocab_start_tensor: Tensor
+    reduction: str
+    ignore_index: int
+    vocab_start: int
+    vocab_end: int
+
+
+def _save_cross_entropy_context(ctx: Any, state: _CrossEntropyContext) -> None:
+    """Save tensors and metadata for :class:`DistributedCrossEntropyFunction`."""
+    ctx.save_for_backward(
+        state.log_probs_local,
+        state.target,
+        state.weight,
+        state.total_weight,
+        state.target_mask,
+        state.vocab_start_tensor,
+    )
+    ctx.reduction = state.reduction
+    ctx.ignore_index = state.ignore_index
+    ctx.vocab_start = state.vocab_start
+    ctx.vocab_end = state.vocab_end
+
+
+def _compute_cross_entropy_gradient(
+    log_probs_local: Tensor,
+    target: Tensor,
+    weight: Optional[Tensor],
+    total_weight: Tensor,
+    reduction: str,
+    ignore_index: int,
+    vocab_start: int,
+    vocab_end: int,
+    grad_output: Tensor,
+) -> Tensor:
+    """Compute the local logits gradient for one reduction mode."""
+    target_flat = target.flatten()
+    softmax_local = log_probs_local.exp()
+    ignore_mask = target_flat != ignore_index
+
+    if weight is not None:
+        safe_target = torch.where(ignore_mask, target_flat, torch.zeros_like(target_flat))
+        sample_weights = weight[safe_target]
+    else:
+        sample_weights = None
+
+    if reduction == "mean":
+        grad_scale = grad_output / total_weight.clamp(min=1e-12)
+    elif reduction == "sum":
+        grad_scale = grad_output
+    else:
+        grad_scale = grad_output.flatten()
+
+    in_vocab_mask = (target_flat >= vocab_start) & (target_flat < vocab_end) & ignore_mask
+    grad_scale_expanded = (
+        grad_scale.unsqueeze(-1) if reduction == "none" else grad_scale.reshape(1, 1)
+    )
+    if sample_weights is not None:
+        grad_scale_expanded = grad_scale_expanded * sample_weights.unsqueeze(-1)
+    grad_input = softmax_local * grad_scale_expanded
+    local_targets = torch.where(
+        in_vocab_mask, target_flat - vocab_start, torch.zeros_like(target_flat)
+    )
+
+    if in_vocab_mask.any():
+        row_indices = torch.arange(target_flat.numel(), device=target.device, dtype=torch.long)
+        grad_values = -grad_scale
+        if reduction != "none":
+            grad_values = -grad_scale.expand_as(target_flat)
+        if sample_weights is not None:
+            grad_values = grad_values * sample_weights
+        grad_input = grad_input.contiguous()
+        grad_input[row_indices[in_vocab_mask], local_targets[in_vocab_mask]] += grad_values[in_vocab_mask]
+
+    if not ignore_mask.all():
+        if reduction == "none":
+            grad_input[~ignore_mask] = 0.0
+        else:
+            ignore_indices_expanded = (~ignore_mask).unsqueeze(-1).expand_as(grad_input)
+            grad_input[ignore_indices_expanded] = 0.0
+    return grad_input
+
+
 class DistributedCrossEntropyFunction(torch.autograd.Function):
     """K3: Fused backward for distributed cross_entropy."""
 
@@ -264,9 +356,9 @@ class DistributedCrossEntropyFunction(torch.autograd.Function):
     ) -> Tensor:
         """Forward pass."""
         local_vocab_size = input_local.shape[-1]
-        rank = mesh.get_local_rank(mesh_dim)
-        tp_size = mesh.size(mesh_dim)
-        vocab_start = _compute_vocab_start(vocab_size, tp_size, rank)
+        vocab_start = _compute_vocab_start(
+            vocab_size, mesh.size(mesh_dim), mesh.get_local_rank(mesh_dim)
+        )
         vocab_end = vocab_start + local_vocab_size
 
         log_probs_local = distributed_log_softmax(
@@ -290,22 +382,21 @@ class DistributedCrossEntropyFunction(torch.autograd.Function):
                 total_weight, op="sum", group=group
             )
 
-            ctx.save_for_backward(
-                log_probs_local,
-                target,
-                weight,
-                total_weight_sum,
-                target_mask,
-                vocab_start_tensor,
+            _save_cross_entropy_context(
+                ctx,
+                _CrossEntropyContext(
+                    log_probs_local,
+                    target,
+                    weight,
+                    total_weight_sum,
+                    target_mask,
+                    vocab_start_tensor,
+                    reduction,
+                    ignore_index,
+                    vocab_start,
+                    vocab_end,
+                ),
             )
-            ctx.reduction = reduction
-            ctx.ignore_index = ignore_index
-            ctx.vocab_size = vocab_size
-            ctx.local_vocab_size = local_vocab_size
-            ctx.mesh = mesh
-            ctx.mesh_dim = mesh_dim
-            ctx.vocab_start = vocab_start
-            ctx.vocab_end = vocab_end
 
             if total_weight_sum.item() == 0:
                 return torch.tensor(float('nan'), dtype=total_loss.dtype, device=total_loss.device)
@@ -314,41 +405,37 @@ class DistributedCrossEntropyFunction(torch.autograd.Function):
             group = mesh.get_group(mesh_dim)
             total_loss = platform.differentiable_all_reduce(loss, op="sum", group=group)
 
-            ctx.save_for_backward(
+            _save_cross_entropy_context(
+                ctx,
+                _CrossEntropyContext(
+                    log_probs_local,
+                    target,
+                    weight,
+                    torch.zeros(1, dtype=loss.dtype, device=loss.device),
+                    target_mask,
+                    vocab_start_tensor,
+                    reduction,
+                    ignore_index,
+                    vocab_start,
+                    vocab_end,
+                ),
+            )
+            return total_loss
+        _save_cross_entropy_context(
+            ctx,
+            _CrossEntropyContext(
                 log_probs_local,
                 target,
                 weight,
                 torch.zeros(1, dtype=loss.dtype, device=loss.device),
                 target_mask,
                 vocab_start_tensor,
-            )
-            ctx.reduction = reduction
-            ctx.ignore_index = ignore_index
-            ctx.vocab_size = vocab_size
-            ctx.local_vocab_size = local_vocab_size
-            ctx.mesh = mesh
-            ctx.mesh_dim = mesh_dim
-            ctx.vocab_start = vocab_start
-            ctx.vocab_end = vocab_end
-
-            return total_loss
-        ctx.save_for_backward(
-            log_probs_local,
-            target,
-            weight,
-            torch.zeros(1, dtype=loss.dtype, device=loss.device),
-            target_mask,
-            vocab_start_tensor,
+                reduction,
+                ignore_index,
+                vocab_start,
+                vocab_end,
+            ),
         )
-        ctx.reduction = reduction
-        ctx.ignore_index = ignore_index
-        ctx.vocab_size = vocab_size
-        ctx.local_vocab_size = local_vocab_size
-        ctx.mesh = mesh
-        ctx.mesh_dim = mesh_dim
-        ctx.vocab_start = vocab_start
-        ctx.vocab_end = vocab_end
-
         return loss
 
     @staticmethod
@@ -363,74 +450,19 @@ class DistributedCrossEntropyFunction(torch.autograd.Function):
             _,
         ) = ctx.saved_tensors
 
-        reduction = ctx.reduction
-        ignore_index = ctx.ignore_index
-        _ = ctx.local_vocab_size
-        vocab_start = ctx.vocab_start
-        vocab_end = ctx.vocab_end
-        _ = ctx.mesh
-        _ = ctx.mesh_dim
-
-        batch_size = target.numel()
-        target_flat = target.flatten()
-
-        softmax_local = log_probs_local.exp()
-
-        ignore_mask = target_flat != ignore_index
-
-        if weight is not None:
-            # Ignore positions may contain -100, which is not a valid class
-            # index. Use a harmless index there; their gradients are masked
-            # below and therefore do not contribute to the result.
-            safe_target = torch.where(
-                ignore_mask, target_flat, torch.zeros_like(target_flat)
-            )
-            sample_weights = weight[safe_target]
-        else:
-            sample_weights = None
-
-        if reduction == "mean":
-            grad_scale = grad_output / total_weight.clamp(min=1e-12)
-        elif reduction == "sum":
-            grad_scale = grad_output
-        else:
-            grad_scale = grad_output.flatten()
-
-        in_vocab_mask = (target_flat >= vocab_start) & (target_flat < vocab_end) & ignore_mask
-
-        if reduction == "none":
-            grad_scale_expanded = grad_scale.unsqueeze(-1)
-        else:
-            grad_scale_expanded = grad_scale.reshape(1, 1)
-        if sample_weights is not None:
-            grad_scale_expanded = grad_scale_expanded * sample_weights.unsqueeze(-1)
-        grad_input = softmax_local * grad_scale_expanded
-
-        local_targets = torch.where(in_vocab_mask, target_flat - vocab_start, torch.zeros_like(target_flat))
-
-        if in_vocab_mask.any():
-            row_indices = torch.arange(batch_size, device=target.device, dtype=torch.long)
-
-            if reduction == "none":
-                grad_values = -grad_scale
-                if sample_weights is not None:
-                    grad_values = grad_values * sample_weights
-            else:
-                grad_values = -grad_scale.expand_as(target_flat)
-                if sample_weights is not None:
-                    grad_values = grad_values * sample_weights
-
-            grad_input = grad_input.contiguous()
-            grad_input[row_indices[in_vocab_mask], local_targets[in_vocab_mask]] += grad_values[in_vocab_mask]
-
-        if not ignore_mask.all():
-            if reduction == "none":
-                grad_input[~ignore_mask] = 0.0
-            else:
-                ignore_indices_expanded = (~ignore_mask).unsqueeze(-1).expand_as(grad_input)
-                grad_input[ignore_indices_expanded] = 0.0
-
-        return grad_input, None, None, None, None, None, None, None
+        grad_input = _compute_cross_entropy_gradient(
+            log_probs_local,
+            target,
+            weight,
+            total_weight,
+            ctx.reduction,
+            ctx.ignore_index,
+            ctx.vocab_start,
+            ctx.vocab_end,
+            grad_output,
+        )
+        gradients = (grad_input, None, None, None, None, None, None, None)
+        return gradients
 
 
 def vocab_parallel_cross_entropy_local(
