@@ -119,3 +119,5 @@ torchrun --standalone --nproc_per_node=4 --module examples.training_demo.train_t
 并行度须与 YAML 匹配。两种入口复用同一个 `PreTokenizedSFTTransform` 校验和切窗逻辑，
 均经 `cu_seq_lens` 接入 `JTPackedRuntime`；collator 会保留每个窗口内部的文档边界。
 Trainer 沿用现有 Dataset/transform/DataLoader 配置组装、DP 采样及 TP 广播。原 JT dataset 导入路径保留兼容。
+
+MF Graph O1 的单卡数值复现配置及验证边界见 [4K 对齐说明](REFERENCE_ALIGNMENT.md)。
