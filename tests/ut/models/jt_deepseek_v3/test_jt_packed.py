@@ -88,3 +88,47 @@ class TestJTPacked(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "loss_chunk_size=0 for CP"):
             configure_context_parallel(model, SimpleNamespace(cp_size=2))
         self.assertFalse(hasattr(model, "jt_cp_context"))
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_diagnostic_losses_preserve_objective_and_gradients(self) -> None:
+        """Raw MTP means and unscaled per-layer aux means never join the backward sum."""
+        for chunk_size in (0, 3):
+            with self.subTest(chunk_size=chunk_size):
+                torch.manual_seed(21)
+                config = small_config()
+                config.num_nextn_predict_layers = 2
+                config.loss_chunk_size = chunk_size
+                reference = JTDeepseekV3ForCausalLM(config)
+                logged = copy.deepcopy(reference)
+                inputs = torch.arange(8).unsqueeze(0)
+                targets = torch.tensor([[1, 2, 3, -100, 5, 6, 7, -100]])
+                expected = reference.compute_jt_losses(inputs, targets, targets >= 0, actual_seq_len=(4, 8))
+                output = logged(inputs, targets, actual_seq_len=(4, 8))
+                metrics = output.loss_metrics
+                self.assertEqual(set(metrics), {"lm_loss", "mtp_1_loss", "mtp_2_loss", "load_balancing_loss"})
+                self.assertTrue(all(not value.requires_grad and value.grad_fn is None for value in metrics.values()))
+                torch.testing.assert_close(metrics["lm_loss"], expected["lm_loss"], rtol=0, atol=0)
+                torch.testing.assert_close((metrics["mtp_1_loss"] + metrics["mtp_2_loss"]) * 0.15,
+                                           expected["mtp_loss"], rtol=1e-6, atol=1e-7)
+                torch.testing.assert_close(metrics["load_balancing_loss"] * (0.01 * 3),
+                                           expected["aux_loss"], rtol=1e-6, atol=1e-7)
+                torch.testing.assert_close(sum(output.loss.values()), sum(expected.values()), rtol=0, atol=0)
+                sum(output.loss.values()).backward()
+                sum(expected.values()).backward()
+                torch.testing.assert_close(
+                    {name: parameter.grad for name, parameter in logged.named_parameters()},
+                    {name: parameter.grad for name, parameter in reference.named_parameters()}, rtol=0, atol=0,
+                )
+
+    def test_disabled_auxiliary_objectives_have_no_diagnostic_entries(self) -> None:
+        """Dense training with MTP and router loss disabled only exposes LM loss."""
+        config = small_config()
+        config.num_nextn_predict_layers = 0
+        config.moe_aux_loss_coeff = 0.0
+        config.mlp_layer_types = ["dense"] * config.num_hidden_layers
+        model = JTDeepseekV3ForCausalLM(config)
+        tokens = torch.arange(8).unsqueeze(0)
+        output = model(tokens, tokens)
+        self.assertEqual(set(output.loss_metrics), {"lm_loss"})
+        torch.testing.assert_close(output.loss_metrics["lm_loss"], output.loss["foundation_loss/lm"],
+                                   rtol=0, atol=0)

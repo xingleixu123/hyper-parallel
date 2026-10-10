@@ -24,6 +24,7 @@ from hyper_parallel.trainer.runtime.distributed import get_world_size_safe
 from hyper_parallel.trainer.runtime.distributed import all_reduce
 from hyper_parallel.data.constants import IGNORE_INDEX
 from hyper_parallel.trainer.runtime.device import get_device_type, get_torch_device
+from hyper_parallel.trainer.runtime.flops import estimate_deepseek_flops
 
 from .base import Callback, TrainerState
 
@@ -46,6 +47,10 @@ class EnvironMeterCallback(Callback):
         self._step_start_time = 0.0
         self._local_step_tokens: Any = None
         self._local_step_samples = 0
+        self._local_input_tokens = 0
+        self._local_flops: float | None = 0.0
+        self._loss_metrics: dict[str, Any] = {}
+        self._loss_metric_steps = 0
         self._consumed_tokens = 0
         self._consumed_samples = 0
         self.trainer.step_train_metrics = {}
@@ -159,7 +164,13 @@ class EnvironMeterCallback(Callback):
         """Reduce one scalar metric, with a single-process no-op fallback."""
         if get_world_size_safe() <= 1:
             return float(value)
-        reduced = all_reduce(value, op=op, group=self._metric_group())
+        group = self._metric_group()
+        mesh = self.trainer.mesh
+        if group is None and (getattr(mesh, "tp_size", 1) > 1 or getattr(mesh, "pp_size", 1) > 1):
+            if getattr(mesh, "dp_size", 1) * getattr(mesh, "cp_size", 1) == 1:
+                return float(value)
+            raise ValueError("DP+CP metrics require an explicit group when TP or PP is enabled")
+        reduced = all_reduce(value, op=op, group=group)
         return float(reduced)
 
     def _accumulate_batches(self, value: Any) -> None:
@@ -175,6 +186,55 @@ class EnvironMeterCallback(Callback):
             else:
                 self._local_step_tokens = self._local_step_tokens + token_count
             self._local_step_samples += self._batch_samples(batch)
+            shape = getattr(batch.get("input_ids"), "shape", ())
+            if len(shape) == 2:
+                batch_size, local_length = shape
+                self._local_input_tokens += batch_size * local_length
+                cp_size = int(getattr(self.trainer.mesh, "cp_size", 1))
+                model = getattr(self.trainer, "model", None)
+                mtp_layers = getattr(getattr(model, "mtp", None), "layers", ())
+                flops = estimate_deepseek_flops(
+                    getattr(self.trainer, "model_config", None), batch_size, local_length * cp_size,
+                    mtp_depths=len(mtp_layers),
+                )
+                if flops is None or getattr(self.trainer.mesh, "pp_size", 1) > 1:
+                    self._local_flops = None
+                elif self._local_flops is not None:
+                    self._local_flops += flops / cp_size
+            else:
+                self._local_flops = None
+
+    def record_loss_metrics(self, model_output: Any) -> None:
+        """Collect detached diagnostic means without adding them to backward loss.
+
+        Args:
+            model_output: Output with an optional ``loss_metrics`` scalar mapping.
+                Keys must be stable across micro-batches and DP/CP ranks; values
+                must represent full TP-replicated local means. Step logging takes
+                the arithmetic micro-batch and DP/CP mean, matching MF's tracker
+                convention, independently of token-weighted training objectives.
+                Standard ``aux_loss`` and ``indexer_loss`` fields are also read.
+        """
+        def _read(name: str) -> Any:
+            value = getattr(model_output, name, None)
+            return model_output.get(name) if value is None and isinstance(model_output, Mapping) else value
+
+        metrics = dict(_read("loss_metrics") or {})
+        for name in ("aux_loss", "indexer_loss"):
+            value = _read(name)
+            if value is not None:
+                metrics.setdefault(name, value)
+        if self._loss_metric_steps and metrics.keys() != self._loss_metrics.keys():
+            raise ValueError("loss_metrics keys must remain stable within an optimizer step")
+        for name, value in metrics.items():
+            if not isinstance(name, str) or not name or "/" in name:
+                raise ValueError("loss_metrics keys must be nonempty names without '/' separators")
+            if self._tensor_numel(value) not in (None, 1):
+                raise ValueError(f"loss_metrics[{name!r}] must be scalar")
+            if callable(getattr(value, "detach", None)):
+                value = value.detach().clone()
+            self._loss_metrics[name] = self._loss_metrics.get(name, 0) + value
+        self._loss_metric_steps += 1
 
     def _global_samples(self) -> int:
         """Reduce samples across DP+CP while removing CP replicas."""
@@ -270,6 +330,12 @@ class EnvironMeterCallback(Callback):
         del state, kwargs
         self._local_step_tokens = None
         self._local_step_samples = 0
+        self._local_input_tokens = 0
+        self._local_flops = 0.0
+        self._loss_metrics = {}
+        self._loss_metric_steps = 0
+        if get_device_type() != "cpu":
+            get_torch_device().synchronize()
         self._step_start_time = time.perf_counter()
         self._accumulate_batches(micro_batches)
 
@@ -307,8 +373,11 @@ class EnvironMeterCallback(Callback):
             **kwargs: Unused callback context.
         """
         del state, kwargs
+        if get_device_type() != "cpu":
+            get_torch_device().synchronize()
         step_time = max(time.perf_counter() - self._step_start_time, 0.0)
-        global_step_time = self._reduce(step_time, op="max")
+        world_size = get_world_size_safe()
+        global_step_time = float(all_reduce(step_time, op="max", group=None)) if world_size > 1 else step_time
         local_step_tokens = 0 if self._local_step_tokens is None else self._local_step_tokens
         global_tokens = int(self._reduce(local_step_tokens, op="sum"))
         global_samples = self._global_samples()
@@ -325,12 +394,34 @@ class EnvironMeterCallback(Callback):
         for name, value in sorted((loss_dict or {}).items()):
             metric_name = name if name.startswith("training/") else f"training/{name}"
             train_metrics[metric_name] = self._reduce(self._scalar(value, name), op="mean")
+        for name, value in sorted(self._loss_metrics.items()):
+            metric_name = f"training/{name}"
+            if metric_name in train_metrics:
+                raise ValueError(f"Diagnostic metric {name!r} collides with a training objective")
+            train_metrics[metric_name] = self._reduce(
+                self._scalar(value, name) / self._loss_metric_steps, op="mean",
+            )
+        self._loss_metrics = {}
+        self._loss_metric_steps = 0
 
         tokens_per_second = global_tokens / global_step_time if global_step_time > 0 else 0.0
+        input_tokens = self._reduce(self._local_input_tokens, op="sum")
+        throughput = {
+            "performance/samples_per_second": global_samples / global_step_time if global_step_time > 0 else 0.0,
+            "performance/input_tokens_per_second": input_tokens / global_step_time if global_step_time > 0 else 0.0,
+        }
+        if self._local_flops is not None and self._local_input_tokens > 0:
+            global_flops = self._reduce(self._local_flops, op="sum")
+            if global_step_time > 0:
+                throughput["performance/throughput_tflops_per_device"] = global_flops / (
+                    global_step_time * world_size * 1e12
+                )
         env_metrics = {
             **train_metrics,
             "performance/step_time": global_step_time,
             "performance/tokens_per_second": tokens_per_second,
+            **throughput,
+            "data/step_input_tokens": input_tokens,
             "data/step_tokens": float(global_tokens),
             "data/consumed_tokens": float(self._consumed_tokens),
             "data/step_samples": float(global_samples),
