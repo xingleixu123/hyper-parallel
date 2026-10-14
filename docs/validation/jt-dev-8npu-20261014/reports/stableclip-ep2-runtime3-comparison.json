@@ -269,5 +269,20 @@
       "different_numeric_summaries": 0,
       "max_small_tensor_abs": 0.0
     }
+  },
+  "measurement_context": {
+    "model_integration_modes": {
+      "stableclip-fsdp8-runtime3": "runtime",
+      "stableclip-ep2-runtime3": "runtime"
+    },
+    "eligible_for_matching_build_mode_performance_comparison": false,
+    "excluded_reasons": [
+      "stableclip-fsdp8-runtime3: model_integration mode is runtime",
+      "stableclip-fsdp8-runtime3: diagnostic observations: ['ns-batches-rank*.jsonl', 'stable-clip-rank*.jsonl']",
+      "stableclip-ep2-runtime3: model_integration mode is runtime",
+      "stableclip-ep2-runtime3: diagnostic observations: ['ns-batches-rank*.jsonl', 'stable-clip-rank*.jsonl']"
+    ],
+    "common_observations": "Per-step scalar metrics and input identity capture, including NPU-to-CPU copies/hash work.",
+    "scope": "Build-mode comparisons retain matching input evidence overhead; they are not raw uninstrumented Trainer latency. Numerical gates are independent."
   }
 }

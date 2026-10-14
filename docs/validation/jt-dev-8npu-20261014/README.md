@@ -12,7 +12,7 @@ This immutable snapshot documents completed runs and known failures. It does not
 
 Loss errors are absolute maxima over every measured step and all eight ranks. The threshold is0.005 for each model-logged component and total. MTP is weighted by0.3 and aux by0.0001; reports also expose unweighted error diagnostics. The curves above show rank0; lower panels show the maximum error across ranks at every step. A completed process is not a passing alignment result.
 
-Step time is the median after excluding the first20 steps of that measured run. Allocated and reserved memory are the maximum reported per-device peaks. Timings include the same lightweight scalar/input observations; runtime parameter-probe jobs are excluded. These are single-run comparisons, not confidence intervals.
+Step time is the median after excluding the first20 steps of that measured run. Allocated and reserved memory are the maximum reported per-device peaks. The original comparison tables use matching scalar/input observations, including per-microbatch NPU-to-CPU input copies and hashing. These are not raw Trainer-only timings. The later FP32-NS diagnostic jobs use runtime parameter/gradient probes; their raw timing and memory must be excluded from uninstrumented performance comparisons. These are single-run comparisons, not confidence intervals.
 
 ## Completed checks
 
@@ -72,13 +72,13 @@ The ordinary CP2 training demo with chunk size 4096 now completes 200 steps with
 
 ## Ranked findings, recompute costs and precision diagnostics
 
-[中文问题排序与完整曲线](REPORT_ZH.md) distinguishes completed fixes from the outstanding cross-topology gate. The six draft PRs each have one commit; [current-head receipts](reports/pr-verification.json) do not establish CI success.
+[中文问题排序与完整曲线](REPORT_ZH.md) distinguishes completed fixes from the outstanding cross-topology gate. The eight draft PRs each have one commit; [current-head receipts](reports/pr-verification.json) do not establish CI success.
 
 Seven recompute policies were compared over 40 steps, with events collected in separate 12-step runs. Every observed loss and gradient matches the off reference exactly on all eight ranks. MLP+norm additionally completed 200 exact steps, saving 1.1654 GiB for about 2% additional step time. Full/selective cost about 9.13%/8.50% in the same-source 40-step study. Module paths are experimental wrappers, not an existing JT YAML feature. [Measurement definitions](reports/recompute-cost-analysis.md) and [pinned current MF/Megatron source comparison](reports/recompute-reference-comparison.md) document the boundaries.
 
 ![Recompute cost](figures/recompute-module-cost.png)
 
-FP32 expert weight gradients plus the complete FP32 NS pipeline do **not** resolve the gate. Completed EP2 and CP2 diagnostics use a matching 200-step FSDP reference; all input, initialization, LR and coverage checks pass, but LM maxima are 0.0194788 and 0.0152731. FSDP median time rises to6.39175s, roughly6.8 times the original recipe, so this is not a recommended production recipe. TP2+EP2 has now completed: maximum LM/MTP/aux errors are 0.014967918/0.005714297/0.0000107335; the 200-step gate still fails. The separately implemented production precision options have passed their focused NPU ST and four three-step integration runs, not the full training gate.
+FP32 expert weight gradients plus the complete FP32 NS pipeline do **not** resolve the gate. Completed EP2 and CP2 diagnostics use a matching 200-step FSDP reference; all input, initialization, LR and coverage checks pass, but LM maxima are 0.0194788 and 0.0152731. The recorded FSDP median of6.39175s includes runtime parameter/gradient observations, unlike the original build-only baseline. The earlier6.8x attribution to FP32 NS is withdrawn; an equivalent-observation performance comparison remains pending. TP2+EP2 has now completed: maximum LM/MTP/aux errors are 0.014967918/0.005714297/0.0000107335; the 200-step gate still fails. The separately implemented production precision options have passed their focused NPU ST and four three-step integration runs, not the full training gate.
 
 The additional raw-component audit divides logged MTP/aux by their verified weights0.3/0.0001 and applies0.005 separately. EP2 raw maxima are0.0301822/0.128801; CP2 raw maxima are0.0355840/0.170822. The original weighted reports remain intact. [Detailed diagnostic evidence](reports/parallel-numerical-diagnosis.md) states which findings are sampled and which cover every step/rank.
 
@@ -86,7 +86,7 @@ The additional raw-component audit divides logged MTP/aux by their verified weig
 
 ![CP2 diagnostic raw losses](figures/fpgmm-nsall32-cp2-200-raw.png)
 
-The [precision CSV](scalars/precision-diagnostics.csv) contains11200 scalar rows from seven completed runs, with a distinct diagnostic-hook flag. No training text or weight tensors are published.
+The [precision CSV](scalars/precision-diagnostics.csv) contains14400 scalar rows from nine completed runs, with a distinct diagnostic-hook flag. No training text or weight tensors are published.
 
 
 ## First-forward localization and precision-option ST
@@ -102,3 +102,20 @@ FP32 reduction alone leaves the BF16 local projection error unchanged. Using FP3
 The expert-gradient production patch passes its two-NPU shared-weight/accumulation/recompute ST. The Muon precision option passes eight-NPU full/hybrid updates and two-NPU missing-gradient/empty-shard tests. [Exact patch receipts](reports/precision-production-st-receipt.json) retain test retry and file-mode details. The combined production source passes four three-step smoke runs; no 200-step production-option pass or performance advantage is claimed.
 
 ![Completed TP2+EP2 FP32 diagnostic, unweighted losses](figures/fpgmm-nsall32-tp2ep2-200-raw.png)
+
+
+## Measurement correction and expanded topology evidence
+
+The earlier attribution of a roughly 6.8x slowdown to FP32 NS is withdrawn. Those four 200-step diagnostic runs used `model_integration: runtime`, while the original BF16 baseline used `build`. The original timings remain in the evidence, with explicit exclusion reasons. Numerical failures are unaffected. A new production-option baseline, resume, continuous reference and topology matrix with matching build-mode observations are in progress; no completed performance attribution is claimed here.
+
+Pure TP2 with replicated experts completes 200 steps but fails: maximum LM/weighted-MTP/weighted-aux errors are 0.014084816/0.006210327/0.0000172808. This run also uses runtime observations; its 7.13563 seconds per step is excluded from comparison with the build reference. EP4 completes with build observations and fails at 0.015380383/0.005264282/0.0000185563. The additional unweighted MTP/aux maxima are 0.02070109/0.17280778 for TP2 and 0.01754761/0.18556311 for EP4. All eight ranks, every step, inputs, initialization and LR are checked. EP4 records 1.02918 seconds per step and 21.32290 GiB allocated with the common input-evidence overhead.
+
+![Pure TP2 replicated-expert unweighted alignment](figures/reviewed-tp2-replicated-experts-200-raw.png)
+
+![EP4 unweighted alignment](figures/reviewed-ep4-off-200-raw.png)
+
+For the current expanded-Ulysses CP2 strategy, first-step loss derivatives for LM/MTP/aux match the FSDP reference exactly. The original first sampled backward difference is at the MTP output; fixed 512-position loss chunks remove that sampled difference and the trunk final-norm output difference. Earlier layers still differ: embedding-output gradient relative L2 decreases from 0.00633 to 0.00532. These are sampled first-step observations, not whole-tensor equality or a 200-step pass. [Scalar derivative audit](reports/cp-first-loss-derivatives.json), [head backward samples](reports/cp-first-head-backward-comparison.json), and [512-chunk samples](reports/cpchunk512-first-backward-comparison.json) retain the boundaries and missing-coordinate checks.
+
+![CP backward boundary samples](figures/cp-first-backward-divergence.png)
+
+The performance audit now rejects runtime/unknown modes, explicit profiling, and eleven types of diagnostic trace markers, including nested files. A CPU fixture verifies these exclusions and rejects an incorrect rank-7 start step. Stage profiling initially failed because a wrapper changed a static method's binding; that failed attempt is retained and a descriptor-preserving retry has been queued.

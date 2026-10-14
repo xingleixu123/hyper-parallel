@@ -120,5 +120,20 @@
       "different_numeric_summaries": 28,
       "max_small_tensor_abs": 0.0001977682113647461
     }
+  },
+  "measurement_context": {
+    "model_integration_modes": {
+      "production-fp32-fsdp8-runtime3": "runtime",
+      "production-fp32-tp2ep2-runtime3": "runtime"
+    },
+    "eligible_for_matching_build_mode_performance_comparison": false,
+    "excluded_reasons": [
+      "production-fp32-fsdp8-runtime3: model_integration mode is runtime",
+      "production-fp32-fsdp8-runtime3: diagnostic observations: ['ns-batches-rank*.jsonl']",
+      "production-fp32-tp2ep2-runtime3: model_integration mode is runtime",
+      "production-fp32-tp2ep2-runtime3: diagnostic observations: ['ns-batches-rank*.jsonl']"
+    ],
+    "common_observations": "Per-step scalar metrics and input identity capture, including NPU-to-CPU copies/hash work.",
+    "scope": "Build-mode comparisons retain matching input evidence overhead; they are not raw uninstrumented Trainer latency. Numerical gates are independent."
   }
 }

@@ -13,8 +13,10 @@
 | 5 | full 重算未覆盖完整 MTP decoder | [PR #195](https://github.com/hf1s/hyper-parallel/pull/195)。补齐 trunk/MTP block 识别、幂等与 JT 重入路径约束。旧配置 loss 相同并不能证明重算覆盖正确。 |
 | 6 | 重算重放再次提交 MoE 路由计数 | [PR #196](https://github.com/hf1s/hyper-parallel/pull/196)。保留张量计算，只禁止重放的持久统计更新。覆盖 full/selective、不同 loss 路径及多微批；修复后 FSDP full/selective 200 步误差均为 0。 |
 | 7 | 续训后累计 token/sample 监控从零开始 | [PR #197](https://github.com/hf1s/hyper-parallel/pull/197)。保存并恢复 meter 累计量，兼容旧 checkpoint。真实续训 200 步、8 rank 的 loss/梯度/累计计数与连续参考均一致。 |
+| 8 | 专家局部权重梯度先舍入到BF16，FP32归约不能恢复 | [PR #200](https://github.com/hf1s/hyper-parallel/pull/200)。提供默认关闭的FP32累加选项，显式参数归属及FSDP消费。CPU与真实2卡累积/共享权重/重算ST通过；尚不代表跨拓扑200步达标。 |
+| 9 | Muon NS输入、计算及更新传输的精度无法配置和恢复 | [PR #201](https://github.com/hf1s/hyper-parallel/pull/201)。保留BF16默认，新增可持久化的FP32选项和旧checkpoint兼容。CPU及真实8卡/2卡ST通过；原成本归因已撤回，保留BF16默认并补测相同观测设置下的性能。 |
 
-六个 PR 均为独立单提交，并经过 Standards / Spec 两轴检视及相应测试。当前仍为 draft，GitHub 没有已验证的完整 CI 成功结果；详细状态见 `reports/pr-verification.json`。目前修复中，#194 的正确性优先级最高，#198 的实测显存收益最明确。
+八个 PR 均为独立单提交，并经过 Standards / Spec 两轴检视及相应测试。当前仍为 draft，GitHub 没有已验证的完整 CI 成功结果；详细状态见 `reports/pr-verification.json`。目前修复中，#194 的正确性优先级最高，#198 的实测显存收益最明确。
 
 ![源参数生命周期修复的显存收益](figures/source-parameter-lifetime.png)
 
@@ -34,20 +36,30 @@
 
 以下为明确标记的诊断插桩，比较双方使用相同数值配方。它们不能代替生产实现验收。
 
-| FP32专家梯度 + 完整FP32 NS | LM最大差 | 日志MTP最大差 | 日志aux最大差 | 未加权MTP最大差 | 未加权aux最大差 | 中位秒/步 | 峰值allocated GiB |
+| FP32专家梯度 + 完整FP32 NS（含runtime观测） | LM最大差 | 日志MTP最大差 | 日志aux最大差 | 未加权MTP最大差 | 未加权aux最大差 | 观测含开销秒/步 | 观测峰值allocated GiB |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | FSDP8参考，200步 | — | — | — | — | — | 6.39175 | 22.28220 |
 | EP2，200步 | 0.0194788 | 0.00905466 | 0.0000128801 | 0.0301822 | 0.128801 | 6.59964 | 21.18306 |
 | CP2，200步 | 0.0152731 | 0.0106752 | 0.0000170822 | 0.0355840 | 0.170822 | 7.06310 | 20.70665 |
 | TP2+EP2，200步 | 0.0149679 | 0.00571430 | 0.0000107335 | 0.0190477 | 0.107335 | 7.46236 | 15.93807 |
 
-完整FP32 NS使 FSDP 步耗时约为原配方的6.8倍，且EP/CP/TP组合仍不达标，因此尚不能推荐。专家梯度补丁、Muon精度选项分别通过独立检视和CPU回归；两者合并后的定向CPU回归为133 passed、83 subtests。修正测试清理接口和空分片观察方式后，专家梯度真实2卡ST为1 passed，Muon真实8卡/2卡ST为2 passed，数值容差未放宽；首次失败证据保留。生产配置FSDP8、EP2、CP2、TP2×EP2各3步集成已完成，全部8rank退出成功且短跑误差小于0.005；不作为200步通过结论。
+性能口径修正：上表四次诊断都开启了`model_integration: runtime`，原始性能基线使用`build`。此前把约6.8倍时间差归因于FP32 NS不成立，现撤回该归因；同口径性能测量待补齐。EP/CP/TP的200步精度仍未达标。专家梯度补丁、Muon精度选项分别通过独立检视和CPU回归；两者合并后的定向CPU回归为133 passed、83 subtests。修正测试清理接口和空分片观察方式后，专家梯度真实2卡ST为1 passed，Muon真实8卡/2卡ST为2 passed，数值容差未放宽；首次失败证据保留。生产配置FSDP8、EP2、CP2、TP2×EP2各3步集成已完成，全部8rank退出成功且短跑误差小于0.005；不作为200步通过结论。
 
 TP 首步的完整分块哈希已将首次偏离定位到第一层输出投影：Q/KV投影输出与 `o_proj` 完整输入共4,608块完全一致，而attention输出采样最大差0.015625。只升高归约精度没有改善；局部投影也使用FP32时，匹配FP32参考的最大差降为0.0009765625，非零采样点比例从38.4%降到0.039%，但后续MLP仍放大残差。FP32投影会改变基线配方，不能与旧BF16基线混用。
 
-FSDP/TP的实际NS矩阵批次一致；EP/CP有4个参数从singleton变为batch2，正用逐矩阵NS消融验证。CPU FP64范数对照已使EP首步28个受观测参数在裁剪前后和更新后的摘要一致，后续仍有差异；该覆盖未包含全部专家参数，且CPU拷贝仅用于定位。纯TP首次测试被融合gate/up连续切分保护拒绝，尚未构成合法纯TP训练验收。详见[定位记录](reports/precision-localization-plan-v5.md)。
+FSDP/TP的实际NS矩阵批次一致；EP/CP有4个参数从singleton变为batch2。逐矩阵NS以及叠加CPU FP64范数的三步消融均完成，仍存在非零差异。稳定范数使EP首步28个受观测参数在裁剪前后和更新后的摘要一致；该覆盖未包含全部专家参数，且CPU拷贝仅用于定位。
+
+纯TP首次测试被融合gate/up连续切分保护拒绝。随后合法的“TP2稠密层、复制专家”配置完成3步：LM最大差0.0004425048828125、加权MTP 0.0002281665802001953、加权aux 5.0320522859692574e-8，全rank初始状态/输入/LR/步骤检查通过。该纯TP配置和EP4均已完成200步，仍未通过：LM最大差分别为0.014084816和0.015380383，未加权MTP为0.02070109和0.01754761，未加权aux为0.17280778和0.18556311。纯TP长跑继承runtime参数观测，7.13563秒/步不用于同原始build基线的性能比较；已另排build模式200步及成对阶段计时。EP4使用build模式，记录1.02918秒/步、21.32290GiB allocated；该口径仍含输入身份采集。CP4正在队列中。稠密层FP32权重梯度消融未消除CP首步的小参数梯度差异。CP首步所有采样前向边界相同；MTP输出梯度最早出现3.64e-12差异，embedding返回梯度的采样相对L2达到0.00633。该结果限于已采样坐标。进一步检查确认LM/MTP/aux的首步loss标量梯度相同；固定512位置的loss分块使MTP decoder输出和主干最终norm输出采样梯度一致，但更早层仍有差异，embedding梯度相对L2从0.00633降至0.00532。该分块消融只跑首步，未达到200步验收。详见[定位记录](reports/precision-localization-plan-v5.md)。
+
+![CP首步梯度偏离](figures/cp-first-backward-divergence.png)
+
+![纯TP复制专家200步](figures/reviewed-tp2-replicated-experts-200-raw.png)
+
+![EP4的200步](figures/reviewed-ep4-off-200-raw.png)
 
 ![TP首步偏离位置](figures/tp-first-divergence.png)
+
+![TP输出投影精度消融](figures/tp-row-precision-ablation.png)
 
 ![EP2诊断：未加权分量](figures/fpgmm-nsall32-ep2-200-raw.png)
 
