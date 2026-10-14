@@ -1,6 +1,6 @@
 # JT DeepSeek V3: eight-910B validation evidence
 
-This immutable snapshot documents completed runs and known failures. It does not claim the complete parallel matrix is accepted.
+Experiments are paused at the user’s request; all owned queues and the container are stopped, with no automatic restart. This immutable snapshot documents completed runs and known failures. It does not claim the complete parallel matrix is accepted.
 
 - Base: hf1s/hyper-parallel JT_dev at ad1c55379767d63ece7e084b0623340b37b83d93.
 - Included PR #180 head: 5de3cceab094bbed18915d1a9c9231ca220629ca (integration 81f141d).
@@ -27,7 +27,7 @@ Step time is the median after excluding the first20 steps of that measured run. 
 | EP2 original |0.014165878|0.003723621|0.000012476|1.019160|30.605194|FAIL|
 | CP2 after chunk support |0.022237778|0.005699873|0.000021477|1.283979|31.183506|FAIL|
 
-Remaining TP/CP/EP drift is being diagnosed. The six-fix follow-up is documented below; EP/CP same-topology memory regressions have passed and are documented below. Module cost ablations and the MLP+norm 200-step check are documented below; additional hybrids remain pending.
+Remaining TP/CP/EP drift is unresolved; investigation is paused. The six-fix follow-up is documented below; EP/CP same-topology memory regressions have passed and are documented below. Module cost ablations and the MLP+norm 200-step check are documented below; additional hybrids remain pending.
 
 Figures are available as PNG and editable SVG; JSON contains all-rank step errors and provenance names. CSV contains scalar measurements and input hashes only, with no training text, weights, checkpoints, or credentials.
 
@@ -78,7 +78,7 @@ Seven recompute policies were compared over 40 steps, with events collected in s
 
 ![Recompute cost](figures/recompute-module-cost.png)
 
-FP32 expert weight gradients plus the complete FP32 NS pipeline do **not** resolve the gate. Completed EP2 and CP2 diagnostics use a matching 200-step FSDP reference; all input, initialization, LR and coverage checks pass, but LM maxima are 0.0194788 and 0.0152731. The recorded FSDP median of6.39175s includes runtime parameter/gradient observations, unlike the original build-only baseline. The earlier6.8x attribution to FP32 NS is withdrawn; an equivalent-observation performance comparison remains pending. TP2+EP2 has now completed: maximum LM/MTP/aux errors are 0.014967918/0.005714297/0.0000107335; the 200-step gate still fails. The separately implemented production precision options have passed their focused NPU ST and four three-step integration runs, not the full training gate.
+FP32 expert weight gradients plus the complete FP32 NS pipeline do **not** resolve the gate. Completed EP2 and CP2 diagnostics use a matching 200-step FSDP reference; all input, initialization, LR and coverage checks pass, but LM maxima are 0.0194788 and 0.0152731. The recorded FSDP median of6.39175s includes runtime parameter/gradient observations, unlike the original build-only baseline. The earlier6.8x attribution to FP32 NS is withdrawn; the matching-build comparison below measures the two production precision options together at +24.25% step time, not the isolated NS cost. TP2+EP2 has now completed: maximum LM/MTP/aux errors are 0.014967918/0.005714297/0.0000107335; the 200-step gate still fails. The separately implemented production precision options have passed their focused NPU ST and four three-step integration runs, not the full training gate.
 
 The additional raw-component audit divides logged MTP/aux by their verified weights0.3/0.0001 and applies0.005 separately. EP2 raw maxima are0.0301822/0.128801; CP2 raw maxima are0.0355840/0.170822. The original weighted reports remain intact. [Detailed diagnostic evidence](reports/parallel-numerical-diagnosis.md) states which findings are sampled and which cover every step/rank.
 
@@ -119,3 +119,20 @@ For the current expanded-Ulysses CP2 strategy, first-step loss derivatives for L
 ![CP backward boundary samples](figures/cp-first-backward-divergence.png)
 
 The performance audit now rejects runtime/unknown modes, explicit profiling, and eleven types of diagnostic trace markers, including nested files. A CPU fixture verifies these exclusions and rejects an incorrect rank-7 start step. Stage profiling initially failed because a wrapper changed a static method's binding; that failed attempt is retained and a descriptor-preserving retry has been queued.
+
+
+## Pause handoff: completed follow-up measurements
+
+The 200-step CP4 run fails the absolute gate (LM0.013643265, weighted MTP0.006476164). TP2 with replicated experts in build mode also fails (LM0.014084816, weighted MTP0.006210327); all its losses and gradient norms exactly match the corresponding runtime-mode run. The build run takes1.416853 seconds/step rather than7.13563 seconds/step with runtime observation. This is observation overhead, not a Muon precision speed ratio.
+
+[Matching-build cost table](reports/matching-build-topology-costs.md) and [machine-readable table](reports/matching-build-topology-costs.json) report time and allocated memory for six layouts. Each uses input CPU-copy/hash observations; no uninstrumented throughput or confidence interval is claimed. Inclusive [stage observations](scalars/tp2-stage-profile.csv) and [rank aggregation](reports/tp2-stage-profile-rank-aggregation.json) retain all8 ranks and sampled steps4–6; nested event names must not be added.
+
+The production FP32 expert-weight-gradient plus FP32 NS recipe completed a new FSDP0–200 baseline:1.165173 seconds/step and22.282196GiB allocated, +24.25% time against the original matching-build FSDP baseline. This measures both options together. Its [self-audit](reports/production-fp32-baseline-self-audit.json) is an integrity check, not independent numerical acceptance. Its resumed201–400 run, continuous400 reference and200-step cross-layout runs have not started. The required step200 checkpoint is retained; no automatic resume is authorized.
+
+[Additional scalar data](scalars/pause-additional-200-step-runs.csv) contains4800 rows (three cases × eight ranks ×200 steps), including patch SHA256 and input identity. [Manifest](reports/pause-additional-runs-manifest.json) and saved YAML configs distinguish the production patch from clean ec2e16b runs. No training text, weights or checkpoint payload is published.
+
+![CP4 raw loss components](figures/reviewed-cp4-off-200-raw.png)
+
+![TP2 build raw loss components](figures/reviewed-tp2-replicated-experts-build-200-raw.png)
+
+An unresolved uneven-shard reconstruction failure is retained separately: for a logical[1,64] tensor sharded on two ranks, full_tensor returned[2,64] on rank0 and[0,64] on rank1 in the original Muon missing-gradient ST. [Rank0 log](reports/dtensor-full-tensor-uneven-rank0.log), [rank1 log](reports/dtensor-full-tensor-uneven-rank1.log) and the [actual historical worker](reports/uneven-full-tensor-observed-worker.txt) retain the failure. The final Muon ST checks local shards against tensor_split with zero tolerance; it does not fix or validate full_tensor reconstruction. A standalone optimizer-free reproduction remains unverified.
