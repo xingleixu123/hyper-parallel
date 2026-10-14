@@ -27,7 +27,7 @@ Step time is the median after excluding the first20 steps of that measured run. 
 | EP2 original |0.014165878|0.003723621|0.000012476|1.019160|30.605194|FAIL|
 | CP2 after chunk support |0.022237778|0.005699873|0.000021477|1.283979|31.183506|FAIL|
 
-Remaining TP/CP/EP drift is being diagnosed. The six-fix follow-up is documented below; EP/CP memory regressions are still running. Full/selective module ablations, additional hybrids, and their acceptance remain pending.
+Remaining TP/CP/EP drift is being diagnosed. The six-fix follow-up is documented below; EP/CP same-topology memory regressions have passed and are documented below. Full/selective module ablations, additional hybrids, and their acceptance remain pending.
 
 Figures are available as PNG and editable SVG; JSON contains all-rank step errors and provenance names. CSV contains scalar measurements and input hashes only, with no training text, weights, checkpoints, or credentials.
 
@@ -44,3 +44,28 @@ The old resume reset cumulative counters: at step 201 it logged 8 samples and 63
 ![Resumed loss alignment](figures/reviewed-fsdp8-resume.png)
 
 `scalars/resume-counter-evidence.csv` contains the exact all-rank source measurements for these comparisons. The large checkpoint was removed only after loss and counter comparisons passed; compact metadata and the file-size inventory are retained locally.
+
+## Initialization parameter lifetime: EP2 and CP2
+
+The scheduler and HSDP state retained full original Parameter objects through source-metadata dictionary keys and explicit replicate-parameter sets after shard construction replaced those parameters. CPU weak-reference tests cover the real shard cloning path, caller-container preservation, and tied aliases. All six old-code lifetime cases fail; the revised five-file CPU suite passes 112 tests and 12 subtests. The new test has no pylint findings; 15 production-file findings and two complexity warnings are unchanged from the base.
+
+| Configuration | Allocated before / after GiB | Saved GiB | Reserved before / after GiB | Median seconds before / after | Same-topology loss and gradient errors |
+|---|---:|---:|---:|---:|---:|
+| EP2 | 30.605194 / 21.183023 | 9.422171 | 36.138672 / 26.724609 | 1.019160 / 1.020075 | exactly 0 |
+| CP2 | 31.183506 / 21.058210 | 10.125296 | 36.394531 / 26.021484 | 1.283979 / 1.285255 | exactly 0 |
+
+Each comparison covers 200 steps and all eight ranks. Time medians exclude 20 warmup steps. The actual saved memory agrees with the independently estimated retained parameter storage. Timing differences below 0.1% in these single runs are not evidence of a throughput change. FSDP8 allocated memory remains 22.633759 GiB.
+
+The EP2 pre-fix source is the #180 integration `81f141d`; the CP2 pre-fix source is the four-fix integration `6e762be`. Both follow-ups use `ec2e16b`. Other integrated fixes are disclosed above; exact same-topology loss equality does not mean EP2 or CP2 now meets the cross-topology FSDP tolerance. Those outstanding errors remain listed in the earlier table.
+
+![Measured memory and step time](figures/source-parameter-lifetime.png)
+
+![EP2 same-topology loss regression](figures/reviewed-ep2-memory.png)
+
+![CP2 same-topology loss regression](figures/reviewed-cp2-memory.png)
+
+## CP chunked-loss distributed regression
+
+The four-process NPU launcher `tests/torch/context_parallel/test_jt_mla_cp.py` passed in 47.19 seconds on `ec2e16b` (four inherited unknown-pytest-marker warnings). Worker output records 16 steps: two steps for each of six existing CP strategy/TP/SP combinations, plus two steps each for chunk size 48 under TP1+CP4 and TP2+SP+CP2. The latter also uses EP4 for fused experts. Existing ST relative tolerances are distinct from the 200-step absolute loss gate; no stricter claim is inferred from this test.
+
+The ordinary CP2 training demo with chunk size 4096 now completes 200 steps without the previous configuration rejection. Its remaining cross-topology loss error is still a failure and is under numerical diagnosis.
