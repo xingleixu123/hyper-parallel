@@ -29,6 +29,7 @@ from torch import nn
 from torch.nn import functional as F
 
 from hyper_parallel.components.losses import calculate_seq_aux_loss
+from hyper_parallel.components.losses.chunked_cross_entropy import projected_cross_entropy
 from hyper_parallel.core.dtensor.dtensor import DTensor
 from hyper_parallel.core.utils.communication import differentiable_all_reduce
 from hyper_parallel.distributed._builder.forward_rewriter import _ForwardRewriteRequest
@@ -296,6 +297,23 @@ class _JTTrainingContext:
         ).reshape(())
         return numerator / count.clamp_min(1)
 
+    def projection_loss(self, hidden: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """Checkpoint local projection chunks using the objective's global CP count."""
+        count = targets.ge(0).sum()
+        dist.all_reduce(count, op=dist.ReduceOp.SUM, group=self.cp_group)
+        denominator = count.clamp_min(1)
+
+        def loss_function(**kwargs: Any) -> torch.Tensor:
+            """Reuse one CP denominator during forward and checkpoint recomputation."""
+            kwargs["num_items_in_batch"] = denominator
+            return self.model.loss_function(**kwargs)
+
+        return projected_cross_entropy(
+            hidden, targets, head=self.model.lm_head, loss_fn=loss_function,
+            vocab_size=self.model.config.vocab_size, chunk_size=self.model.loss_chunk_size,
+            sequence_parallel_size=self.model.loss_sequence_parallel_size, tp_mesh=self.model.loss_tp_mesh,
+        )
+
     def routing_statistics(self, module: JTDeepseekV3MoE, indices: torch.Tensor,
                            scores: torch.Tensor) -> torch.Tensor:
         """Reuse the public sequence objective without duplicating the root CP sum.
@@ -318,8 +336,6 @@ def configure_context_parallel(model: nn.Module, mesh: Any) -> None:
     """
     if mesh.cp_size <= 1:
         return
-    if getattr(model, "loss_chunk_size", 0):
-        raise ValueError("JT chunked projection loss requires cp_size=1; set loss_chunk_size=0 for CP")
     if getattr(model, "jt_cp_context", None) is not None:
         raise ValueError("JT model context parallelism is already installed")
     attentions = [module for module in model.modules() if isinstance(module, JTDeepseekV3MLAAttention)]
@@ -330,6 +346,7 @@ def configure_context_parallel(model: nn.Module, mesh: Any) -> None:
     model.register_forward_pre_hook(context.prepare, with_kwargs=True)
     model.register_forward_hook(context.reduce_losses)
     model._token_loss = context.token_loss
+    model._projection_loss = context.projection_loss
     model.shift_mtp_inputs = context.shift_inputs
     for module in model.modules():
         if isinstance(module, JTDeepseekV3MoE):

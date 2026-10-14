@@ -81,10 +81,10 @@ class TestJTPacked(unittest.TestCase):
             {name: parameter.grad for name, parameter in eager.named_parameters()}, rtol=3e-4, atol=2e-6)
 
     @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
-    def test_chunking_rejects_cp_before_installing_runtime(self) -> None:
-        """Local chunk denominators must not bypass the upstream global CP normalization."""
+    def test_chunking_still_requires_cp_attention_wrappers(self) -> None:
+        """Chunked loss cannot bypass the attention-level context-parallel contract."""
         model = JTDeepseekV3ForCausalLM(small_config())
         model.loss_chunk_size = 4
-        with self.assertRaisesRegex(ValueError, "loss_chunk_size=0 for CP"):
+        with self.assertRaisesRegex(ValueError, "explicit MLA wrappers"):
             configure_context_parallel(model, SimpleNamespace(cp_size=2))
         self.assertFalse(hasattr(model, "jt_cp_context"))

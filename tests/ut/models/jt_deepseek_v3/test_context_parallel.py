@@ -22,6 +22,8 @@ from unittest.mock import patch
 
 import torch
 from torch.nn import functional as F
+from torch.utils.checkpoint import DefaultDeviceType
+from transformers.loss.loss_utils import ForCausalLMLoss
 
 from hyper_parallel.components.modules.mtp import DeepseekV3MTP
 from hyper_parallel.components.losses import calculate_mtp_loss
@@ -37,6 +39,7 @@ from hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3 import (
     JTDeepseekV3Attention, observed_fusion_attention,
 )
 from hyper_parallel.models.jt_deepseek_v3.adapter.runtime import jt_optimizer
+from tests.common.mark_utils import arg_mark
 
 
 class TestJTContextParallel(unittest.TestCase):
@@ -119,6 +122,82 @@ class TestJTContextParallel(unittest.TestCase):
         expected = F.cross_entropy(logits.flatten(0, 1), labels.flatten(), reduction="sum") / 4
         torch.testing.assert_close(value, expected)
         torch.testing.assert_close(torch.autograd.grad(value, logits)[0], torch.autograd.grad(expected, logits)[0])
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_chunked_projection_matches_global_loss_and_gradients(self) -> None:
+        """Keep one global objective denominator for uneven and empty CP shards.
+
+        Feature: Chunked JT LM and MTP loss under context parallelism.
+        Description: Sum two local chunked projections and compare with a full-sequence CE oracle.
+        Expectation: Loss, hidden gradients and head gradients agree; backward repeats no count collective.
+        """
+        self.addCleanup(DefaultDeviceType.set_device_type, DefaultDeviceType.get_device_type())
+        DefaultDeviceType.set_device_type("cpu")
+        torch.manual_seed(59)
+        for labels in (torch.tensor([[1, -100, -100, -100, 3, 2, 1, -100]]),
+                       torch.tensor([[-100, -100, -100, -100, 3, 2, 1, -100]])):
+            with self.subTest(labels=labels.tolist()):
+                head = torch.nn.Linear(4, 7, bias=False)
+                reference_head = deepcopy(head)
+                hidden = torch.randn(1, 8, 4, requires_grad=True)
+                reference_hidden = hidden.detach().clone().requires_grad_()
+                context = object.__new__(_JTTrainingContext)
+                context.cp_group = "cp"
+                context.model = SimpleNamespace(
+                    lm_head=head, loss_function=ForCausalLMLoss, config=SimpleNamespace(vocab_size=7),
+                    loss_chunk_size=3, loss_sequence_parallel_size=1, loss_tp_mesh=None,
+                )
+                valid_count = labels.ge(0).sum()
+                expected = F.cross_entropy(reference_head(reference_hidden).flatten(0, 1), labels.flatten())
+                with patch("hyper_parallel.models.jt_deepseek_v3.adapter.distributed.context_parallel.dist.all_reduce",
+                           side_effect=lambda count, **_kwargs: count.copy_(valid_count)) as reduce:
+                    actual = sum(context.projection_loss(states, targets)
+                                 for states, targets in zip(hidden.chunk(2, 1), labels.chunk(2, 1)))
+                    torch.testing.assert_close(actual, expected, rtol=1e-6, atol=1e-7)
+                    actual.backward()
+                    self.assertEqual(reduce.call_count, 2, f"expected=2 count collectives, got={reduce.call_count}")
+                expected.backward()
+                torch.testing.assert_close(hidden.grad, reference_hidden.grad, rtol=1e-6, atol=1e-7)
+                torch.testing.assert_close(head.weight.grad, reference_head.weight.grad, rtol=1e-6, atol=1e-7)
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_chunked_mtp_depths_keep_independent_denominators(self) -> None:
+        """Retain distinct normalization counts across two queued MTP objectives.
+
+        Feature: Multiple MTP depths with CP chunking.
+        Description: Score two future-target sets with different valid counts and one shared head.
+        Expectation: Joint backward matches the full-sequence oracle for both hidden states and the head.
+        """
+        self.addCleanup(DefaultDeviceType.set_device_type, DefaultDeviceType.get_device_type())
+        DefaultDeviceType.set_device_type("cpu")
+        torch.manual_seed(61)
+        head = torch.nn.Linear(4, 7, bias=False)
+        reference_head = deepcopy(head)
+        predictions = [torch.randn(1, 8, 4, requires_grad=True) for _ in range(2)]
+        reference_predictions = [value.detach().clone().requires_grad_() for value in predictions]
+        targets = [torch.tensor([[1, -100, -100, 3, 2, 1, -100, -100]]),
+                   torch.tensor([[-100, -100, 3, 2, 1, -100, -100, -100]])]
+        context = object.__new__(_JTTrainingContext)
+        context.cp_group = "cp"
+        context.model = SimpleNamespace(
+            lm_head=head, loss_function=ForCausalLMLoss, config=SimpleNamespace(vocab_size=7),
+            loss_chunk_size=3, loss_sequence_parallel_size=1, loss_tp_mesh=None,
+        )
+        expected = sum(F.cross_entropy(reference_head(hidden).flatten(0, 1), labels.flatten()) * 0.15
+                       for hidden, labels in zip(reference_predictions, targets))
+        counts = iter([labels.ge(0).sum() for labels in targets for _rank in range(2)])
+        with patch("hyper_parallel.models.jt_deepseek_v3.adapter.distributed.context_parallel.dist.all_reduce",
+                   side_effect=lambda count, **_kwargs: count.copy_(next(counts))) as reduce:
+            actual = sum(context.projection_loss(states, labels) * 0.15
+                         for hidden, target in zip(predictions, targets)
+                         for states, labels in zip(hidden.chunk(2, 1), target.chunk(2, 1)))
+            actual.backward()
+            self.assertEqual(reduce.call_count, 4, f"expected=4 count collectives, got={reduce.call_count}")
+        expected.backward()
+        torch.testing.assert_close(actual, expected, rtol=1e-6, atol=1e-7)
+        for actual_hidden, expected_hidden in zip(predictions, reference_predictions):
+            torch.testing.assert_close(actual_hidden.grad, expected_hidden.grad, rtol=1e-6, atol=1e-7)
+        torch.testing.assert_close(head.weight.grad, reference_head.weight.grad, rtol=1e-6, atol=1e-7)
 
     def test_head_divisibility_fails_before_communication(self):
         """The TP-local head shard divides evenly over the CP mesh."""
