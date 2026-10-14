@@ -78,7 +78,7 @@ Seven recompute policies were compared over 40 steps, with events collected in s
 
 ![Recompute cost](figures/recompute-module-cost.png)
 
-FP32 expert weight gradients plus the complete FP32 NS pipeline do **not** resolve the gate. Completed EP2 and CP2 diagnostics use a matching 200-step FSDP reference; all input, initialization, LR and coverage checks pass, but LM maxima are 0.0194788 and 0.0152731. FSDP median time rises to6.39175s, roughly6.8 times the original recipe, so this is not a recommended production recipe. TP2+EP2 and actual production-option integration tests were still pending at this snapshot.
+FP32 expert weight gradients plus the complete FP32 NS pipeline do **not** resolve the gate. Completed EP2 and CP2 diagnostics use a matching 200-step FSDP reference; all input, initialization, LR and coverage checks pass, but LM maxima are 0.0194788 and 0.0152731. FSDP median time rises to6.39175s, roughly6.8 times the original recipe, so this is not a recommended production recipe. TP2+EP2 has now completed: maximum LM/MTP/aux errors are 0.014967918/0.005714297/0.0000107335; the 200-step gate still fails. The separately implemented production precision options have passed their focused NPU ST and four three-step integration runs, not the full training gate.
 
 The additional raw-component audit divides logged MTP/aux by their verified weights0.3/0.0001 and applies0.005 separately. EP2 raw maxima are0.0301822/0.128801; CP2 raw maxima are0.0355840/0.170822. The original weighted reports remain intact. [Detailed diagnostic evidence](reports/parallel-numerical-diagnosis.md) states which findings are sampled and which cover every step/rank.
 
@@ -86,4 +86,19 @@ The additional raw-component audit divides logged MTP/aux by their verified weig
 
 ![CP2 diagnostic raw losses](figures/fpgmm-nsall32-cp2-200-raw.png)
 
-The [precision CSV](scalars/precision-diagnostics.csv) contains9600 scalar rows from six completed runs, with a distinct diagnostic-hook flag. No training text or weight tensors are published.
+The [precision CSV](scalars/precision-diagnostics.csv) contains11200 scalar rows from seven completed runs, with a distinct diagnostic-hook flag. No training text or weight tensors are published.
+
+
+## First-forward localization and precision-option ST
+
+The first TP divergence occurs after the first attention output projection. Complete Q/KV outputs and o_proj inputs match in all 4,608 whole-sequence feature-block digests. Numerical output charts use sampled coordinates and do not establish complete tensor equality. [Input audit](reports/first-step-projection-input-audit.json) and [localization record](reports/precision-localization-plan-v5.md) describe coverage.
+
+![First TP divergence](figures/tp-first-divergence.png)
+
+FP32 reduction alone leaves the BF16 local projection error unchanged. Using FP32 local math reduces first-attention sampled error substantially against a matching FP32 reference; later norm/MLP still amplify residual differences. This changes backward as well and is only a first-forward causal ablation.
+
+![Row projection precision ablation](figures/tp-row-precision-ablation.png)
+
+The expert-gradient production patch passes its two-NPU shared-weight/accumulation/recompute ST. The Muon precision option passes eight-NPU full/hybrid updates and two-NPU missing-gradient/empty-shard tests. [Exact patch receipts](reports/precision-production-st-receipt.json) retain test retry and file-mode details. The combined production source passes four three-step smoke runs; no 200-step production-option pass or performance advantage is claimed.
+
+![Completed TP2+EP2 FP32 diagnostic, unweighted losses](figures/fpgmm-nsall32-tp2ep2-200-raw.png)

@@ -1,0 +1,124 @@
+{
+  "reference": "production-fp32-fsdp8-runtime3",
+  "candidate": "production-fp32-tp2ep2-runtime3",
+  "steps": [
+    1,
+    3
+  ],
+  "ranks": 8,
+  "tolerance_absolute": 0.005,
+  "status": "PASS",
+  "findings": [],
+  "errors": {
+    "training/total_loss": {
+      "max_abs": 0.0005817413330078125,
+      "step": 3,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.000438690185546875,
+      "step": 3,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.0002415180206298828,
+      "step": 2,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 1.2057716958224773e-07,
+      "step": 3,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.0028028488159179688,
+      "step": 3,
+      "rank": 0
+    }
+  },
+  "input_mismatch_count": 0,
+  "input_mismatch_examples": [],
+  "initial_mismatches": [],
+  "step_errors": {
+    "training/total_loss": [
+      0.0003509521484375,
+      0.0003147125244140625,
+      0.0005817413330078125
+    ],
+    "training/foundation_loss/lm": [
+      0.00013637542724609375,
+      7.343292236328125e-05,
+      0.000438690185546875
+    ],
+    "training/foundation_loss/mtp": [
+      0.00021123886108398438,
+      0.0002415180206298828,
+      0.00014400482177734375
+    ],
+    "training/foundation_loss/aux": [
+      3.166496753692627e-08,
+      4.6711647883057594e-09,
+      1.2057716958224773e-07
+    ]
+  },
+  "loss_units": {
+    "lm": "unweighted",
+    "mtp": "weighted by 0.3",
+    "aux": "weighted by 0.0001"
+  },
+  "unweighted_error_diagnostics": {
+    "mtp": 0.0008050600687662761,
+    "aux": 0.0012057716958224773
+  },
+  "performance": {
+    "warmup_steps_excluded": 20,
+    "median_step_seconds": null,
+    "processed_tokens_per_second": null,
+    "supervised_tokens_per_second": null,
+    "allocated_gib": 15.895545959472656,
+    "reserved_gib": 17.349609375
+  },
+  "scope": "Three-step diagnostic only. Not the required 200-step acceptance or a throughput result.",
+  "raw_component_gate": {
+    "tolerance_absolute": 0.005,
+    "status": "PASS"
+  },
+  "ns_batch_changes_step1": {},
+  "parameter_stages_step1": {
+    "main_before": {
+      "records": 28,
+      "different_comparable_digests": 0,
+      "comparable_digests": 0,
+      "different_numeric_summaries": 4,
+      "max_small_tensor_abs": 0.0
+    },
+    "main_grad_before_clip": {
+      "records": 28,
+      "different_comparable_digests": 0,
+      "comparable_digests": 0,
+      "different_numeric_summaries": 28,
+      "max_small_tensor_abs": 0.00014543533325195312
+    },
+    "main_grad_after_clip": {
+      "records": 28,
+      "different_comparable_digests": 0,
+      "comparable_digests": 0,
+      "different_numeric_summaries": 28,
+      "max_small_tensor_abs": 6.472284439951181e-06
+    },
+    "main_after_optimizer": {
+      "records": 28,
+      "different_comparable_digests": 0,
+      "comparable_digests": 0,
+      "different_numeric_summaries": 28,
+      "max_small_tensor_abs": 0.0001977682113647461
+    },
+    "model_after_copy_back": {
+      "records": 28,
+      "different_comparable_digests": 0,
+      "comparable_digests": 0,
+      "different_numeric_summaries": 28,
+      "max_small_tensor_abs": 0.0001977682113647461
+    }
+  }
+}
