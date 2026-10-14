@@ -27,7 +27,7 @@ Step time is the median after excluding the first20 steps of that measured run. 
 | EP2 original |0.014165878|0.003723621|0.000012476|1.019160|30.605194|FAIL|
 | CP2 after chunk support |0.022237778|0.005699873|0.000021477|1.283979|31.183506|FAIL|
 
-Remaining TP/CP/EP drift is being diagnosed. The six-fix follow-up is documented below; EP/CP same-topology memory regressions have passed and are documented below. Full/selective module ablations, additional hybrids, and their acceptance remain pending.
+Remaining TP/CP/EP drift is being diagnosed. The six-fix follow-up is documented below; EP/CP same-topology memory regressions have passed and are documented below. Module cost ablations and the MLP+norm 200-step check are documented below; additional hybrids remain pending.
 
 Figures are available as PNG and editable SVG; JSON contains all-rank step errors and provenance names. CSV contains scalar measurements and input hashes only, with no training text, weights, checkpoints, or credentials.
 
@@ -69,3 +69,21 @@ The EP2 pre-fix source is the #180 integration `81f141d`; the CP2 pre-fix source
 The four-process NPU launcher `tests/torch/context_parallel/test_jt_mla_cp.py` passed in 47.19 seconds on `ec2e16b` (four inherited unknown-pytest-marker warnings). Worker output records 16 steps: two steps for each of six existing CP strategy/TP/SP combinations, plus two steps each for chunk size 48 under TP1+CP4 and TP2+SP+CP2. The latter also uses EP4 for fused experts. Existing ST relative tolerances are distinct from the 200-step absolute loss gate; no stricter claim is inferred from this test.
 
 The ordinary CP2 training demo with chunk size 4096 now completes 200 steps without the previous configuration rejection. Its remaining cross-topology loss error is still a failure and is under numerical diagnosis.
+
+## Ranked findings, recompute costs and precision diagnostics
+
+[中文问题排序与完整曲线](REPORT_ZH.md) distinguishes completed fixes from the outstanding cross-topology gate. The six draft PRs each have one commit; [current-head receipts](reports/pr-verification.json) do not establish CI success.
+
+Seven recompute policies were compared over 40 steps, with events collected in separate 12-step runs. Every observed loss and gradient matches the off reference exactly on all eight ranks. MLP+norm additionally completed 200 exact steps, saving 1.1654 GiB for about 2% additional step time. Full/selective cost about 9.13%/8.50% in the same-source 40-step study. Module paths are experimental wrappers, not an existing JT YAML feature. [Measurement definitions](reports/recompute-cost-analysis.md) and [pinned current MF/Megatron source comparison](reports/recompute-reference-comparison.md) document the boundaries.
+
+![Recompute cost](figures/recompute-module-cost.png)
+
+FP32 expert weight gradients plus the complete FP32 NS pipeline do **not** resolve the gate. Completed EP2 and CP2 diagnostics use a matching 200-step FSDP reference; all input, initialization, LR and coverage checks pass, but LM maxima are 0.0194788 and 0.0152731. FSDP median time rises to6.39175s, roughly6.8 times the original recipe, so this is not a recommended production recipe. TP2+EP2 and actual production-option integration tests were still pending at this snapshot.
+
+The additional raw-component audit divides logged MTP/aux by their verified weights0.3/0.0001 and applies0.005 separately. EP2 raw maxima are0.0301822/0.128801; CP2 raw maxima are0.0355840/0.170822. The original weighted reports remain intact. [Detailed diagnostic evidence](reports/parallel-numerical-diagnosis.md) states which findings are sampled and which cover every step/rank.
+
+![EP2 diagnostic raw losses](figures/fpgmm-nsall32-ep2-200-raw.png)
+
+![CP2 diagnostic raw losses](figures/fpgmm-nsall32-cp2-200-raw.png)
+
+The [precision CSV](scalars/precision-diagnostics.csv) contains9600 scalar rows from six completed runs, with a distinct diagnostic-hook flag. No training text or weight tensors are published.
