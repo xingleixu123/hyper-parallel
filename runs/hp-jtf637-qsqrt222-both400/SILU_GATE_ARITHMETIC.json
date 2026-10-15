@@ -1,0 +1,13 @@
+{
+  "scope": "all",
+  "modules": [
+    "model.layers.0.mlp",
+    "model.layers.1.mlp.shared_experts",
+    "mtp.layers.0.transformer_layer.mlp.shared_experts"
+  ],
+  "teacher_values_used": false,
+  "gate_formula": "(dy.float()*up.float())*((sigmoid(x)+silu(x))-silu(x)*sigmoid(x))",
+  "forward_unchanged": true,
+  "up_derivative_unchanged": true,
+  "classification": "Archive graph arithmetic compatibility experiment; no mathematical-bug claim"
+}

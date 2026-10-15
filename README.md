@@ -1,8 +1,8 @@
 # JT单卡200→400步公开实验记录
 
-截至2026年10月16日，87组独立完整200步实验尚无全部六项指标通过者。参考值替换诊断不纳入验收。本目录发布指标、状态哈希、配置、观测/比较脚本，不包含训练数据、模型或优化器大数组。
+截至2026年10月16日，89组独立完整200步实验尚无全部六项指标通过者。参考值替换诊断不纳入验收。本目录发布指标、状态哈希、配置、观测/比较脚本，不包含训练数据、模型或优化器大数组。
 
-- `evidence/completed-cann92-inventory.csv`：87组逐项统计、源码版本和比较文件。
+- `evidence/completed-cann92-inventory.csv`：89组逐项统计、源码版本和比较文件。
 - `runs/`：原始未截断指标、实际恢复清单、源码标识和因素范围。
 - `configs/`：实际配置；环境路径需映射到复现环境。
 - `scripts/`：共同观察/比较程序。`scripts/latest-jt-f637`对应远端`/alignment/phase12/tools-f637`；源清单校验固定49份依赖，新增因素另记运行时SHA256。
@@ -119,3 +119,14 @@ router206实际梯度、动量均相同，12个更新权重差异被定位到原
 [六项完整200步审计](evidence/norm219-independent200-audit.json) · [26步模型首差](evidence/norm219-independent26-audit.json) · [222完整状态](evidence/frontier222-state-comparison.json)
 
 ![219归一化完整窗口](evidence/norm219-independent200-loss-errors.png)
+
+
+## 第88／89组：Q开方完整窗口的背景依赖与226新首差
+
+[详细中文阶段记录](阶段记录-222Q开方与226梯度首差.md)。实际222两项Q的旧状态、裁剪梯度和新动量精确，仅CPU→NPU开方就完整复现MF更新；高精度比较却显示主Q原CPU更近、MTP Q为NPU更近，不能将兼容性当数学正确性。
+
+两组独立200步均已完成、保真通过，累计89组仍无六项全过。Q因素在219组合背景使total均值0.011918712→0.008506739，在expert背景反而0.004717957→0.012623570；首次超限后移均不代表通过。组合背景模型精确推进到225，226首次43项FP32/30项BF16不同且梯度范数分开，正在核对裁剪前梯度。
+
+[完整200步审计](evidence/qsqrt222-independent200-audit.json) · [26步全部模型哈希审计](evidence/qsqrt222-independent26-audit.json) · [同输入及FP64比较](evidence/frontier222-q-ns-comparison.json)
+
+![Q开方完整窗口](evidence/qsqrt222-independent200-loss-errors.png)

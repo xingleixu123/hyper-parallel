@@ -1,5 +1,5 @@
 {
-  "complete_runs": 87,
+  "complete_runs": 89,
   "excluded": [
     {
       "run": "hp-cann92-jt81-best-mf-bias-diag",
@@ -8995,6 +8995,274 @@
       },
       "numerical_passed": false,
       "scope": "独立归档归一化消融；保留前阶段分段兼容因素，不代表未修改的库默认配方"
+    },
+    {
+      "run": "hp-jtf637-qsqrt222-both400",
+      "source_revision": {
+        "commit": "9213a97147020fb75e7a98a40f7e7b636f98d349",
+        "upstream_commit": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+        "included_prs": [
+          180,
+          186,
+          192
+        ],
+        "files": [
+          {
+            "path": "docs/guide/trainer/yaml_config.md",
+            "sha256": "d040b970ccd4825e94cf9136bec98bcce40667c5b289f68925aafe843eee31a4"
+          },
+          {
+            "path": "examples/training_demo/jt_deepseek_v3/hp_4k_1_card.yaml",
+            "sha256": "8d87e26e313dac4149e2381e837777b248628e22b1572619b6b0047f32a62f9e"
+          },
+          {
+            "path": "hyper_parallel/components/losses/chunked_cross_entropy.py",
+            "sha256": "c04523a41332786e375d6ca6cc16b3a2c4abc92e2fac88179180318aede0b3dc"
+          },
+          {
+            "path": "hyper_parallel/distributed/context_parallel/mla_context_parallel.py",
+            "sha256": "2b2cb46255ab34e142157345e476565c8e847a25e721534303bc660914bf4be7"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+            "sha256": "2b02c3ec956e1eea7497e6075f184b4895b3ad3da76859ea9f67b6410ba87106"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+            "sha256": "48805960068f49dca055a6f03fa440bf9def9ecf0a22e82664bf368af4097bc5"
+          },
+          {
+            "path": "hyper_parallel/trainer/base.py",
+            "sha256": "ac9694cd1c0462a8282884d04911ba0394049b68d74e10ec32783e02fbe98511"
+          },
+          {
+            "path": "hyper_parallel/trainer/config/training.py",
+            "sha256": "dd031eb16a283d4a5ea416151a10f5cc5d4837093e64979ca3462f8eb80e3cf4"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/metrics.py",
+            "sha256": "7977dd6f462f4ed2e24e615e0b9a2e70f071626b3a556c9a5750a80afa004298"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/random.py",
+            "sha256": "aef29f61a90824b35faaac4dfa93e2806ce62dc98fda2713d3aa3b38e2e07be7"
+          },
+          {
+            "path": "tests/ut/auto_models/test_projected_cross_entropy.py",
+            "sha256": "acc9f716e86034351c7b66f3a88aec6ceaf289aa34ecf6af92b94d014bd999ee"
+          },
+          {
+            "path": "tests/ut/models/jt_deepseek_v3/test_jt_packed.py",
+            "sha256": "6e80ef23309fd10d457a19a29328db986233d5920d07ee47e7b206d5c9cbf763"
+          },
+          {
+            "path": "tests/ut/trainer/runtime/test_random.py",
+            "sha256": "8ef3264da1d1e2ca108940e47d0fba98ab9c6ed2eccde04e49a82e8a9eb1b23c"
+          },
+          {
+            "path": "tests/ut/trainer/test_config_overrides.py",
+            "sha256": "6b9ae652ad1529d5953b532c5e945e3e4792819a56b706b71577cfad14cdc881"
+          },
+          {
+            "path": "tests/ut/trainer/test_loss_metrics.py",
+            "sha256": "6180255a7877f8eb06cfd6c3deb4feeac0dc06db45987084c69b6906b96f0fd7"
+          }
+        ]
+      },
+      "metrics_sha256": "73ae1859dbc3f8c878c6995b7fd44852cd2f4a61c667d7337fd3178c3ad60ced",
+      "comparison": "evidence/qsqrt222-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.33403682708740234,
+          "max_step": 399,
+          "mean": 0.008506739139556884,
+          "last": 0.03078746795654297,
+          "passed": false,
+          "over_window_tolerance": 50
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.2774667739868164,
+          "max_step": 399,
+          "mean": 0.006858963966369629,
+          "last": 0.028784751892089844,
+          "passed": false,
+          "over_window_tolerance": 38
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.05667829513549805,
+          "max_step": 399,
+          "mean": 0.002626059651374817,
+          "last": 0.0020415782928466797,
+          "passed": false,
+          "over_window_tolerance": 27
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.18892765045166016,
+          "max_step": 399,
+          "mean": 0.008753532171249355,
+          "last": 0.006805260976156191,
+          "passed": false,
+          "over_window_tolerance": 89
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 0.00012939295968972145,
+          "max_step": 398,
+          "mean": 5.306503188330678e-06,
+          "last": 3.8887840323150184e-05,
+          "passed": true,
+          "over_window_tolerance": 0
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 1.2939295968972147,
+          "max_step": 398,
+          "mean": 0.0530650318833068,
+          "last": 0.3888784032315016,
+          "passed": false,
+          "over_window_tolerance": 122
+        }
+      },
+      "numerical_passed": false,
+      "scope": "独立Q开方兼容消融；分别在219组合/专家背景仅改一个因素，不代表未修改库默认配方"
+    },
+    {
+      "run": "hp-jtf637-qsqrt222-expert400",
+      "source_revision": {
+        "commit": "9213a97147020fb75e7a98a40f7e7b636f98d349",
+        "upstream_commit": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+        "included_prs": [
+          180,
+          186,
+          192
+        ],
+        "files": [
+          {
+            "path": "docs/guide/trainer/yaml_config.md",
+            "sha256": "d040b970ccd4825e94cf9136bec98bcce40667c5b289f68925aafe843eee31a4"
+          },
+          {
+            "path": "examples/training_demo/jt_deepseek_v3/hp_4k_1_card.yaml",
+            "sha256": "8d87e26e313dac4149e2381e837777b248628e22b1572619b6b0047f32a62f9e"
+          },
+          {
+            "path": "hyper_parallel/components/losses/chunked_cross_entropy.py",
+            "sha256": "c04523a41332786e375d6ca6cc16b3a2c4abc92e2fac88179180318aede0b3dc"
+          },
+          {
+            "path": "hyper_parallel/distributed/context_parallel/mla_context_parallel.py",
+            "sha256": "2b2cb46255ab34e142157345e476565c8e847a25e721534303bc660914bf4be7"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+            "sha256": "2b02c3ec956e1eea7497e6075f184b4895b3ad3da76859ea9f67b6410ba87106"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+            "sha256": "48805960068f49dca055a6f03fa440bf9def9ecf0a22e82664bf368af4097bc5"
+          },
+          {
+            "path": "hyper_parallel/trainer/base.py",
+            "sha256": "ac9694cd1c0462a8282884d04911ba0394049b68d74e10ec32783e02fbe98511"
+          },
+          {
+            "path": "hyper_parallel/trainer/config/training.py",
+            "sha256": "dd031eb16a283d4a5ea416151a10f5cc5d4837093e64979ca3462f8eb80e3cf4"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/metrics.py",
+            "sha256": "7977dd6f462f4ed2e24e615e0b9a2e70f071626b3a556c9a5750a80afa004298"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/random.py",
+            "sha256": "aef29f61a90824b35faaac4dfa93e2806ce62dc98fda2713d3aa3b38e2e07be7"
+          },
+          {
+            "path": "tests/ut/auto_models/test_projected_cross_entropy.py",
+            "sha256": "acc9f716e86034351c7b66f3a88aec6ceaf289aa34ecf6af92b94d014bd999ee"
+          },
+          {
+            "path": "tests/ut/models/jt_deepseek_v3/test_jt_packed.py",
+            "sha256": "6e80ef23309fd10d457a19a29328db986233d5920d07ee47e7b206d5c9cbf763"
+          },
+          {
+            "path": "tests/ut/trainer/runtime/test_random.py",
+            "sha256": "8ef3264da1d1e2ca108940e47d0fba98ab9c6ed2eccde04e49a82e8a9eb1b23c"
+          },
+          {
+            "path": "tests/ut/trainer/test_config_overrides.py",
+            "sha256": "6b9ae652ad1529d5953b532c5e945e3e4792819a56b706b71577cfad14cdc881"
+          },
+          {
+            "path": "tests/ut/trainer/test_loss_metrics.py",
+            "sha256": "6180255a7877f8eb06cfd6c3deb4feeac0dc06db45987084c69b6906b96f0fd7"
+          }
+        ]
+      },
+      "metrics_sha256": "aedf1bb65887085f4bf9dc5ea2e44295b939ae563b3481476d555726af8ab335",
+      "comparison": "evidence/qsqrt222-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.41706275939941406,
+          "max_step": 399,
+          "mean": 0.012623569965362548,
+          "last": 0.051980018615722656,
+          "passed": false,
+          "over_window_tolerance": 54
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.36284303665161133,
+          "max_step": 397,
+          "mean": 0.010921465158462524,
+          "last": 0.05696868896484375,
+          "passed": false,
+          "over_window_tolerance": 53
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.06232929229736328,
+          "max_step": 399,
+          "mean": 0.0032790741324424744,
+          "last": 0.004898548126220703,
+          "passed": false,
+          "over_window_tolerance": 32
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.207764307657877,
+          "max_step": 399,
+          "mean": 0.010930247108141581,
+          "last": 0.01632849375406842,
+          "passed": false,
+          "over_window_tolerance": 97
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 0.0001503623568918556,
+          "max_step": 397,
+          "mean": 8.198453148826956e-06,
+          "last": 9.048241246491673e-05,
+          "passed": true,
+          "over_window_tolerance": 0
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 1.503623568918556,
+          "max_step": 397,
+          "mean": 0.08198453148826956,
+          "last": 0.9048241246491671,
+          "passed": false,
+          "over_window_tolerance": 124
+        }
+      },
+      "numerical_passed": false,
+      "scope": "独立Q开方兼容消融；分别在219组合/专家背景仅改一个因素，不代表未修改库默认配方"
     }
   ]
 }
