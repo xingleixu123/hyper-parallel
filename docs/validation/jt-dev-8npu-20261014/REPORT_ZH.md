@@ -6,7 +6,7 @@
 
 **当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2和CP2已完整跑完200步但精度失败；TP2仅完成69步前缀，TP及合法组合、完整/选择重算仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
 
-当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部12个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
+当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部13个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
 
 ## 按影响排序的问题、子问题与独立 PR
 
@@ -24,13 +24,28 @@
 | Top8 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 最新固定配方201–400×8rank累计/逐步计数与独立400参考一致；各loss与梯度最大差0；集成结果不全部归因于本PR |
 | Top9 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
 | Top10 | Muon NS 精度无法显式配置并从 checkpoint 恢复 | [#210](https://github.com/hf1s/hyper-parallel/issues/210) | [#201](https://github.com/hf1s/hyper-parallel/pull/201) | 保留 BF16 默认；CPU、8 卡和 2 卡 ST 通过；可选 FP32 成本须匹配配方评估 |
-| Top11 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
-| Top12 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
-| Top13 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；真实69步前缀确认耗时及reserved漏报，修复后NPU/PP通信仍待回归 |
+| Top11 | Trainer向NPU写入无效CUDA属性，不能关闭预先开启的HF32 | [#227](https://github.com/hf1s/hyper-parallel/issues/227) | [#228](https://github.com/hf1s/hyper-parallel/pull/228) | 单提交2文件；真实TorchNPU选项及3项CPU测试/2项子测试通过，两轴检视通过；默认HF32关闭，未证明是CP/EP漂移根因，硬件训练未验 |
+| Top12 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
+| Top13 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
+| Top14 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；真实69步前缀确认耗时及reserved漏报，修复后NPU/PP通信仍待回归 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+
+## 最新补充：NPU精度开关独立修复与完全重算让卡记录（2026-10-16，UTC+8）
+
+新增小问题[#227](https://github.com/hf1s/hyper-parallel/issues/227)和独立单提交草稿PR[#228](https://github.com/hf1s/hyper-parallel/pull/228)，提交`453fe5723429b0e45ee6f0236d6e262cbe58b04f`。Trainer此前向NPU matmul对象写入CUDA风格属性，实际TorchNPU2.12.0静默忽略；先开启HF32再调用高精度函数，旧版仍为true。修复改用`allow_hf32=False`，真实选项读回变为false，NPU运行时始终未初始化；CUDA与CPU策略保持。
+
+同一CPU用例旧版两项NPU子测试失败，修复版3项测试/2项子测试通过；规范与需求两轴检视通过。初版批次尾部JSON读取被驱动stdout文本干扰而退出1，UT已完成；独立JSON输出的后续probe退出0，原始失败与修正均保留。修改后4项lint诊断均为基点继承，不宣称完整lint或CI通过；当前head无check run、combined status为pending。
+
+默认HF32实际读回为关闭，**不能把本缺陷当作当前CP2/EP2数值漂移的已确认根因**。本修复不控制NPU BF16累加，也没有单独的硬件算子/200步训练/性能结论。现有固定源`18602c4`继续用于重算对照；需要改变数值策略时将另建完整参考。
+
+[中文证据与复现边界](reports/npu-precision-switch/README_ZH.md) · [真实后端选项读回](reports/npu-precision-switch/npu-precision-option-after-verified.json) · [修复前UT](reports/npu-precision-switch/npu-precision-ut-before.log) · [修复后UT](reports/npu-precision-switch/npu-precision-ut-after.log) · [规范轴](reports/npu-precision-switch/npu-precision-standards-review.json) · [需求轴](reports/npu-precision-switch/npu-precision-spec-review.json) · [全部文件指纹](reports/npu-precision-switch/manifest.json)。
+
+完全重计算尝试`r129-f637-fp32-fsdp8-full-200`满足全局20分钟间隔及两次空卡检查后启动，0号卡随后出现其他宿主进程。守卫刷新namespace/cgroup确认归属不同，只停止本任务容器；35.41秒后退出137并释放，训练0步、无本任务设备PID残留。31份原始文件逐一核验，公开30份，其他任务归属明细只留本地；两端重复归档已删除。此尝试没有loss、显存或性能验收结果。
+
+[31份采集指纹](reports/f637-fsdp8-full-200-interrupted/f637-fsdp8-full-200-interrupted-evidence-manifest.json) · [SHA核验与归档清理](reports/f637-fsdp8-full-200-interrupted/f637-fsdp8-full-200-interrupted-local-verification.json) · [不含他人身份的归属摘要](reports/f637-fsdp8-full-200-interrupted/ownership-summary.json) · [释放凭据](reports/f637-fsdp8-full-200-interrupted/raw/scheduling/r129-f637-fp32-fsdp8-full-200.receipt.json)。重试须在本地协调器记录的释放时刻之后满20分钟，即2026-10-16 01:15:48（UTC+8）之后重新确认空卡；其他实验同样受此全局间隔约束。
 
 ## 最新完整结果：CP2的200步精度未通过（2026-10-16，UTC+8）
 
