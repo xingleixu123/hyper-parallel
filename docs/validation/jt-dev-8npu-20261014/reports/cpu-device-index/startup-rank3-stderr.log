@@ -1,0 +1,29 @@
+2026-10-15 10:25:05,271 [INFO] torch_npu.env: get env LOCAL_RANK = 3
+2026-10-15 10:25:05,271 [INFO] torch_npu.env: get env WORLD_SIZE = 8
+2026-10-15 10:25:05,271 [INFO] torch_npu.env: get env MASTER_ADDR = 127.0.0.1
+2026-10-15 10:25:05,272 [INFO] torch_npu.env: get env MASTER_PORT = 30321
+2026-10-15 10:25:05,272 [INFO] torch_npu.env: get env TORCHELASTIC_USE_AGENT_STORE = True
+2026-10-15 10:25:05,527 [INFO] hyper_parallel.trainer.base: Process rank: 3, world size: 8
+2026-10-15 10:25:05,541 [INFO] hyper_parallel.distributed.mesh: Built device mesh (8, 1, 1), dense FSDP mesh (1, 8, 1) and expert FSDP mesh None
+2026-10-15 10:25:05,541 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='model.layers.[123456789]*.mlp' skipped because condition 'ep' is inactive
+2026-10-15 10:25:05,541 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='mtp.layers.*.transformer_layer.mlp' skipped because condition 'ep' is inactive
+2026-10-15 10:25:05,595 [INFO] hyper_parallel.models._transformers.model_builder: FSDP2Manager instantiated with FSDP2Config
+2026-10-15 10:25:59,212 [INFO] hyper_parallel.models._transformers.model_builder: Initialized model state with model-native random initialization
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/work/runs/r125-f637-fp32-fsdp8-0-200/capture_training.py", line 161, in <module>
+[rank3]:     main()
+[rank3]:   File "/work/runs/r125-f637-fp32-fsdp8-0-200/capture_training.py", line 127, in main
+[rank3]:     trainer = TextTrainer(config)
+[rank3]:               ^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/trainer/text_trainer.py", line 53, in __init__
+[rank3]:     self.base._build_model()
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/trainer/base.py", line 303, in _build_model
+[rank3]:     self.model = self.config.model.build(
+[rank3]:                  ^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/trainer/config/target.py", line 110, in build
+[rank3]:     return self._target_(**kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py", line 150, in build_jt_model
+[rank3]:     device = torch.device(mesh.device_mesh.device_type, get_device_id())
+[rank3]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]: TypeError: device(): argument 'index' (position 2) must be int, not str

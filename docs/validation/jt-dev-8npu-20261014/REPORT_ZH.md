@@ -1,10 +1,24 @@
 ## 最新八卡基线执行与让卡记录（2026-10-15）
 
-在全局间隔超过20分钟、129八卡连续两次确认空闲后，使用集成源 `18602c4524dc664b81b2bad9a7b624455ce1494f` 启动 `r129-f637-fp32-fsdp8-0-200-r2`。8个rank均记录了step1–31，loss有限、输入身份一致；step31累计248个样本、614332个监督token。随后0–3卡出现外部作业，事件时的UID、PID命名空间及控制组均与本任务容器不同，刷新进程清单后身份差异仍在。本任务只释放自己的容器；退出137、无残留本任务设备PID，整轮172.14秒。**未完成200步，也没有checkpoint200，不能开始本轮200–400续训或声明精度达标；冲突轮次不用于性能收益比较。**
+最新上游 `f637ef7` 加已检视修复的集成源为 `18602c4524dc664b81b2bad9a7b624455ce1494f`。129第三轮从0启动，全部8个rank记录step1–150，有限值检查通过；step150累计1200个样本、2780930个监督token。约307.33秒后3号卡出现其他容器进程，PID命名空间和控制组不同，刷新后仍存在。本任务只释放自己的容器，退出137、无本任务残留设备PID；外部进程仍在。**本轮未完成200步，没有checkpoint200，不能开始本轮200–400续训或声明精度达标；冲突轮次不作为性能收益依据。**
 
-[31步全rank核验与归属摘要](reports/f637-fsdp8-r2-interrupted/f637-fsdp8-r2-interrupted-analysis.json)、[设备释放凭据](reports/f637-fsdp8-r2-interrupted/r129-f637-fp32-fsdp8-0-200-r2.receipt.json)、[逐文件校验记录](reports/f637-fsdp8-r2-interrupted/f637-fsdp8-r2-interrupted-local-verification.json)。采集的68份文件全部校验，重复压缩包两端已删除；原始进程信息本地保留，公开版本仅披露必要身份差异。此轮不能反推此前#199中断的进程归属。
+[150步全rank核验与归属摘要](reports/f637-fsdp8-r3-interrupted/f637-fsdp8-r3-interrupted-analysis.json)、[设备释放凭据](reports/f637-fsdp8-r3-interrupted/r129-f637-fp32-fsdp8-0-200-r3.receipt.json)、[逐文件校验](reports/f637-fsdp8-r3-interrupted/f637-fsdp8-r3-interrupted-local-verification.json)。68份采集文件全部校验，重复压缩包两端已清理。公开证据保留必要身份差异，原始进程身份信息留在本地排障资料中。
 
-总单、9个小问题及9个独立单提交PR共19项已回读核对，[双向关联与提交数](reports/f637-fsdp8-r2-interrupted/github-chinese-full-link-audit.json)完整。守卫诊断另修正了非UTF8进程信息解码与证据大小边界，10项CPU检查和规范/验收条件两轴复审通过；实际未知PID判断、只停止本任务容器及全局20分钟间隔均未改变。125的基线、续训和连续参考配置均已准备，下一轮重新检查空卡。
+上一轮同源、同镜像、同数值配方的独立启动记录了31步，随后因外部任务占卡被释放。[两轮共有step1–31的比较](reports/f637-fsdp8-r3-interrupted/f637-fsdp8-prefix31-comparison.json)显示，全部8rank的LM、日志MTP、日志aux、总loss和梯度范数最大绝对差均为0，数据计数与输入哈希一致。MTP/aux按记录系数0.3/0.0001还原后的差也为0；这不是直接采集加权前张量。**两轮均中断，比较总体仍为FAIL，未加权验收为UNVERIFIED，不能把31步重复性写成200步通过。**
+
+![最新源码前31步重复性；两轮中断，尚未完成200步验收](figures/f637-fsdp8-prefix31-zh.png)
+
+离线比较入口新增完整200步、8rank、独立执行容器凭据、源码/镜像/数值配方一致性、rank/输入身份和累计数据计数检查，同时检查加权日志与还原后的LM/MTP/aux绝对差≤0.005；输出禁止覆盖输入证据。20个合成CPU反例检查通过，[工具验证记录](reports/f637-fsdp8-r3-interrupted/strict-loss-gate-validation.json)明确标注非训练结果。新增文件SHA绑定、参考轨迹连续性和跨rank全局摘要一致性核验；[两轴复审均通过](reports/f637-fsdp8-r3-interrupted/strict-loss-gate-final-review.json)，不改变此前原始训练日志。
+
+总单、9个小问题及9个独立单提交PR共19项已回读核对，[双向关联与提交数](reports/f637-fsdp8-r2-interrupted/github-chinese-full-link-audit.json)完整。上一轮[31步全rank摘要](reports/f637-fsdp8-r2-interrupted/f637-fsdp8-r2-interrupted-analysis.json)和[释放凭据](reports/f637-fsdp8-r2-interrupted/r129-f637-fp32-fsdp8-0-200-r2.receipt.json)保留。125已准备匹配基线、续训和连续参考配置；每轮结束后至少间隔20分钟再检查空卡，全部资源操作只针对本任务容器。
+
+## 125 初始化失败与独立 CPU 接口缺陷（2026-10-15）
+
+125在满足20分钟间隔、宿主机八卡空闲后尝试匹配基线，约94.34秒后退出1，尚无训练步。8卡已全部释放、无本任务残留设备PID；36份采集文件校验后删除两端重复压缩包。日志先报告无法取得ascend_hal设备数，随后JT模型构造出现字符串索引TypeError。[启动失败摘要](reports/cpu-device-index/r125-f637-fsdp8-startup-failure-analysis.json)、[原始rank3异常](reports/cpu-device-index/startup-rank3-stderr.log)、[释放凭据](reports/cpu-device-index/r125-f637-fp32-fsdp8-0-200.receipt.json)。
+
+这涉及两个不同边界。第一，CPU后端的`torch.cpu.current_device()`返回`"cpu"`，`get_device_id()`直接转交给`torch.device(type,index)`，使JT的CPU构建失败；不挂NPU的最小复现已确认。修复使CPU返回无索引`None`，CUDA/NPU仍保留当前整数索引；JT测试不再把该API固定mock为0，改走真实CPU分支。修复前5失败/17通过/5子测试通过，修复后**20项测试和7项子测试通过，19.06秒**；最小复现也通过，规范/验收条件两轴检视通过，静态检查基点和补丁均6条既有告警、无新增。第一次测试容器缺pytest、未收集测试，单独保存失败记录；安装隔离测试依赖后才取得以上结果。[修复与检视](reports/cpu-device-index/cpu-device-index-review.json)、[红回归](reports/cpu-device-index/r125-cpu-device-index-red-r2.log)、[绿回归](reports/cpu-device-index/r125-cpu-device-index-green.log)。
+
+第二，125同挂载方式的只读npu-smi查询返回`device is used / -8020`，129相同查询正常；驱动主库解析均指向各自主机的挂载库。现有证据只说明125的新容器不可用，尚不能把具体容器或驱动版本认定为根因。没有停止其他容器、修改全机共享开关或升级驱动。**CPU修复不代表NPU发现问题已解决，也不产生八卡训练或性能结论。**
 
 ## 上游更新与资源进展（2026-10-15）
 

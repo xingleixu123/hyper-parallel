@@ -1,0 +1,90 @@
+diff --git a/hyper_parallel/models/build_options.py b/hyper_parallel/models/build_options.py
+index cb6afda..a363619 100644
+--- a/hyper_parallel/models/build_options.py
++++ b/hyper_parallel/models/build_options.py
+@@ -75,8 +75,10 @@ def get_torch_device() -> Any:
+         return torch.cuda
+ 
+ 
+-def get_device_id() -> int:
+-    """Get current device id based on device type."""
++def get_device_id() -> Optional[int]:
++    """Return the accelerator index, or None for an unindexed CPU device."""
++    if get_device_type() == "cpu":
++        return None
+     return get_torch_device().current_device()
+ 
+ 
+diff --git a/tests/ut/auto_models/test_build_options.py b/tests/ut/auto_models/test_build_options.py
+index 82a13bf..248095f 100644
+--- a/tests/ut/auto_models/test_build_options.py
++++ b/tests/ut/auto_models/test_build_options.py
+@@ -21,10 +21,12 @@ import sys
+ import unittest
+ from dataclasses import fields
+ from pathlib import Path
++from unittest.mock import Mock, patch
+ 
+ 
+ import torch
+ 
++from hyper_parallel.models import build_options
+ from hyper_parallel.models.build_options import (
+     CompileConfig,
+     FSDP2Config,
+@@ -42,6 +44,33 @@ def _field_snapshot(cls):
+     return [(field.name, repr(field.default)) for field in fields(cls)]
+ 
+ 
++class TestDeviceDiscovery(unittest.TestCase):
++    """Device indices remain suitable for the model builders' torch.device call."""
++
++    @arg_mark(plat_marks=["cpu_linux", "cpu_macos"], level_mark="level0",
++              card_mark="allcards", essential_mark="essential")
++    def test_cpu_device_has_no_index(self) -> None:
++        """CPU discovery constructs the canonical unindexed CPU device."""
++        with patch.object(build_options, "IS_CUDA_AVAILABLE", False), \
++                patch.object(build_options, "IS_NPU_AVAILABLE", False):
++            device = torch.device(build_options.get_device_type(), build_options.get_device_id())
++        self.assertEqual(device, torch.device("cpu"))
++        self.assertIsNone(device.index)
++
++    @arg_mark(plat_marks=["cpu_linux", "cpu_macos"], level_mark="level0",
++              card_mark="allcards", essential_mark="essential")
++    def test_accelerator_current_index_is_preserved(self) -> None:
++        """CUDA and NPU retain their backend's current index without touching hardware."""
++        for device_type in ("cuda", "npu"):
++            with self.subTest(device_type=device_type):
++                backend = Mock()
++                backend.current_device.return_value = 3
++                with patch.object(build_options, "get_device_type", return_value=device_type), \
++                        patch.object(build_options, "get_torch_device", return_value=backend):
++                    self.assertEqual(build_options.get_device_id(), 3)
++                backend.current_device.assert_called_once_with()
++
++
+ class TestBuildOptionsFields(unittest.TestCase):
+     """Field/default snapshots for the options owned by build_options."""
+ 
+diff --git a/tests/ut/models/jt_deepseek_v3/test_jt_builder.py b/tests/ut/models/jt_deepseek_v3/test_jt_builder.py
+index 4c3d66a..7d9f477 100644
+--- a/tests/ut/models/jt_deepseek_v3/test_jt_builder.py
++++ b/tests/ut/models/jt_deepseek_v3/test_jt_builder.py
+@@ -26,6 +26,7 @@ import torch
+ from torch.nn import functional as F
+ 
+ from hyper_parallel.distributed.mesh import DistributedSetup
++from hyper_parallel.models import build_options
+ from hyper_parallel.models.jt_deepseek_v3.adapter import jt_builder
+ from hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3 import (
+     JTDeepseekV3Config,
+@@ -73,7 +74,8 @@ class TestJTBuilder(unittest.TestCase):
+         warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+         self.addCleanup(torch.use_deterministic_algorithms, deterministic, warn_only=warn_only)
+         self.enterContext(patch.object(jt_builder.torch_npu.npu, "set_compile_mode"))
+-        self.enterContext(patch.object(jt_builder, "get_device_id", return_value=0))
++        self.enterContext(patch.object(build_options, "IS_CUDA_AVAILABLE", False))
++        self.enterContext(patch.object(build_options, "IS_NPU_AVAILABLE", False))
+         self.enterContext(patch.object(jt_builder, "instantiate_infrastructure", return_value=(None, None)))
+ 
+     def build(self, seed: int = 42, **options: Any) -> JTDeepseekV3ForCausalLM:

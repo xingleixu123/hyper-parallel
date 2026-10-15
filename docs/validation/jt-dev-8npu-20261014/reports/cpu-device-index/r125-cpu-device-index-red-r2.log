@@ -1,0 +1,445 @@
+Looking in links: /work/tmp/issue211-test-wheels
+Processing /work/tmp/issue211-test-wheels/pytest-9.1.1-py3-none-any.whl
+Processing /work/tmp/issue211-test-wheels/iniconfig-2.3.1-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: packaging>=22 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (26.3)
+Processing /work/tmp/issue211-test-wheels/pluggy-1.6.0-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: pygments>=2.7.2 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (2.21.0)
+Installing collected packages: pluggy, iniconfig, pytest
+Successfully installed iniconfig-2.3.1 pluggy-1.6.0 pytest-9.1.1
+Obtaining file:///workspace/hyper-parallel
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: hyper_parallel
+  Building editable for hyper_parallel (pyproject.toml): started
+  Building editable for hyper_parallel (pyproject.toml): finished with status 'done'
+  Created wheel for hyper_parallel: filename=hyper_parallel-0.1.0-0.editable-cp312-cp312-linux_aarch64.whl size=13299 sha256=a3c5236c89fb503dfffcca136fbcb4769714a4d52085c5dc53e187b50c5fdffd
+  Stored in directory: /tmp/pip-ephem-wheel-cache-a2yb4myp/wheels/5b/a7/76/7bfa1e0a47b0327fbcae8478b4253250837789cbc4cf317387
+Successfully built hyper_parallel
+Installing collected packages: hyper_parallel
+  Attempting uninstall: hyper_parallel
+    Found existing installation: hyper_parallel 0.1.0
+    Not uninstalling hyper-parallel at /workspace/venv/lib/python3.12/site-packages, outside environment /work/venvs/cpu-device-index-tests
+    Can't uninstall 'hyper_parallel'. No files were found to uninstall.
+Successfully installed hyper_parallel-0.1.0
+/workspace/hyper-parallel/hyper_parallel/__init__.py
+.F................FF                                              [100%]
+=================================== FAILURES ===================================
+_______________ TestDeviceDiscovery.test_cpu_device_has_no_index _______________
+
+self = <test_build_options.TestDeviceDiscovery testMethod=test_cpu_device_has_no_index>
+
+    @arg_mark(plat_marks=["cpu_linux", "cpu_macos"], level_mark="level0",
+              card_mark="allcards", essential_mark="essential")
+    def test_cpu_device_has_no_index(self) -> None:
+        """CPU discovery constructs the canonical unindexed CPU device."""
+        with patch.object(build_options, "IS_CUDA_AVAILABLE", False), \
+                patch.object(build_options, "IS_NPU_AVAILABLE", False):
+>           device = torch.device(build_options.get_device_type(), build_options.get_device_id())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: device(): argument 'index' (position 2) must be int, not str
+
+tests/ut/auto_models/test_build_options.py:56: TypeError
+_ TestJTBuilder.test_matching_reference_loads_exact_values (reference_type='str') _
+
+self = <test_jt_builder.TestJTBuilder testMethod=test_matching_reference_loads_exact_values>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_matching_reference_loads_exact_values(self) -> None:
+        """Feature: Explicit reference loading.
+    
+        Description: Load a matching archive through both string and Path arguments.
+        Expectation: Every tensor equals the archive; initialization is never used as a fallback.
+        """
+        expected = JTDeepseekV3ForCausalLM(JTDeepseekV3Config(**self.config)).state_dict()
+        with TemporaryDirectory() as directory, patch.object(
+                jt_builder, "_initialize_model_weights", create=True,
+                side_effect=AssertionError("Unexpected initialization")):
+            np.savez(Path(directory) / "model.npz", **{name: value.numpy() for name, value in expected.items()})
+            for reference in (directory, Path(directory)):
+                with self.subTest(reference_type=type(reference).__name__):
+>                   model = self.build(reference_weights=reference)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:84: in build
+    return jt_builder.build_jt_model(config=self.config, distributed_setup=self.setup, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+config = JTDeepseekV3Config {
+  "architectures": [
+    "JTDeepseekV3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_d...ransformers_version": "5.13.1",
+  "use_cache": true,
+  "use_pad_tokens": true,
+  "v_head_dim": 4,
+  "vocab_size": 32
+}
+
+reference_weights = '/tmp/tmpkkhv14nt'
+distributed_setup = DistributedSetup(mesh_context=namespace(device_mesh=namespace(device_type='cpu'), dp_cp_mesh=None, tp_size=1, cp_size=...n_checkpointing=None, plan_overrides=None, module_replacements=None, low_precision_config=None, fp32_main_params=False)
+infrastructure_options = {}
+
+    def build_jt_model(*, config: dict[str, Any], reference_weights: str | Path | None = None,
+                        distributed_setup: Any, **infrastructure_options: Any) -> PreTrainedModel:
+        """Build the JT model with optional converted ``model.npz`` weights.
+    
+        Args:
+            config: JT model configuration fields.
+            reference_weights: Directory containing ``model.npz``. If omitted or None,
+                initialize from ``config`` using the model's native initialization
+                and the caller's random seed.
+            distributed_setup: Trainer distributed setup.
+            **infrastructure_options: Options forwarded to ``apply_model_infrastructure``.
+    
+        Returns:
+            The sharded JT model.
+    
+        Raises:
+            ValueError: If the weights or explicit context-parallel plan do not match the model.
+        """
+        torch_npu.npu.set_compile_mode(jit_compile=False)
+        torch.use_deterministic_algorithms(True)
+        config = JTDeepseekV3Config(**config)
+        mesh = distributed_setup.mesh_context
+        # Source-layout FSDP owns parameters and gradient synchronization even at DP1.
+        framework_setup = replace(
+            distributed_setup, module_replacements=(),
+            strategy_config=distributed_setup.strategy_config or FSDP2Config(),
+        )
+        planner, fsdp = instantiate_infrastructure(distributed_setup=framework_setup)
+        with torch.device("meta"):
+            model = JTDeepseekV3ForCausalLM(config)
+            model, _ = _apply_module_replacement_actions(
+                model,
+                getattr(distributed_setup, "module_replacements", None),
+                weights_mapping=get_model_conversion_mapping(model),
+                context=_build_replacement_context(distributed_setup, None),
+            )
+        model.to_empty(device="cpu")
+        if reference_weights is None:
+            _initialize_model_weights(model)
+        else:
+            with np.load(Path(reference_weights) / "model.npz", allow_pickle=False) as archive:
+                arrays = {name: archive[name] for name in archive.files}
+            _load_reference_state(model, arrays)
+    
+>       device = torch.device(mesh.device_mesh.device_type, get_device_id())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: device(): argument 'index' (position 2) must be int, not str
+
+hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py:150: TypeError
+_ TestJTBuilder.test_matching_reference_loads_exact_values (reference_type='PosixPath') _
+
+self = <test_jt_builder.TestJTBuilder testMethod=test_matching_reference_loads_exact_values>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_matching_reference_loads_exact_values(self) -> None:
+        """Feature: Explicit reference loading.
+    
+        Description: Load a matching archive through both string and Path arguments.
+        Expectation: Every tensor equals the archive; initialization is never used as a fallback.
+        """
+        expected = JTDeepseekV3ForCausalLM(JTDeepseekV3Config(**self.config)).state_dict()
+        with TemporaryDirectory() as directory, patch.object(
+                jt_builder, "_initialize_model_weights", create=True,
+                side_effect=AssertionError("Unexpected initialization")):
+            np.savez(Path(directory) / "model.npz", **{name: value.numpy() for name, value in expected.items()})
+            for reference in (directory, Path(directory)):
+                with self.subTest(reference_type=type(reference).__name__):
+>                   model = self.build(reference_weights=reference)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:84: in build
+    return jt_builder.build_jt_model(config=self.config, distributed_setup=self.setup, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+config = JTDeepseekV3Config {
+  "architectures": [
+    "JTDeepseekV3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_d...ransformers_version": "5.13.1",
+  "use_cache": true,
+  "use_pad_tokens": true,
+  "v_head_dim": 4,
+  "vocab_size": 32
+}
+
+reference_weights = PosixPath('/tmp/tmpkkhv14nt')
+distributed_setup = DistributedSetup(mesh_context=namespace(device_mesh=namespace(device_type='cpu'), dp_cp_mesh=None, tp_size=1, cp_size=...n_checkpointing=None, plan_overrides=None, module_replacements=None, low_precision_config=None, fp32_main_params=False)
+infrastructure_options = {}
+
+    def build_jt_model(*, config: dict[str, Any], reference_weights: str | Path | None = None,
+                        distributed_setup: Any, **infrastructure_options: Any) -> PreTrainedModel:
+        """Build the JT model with optional converted ``model.npz`` weights.
+    
+        Args:
+            config: JT model configuration fields.
+            reference_weights: Directory containing ``model.npz``. If omitted or None,
+                initialize from ``config`` using the model's native initialization
+                and the caller's random seed.
+            distributed_setup: Trainer distributed setup.
+            **infrastructure_options: Options forwarded to ``apply_model_infrastructure``.
+    
+        Returns:
+            The sharded JT model.
+    
+        Raises:
+            ValueError: If the weights or explicit context-parallel plan do not match the model.
+        """
+        torch_npu.npu.set_compile_mode(jit_compile=False)
+        torch.use_deterministic_algorithms(True)
+        config = JTDeepseekV3Config(**config)
+        mesh = distributed_setup.mesh_context
+        # Source-layout FSDP owns parameters and gradient synchronization even at DP1.
+        framework_setup = replace(
+            distributed_setup, module_replacements=(),
+            strategy_config=distributed_setup.strategy_config or FSDP2Config(),
+        )
+        planner, fsdp = instantiate_infrastructure(distributed_setup=framework_setup)
+        with torch.device("meta"):
+            model = JTDeepseekV3ForCausalLM(config)
+            model, _ = _apply_module_replacement_actions(
+                model,
+                getattr(distributed_setup, "module_replacements", None),
+                weights_mapping=get_model_conversion_mapping(model),
+                context=_build_replacement_context(distributed_setup, None),
+            )
+        model.to_empty(device="cpu")
+        if reference_weights is None:
+            _initialize_model_weights(model)
+        else:
+            with np.load(Path(reference_weights) / "model.npz", allow_pickle=False) as archive:
+                arrays = {name: archive[name] for name in archive.files}
+            _load_reference_state(model, arrays)
+    
+>       device = torch.device(mesh.device_mesh.device_type, get_device_id())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: device(): argument 'index' (position 2) must be int, not str
+
+hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py:150: TypeError
+_______ TestJTBuilder.test_optional_reference_uses_native_initialization _______
+
+self = <test_jt_builder.TestJTBuilder testMethod=test_optional_reference_uses_native_initialization>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_optional_reference_uses_native_initialization(self) -> None:
+        """Feature: Optional reference weights.
+    
+        Description: Build a 32-head model with trunk/MTP MLA replacements, omitted/null references and two seeds.
+        Expectation: Initialization is reproducible, preserves native constants and buffers, and never reads weights.
+        """
+        torch.manual_seed(42)
+        expected = JTDeepseekV3ForCausalLM(JTDeepseekV3Config(**self.config))
+        self.setup.module_replacements = entries_to_module_replacements(jt_test_config().plan_overrides)
+        with patch.object(jt_builder.np, "load", side_effect=AssertionError("Unexpected weight read")):
+>           omitted = self.build()
+                      ^^^^^^^^^^^^
+
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:84: in build
+    return jt_builder.build_jt_model(config=self.config, distributed_setup=self.setup, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+config = JTDeepseekV3Config {
+  "architectures": [
+    "JTDeepseekV3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_d...ransformers_version": "5.13.1",
+  "use_cache": true,
+  "use_pad_tokens": true,
+  "v_head_dim": 4,
+  "vocab_size": 32
+}
+
+reference_weights = None
+distributed_setup = DistributedSetup(mesh_context=namespace(device_mesh=namespace(device_type='cpu'), dp_cp_mesh=None, tp_size=1, cp_size=...modeling_jt_deepseek_v3.JTDeepseekV3Attention'>, exact_type=True),), low_precision_config=None, fp32_main_params=False)
+infrastructure_options = {}
+
+    def build_jt_model(*, config: dict[str, Any], reference_weights: str | Path | None = None,
+                        distributed_setup: Any, **infrastructure_options: Any) -> PreTrainedModel:
+        """Build the JT model with optional converted ``model.npz`` weights.
+    
+        Args:
+            config: JT model configuration fields.
+            reference_weights: Directory containing ``model.npz``. If omitted or None,
+                initialize from ``config`` using the model's native initialization
+                and the caller's random seed.
+            distributed_setup: Trainer distributed setup.
+            **infrastructure_options: Options forwarded to ``apply_model_infrastructure``.
+    
+        Returns:
+            The sharded JT model.
+    
+        Raises:
+            ValueError: If the weights or explicit context-parallel plan do not match the model.
+        """
+        torch_npu.npu.set_compile_mode(jit_compile=False)
+        torch.use_deterministic_algorithms(True)
+        config = JTDeepseekV3Config(**config)
+        mesh = distributed_setup.mesh_context
+        # Source-layout FSDP owns parameters and gradient synchronization even at DP1.
+        framework_setup = replace(
+            distributed_setup, module_replacements=(),
+            strategy_config=distributed_setup.strategy_config or FSDP2Config(),
+        )
+        planner, fsdp = instantiate_infrastructure(distributed_setup=framework_setup)
+        with torch.device("meta"):
+            model = JTDeepseekV3ForCausalLM(config)
+            model, _ = _apply_module_replacement_actions(
+                model,
+                getattr(distributed_setup, "module_replacements", None),
+                weights_mapping=get_model_conversion_mapping(model),
+                context=_build_replacement_context(distributed_setup, None),
+            )
+        model.to_empty(device="cpu")
+        if reference_weights is None:
+            _initialize_model_weights(model)
+        else:
+            with np.load(Path(reference_weights) / "model.npz", allow_pickle=False) as archive:
+                arrays = {name: archive[name] for name in archive.files}
+            _load_reference_state(model, arrays)
+    
+>       device = torch.device(mesh.device_mesh.device_type, get_device_id())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: device(): argument 'index' (position 2) must be int, not str
+
+hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py:150: TypeError
+____________________ TestJTBuilder.test_random_model_trains ____________________
+
+self = <test_jt_builder.TestJTBuilder testMethod=test_random_model_trains>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_random_model_trains(self) -> None:
+        """Feature: Training from scratch.
+    
+        Description: Run forward, backward and an optimizer step with only the NPU grouped kernel replaced on CPU.
+        Expectation: All three losses and gradients are finite and the embedding changes.
+        """
+>       model = self.build()
+                ^^^^^^^^^^^^
+
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:84: in build
+    return jt_builder.build_jt_model(config=self.config, distributed_setup=self.setup, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+config = JTDeepseekV3Config {
+  "architectures": [
+    "JTDeepseekV3ForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_d...ransformers_version": "5.13.1",
+  "use_cache": true,
+  "use_pad_tokens": true,
+  "v_head_dim": 4,
+  "vocab_size": 32
+}
+
+reference_weights = None
+distributed_setup = DistributedSetup(mesh_context=namespace(device_mesh=namespace(device_type='cpu'), dp_cp_mesh=None, tp_size=1, cp_size=...n_checkpointing=None, plan_overrides=None, module_replacements=None, low_precision_config=None, fp32_main_params=False)
+infrastructure_options = {}
+
+    def build_jt_model(*, config: dict[str, Any], reference_weights: str | Path | None = None,
+                        distributed_setup: Any, **infrastructure_options: Any) -> PreTrainedModel:
+        """Build the JT model with optional converted ``model.npz`` weights.
+    
+        Args:
+            config: JT model configuration fields.
+            reference_weights: Directory containing ``model.npz``. If omitted or None,
+                initialize from ``config`` using the model's native initialization
+                and the caller's random seed.
+            distributed_setup: Trainer distributed setup.
+            **infrastructure_options: Options forwarded to ``apply_model_infrastructure``.
+    
+        Returns:
+            The sharded JT model.
+    
+        Raises:
+            ValueError: If the weights or explicit context-parallel plan do not match the model.
+        """
+        torch_npu.npu.set_compile_mode(jit_compile=False)
+        torch.use_deterministic_algorithms(True)
+        config = JTDeepseekV3Config(**config)
+        mesh = distributed_setup.mesh_context
+        # Source-layout FSDP owns parameters and gradient synchronization even at DP1.
+        framework_setup = replace(
+            distributed_setup, module_replacements=(),
+            strategy_config=distributed_setup.strategy_config or FSDP2Config(),
+        )
+        planner, fsdp = instantiate_infrastructure(distributed_setup=framework_setup)
+        with torch.device("meta"):
+            model = JTDeepseekV3ForCausalLM(config)
+            model, _ = _apply_module_replacement_actions(
+                model,
+                getattr(distributed_setup, "module_replacements", None),
+                weights_mapping=get_model_conversion_mapping(model),
+                context=_build_replacement_context(distributed_setup, None),
+            )
+        model.to_empty(device="cpu")
+        if reference_weights is None:
+            _initialize_model_weights(model)
+        else:
+            with np.load(Path(reference_weights) / "model.npz", allow_pickle=False) as archive:
+                arrays = {name: archive[name] for name in archive.files}
+            _load_reference_state(model, arrays)
+    
+>       device = torch.device(mesh.device_mesh.device_type, get_device_id())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: device(): argument 'index' (position 2) must be int, not str
+
+hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py:150: TypeError
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/common/mark_utils.py:38
+tests/common/mark_utils.py:38
+  /workspace/hyper-parallel/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:38
+  /workspace/hyper-parallel/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+tests/common/mark_utils.py:39
+  /workspace/hyper-parallel/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /workspace/hyper-parallel/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.allcards - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+tests/common/mark_utils.py:41
+  /workspace/hyper-parallel/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+tests/common/mark_utils.py:40
+  /workspace/hyper-parallel/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/ut/auto_models/test_build_options.py::TestDeviceDiscovery::test_cpu_device_has_no_index
+SUBFAILED(reference_type='str') tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_matching_reference_loads_exact_values
+SUBFAILED(reference_type='PosixPath') tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_matching_reference_loads_exact_values
+FAILED tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_optional_reference_uses_native_initialization
+FAILED tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_random_model_trains
+5 failed, 17 passed, 23 warnings, 5 subtests passed in 19.00s

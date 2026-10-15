@@ -1,0 +1,60 @@
+Looking in links: /work/tmp/issue211-test-wheels
+Requirement already satisfied: pytest==9.1.1 in /work/venvs/cpu-device-index-tests/lib/python3.12/site-packages (9.1.1)
+Requirement already satisfied: iniconfig>=1.0.1 in /work/venvs/cpu-device-index-tests/lib/python3.12/site-packages (from pytest==9.1.1) (2.3.1)
+Requirement already satisfied: packaging>=22 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (26.3)
+Requirement already satisfied: pluggy<2,>=1.5 in /work/venvs/cpu-device-index-tests/lib/python3.12/site-packages (from pytest==9.1.1) (1.6.0)
+Requirement already satisfied: pygments>=2.7.2 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (2.21.0)
+Obtaining file:///workspace/hyper-parallel
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: hyper_parallel
+  Building editable for hyper_parallel (pyproject.toml): started
+  Building editable for hyper_parallel (pyproject.toml): finished with status 'done'
+  Created wheel for hyper_parallel: filename=hyper_parallel-0.1.0-0.editable-cp312-cp312-linux_aarch64.whl size=13299 sha256=cf2ebf0d1ef254bbb6fa7703e22d9a42b81e572d5257e3233661799bea9b311e
+  Stored in directory: /tmp/pip-ephem-wheel-cache-q3fjsg76/wheels/5b/a7/76/7bfa1e0a47b0327fbcae8478b4253250837789cbc4cf317387
+Successfully built hyper_parallel
+Installing collected packages: hyper_parallel
+  Attempting uninstall: hyper_parallel
+    Found existing installation: hyper_parallel 0.1.0
+    Uninstalling hyper_parallel-0.1.0:
+      Successfully uninstalled hyper_parallel-0.1.0
+Successfully installed hyper_parallel-0.1.0
+/workspace/hyper-parallel/hyper_parallel/__init__.py
+....................                                              [100%]
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/common/mark_utils.py:38
+tests/common/mark_utils.py:38
+  /workspace/hyper-parallel/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:38
+  /workspace/hyper-parallel/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+tests/common/mark_utils.py:39
+  /workspace/hyper-parallel/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /workspace/hyper-parallel/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.allcards - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+tests/common/mark_utils.py:41
+  /workspace/hyper-parallel/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+tests/common/mark_utils.py:40
+  /workspace/hyper-parallel/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+20 passed, 23 warnings, 7 subtests passed in 19.06s
+{"device_type": "cpu", "index": null, "index_type": "NoneType", "scope": "CPU only; accelerator availability patched false; no NPU devices mounted", "status": "PASS", "actual": "cpu"}
