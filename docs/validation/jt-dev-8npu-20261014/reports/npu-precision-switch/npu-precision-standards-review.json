@@ -1,0 +1,69 @@
+{
+  "axis": "Standards",
+  "status": "PASS",
+  "base": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+  "head": "453fe5723429b0e45ee6f0236d6e262cbe58b04f",
+  "merge_base": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+  "reviewed_at_utc": "2026-10-15T17:05:13.701652+00:00",
+  "diff_command": "git diff f637ef7ee4d4b416800716f1ebaaae7709b8a06a...HEAD",
+  "commit_list": [
+    "453fe57 fix(trainer): 修正 NPU 高精度初始化的 HF32 开关"
+  ],
+  "worktree": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\fixes\\trainer-npu-hf32",
+  "checked_files_sha256": {
+    "hyper_parallel/trainer/runtime/random.py": "31691d134d7fa852bdf43c3a26c749998b7e50a02d57d4e3818f35636db397c6",
+    "tests/ut/trainer/runtime/test_random.py": "c31a30f2ac669d0b52c8e1d899c5d4d1fd231f563a344eaadb84119032b9b752"
+  },
+  "standards_sha256": {
+    "AGENTS.md": "4f5dd60094bb3a4c79fde373389d1be0050f1142bb80e821d04d8efe6f32732c",
+    ".agent/rules/code-style.md": "90c0e3f26a7bdaa629b54515b11cc9ecbafb9599e7c58b07d6ad3e15095209de",
+    ".agent/rules/testing.md": "ffc0551ab8af2beced1ec7efad164d6a660ef3f4bb981c5a0de07f442eee593d",
+    ".agent/rules/unit-test.md": "85bfb51f6290a8a0f5b2f8bf001767d51268b0f35d99c4844e4f5df426d077da",
+    ".agent/rules/test-assertion-style.md": "1aac5f63355d7e2dcc67123dc2adbbce748f9baac43223c2efb255958ada4c9d",
+    ".agent/skills/add-unit-test/references/guide.md": "27ef953e6c23b754fdb3b89629f8ddea921708ebb76c51a2c1410b68abaeeec0"
+  },
+  "related_files_sha256": {
+    "hyper_parallel/trainer/base.py": "eb0293f1c87c09895398e848cee62b39a2500484ab2a4f35ce9cfd7085b8a0c7",
+    "tests/common/mark_utils.py": "51f2e40740d28cdebd2f143af7cc49bd7bd3834ca91800b0de271a1de6843811"
+  },
+  "evidence_sha256": {
+    "evidence/npu-precision-lint-base.json": "7b4a1d9329305b598d9c2511d8fac110d79c34f853cb1ac6cf6028c473f63406",
+    "evidence/npu-precision-lint-fixed.json": "3b132a199aa96cb9a0eee0f48c3680c6c3525bebfce38a6d7e52345b6694e49d",
+    "evidence/npu-precision-lint-comparison.json": "75547f6b4daea08d9bb048196091a33c2648c15e62d4bd18530f4548fc5f86ec",
+    "evidence/npu-precision-ut-before.log": "25013efe96efae2c5634cb03f4a137574b27936bf39aa1ee2654c751c805028b",
+    "evidence/npu-precision-ut-after.log": "fa73b9d7a9b2f6538a80143240bfe3b60869438a98e7d9500c5e22823adf0b63",
+    "evidence/npu-precision-ut-after.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "evidence/npu-precision-option-after-verified.json": "1e72b0006dc962785037d8a06942e4178ffb49725e02fb737a7232543ff88493"
+  },
+  "hard_standard_findings": [],
+  "heuristic_findings": [],
+  "observations": [
+    "生产修复仅替换 NPU matmul 选项并澄清文档；保留公共函数名称、签名、导出及 CUDA 行为。",
+    "文档明确 NPU 关闭的是 FP32 matmul 的 HF32 路径，不声称改变 BF16 累加精度。",
+    "UT 使用 unittest.TestCase、作用域内 patch 和 SimpleNamespace，覆盖 HF32 两种初态及 CUDA/CPU 分支，不执行设备算子。",
+    "NPU 断言比较完整选项字典，可检出旧实现写入无效 CUDA 风格字段的问题；patch 在异常路径也恢复模块状态。",
+    "已读取固定基点 lint 对照，无新增 finding；基点继承项不重复归因。",
+    "已读取既有 CPU 日志：修前两个 NPU 子测试失败，修后 3 passed / 2 subtests passed；后端选项探针源码 SHA 与本次生产文件完全一致。"
+  ],
+  "reviewed_heuristics": [
+    "Mysterious Name",
+    "Duplicated Code",
+    "Feature Envy",
+    "Data Clumps",
+    "Primitive Obsession",
+    "Repeated Switches",
+    "Shotgun Surgery",
+    "Divergent Change",
+    "Speculative Generality",
+    "Message Chains",
+    "Middle Man",
+    "Refused Bequest"
+  ],
+  "limits": [
+    "本轮仅本地只读检视生产文件并创建此结果文件，未重新运行 UT 或设备任务。",
+    "既有无设备后端选项探针不构成 NPU 算子精度、性能或 200 步训练验收。"
+  ],
+  "modified_files": [
+    "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-standards-review.json"
+  ]
+}

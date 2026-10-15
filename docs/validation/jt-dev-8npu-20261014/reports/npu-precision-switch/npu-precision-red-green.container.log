@@ -1,0 +1,89 @@
+Looking in links: /work/tmp/issue211-test-wheels
+Processing ./tmp/issue211-test-wheels/pytest-9.1.1-py3-none-any.whl
+Processing ./tmp/issue211-test-wheels/iniconfig-2.3.1-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: packaging>=22 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (26.3)
+Processing ./tmp/issue211-test-wheels/pluggy-1.6.0-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: pygments>=2.7.2 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (2.21.0)
+Installing collected packages: pluggy, iniconfig, pytest
+Successfully installed iniconfig-2.3.1 pluggy-1.6.0 pytest-9.1.1
+Obtaining file:///work/fixes/trainer-npu-hf32-cpu
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: hyper_parallel
+  Building editable for hyper_parallel (pyproject.toml): started
+  Building editable for hyper_parallel (pyproject.toml): finished with status 'done'
+  Created wheel for hyper_parallel: filename=hyper_parallel-0.1.0-0.editable-cp312-cp312-linux_aarch64.whl size=13312 sha256=b7cf1aeb2568974e2000a31f6301c9efaa5e36880cd4eb5e291d883c5f3b6064
+  Stored in directory: /tmp/pip-ephem-wheel-cache-bw891o6i/wheels/f0/58/47/d985fabc14772deb306d4d041fe0180bbd464da7110b3d3d62
+Successfully built hyper_parallel
+Installing collected packages: hyper_parallel
+  Attempting uninstall: hyper_parallel
+    Found existing installation: hyper_parallel 0.1.0
+    Not uninstalling hyper-parallel at /workspace/venv/lib/python3.12/site-packages, outside environment /work/venvs/npu-precision-tests
+    Can't uninstall 'hyper_parallel'. No files were found to uninstall.
+Successfully installed hyper_parallel-0.1.0
+EDITABLE_IMPORT /work/fixes/trainer-npu-hf32-cpu/hyper_parallel/__init__.py
+
+tests/common/mark_utils.py:39
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SUBFAILED(initial_allow_hf32=True) tests/ut/trainer/runtime/test_random.py::TestHighPrecision::test_npu_disables_hf32
+SUBFAILED(initial_allow_hf32=False) tests/ut/trainer/runtime/test_random.py::TestHighPrecision::test_npu_disables_hf32
+2 failed, 3 passed, 20 warnings in 28.74s
+...                                                                    [100%]
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+tests/common/mark_utils.py:38
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:38
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 20 warnings, 2 subtests passed in 28.43s
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+  warnings.warn("Can't get ascend_hal device count")
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+  File "/usr/local/python3.12.14/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python3.12.14/lib/python3.12/json/decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python3.12.14/lib/python3.12/json/decoder.py", line 356, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

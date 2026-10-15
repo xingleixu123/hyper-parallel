@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec",
+  "reviewer": "review_token_spec",
+  "reviewed_at_utc": "2026-10-15T17:06:34.196667+00:00",
+  "status": "PASS",
+  "findings": [],
+  "worktree": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\fixes\\trainer-npu-hf32",
+  "base": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+  "head": "453fe5723429b0e45ee6f0236d6e262cbe58b04f",
+  "diff_command": "git diff f637ef7ee4d4b416800716f1ebaaae7709b8a06a...HEAD",
+  "commit_count": 1,
+  "changed_files": [
+    "hyper_parallel/trainer/runtime/random.py",
+    "tests/ut/trainer/runtime/test_random.py"
+  ],
+  "source_binding": {
+    "base_git_blob_sha256": "8954496f1f089b4a448fad750816588278e01db1b638ff10f55957136e4127b2",
+    "before_probe_source_sha256": "4e34d9b85ddee1dabb0fd8a723d9e8ef36ee5474a62d9fb4b392d7d7fb2f6ff8",
+    "before_probe_binding": "Equals the fixed base source serialized with CRLF; syntax and behavior unchanged.",
+    "head_git_blob_sha256": "31691d134d7fa852bdf43c3a26c749998b7e50a02d57d4e3818f35636db397c6",
+    "after_probe_source_sha256": "31691d134d7fa852bdf43c3a26c749998b7e50a02d57d4e3818f35636db397c6",
+    "after_probe_binding": "Exact byte equality with the committed LF source.",
+    "test_git_blob_sha256": "c31a30f2ac669d0b52c8e1d899c5d4d1fd231f563a344eaadb84119032b9b752"
+  },
+  "requirements": [
+    {
+      "id": 1,
+      "status": "PASS",
+      "evidence": "random.py:44-45 uses allow_hf32=False. Installed TorchNPU setter dispatches ALLOW_MATMUL_HF32; actual readback changes true to false only after the fix."
+    },
+    {
+      "id": 2,
+      "status": "PASS",
+      "evidence": "Signature, CUDA branch AST and base.py caller bytes unchanged. CPU branch accesses no accelerator option namespace."
+    },
+    {
+      "id": 3,
+      "status": "PASS",
+      "evidence": "random.py:35-38 explicitly distinguishes NPU FP32 matmul HF32 from BF16 accumulation."
+    },
+    {
+      "id": 4,
+      "status": "PASS",
+      "evidence": "Same three tests cover initial HF32 true/false, CUDA and CPU. Old source: two failed subtests; fixed source: three tests and two subtests passed. Tests allocate no device tensors."
+    },
+    {
+      "id": 5,
+      "status": "PASS",
+      "evidence": "Actual TorchNPU 2.12.0 option, not a mocked backend, with only availability booleans patched. Before/after receipts have devices=[], removed=true; both probe records show NPU uninitialized."
+    },
+    {
+      "id": 6,
+      "status": "PASS_FOR_LOCAL_CODE_SCOPE",
+      "evidence": "One commit, production helper plus corresponding UT only. No GitHub write performed; publication/draft status is outside this local review."
+    }
+  ],
+  "validation": {
+    "method": "Read-only local source/AST, raw-byte hashes, actual recorded TorchNPU API/readback and pytest/receipt cross-checks; no new framework or hardware execution.",
+    "red_ut_exit": 1,
+    "red_failed_subtests": 2,
+    "green_ut_exit": 0,
+    "green_passed_tests": 3,
+    "green_passed_subtests": 2,
+    "original_cpu_batch_exit": 1,
+    "original_cpu_batch_failure": "JSONDecodeError after UT pass; redirected stdout contained driver diagnostic text. Original invalid JSON and receipt retained.",
+    "independent_after_v2_exit": 0,
+    "actual_backend_before_fix": true,
+    "actual_backend_after_fix": false,
+    "initial_hf32_default_recorded": false,
+    "npu_initialized": false
+  },
+  "boundaries": [
+    "No hardware matmul result, CI success, BF16 accumulation change, or 200-step cross-topology precision acceptance is claimed.",
+    "Recorded default HF32 is false; this defect is not established as the cause of existing EP2/CP2 divergence.",
+    "Production files were not modified; only this dedicated review result was written."
+  ],
+  "report_zh": "PASS：未发现缺失、错误实现或范围扩张。NPU 改用真实支持的 allow_hf32，CUDA/CPU 与调用时机保留，文档明确不控制 BF16 累加。已绑定基点/提交源码 SHA 并核对真实 TorchNPU 2.12.0 读回：旧代码 true→true，修复 true→false，全程未初始化 NPU。UT 旧版两子例失败，修复三测试及两子例通过。首批尾部 JSON 解析失败，整批退出 1；独立 v2 退出 0。仅验收选项契约，不代表硬件计算、CI 或 200 步精度通过。",
+  "evidence": [
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\reports\\npu-precision-fix-spec-zh.md",
+      "bytes": 1691,
+      "sha256": "ddabddfba095594edcfc6ec85a1f184076592894b06cdea6a37c053b2643dc87"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\installed-npu-matmul-api.txt",
+      "bytes": 12124,
+      "sha256": "ce09a2207bd7f30838e57559cfbfae99d72ba4d8d4278df53eb6ac83d03222c8"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-option-before.container.log",
+      "bytes": 911,
+      "sha256": "97dfb154d183d38c0dfec051f42fbda68d43f259a46019427c8634770bfc92c0"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-option-before.receipt.json",
+      "bytes": 596,
+      "sha256": "f7293d097ff246ad7f2e1c01982817ae329e3a7bfe4d2628dde59f53f5c2db5f"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-ut-before.log",
+      "bytes": 6710,
+      "sha256": "25013efe96efae2c5634cb03f4a137574b27936bf39aa1ee2654c751c805028b"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-ut-before.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-ut-after.log",
+      "bytes": 2559,
+      "sha256": "fa73b9d7a9b2f6538a80143240bfe3b60869438a98e7d9500c5e22823adf0b63"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-ut-after.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-red-green.receipt.json",
+      "bytes": 454,
+      "sha256": "272f714ffbd1a5e149672936f3625d1976284c35f2548597c4ae0894927ba6f6"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-red-green.container.log",
+      "bytes": 6871,
+      "sha256": "3d40f609a1821daf20fd795dfe64e4e096dc769edef907dd35e4892c9cf89fe6"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-red-green-as-run.sh",
+      "bytes": 2247,
+      "sha256": "c34bb20fbe46906ae1b891084e2e5ea882c0562049b8dce7b744e34355186df3"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-option-after.json",
+      "bytes": 750,
+      "sha256": "9a898b112275f1ab6c8e0cb7bb47ae791e22a816597329b3f53d492fb654fa8c"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-option-after-verified.json",
+      "bytes": 709,
+      "sha256": "1e72b0006dc962785037d8a06942e4178ffb49725e02fb737a7232543ff88493"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-option-after-v2.receipt.json",
+      "bytes": 728,
+      "sha256": "a603a0106a9d8052cadb40dd7b9f3e7cb4f83f5d92dff392ae639ef9568124d4"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\npu-precision-option-after-v2.container.log",
+      "bytes": 926,
+      "sha256": "485b7b9a9217fe949e5543cd160dea9950ae58c9cc0461d78743b7979277888a"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\tools\\probe_npu_precision_options.py",
+      "bytes": 2402,
+      "sha256": "502409d405a999d31d2a71003bc787ffa82b84af62fcb936623b307ec5ab1df1"
+    }
+  ]
+}

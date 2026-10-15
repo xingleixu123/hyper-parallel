@@ -1,0 +1,106 @@
+...                                                                    [100%]
+=================================== FAILURES ===================================
+______ TestHighPrecision.test_npu_disables_hf32 (initial_allow_hf32=True) ______
+
+self = <test_random.TestHighPrecision testMethod=test_npu_disables_hf32>
+
+    @arg_mark(["cpu_linux", "cpu_macos"], "level0", "onecard", "essential")
+    def test_npu_disables_hf32(self) -> None:
+        """Disable HF32 through the supported NPU option.
+    
+        Feature: NPU high precision policy.
+        Description: Start with HF32 enabled or disabled and apply the policy.
+        Expectation: HF32 is disabled and CUDA-only options are not introduced.
+        """
+        for initial in (True, False):
+            with self.subTest(initial_allow_hf32=initial):
+                matmul = SimpleNamespace(allow_hf32=initial)
+                backend = SimpleNamespace(npu=SimpleNamespace(matmul=matmul))
+                with (
+                    patch.object(random_module, "IS_NPU_AVAILABLE", True),
+                    patch.object(random_module, "IS_CUDA_AVAILABLE", False),
+                    patch.object(random_module, "torch", backend),
+                ):
+                    random_module.enable_high_precision_for_bf16()
+                expected = {"allow_hf32": False}
+>               self.assertEqual(vars(matmul), expected, f"expected={expected}, got={vars(matmul)}")
+E               AssertionError: {'allow_hf32': True, 'allow_tf32': False, 'allow_bf16_re[29 chars]alse} != {'allow_hf32': False}
+E               - {'allow_bf16_reduced_precision_reduction': False,
+E               -  'allow_hf32': True,
+E               -  'allow_tf32': False}
+E               ? ^       ^
+E               
+E               + {'allow_hf32': False}
+E               ? ^       ^
+E                : expected={'allow_hf32': False}, got={'allow_hf32': True, 'allow_tf32': False, 'allow_bf16_reduced_precision_reduction': False}
+
+tests/ut/trainer/runtime/test_random.py:47: AssertionError
+_____ TestHighPrecision.test_npu_disables_hf32 (initial_allow_hf32=False) ______
+
+self = <test_random.TestHighPrecision testMethod=test_npu_disables_hf32>
+
+    @arg_mark(["cpu_linux", "cpu_macos"], "level0", "onecard", "essential")
+    def test_npu_disables_hf32(self) -> None:
+        """Disable HF32 through the supported NPU option.
+    
+        Feature: NPU high precision policy.
+        Description: Start with HF32 enabled or disabled and apply the policy.
+        Expectation: HF32 is disabled and CUDA-only options are not introduced.
+        """
+        for initial in (True, False):
+            with self.subTest(initial_allow_hf32=initial):
+                matmul = SimpleNamespace(allow_hf32=initial)
+                backend = SimpleNamespace(npu=SimpleNamespace(matmul=matmul))
+                with (
+                    patch.object(random_module, "IS_NPU_AVAILABLE", True),
+                    patch.object(random_module, "IS_CUDA_AVAILABLE", False),
+                    patch.object(random_module, "torch", backend),
+                ):
+                    random_module.enable_high_precision_for_bf16()
+                expected = {"allow_hf32": False}
+>               self.assertEqual(vars(matmul), expected, f"expected={expected}, got={vars(matmul)}")
+E               AssertionError: {'allow_hf32': False, 'allow_tf32': False, 'allow_bf16_reduce[25 chars]alse} != {'allow_hf32': False}
+E               - {'allow_bf16_reduced_precision_reduction': False,
+E               -  'allow_hf32': False,
+E               ? ^                   ^
+E               
+E               + {'allow_hf32': False}
+E               ? ^                   ^
+E               
+E               -  'allow_tf32': False} : expected={'allow_hf32': False}, got={'allow_hf32': False, 'allow_tf32': False, 'allow_bf16_reduced_precision_reduction': False}
+
+tests/ut/trainer/runtime/test_random.py:47: AssertionError
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+tests/common/mark_utils.py:38
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:38
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/trainer-npu-hf32-cpu/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SUBFAILED(initial_allow_hf32=True) tests/ut/trainer/runtime/test_random.py::TestHighPrecision::test_npu_disables_hf32
+SUBFAILED(initial_allow_hf32=False) tests/ut/trainer/runtime/test_random.py::TestHighPrecision::test_npu_disables_hf32
+2 failed, 3 passed, 20 warnings in 28.74s
