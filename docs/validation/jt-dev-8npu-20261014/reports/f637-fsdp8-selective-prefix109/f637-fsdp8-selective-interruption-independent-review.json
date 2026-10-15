@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "review_axis": "只读独立归属与中断证据核验",
+  "reviewed_at": "2026-10-16T02:41:51.417873+08:00",
+  "case": "r129-f637-fp32-fsdp8-selective-200",
+  "source_commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+  "host": "129",
+  "summary_zh": "二次docker top刷新成功后，卡4额外进程仍不属于本任务集合。前后身份稳定，PID namespace与cgroup均不同于本任务容器；证据支持真实外部任务冲突，未见守卫误判。本任务以137退出并完成释放，剩余owned PID为零。仅有8rank各109步，200步训练验收未完成。",
+  "execution_status": "INTERRUPTED_FOR_EXTERNAL_RESOURCE_CONTENTION",
+  "training_acceptance": "UNVERIFIED",
+  "performance_verdict": "NOT_EVALUATED",
+  "execution": {
+    "exit_code": 137,
+    "reason": "foreign-job-appeared-on-selected-devices",
+    "duration_seconds": 270.35286103999533,
+    "guard_timeout_seconds": 900,
+    "released": true,
+    "remaining_owned_pids": [],
+    "external_process_count": 1,
+    "external_cards": [
+      4
+    ],
+    "task_container_id": "c0b03e3c76107daa56a4e85dbbc5190b78b4284897bd4e2154788c9c845e3812"
+  },
+  "ownership": {
+    "top_before_count": 11,
+    "top_after_count": 11,
+    "historical_owned_count": 12,
+    "top_sets_identical": true,
+    "anonymous_identity_checks": [
+      {
+        "complete_untruncated_records": true,
+        "pid_labels_and_status_consistent": true,
+        "stable_start_time": true,
+        "stable_namespace": true,
+        "different_namespace_from_task": true,
+        "stable_cgroup": true,
+        "different_cgroup_from_task": true,
+        "task_container_id_bound_to_init_cgroup": true,
+        "task_container_id_absent_external_cgroup": true,
+        "different_container_id_in_external_cgroup": true,
+        "identity_capture_ordered": true,
+        "same_external_pid_still_present_after_release": true
+      }
+    ],
+    "per_card_counts": {
+      "0": {
+        "all": 1,
+        "owned": 1,
+        "external": 0
+      },
+      "1": {
+        "all": 1,
+        "owned": 1,
+        "external": 0
+      },
+      "2": {
+        "all": 1,
+        "owned": 1,
+        "external": 0
+      },
+      "3": {
+        "all": 1,
+        "owned": 1,
+        "external": 0
+      },
+      "4": {
+        "all": 2,
+        "owned": 1,
+        "external": 1
+      },
+      "5": {
+        "all": 1,
+        "owned": 1,
+        "external": 0
+      },
+      "6": {
+        "all": 1,
+        "owned": 1,
+        "external": 0
+      },
+      "7": {
+        "all": 1,
+        "owned": 1,
+        "external": 0
+      }
+    },
+    "stop_scope_zh": "哈希固定的guard在inspect中校验codex.owner与精确容器ID。stop_owned只docker stop该ID，释放后只docker rm该ID；没有向外部PID或容器发停止操作的分支。回执显示owned集合交集为空，卡4外部PID仍存在。",
+    "code_evidence": [
+      {
+        "path": "tools/fair_resource_guard.py",
+        "lines": [
+          194,
+          202
+        ],
+        "purpose": "owner/容器ID校验和仅停止本任务"
+      },
+      {
+        "path": "tools/fair_resource_guard.py",
+        "lines": [
+          219,
+          263
+        ],
+        "purpose": "二次刷新和冲突让卡"
+      },
+      {
+        "path": "tools/fair_resource_guard.py",
+        "lines": [
+          266,
+          283
+        ],
+        "purpose": "释放验证及仅删除本任务容器"
+      }
+    ]
+  },
+  "prefix_records": [
+    {
+      "rank": 0,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    },
+    {
+      "rank": 1,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    },
+    {
+      "rank": 2,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    },
+    {
+      "rank": 3,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    },
+    {
+      "rank": 4,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    },
+    {
+      "rank": 5,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    },
+    {
+      "rank": 6,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    },
+    {
+      "rank": 7,
+      "records": 109,
+      "first_step": 1,
+      "last_step": 109,
+      "completion_marker_present": false
+    }
+  ],
+  "cooldown": {
+    "phase_at_review": "cooldown",
+    "released_wall": 1792089293.6132772,
+    "released_local_time": "2026-10-16T02:34:53.613277+08:00",
+    "released_monotonic": 2965687.437,
+    "minimum_gap_seconds": 1200,
+    "earliest_next_wall": 1792090493.6132772,
+    "earliest_next_local_time": "2026-10-16T02:54:53.613277+08:00",
+    "earliest_next_monotonic": 2966887.437,
+    "rule_zh": "跨125/129共用全局冷却。下一次启动须同时满足协调器墙钟与monotonic释放后1200秒，且重新满足全套空闲健康设备检查；墙钟到时本身不是启动授权。"
+  },
+  "measurement_limits_zh": [
+    "109步只是共同已落盘前缀，不能作为完整200步精度达标。没有complete-rank文件和运行内EXIT_CODE；137来自容器执行回执。",
+    "外部进程出现时刻与最早受影响训练步未被逐步时间戳绑定；末尾资源数据可能已受争用影响，不计算或发布最终性能/显存收益。",
+    "namespace/cgroup/starttime稳定性来自冲突前后两次/proc快照。释放快照仍见相同外部PID，但未再次采集完整身份。",
+    "仅释放本任务的结论由固定守卫控制流、回执及释放后集合支持；没有独立系统级审计日志，不声称审计主机全部操作。"
+  ],
+  "privacy_zh": "摘要只保存外部进程数量、所在卡、关系布尔值及原始文件SHA。不复制其PID、namespace标识、cgroup路径、容器ID、命令行或账户信息；原始记录保持不变。",
+  "checks": [
+    {
+      "name": "68份采集证据字节数与SHA一致",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "归属事件与释放回执均由清单绑定",
+      "status": "PASS"
+    },
+    {
+      "name": "事件与请求均绑定本任务",
+      "status": "PASS"
+    },
+    {
+      "name": "启动前八卡健康空闲",
+      "status": "PASS"
+    },
+    {
+      "name": "docker top两次刷新成功且未截断",
+      "status": "PASS"
+    },
+    {
+      "name": "二次刷新仍排除外部PID",
+      "status": "PASS"
+    },
+    {
+      "name": "归属证据未截断",
+      "status": "PASS"
+    },
+    {
+      "name": "原始NPU快照确认卡4额外进程",
+      "status": "PASS"
+    },
+    {
+      "name": "刷新前后身份稳定且namespace/cgroup独立",
+      "status": "PASS"
+    },
+    {
+      "name": "回执与事件的外部进程集合一致",
+      "status": "PASS"
+    },
+    {
+      "name": "owned进程清零且保留外部进程",
+      "status": "PASS"
+    },
+    {
+      "name": "中断原因与执行时限",
+      "status": "PASS"
+    },
+    {
+      "name": "fair_resource_guard.py哈希与请求一致",
+      "status": "PASS"
+    },
+    {
+      "name": "run_fair_training_case.sh哈希与请求一致",
+      "status": "PASS"
+    },
+    {
+      "name": "launcher回执一致",
+      "status": "PASS"
+    },
+    {
+      "name": "源码与selective配方一致",
+      "status": "PASS"
+    },
+    {
+      "name": "rank0连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "rank1连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "rank2连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "rank3连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "rank4连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "rank5连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "rank6连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "rank7连续109步且无完成标志",
+      "status": "PASS"
+    },
+    {
+      "name": "未错误接受为200步验收",
+      "status": "PASS"
+    },
+    {
+      "name": "全局1200秒冷却绑定本次释放",
+      "status": "PASS"
+    }
+  ],
+  "findings": [],
+  "input_sha256": {
+    "evidence/f637-fsdp8-selective-200-interrupted-evidence-manifest.json": "f6d122199421dea4e41fb4a80e9171860b01adc5388609af54dc5a3ecc1d745b",
+    "evidence/f637-fsdp8-selective-prefix109-strict-incomplete.json": "74bdd4948503f7f172a4a6b1447aa27f271ca577b53a66c8f7fab64de652ddeb",
+    "runs/r129-f637-fp32-fsdp8-selective-200/capture_precision_training.py": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6",
+    "runs/r129-f637-fp32-fsdp8-selective-200/capture_training.py": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+    "runs/r129-f637-fp32-fsdp8-selective-200/config.resolved.json": "f0b9acf7e737b91796034ab4356630b37d0ad123f1001d984890029400fd352d",
+    "runs/r129-f637-fp32-fsdp8-selective-200/config.yaml": "ebd67afaa4be29ce27749432ae856b0fa56ebaeda6a88889b78720e963d4c02e",
+    "runs/r129-f637-fp32-fsdp8-selective-200/expert_probe.py": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f",
+    "runs/r129-f637-fp32-fsdp8-selective-200/fp32_wgrad_experiment.py": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670",
+    "runs/r129-f637-fp32-fsdp8-selective-200/import-path.txt": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank0.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank1.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank2.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank3.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank4.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank5.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank6.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/initial-state-rank7.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/check/activation_checkpoint.json": "e200b7eda51c55eb6bbab83f91fd4527a59fd6c29c80ee80b5dd1b00c6164b7d",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/check/findings.json": "c1dc76c20e32c367de2830fa8947e632ef83d98a151a54e7f598c083f8742f79",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/check/fsdp_units.json": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/check/optimizer_layout_initial.json": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/check/parameter_ownership.csv": "d621eaf939f5a79fb10cc34f2c007e60bc009a3dec3a39ed74adebe80391864f",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/checkpoint/coverage.json": "c2c685e1fe5995375393df9abec6fc4807d65ae63768f41818f9fe4cc431ddd6",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/data/field_ownership.json": "41896dc974540373fa01a10a0b7087f543fac3d5df44c4ebe6fe37c6728d6cc3",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/data/findings.json": "ff9c9fad82662fc12754bd8f6714c7d329754d5a483e2aaa948566861f333170",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/environment.json": "f369139f250250c23de4422d6ed344f20857d315b032be0cb24d23f70a60d7c1",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/integration_state.json": "7e3defc6c12dd748ecd2325f6f3fe71f910eff1aed554b80ad3d343a8c50f111",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/inventory/candidate.json": "61c01341434d56aae0ecaf51eb73f655eb6de05fbfa5e65b0a6a4542bc5f026c",
+    "runs/r129-f637-fp32-fsdp8-selective-200/integration/trainer_config.resolved.json": "d26fc682d1fd54a07cee3df7075f79f1b3500b81f204a43949d60e188a8ee502",
+    "runs/r129-f637-fp32-fsdp8-selective-200/launcher.log": "8295fc6178458ca9e848e833b57ccc311ace668172358c01293efa77b1924c35",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank0.jsonl": "5daa910c3f3a36003a7e46c4cad18e027c9c8f378c0bdd6a3790e2655bf030f7",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank1.jsonl": "dd9ef0282e0061aa3b929018b9abaed730640512727fb2c16a70b1b941d15f14",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank2.jsonl": "6e52241710edad73528e94aad4f1b9e38ff954a1fe6a45db846b4a55ad3c3593",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank3.jsonl": "639486dfa2887005cb02a60b9364c0e6ea9ac6aa8489a327f8b72b0347943df4",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank4.jsonl": "f8ee20fa23d7e99550c27ee80049224cc4a44024f919455bd584036ccdc3d7f5",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank5.jsonl": "e54e406e45bc2c167cbe74164e31163fb393720e88cb91446ae00486313b3d93",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank6.jsonl": "37d1cbf13f4909932b1eeaa3898b2babbf35230470fe19ba8eb941e71df28264",
+    "runs/r129-f637-fp32-fsdp8-selective-200/metrics-rank7.jsonl": "666ec6aeca3fb952c06a76808820ba9ecb9080545c0cae48ab913ac0999b2e17",
+    "runs/r129-f637-fp32-fsdp8-selective-200/module_profile.py": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c",
+    "runs/r129-f637-fp32-fsdp8-selective-200/ns_batch_trace.py": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e",
+    "runs/r129-f637-fp32-fsdp8-selective-200/precision_experiments.py": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659",
+    "runs/r129-f637-fp32-fsdp8-selective-200/source-commit.txt": "11e1103266493a353af04b3be5136176b9341f77fb898c261b3028070b051334",
+    "runs/r129-f637-fp32-fsdp8-selective-200/source-status.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/r129-f637-fp32-fsdp8-selective-200/source.patch": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank0.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank1.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank2.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank3.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank4.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank5.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank6.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/start-rank7.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/0/stderr.log": "fbdd0f6d5104373c23910ef3284344479415274dbc1cd7d810606bf71b3435c8",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/0/stdout.log": "a66c257e81181289ee9ace35ef18390f84ce7c46c3bf8c46ed186f660bf14a64",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/1/stderr.log": "eab2137f272548d82f3743ad64672e6435fed41809775512797441041e99b5ac",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/1/stdout.log": "a0f9f77f78dc3692349af52b60e4920662c8248f830b212cf91bbfd902e4a813",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/2/stderr.log": "bd04978f60bd160db48997f995b4f803b4a817f96f10bc7a15a062dbfd0903ab",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/2/stdout.log": "ac817d9536acdc6697e4be29f4f0e1d621a292c2fa5cd94e19529723bb7076b6",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/3/stderr.log": "71241b4a22d9126922012f8416fe487bf2773417d081beefdac47d9b106d4634",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/3/stdout.log": "8d3ff0573b66d7337b85a039bd60d137e3a3f31acb44d133f7aec34247fde64a",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/4/stderr.log": "3f50da141db0d8e977934c865263aabe305bdda0bc5322d8ef222a86bc998060",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/4/stdout.log": "e79f3a628bca5667ac177f7c08f9867b2170307cdaac4279fd775c26c0b823d2",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/5/stderr.log": "46ff612117a61a01d81e910bb480c44da348d7e12c37a103221ba702c2558cc7",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/5/stdout.log": "37d642b3127ad112d433ce9387af13f7c578690ff5f670291d812f532f621d8a",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/6/stderr.log": "485f79b1d08615ebd82c9684fa5759096d24f6776d6494be1881e0c8b984fd40",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/6/stdout.log": "f7a3a24c816c1f0017d05256043e0047125e71acf5230e6d967c185337c11980",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/7/stderr.log": "5feec45f63c5e7f446f8260af1437a90503f2bd30f879223451dc425d937ea3c",
+    "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/7/stdout.log": "8d91b8e33bb83e1bf86cc66cef5de75cd9acf30bfe358404eb70c1eaec6de575",
+    "scheduling/global-resource-state.json": "ed89ada9b9734bdbef1aa1c4b558820c2ea48b6f6aa0b93ac564b7b0de8708c8",
+    "scheduling/r129-f637-fp32-fsdp8-selective-200.launcher.log": "4ac8bac707e8289d67752d7f75def14064d2facc8139b3e0e336ab68bab388e1",
+    "scheduling/r129-f637-fp32-fsdp8-selective-200.ownership-event.json": "e601093292ca0f2a8e9b42b01cdaac55201d00eb30d5adedaf64b6387d3770e7",
+    "scheduling/r129-f637-fp32-fsdp8-selective-200.receipt.json": "d3f20029dbfa69fc90b41c5ec5ac3defba283a7f7a8e3634b91b9c22cdf6b97f",
+    "scheduling/r129-f637-fp32-fsdp8-selective-200.request.json": "2610716e059d5ed6dac44990a7d253bdc2ddbcb3b1ca0f52e4aa9c4c902fbf5b",
+    "scheduling/resource-policy.json": "571b1cc516f4961faa81d9690a4c4052f17b8ca5cb07d3100aabe0bd8d45aa55",
+    "tools/fair_resource_guard.py": "83d461a2aba65cc0ad08b48bee8141ac45aaa4cd48eaea8a21eb129897cb9ae4",
+    "tools/run_fair_training_case.sh": "b093a110e0adb2725459831f5d89d042813d60f85d6bf9d81fbab7bb407adb93"
+  },
+  "actions": {
+    "npu_runs_started": 0,
+    "remote_operations": 0,
+    "production_files_modified": 0,
+    "github_writes": 0,
+    "only_written_file": "D:/Obsidian Vault D/hyperllal/jt-dev-8npu-20261014/evidence/f637-fsdp8-selective-interruption-independent-review.json"
+  }
+}

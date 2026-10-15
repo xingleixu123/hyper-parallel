@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec / independent interrupted-prefix evidence audit",
+  "reviewer": "review_token_spec",
+  "reviewed_at_utc": "2026-10-15T18:40:22.613543+00:00",
+  "status": "INCOMPLETE",
+  "evidence_audit_status": "PASS",
+  "precision_200_step_status": "INCOMPLETE",
+  "prefix_alignment": "EXACT_FOR_OBSERVED_PREFIX",
+  "reference": "r129-f637-fp32-fsdp8-0-200-r4",
+  "candidate": "r129-f637-fp32-fsdp8-selective-200",
+  "observed_steps": [
+    1,
+    109
+  ],
+  "requested_steps": [
+    1,
+    200
+  ],
+  "candidate_steps_per_rank": [
+    109,
+    109,
+    109,
+    109,
+    109,
+    109,
+    109,
+    109
+  ],
+  "reference_steps_per_rank": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
+  "comparisons_per_scalar": 872,
+  "unobserved_steps_per_rank": 91,
+  "conclusion_zh": "INCOMPLETE：八rank只完成1–109步，无complete标记和EXIT_CODE文件，receipt退出137。已观测前缀的LM/MTP/aux/total/grad_norm最大差均为0，按实际0.3/0.0001还原后仍为0；输入、48项初态哈希、计数、LR和数值配方一致。卡4外部PID的容器及PID namespace与本任务不同；本任务已释放且无残留。零误差前缀不能作为200步精度通过。",
+  "findings": [],
+  "incomplete_reasons_zh": [
+    "每rank仅109条连续step记录，缺少110–200步共91步。",
+    "八个complete-rank标记全部缺失。",
+    "运行目录没有EXIT_CODE文件；守卫receipt记录exit_code=137。"
+  ],
+  "weighted_scalar_errors": {
+    "training/total_loss": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    }
+  },
+  "per_rank_max_errors": {
+    "training/total_loss": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/lm": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/mtp": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/aux": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/grad_norm": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "unweighted_errors": {
+    "lm": 0.0,
+    "mtp": 0.0,
+    "aux": 0.0
+  },
+  "loss_coefficients": {
+    "mtp_loss_factor": 0.3,
+    "moe_aux_loss_coeff": 0.0001
+  },
+  "absolute_tolerance": 0.005,
+  "input_and_initial_state": {
+    "input_mismatches": 0,
+    "global_input_consistent_across_all_ranks_each_step": true,
+    "initial_mismatches": 0,
+    "initial_state_entries_per_rank": 48,
+    "start_global_step": 0,
+    "restore_from": null,
+    "counter_and_lr_mismatches": 0,
+    "consumed_tokens_at_109": 2065277.0,
+    "consumed_samples_at_109": 872.0
+  },
+  "manifests": [
+    {
+      "case": "r129-f637-fp32-fsdp8-0-200-r4",
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-r4-complete-evidence-manifest.json",
+      "sha256": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11",
+      "verified_files": 76,
+      "all_bytes_and_sha256_match": true,
+      "declared_archive_sha256": "0c5a6d0b92480395f6b44b678bc5f09ffb8a3488ce263e28f131c9219fc63c34"
+    },
+    {
+      "case": "r129-f637-fp32-fsdp8-selective-200",
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-selective-200-interrupted-evidence-manifest.json",
+      "sha256": "f6d122199421dea4e41fb4a80e9171860b01adc5388609af54dc5a3ecc1d745b",
+      "verified_files": 68,
+      "all_bytes_and_sha256_match": true,
+      "declared_archive_sha256": "2fce9ce19036688f33734b37509d8eb1f9ca83dfbb5a14fd4880287e52e18fb9"
+    }
+  ],
+  "config_differences": [
+    {
+      "path": ".activation_checkpoint.mode",
+      "reference": "off",
+      "candidate": "selective"
+    },
+    {
+      "path": ".checkpoint.checkpoint_dir",
+      "reference": "/work/checkpoints/r129-f637-fp32-fsdp8",
+      "candidate": "/work/checkpoints/r129-f637-fp32-fsdp8-selective-200"
+    },
+    {
+      "path": ".checkpoint.save_ckpt",
+      "reference": true,
+      "candidate": false
+    }
+  ],
+  "capture_helpers_same_bytes": [
+    {
+      "name": "capture_precision_training.py",
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "name": "capture_training.py",
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "name": "expert_probe.py",
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "name": "fp32_wgrad_experiment.py",
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "name": "module_profile.py",
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "name": "ns_batch_trace.py",
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "name": "precision_experiments.py",
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    }
+  ],
+  "execution": [
+    {
+      "case": "r129-f637-fp32-fsdp8-0-200-r4",
+      "host": "129",
+      "container_id": "d41078daf90e05af851ddd097afbd8995b7e7eafce8d08c21292839642315b40",
+      "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "exit_code": 0,
+      "released": true,
+      "remaining_owned_pids": [],
+      "duration_seconds": 376.6501968099983
+    },
+    {
+      "case": "r129-f637-fp32-fsdp8-selective-200",
+      "host": "129",
+      "container_id": "c0b03e3c76107daa56a4e85dbbc5190b78b4284897bd4e2154788c9c845e3812",
+      "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "exit_code": 137,
+      "released": true,
+      "remaining_owned_pids": [],
+      "duration_seconds": 270.35286103999533
+    }
+  ],
+  "interruption": {
+    "reason": "foreign-job-appeared-on-selected-devices",
+    "card": 4,
+    "external_process_count": 1,
+    "two_identity_snapshots_agree": true,
+    "external_pid_namespace_and_cgroup_differ_from_task": true,
+    "foreign_pid_still_present_on_card4_after_task_release": true,
+    "owned_pids_remaining": [],
+    "identity_scope_zh": "PID在两次身份采样中均属于另一Docker cgroup和PID namespace；UID同为0，不以UID作为不同归属证据。"
+  },
+  "selective_installation": {
+    "count_per_rank": 3,
+    "logs": [
+      {
+        "rank": 0,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/0/stderr.log",
+        "sha256": "fbdd0f6d5104373c23910ef3284344479415274dbc1cd7d810606bf71b3435c8"
+      },
+      {
+        "rank": 1,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/1/stderr.log",
+        "sha256": "eab2137f272548d82f3743ad64672e6435fed41809775512797441041e99b5ac"
+      },
+      {
+        "rank": 2,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/2/stderr.log",
+        "sha256": "bd04978f60bd160db48997f995b4f803b4a817f96f10bc7a15a062dbfd0903ab"
+      },
+      {
+        "rank": 3,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/3/stderr.log",
+        "sha256": "71241b4a22d9126922012f8416fe487bf2773417d081beefdac47d9b106d4634"
+      },
+      {
+        "rank": 4,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/4/stderr.log",
+        "sha256": "3f50da141db0d8e977934c865263aabe305bdda0bc5322d8ef222a86bc998060"
+      },
+      {
+        "rank": 5,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/5/stderr.log",
+        "sha256": "46ff612117a61a01d81e910bb480c44da348d7e12c37a103221ba702c2558cc7"
+      },
+      {
+        "rank": 6,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/6/stderr.log",
+        "sha256": "485f79b1d08615ebd82c9684fa5759096d24f6776d6494be1881e0c8b984fd40"
+      },
+      {
+        "rank": 7,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200/worker-logs/none_2s6rsmcg/attempt_0/7/stderr.log",
+        "sha256": "5feec45f63c5e7f446f8260af1437a90503f2bd30f879223451dc425d937ea3c"
+      }
+    ]
+  },
+  "published_strict_gate": {
+    "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-selective-prefix109-strict-incomplete.json",
+    "status": "FAIL",
+    "interpretation_zh": "FAIL来自运行不完整、缺少完成标记和200步要求；本独立报告将总体明确标为INCOMPLETE，不能解释为前缀数值不一致。"
+  },
+  "method_zh": [
+    "仅使用Python标准库对原始字节快照重新计算两份manifest的bytes/SHA；未调用或导入strict_compare。",
+    "逐rank校验step/rank身份、有限数值、初态shape/dtype/SHA、起点、累计token/sample；逐步核对8rank全局输入SHA及两运行输入/LR/计数。",
+    "直接计算109步×8rank五项scalar最大绝对差，按实际配置系数还原MTP/aux；然后才与已生成的严格门槛报告交叉核对。",
+    "递归核对resolved配方、同源码空patch/镜像和独立容器；检查缺失完成标记，并以归属事件验证卡4外部进程与本任务不同容器/namespace。"
+  ],
+  "boundaries_zh": [
+    "未观测110–200步，未获正常训练结束，因此不得标记200步precision PASS。",
+    "未加权分量由日志标量除实际系数推导；grad_norm不是完整梯度张量，初态哈希不等同最终参数对齐。",
+    "本次从0开始且restore_from为空，不验证恢复训练。",
+    "未据109步前缀给出200步显存、性能或性价比验收结论。",
+    "归档已清理，重新核验的是manifest内全部本地原始文件；仅核对记录中的archive SHA一致。",
+    "没有NPU/容器启动、源码修改或GitHub操作，只写本文件。"
+  ],
+  "reviewed_inputs": [
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-r4-complete-evidence-manifest.json",
+      "bytes": 15109,
+      "sha256": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-selective-200-interrupted-evidence-manifest.json",
+      "bytes": 13966,
+      "sha256": "f6d122199421dea4e41fb4a80e9171860b01adc5388609af54dc5a3ecc1d745b"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-selective-200-interrupted-local-verification.json",
+      "bytes": 210,
+      "sha256": "cd8ffe47958b052ccdabf7b7b67b1a41ddf427d1be841ce9ff18a0eb129989b3"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-selective-prefix109-strict-incomplete.json",
+      "bytes": 10751,
+      "sha256": "74bdd4948503f7f172a4a6b1447aa27f271ca577b53a66c8f7fab64de652ddeb"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\scheduling\\r129-f637-fp32-fsdp8-selective-200.ownership-event.json",
+      "bytes": 16009,
+      "sha256": "e601093292ca0f2a8e9b42b01cdaac55201d00eb30d5adedaf64b6387d3770e7"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\scheduling\\r129-f637-fp32-fsdp8-selective-200.receipt.json",
+      "bytes": 2914,
+      "sha256": "d3f20029dbfa69fc90b41c5ec5ac3defba283a7f7a8e3634b91b9c22cdf6b97f"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\scheduling\\r129-f637-fp32-fsdp8-0-200-r4.receipt.json",
+      "bytes": 2692,
+      "sha256": "c2f98e781b44fccec74b59200e8262ee2d5beb74c8aa596cdea03226910d43e0"
+    }
+  ],
+  "public_copy_notice_zh": "这是公开副本，仅将外部进程身份替换为关系布尔值；所有数值、验收状态和边界保持原样。原始独立审计保留本地。",
+  "original_local_review_sha256": "e532be497424a34cf880952594ec0ddd59a5ee0e937064b3dd42152b7ce8567e"
+}

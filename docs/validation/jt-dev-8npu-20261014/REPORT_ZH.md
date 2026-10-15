@@ -4,7 +4,7 @@
 
 本单是 JT DeepSeek V3 八卡验证的**总问题单**，统一关联所有已拆分的小问题及独立 PR，维护优先级、复现证据、精度曲线、显存/性能、重计算与续训验收状态。每个已确认的独立缺陷或接口需求各用一个小问题单和一个单提交 PR，两个方向均能回到本单；不把多个缺陷混入同一个修复提交。
 
-**当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2和CP2已完整跑完200步但精度失败；TP2仅完成69步前缀，当前配方完全重算200步×8rank已与off基线逐步一致，选择重算、TP及合法组合仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
+**当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2和CP2已完整跑完200步但精度失败；TP2仅完成69步前缀，当前配方完全重算200步×8rank已与off基线逐步一致，选择重算仅109步前缀全零后因外部争用让卡，TP及合法组合仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
 
 当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部14个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
 
@@ -19,7 +19,7 @@
 | Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
 | Top4 | 测试调度器覆盖上层NPU可见列表，使设备分配越界 | [#223](https://github.com/hf1s/hyper-parallel/issues/223) | [#224](https://github.com/hf1s/hyper-parallel/pull/224) | 单提交2文件；无设备回归10测试/18子测试通过、两轴检视通过；不等同实际多卡训练验证 |
 | Top5 | CP 分块输出损失的支持与回归覆盖 | [#205](https://github.com/hf1s/hyper-parallel/issues/205) | [#199](https://github.com/hf1s/hyper-parallel/pull/199) | 功能已由上游 #186 合入；#199 收敛为独立回归，新基点 CPU20项/25子测试及129四卡短步ST通过；每组2步，不代替200步验收 |
-| Top6 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；当前配方full200步×8rank全部loss/梯度范数零误差，两个主干层和一个MTP层均包裹；selective待验 |
+| Top6 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；当前配方full200步×8rank全部loss/梯度范数零误差，两个主干层和一个MTP层均包裹；selective仅109步零误差前缀，200步未验 |
 | Top7 | 重计算重放重复提交专家路由 token 计数 | [#207](https://github.com/hf1s/hyper-parallel/issues/207) | [#196](https://github.com/hf1s/hyper-parallel/pull/196) | 保留必要张量运算，只约束持久副作用；均匀重复计数未必改变 sign 型 bias 更新，不能虚构旧 loss 漂移 |
 | Top8 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 最新固定配方201–400×8rank累计/逐步计数与独立400参考一致；各loss与梯度最大差0；集成结果不全部归因于本PR |
 | Top9 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
@@ -33,6 +33,22 @@
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
 已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `b540051`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+
+## 最新执行：选择重算109步让卡，完整验收未完成（2026-10-16，UTC+8）
+
+`r129-f637-fp32-fsdp8-selective-200`在上轮释放满20分钟、八卡空闲检查后启动；八rank均记录连续109步，卡4随后出现不属于本任务的进程。两次归属快照及独立复核确认其namespace/cgroup不同，守卫只停止本任务容器。exit137、运行270.352861秒，已释放且没有本任务PID残留，外部实验继续运行。此为资源冲突中断，不作为新的训练代码缺陷。
+
+| 共同已观测范围 | LM | 日志及按系数还原MTP | 日志及按系数还原aux | 总loss | 梯度范数 | 200步验收 |
+|---|---:|---:|---:|---:|---:|---|
+| 全8rank、1–109步最大绝对差 | 0 | 0 | 0 | 0 | 0 | **未完成** |
+
+原始严格比较仍为FAIL：缺少每rank后91步、8份完成标记及运行内EXIT_CODE，不能把零误差前缀当作200步通过。Spec数值审计与归属/释放审计分别复核通过；它们确认已有证据可靠，不替代完整训练验收。末尾资源数据可能受争用影响，因此本轮不发布选择重算性能/显存收益。MTP/aux为按实际0.3/0.0001系数还原，梯度结论仅限范数。
+
+![选择重算仅109步前缀，不代表完整200步验收](figures/f637-fsdp8-selective-prefix109-raw-zh.png)
+
+68份原始文件大小/SHA全部核验，66份训练文件原样公开；2份包含外部身份的调度原文仅本地保留，公开清单说明遗漏并提供匿名回执/审计。两端重复归档已删除。重试r2实际镜像解析通过，未初始化NPU；下一轮最早2026-10-16 02:54:53.613277（UTC+8），同时遵守monotonic释放后1200秒及新一轮空闲检查。
+
+[完整中文记录](reports/f637-fsdp8-selective-prefix109/README_ZH.md) · [严格未完成比较](reports/f637-fsdp8-selective-prefix109/f637-fsdp8-selective-prefix109-strict-incomplete.json) · [公开清单](reports/f637-fsdp8-selective-prefix109/public-manifest.json) · [独立数值审计](reports/f637-fsdp8-selective-prefix109/f637-fsdp8-selective-prefix109-independent-review-public.json) · [独立归属审计](reports/f637-fsdp8-selective-prefix109/f637-fsdp8-selective-interruption-independent-review.json) · [当前首差定位计划](reports/f637-fsdp8-selective-prefix109/precision-localization-plan-v6.md)。
 
 ## 最新完整结果：完全重算200步精度通过及性价比（2026-10-16，UTC+8）
 
@@ -57,7 +73,7 @@
 
 实际构建日志与模块清单覆盖两个主干解码层及一个MTP解码层。当前固定源码未集成仅修报告的#230，旧报告仍可能把两个动态派生wrapper漏计为总计1；这是#229中已独立复现的统计问题，不能反推本轮只重算了一个区域。该训练结果属于修复集成源，不把全部零误差或全部显存收益归因于单个PR。
 
-76份原始文件逐一验证大小/SHA，两端重复压缩包均已清理。下一次NPU实验必须晚于2026-10-16 02:29:49.787256（UTC+8），再由守卫核验空闲设备；不提前占卡。
+76份原始文件逐一验证大小/SHA，两端重复压缩包均已清理。该轮释放后20分钟门槛为2026-10-16 02:29:49.787256（UTC+8）；后续selective已遵守该间隔，当前等待时间见上方最新记录。
 
 [严格精度比较](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-strict-comparison.json) · [完整分析](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-complete-analysis.json) · [76份采集清单](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-r4-complete-evidence-manifest.json) · [8rank原始证据](reports/f637-fsdp8-full-200-complete/raw/runs/r129-f637-fp32-fsdp8-full-200-r4) · [全rank资源](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-all-rank-resources.json) · [匹配off资源](reports/f637-fsdp8-full-200-complete/f637-fsdp8-r4-all-rank-resources.json) · [SHA与清理凭据](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-r4-complete-local-verification.json) · [精度独立复算](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-independent-evidence-review.json) · [资源独立复算](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-resource-independent-review.json)。
 
