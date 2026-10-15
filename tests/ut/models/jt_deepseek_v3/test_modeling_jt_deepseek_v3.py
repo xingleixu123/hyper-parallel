@@ -24,6 +24,7 @@ from unittest.mock import patch
 
 import torch
 from torch.nn import functional as F
+from torch.utils.checkpoint import DefaultDeviceType
 
 from hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3 import (
     JTDeepseekV3Config,
@@ -74,6 +75,11 @@ def _cpu_grouped_swiglu(inputs, gate_up_weight, down_weight, counts):
 
 class TestCompleteModel(unittest.TestCase):
     """Exercise model semantics without a builder, EP adapter or replacement pass."""
+
+    def setUp(self) -> None:
+        """Keep CPU checkpoint replay independent of the installed accelerator backend."""
+        self.addCleanup(DefaultDeviceType.set_device_type, DefaultDeviceType.get_device_type())
+        DefaultDeviceType.set_device_type("cpu")
 
     def _assert_gradients_match(self, reference: torch.nn.Module, candidate: torch.nn.Module) -> None:
         """Compare every parameter, including parameters unused by the selected objective."""

@@ -24,7 +24,7 @@ from unittest.mock import patch
 
 import torch
 from torch.distributed.tensor import DTensor as TorchDTensor
-from torch.utils.checkpoint import checkpoint
+from torch.utils.checkpoint import DefaultDeviceType, checkpoint
 
 from hyper_parallel.core.dtensor.dtensor import DTensor
 from hyper_parallel.core.dtensor.placement_types import Shard
@@ -97,6 +97,8 @@ class TestGroupedSwiGLUGradients(unittest.TestCase):
 
     def setUp(self) -> None:
         """Replace only NPU kernels, keeping the production autograd wrapper."""
+        self.addCleanup(DefaultDeviceType.set_device_type, DefaultDeviceType.get_device_type())
+        DefaultDeviceType.set_device_type("cpu")
         backend = SimpleNamespace(npu_grouped_matmul=grouped_mm, npu_grouped_matmul_add_=grouped_add)
         self.enterContext(patch.dict(sys.modules, {"torch_npu": backend}))
         self.enterContext(patch.object(grouped_swiglu, "_NPU_GROUPED_MATMUL", None))
