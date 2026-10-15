@@ -1,0 +1,65 @@
+{
+  "complete": true,
+  "sources": [
+    {
+      "project": "CANN ops-nn",
+      "commit": "7a44832e08fa1a0604621f8fdb6b72d0f85b61ce",
+      "path": "activation/swi_glu_grad/op_kernel/swi_glu_grad.cpp",
+      "lines": [
+        36,
+        40,
+        53,
+        57
+      ],
+      "local": "shared-swiglu205-cann-swi_glu_grad.cpp.txt",
+      "finding": "BF16分支以float作为calcType；这是公开源码快照，未证明与本机CANN9.2二进制逐行对应。",
+      "sha256": "c9a7a387a611c3a5c8fa1ab282779ffa4316252f9f84e35fb1ede2657c4ae96f",
+      "url": "https://gitcode.com/cann/ops-nn/blob/7a44832e08fa1a0604621f8fdb6b72d0f85b61ce/activation/swi_glu_grad/op_kernel/swi_glu_grad.cpp#L36"
+    },
+    {
+      "project": "CANN ops-nn",
+      "commit": "7a44832e08fa1a0604621f8fdb6b72d0f85b61ce",
+      "path": "activation/swi_glu_grad/op_kernel/swi_glu_grad_bf16.hpp",
+      "lines": [
+        87,
+        95,
+        132,
+        168
+      ],
+      "local": "shared-swiglu205-cann-swi_glu_grad_bf16.hpp.txt",
+      "finding": "上行梯度先计算sigmoid乘gate，再乘上游梯度，末端转换输出精度。源码支持浮点分解顺序假设，不是算子有错的证据。",
+      "sha256": "8b484c93687eb470a0d4482511fe9ce4f6214dd9761d26657bbbb7bc5fb7d942",
+      "url": "https://gitcode.com/cann/ops-nn/blob/7a44832e08fa1a0604621f8fdb6b72d0f85b61ce/activation/swi_glu_grad/op_kernel/swi_glu_grad_bf16.hpp#L87"
+    },
+    {
+      "project": "Megatron-LM",
+      "commit": "915b1d2d427e526dabc4a0b460562c257376025c",
+      "path": "megatron/core/fusions/fused_bias_swiglu.py",
+      "lines": [
+        143,
+        158
+      ],
+      "local": "shared-swiglu205-megatron_source.txt",
+      "finding": "swiglu_back的up分支在源码层使用上游梯度乘F.silu；函数带jit_fuser，不能据Python表达式保证与当前NPU的中间精度、融合路径或结果逐位相同。",
+      "sha256": "f6cb523b234a35442465ce7b329cc9f535ed7c9b8018801b78e8ef7b756526d3",
+      "url": "https://github.com/NVIDIA/Megatron-LM/blob/915b1d2d427e526dabc4a0b460562c257376025c/megatron/core/fusions/fused_bias_swiglu.py#L143"
+    }
+  ],
+  "same_input_evidence": "shared-activation-row205-comparison.json",
+  "replay_evidence": "shared-swiglu205-up-screen.json",
+  "correctness": {
+    "mathematical_formula": "up_grad = dy * gate / (1 + exp(-gate))",
+    "decimal_precision": 90,
+    "different_row_up_coordinates": 1,
+    "hp_closer": 0,
+    "mf_closer": 1,
+    "tie": 0,
+    "assessment": "本处MF取到更近的BF16值，但两边绝对误差仅相差约2.6274e-16。不可从一个临界点推导整个CANN版本或全部激活更正确；当前归类为有真实训练影响的舍入路径差异。",
+    "no_default_fix_yet": "候选仅用于独立兼容性实验，未作为默认产品修复提交；先观察完整窗口及优化器交互。"
+  },
+  "limits": [
+    "未获得运行中SwiGluGrad二进制的内部中间值或kernel构建提交。",
+    "源码路径和同输入重放共同支持解释；具体哪条底层指令首次舍入不一致仍未定位。",
+    "原始MF包未改动；HP因子不读MF参考数值，不特判步数或坐标。"
+  ]
+}

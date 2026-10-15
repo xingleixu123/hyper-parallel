@@ -1,0 +1,71 @@
+{
+  "complete": true,
+  "records": [
+    {
+      "variant": "native_nn",
+      "vs_native_hp": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": -1.1781230568885803e-07,
+        "mf_at_worst": -1.1781230568885803e-07
+      },
+      "vs_native_mf": {
+        "exact": false,
+        "size": 20971520,
+        "different": 360,
+        "max_abs": 1.4551915228366852e-11,
+        "rel_l2": 5.414063586083853e-09,
+        "worst_index": [
+          1605,
+          1207
+        ],
+        "hp_at_worst": -1.862645149230957e-09,
+        "mf_at_worst": -1.877197064459324e-09
+      },
+      "sha256": "8043d32aeb0c39591d5239ef934ac10075563bc7c9b9edce6253bbacb4256061"
+    },
+    {
+      "variant": "native_nn_with_mf_dy",
+      "vs_native_hp": {
+        "exact": false,
+        "size": 20971520,
+        "different": 360,
+        "max_abs": 1.4551915228366852e-11,
+        "rel_l2": 5.414063586083852e-09,
+        "worst_index": [
+          1605,
+          1207
+        ],
+        "hp_at_worst": -1.877197064459324e-09,
+        "mf_at_worst": -1.862645149230957e-09
+      },
+      "vs_native_mf": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": -1.1781230568885803e-07,
+        "mf_at_worst": -1.1781230568885803e-07
+      },
+      "sha256": "c4227025958960405eee599cedd7cb9a8bd3cc98c7247e530aea47eee6ff0471"
+    }
+  ],
+  "runtime": {
+    "torch": "2.12.0+cpu",
+    "deterministic": true,
+    "CLOSE_MATMUL_K_SHIFT": "0"
+  },
+  "scope": "Replay both actual upstream gradients with the same BF16 weight and full GEMM shape on CANN9.2. Diagnostic only; no training acceptance."
+}

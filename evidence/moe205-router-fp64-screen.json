@@ -1,0 +1,76 @@
+{
+  "complete": true,
+  "fidelity": {
+    "all_metrics_grad_norm_exact": true,
+    "all_inputs_exact": true,
+    "restore_exact": true
+  },
+  "native_join_replay": {
+    "exact": true,
+    "size": 20971520,
+    "different": 0,
+    "max_abs": 0.0,
+    "rel_l2": 0.0,
+    "worst_index": [
+      0,
+      0
+    ],
+    "hp_at_worst": -1.7955899238586426e-06,
+    "mf_at_worst": -1.7955899238586426e-06
+  },
+  "router_vs_fp64_rounded": {
+    "exact": false,
+    "size": 20971520,
+    "different": 4639140,
+    "max_abs": 7.275957614183426e-12,
+    "rel_l2": 2.3984640326609357e-08,
+    "worst_index": [
+      251,
+      294
+    ],
+    "hp_at_worst": -6.523924093926325e-05,
+    "mf_at_worst": -6.523923366330564e-05
+  },
+  "combined_vs_native_mf": {
+    "native": {
+      "exact": false,
+      "size": 20971520,
+      "different": 49,
+      "max_abs": 1.1641532182693481e-10,
+      "rel_l2": 3.4480305263630728e-09,
+      "worst_index": [
+        1605,
+        660
+      ],
+      "hp_at_worst": 1.6996636986732483e-08,
+      "mf_at_worst": 1.7113052308559418e-08
+    },
+    "router_fp64_then_fp32": {
+      "exact": false,
+      "size": 20971520,
+      "different": 60,
+      "max_abs": 1.1641532182693481e-10,
+      "rel_l2": 3.870749355792356e-09,
+      "worst_index": [
+        1605,
+        660
+      ],
+      "hp_at_worst": 1.6996636986732483e-08,
+      "mf_at_worst": 1.7113052308559418e-08
+    },
+    "pair_fp64_round_direct_bf16": {
+      "exact": false,
+      "size": 20971520,
+      "different": 203,
+      "max_abs": 9.5367431640625e-07,
+      "rel_l2": 2.858291004380787e-05,
+      "worst_index": [
+        65,
+        2720
+      ],
+      "hp_at_worst": 8.678436279296875e-05,
+      "mf_at_worst": 8.7738037109375e-05
+    }
+  },
+  "scope": "Read-only same-HP-input router FP64 GEMM; MF router operands not yet compared. Conditional on actual routed/shared gradients; not whole-model correctness or acceptance."
+}
