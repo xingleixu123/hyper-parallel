@@ -1,0 +1,61 @@
+{
+  "scope": "离线证据工具反例；不是NPU精度验收",
+  "checks": 11,
+  "results": [
+    {
+      "case": "valid",
+      "passed": true,
+      "rejected_reason": null
+    },
+    {
+      "case": "missing_baseline_complete",
+      "passed": true,
+      "rejected_reason": "Missing collected input: r129-f637-fp32-fsdp8-0-200-r4/complete-rank7.json"
+    },
+    {
+      "case": "changed_baseline_metric",
+      "passed": true,
+      "rejected_reason": "Collected input SHA or size differs: r129-f637-fp32-fsdp8-0-200-r4/metrics-rank7.jsonl"
+    },
+    {
+      "case": "short_baseline",
+      "passed": true,
+      "rejected_reason": "Incomplete run start or coverage: r129-f637-fp32-fsdp8-0-200-r4, rank 7"
+    },
+    {
+      "case": "source_mismatch",
+      "passed": true,
+      "rejected_reason": "Execution receipt does not match the run: r129-f637-fp32-fsdp8-200-400-r2"
+    },
+    {
+      "case": "patch_mismatch",
+      "passed": true,
+      "rejected_reason": "Execution receipt patch does not match: r129-f637-fp32-fsdp8-200-400-r2"
+    },
+    {
+      "case": "failed_exit",
+      "passed": true,
+      "rejected_reason": "Recorded process exit was not zero"
+    },
+    {
+      "case": "image_mismatch",
+      "passed": true,
+      "rejected_reason": "Source, runtime image, or numerical recipe differs"
+    },
+    {
+      "case": "recipe_mismatch",
+      "passed": true,
+      "rejected_reason": "Source, runtime image, or numerical recipe differs"
+    },
+    {
+      "case": "plot_missing_rank",
+      "passed": true,
+      "rejected_reason": "Missing collected input: r129-f637-fp32-fsdp8-200-400-r2/metrics-rank7.jsonl"
+    },
+    {
+      "case": "plot_output_over_input",
+      "passed": true,
+      "rejected_reason": "The output report must be outside both input run directories"
+    }
+  ]
+}

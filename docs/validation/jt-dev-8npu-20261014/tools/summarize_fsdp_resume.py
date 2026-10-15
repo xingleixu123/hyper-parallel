@@ -15,47 +15,76 @@
 """Summarize a completed resume without substituting for an independent comparison."""
 
 import argparse
+import hashlib
 import json
 import math
+import re
 import statistics
 from pathlib import Path
 
 from compare_runs import LOSSES, read_rows
-from strict_compare_runs import _validate_output, _verify_manifest
+from strict_compare_runs import _execution, _recipe, _validate_output, _verify_manifest
 
 
-def main() -> None:
-    """Validate the recovered boundary and summarize all eight rank traces."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("baseline", type=Path)
-    parser.add_argument("resumed", type=Path)
-    parser.add_argument("manifest", type=Path)
-    parser.add_argument("output", type=Path)
-    args = parser.parse_args()
-    _validate_output(args.output, args.baseline, args.resumed, (args.manifest,))
-    receipt_path = args.resumed.parent.parent / "scheduling" / (args.resumed.name + ".receipt.json")
-    receipt = json.loads(receipt_path.read_text())
-    problems = _verify_manifest(args.resumed, args.manifest)
-    if receipt.get("exit_code") != 0 or not receipt.get("released") or receipt.get("reason"):
-        problems.append("Execution was not cleanly completed and released")
+def _verified_run(directory: Path, manifest: Path, first: int, last: int) -> tuple:
+    """Bind a complete eight-rank run to its collection and execution identity."""
+    problems = _verify_manifest(directory, manifest)
+    if problems:
+        raise ValueError("; ".join(problems))
+    commit = (directory / "source-commit.txt").read_text().strip()
+    if not re.fullmatch(r"[0-9a-f]{40}", commit):
+        raise ValueError("A complete source SHA is required")
+    source = {"commit": commit, "patch_sha256": hashlib.sha256((directory / "source.patch").read_bytes()).hexdigest()}
+    _, problems = _execution(directory, source)
+    if (directory / "EXIT_CODE").read_text().strip() != "0":
+        problems.append("Recorded process exit was not zero")
+    if problems:
+        raise ValueError("; ".join(problems))
+    rows = [read_rows(directory, rank) for rank in range(8)]
+    for rank, values in enumerate(rows):
+        start = json.loads((directory / f"start-rank{rank}.json").read_text())
+        complete = json.loads((directory / f"complete-rank{rank}.json").read_text())
+        if sorted(values) != list(range(first, last + 1)) or start["global_step"] != first - 1:
+            raise ValueError(f"Incomplete run start or coverage: {directory.name}, rank {rank}")
+        if complete["global_step"] != last:
+            raise ValueError(f"Incomplete run completion: {directory.name}, rank {rank}")
+    receipt = json.loads((directory.parent.parent / "scheduling" / (directory.name + ".receipt.json")).read_text())
+    return rows, receipt, source, json.loads((directory / "config.resolved.json").read_text())
+
+
+def summarize_resume(baseline: Path, resumed: Path, baseline_manifest: Path, resumed_manifest: Path) -> dict:
+    """Validate both complete runs; keep precision unverified without an independent reference."""
+    before, base_receipt, base_source, base_config = _verified_run(baseline, baseline_manifest, 1, 200)
+    after, receipt, source, config = _verified_run(resumed, resumed_manifest, 201, 400)
+    if baseline.resolve() == resumed.resolve() or base_receipt["container_id"] == receipt["container_id"]:
+        raise ValueError("Separate baseline and resume executions are required")
+    if base_source != source or base_receipt["image"] != receipt["image"] or _recipe(base_config) != _recipe(config):
+        raise ValueError("Source, runtime image, or numerical recipe differs")
+    for field in ("accelerator", "activation_checkpoint", "fsdp_config"):
+        if base_config[field] != config[field]:
+            raise ValueError(f"Resume configuration changed: {field}")
+    for field in ("mtp_loss_factor", "moe_aux_loss_coeff"):
+        coefficient = float(config["model"]["config"][field])
+        if not math.isfinite(coefficient) or coefficient <= 0:
+            raise ValueError("Loss coefficients must be positive and finite")
+    problems = []
     all_rows = []
     boundaries = []
     fields = (*LOSSES, "training/grad_norm", "data/consumed_samples", "data/consumed_tokens")
     for rank in range(8):
-        rows = read_rows(args.resumed, rank)
+        rows = after[rank]
         all_rows.append(rows)
-        start = json.loads((args.resumed / f"start-rank{rank}.json").read_text())
-        complete = json.loads((args.resumed / f"complete-rank{rank}.json").read_text())
-        if sorted(rows) != list(range(201, 401)) or start["global_step"] != 200 or complete["global_step"] != 400:
-            raise ValueError(f"Incomplete resume boundary on rank {rank}")
-        previous = read_rows(args.baseline, rank)[200]
-        for step, row in sorted(rows.items()):
+        previous = {"data/consumed_samples": 0, "data/consumed_tokens": 0}
+        chain = {**before[rank], **rows}
+        for step, row in sorted(chain.items()):
             if any(not math.isfinite(value) for value in row.values() if isinstance(value, (int, float))):
                 problems.append(f"Nonfinite metric: rank {rank}, step {step}")
             identity = row["input_identity"]
-            if row["rank"] != rank or identity["rank_count"] != 8:
+            if (row["rank"] != rank or identity["rank_count"] != 8
+                    or not re.fullmatch(r"[0-9a-f]{64}", identity["global_sha256"])):
                 problems.append(f"Invalid rank identity: rank {rank}, step {step}")
-            if identity["global_sha256"] != all_rows[0][step]["input_identity"]["global_sha256"]:
+            reference_rows = before[0] if step <= 200 else after[0]
+            if identity["global_sha256"] != reference_rows[step]["input_identity"]["global_sha256"]:
                 problems.append(f"Cross-rank input identity differs: rank {rank}, step {step}")
             for suffix in ("samples", "tokens"):
                 current = row[f"data/consumed_{suffix}"]
@@ -67,7 +96,7 @@ def main() -> None:
                            "last": {key: rows[400][key] for key in fields}})
     rows_flat = [row for rows in all_rows for row in rows.values()]
     report = {
-        "case": args.resumed.name,
+        "case": resumed.name,
         "status": "INTEGRITY_FAILED" if problems else "RUN_COMPLETE_REFERENCE_COMPARISON_PENDING",
         "precision_verdict": "UNVERIFIED",
         "scope": "运行完整性与恢复边界核验；不是独立连续400步对照，也不证明性能收益",
@@ -87,9 +116,23 @@ def main() -> None:
         "peak_allocated_gib": max(row["memory/device_max_allocated_gb"] for row in rows_flat),
         "peak_reserved_gib": max(row["memory/device_max_reserved_gb"] for row in rows_flat),
     }
+    return report
+
+
+def main() -> None:
+    """Write a summary only outside the immutable input evidence."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("baseline", type=Path)
+    parser.add_argument("resumed", type=Path)
+    parser.add_argument("manifest", type=Path)
+    parser.add_argument("output", type=Path)
+    parser.add_argument("--baseline-manifest", type=Path, required=True)
+    args = parser.parse_args()
+    _validate_output(args.output, args.baseline, args.resumed, (args.baseline_manifest, args.manifest))
+    report = summarize_resume(args.baseline, args.resumed, args.baseline_manifest, args.manifest)
     args.output.write_bytes((json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode())
     print(json.dumps({key: value for key, value in report.items() if key != "boundaries"}, ensure_ascii=False))
-    raise SystemExit(bool(problems))
+    raise SystemExit(bool(report["problems"]))
 
 
 if __name__ == "__main__":

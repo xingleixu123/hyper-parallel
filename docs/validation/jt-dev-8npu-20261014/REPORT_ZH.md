@@ -1,3 +1,15 @@
+## 独立参考等待资源、证据复审与清理（2026-10-15）
+
+FSDP基线1–200和checkpoint200续训201–400均已完整完成，详见下一节。独立连续0–400参考在满足全局20分钟间隔后首次检查发现3号卡占用，没有启动；随后再次确认八卡空闲才启动，初始化阶段再次发现3号卡外部进程，整轮约41.64秒后因让卡结束。其PID命名空间及控制组与本任务不同，刷新进程清单后仍存在；守卫只释放本任务容器，退出137，无本任务设备PID残留。**8rank均为0训练步，既不能作为独立参考，也不属于loss精度失败。** 下次最早于2026-10-15 20:29:37（UTC+8）后检查空卡，仍使用相同源码、镜像和配置。
+
+[参考中断及归属摘要](reports/f637-fsdp8-continuous400-interrupted/f637-fsdp8-continuous400-interrupted-analysis.json) · [释放凭据](reports/f637-fsdp8-continuous400-interrupted/r129-f637-fp32-fsdp8-continuous400.receipt.json) · [31份文件采集校验](reports/f637-fsdp8-continuous400-interrupted/f637-fsdp8-continuous400-interrupted-local-verification.json)。重复压缩包两端已删除，原始进程身份仅保留本地。
+
+完成两轴复审，其中验收轴独立重算完整基线和续训的8rank逐步数据，确认报告数值、计数边界和图示还原系数正确，明确保留精度UNVERIFIED。验收轴同时发现两个离线辅助工具缺口：摘要只绑定续训采集清单，绘图只凭rank0记录便标为运行完成。现已让摘要同时核对两侧采集SHA、完整窗口、源码/patch/执行凭据/退出码、镜像与数值配方；绘图复用同一摘要检查。11项有效输入及反例全部通过，独立复审确认两处缺口已关闭。**重算后真实摘要所有字段和PNG字节均与原版相同，没有改动原始训练证据或生产训练源码。**
+
+[两轴最终复审](reports/f637-resume-review/resume-evidence-helper-review.json) · [11项反例回归](reports/f637-resume-review/resume-evidence-helper-validation.json) · [真实结果及图像字节一致性](reports/f637-resume-review/resume-evidence-helper-result-equivalence.json) · [中文总单/子问题/PR最新关联核对](reports/f637-resume-review/github-chinese-full-link-audit.json)。关联核对绑定本次追加前的已发布总单正文；10个子问题和10个单提交草稿PR关系不变。
+
+经来源、完整运行记录、当前容器及文件使用检查，125的旧`production-fp32-fsdp8`和129的旧`r129-jtclean-fp32-fsdp8` checkpoint已被最新源码实验取代，不再用于后续恢复；保留逐文件清单、小元数据、张量头和原始运行证据后，清理共55,946,525,680字节（约55.95GB）。最新checkpoint200的25个文件大小、修改时间及小文件SHA与基线保存时一致，继续完整保留；这不宣称大张量文件全量哈希校验。[清理范围摘要](reports/f637-resume-review/f637-checkpoint-cleanup-summary.json) · [最新checkpoint保留核对](reports/f637-resume-review/f637-checkpoint-retained-after-complete-resume.json)。
+
 ## 最新进展：完整完成 FSDP 0–200 与 200–400 续训（2026-10-15）
 
 北京时间19:37再次核对，JT_dev仍为`f637ef7ee4d4b416800716f1ebaaae7709b8a06a`；本轮沿用含#180和已检视修复的固定集成源码`18602c4524dc664b81b2bad9a7b624455ce1494f`、同一镜像及CANN 9.2.0-beta.2。满足全局20分钟间隔且129八卡两次空闲检查通过后，第二次恢复完整完成step201–400：**8个rank各200条记录、退出码0、376.91秒内正常释放全部设备，无本任务残留PID。** 没有改动本轮数值配方或占用别人正在使用的卡。
@@ -9,7 +21,7 @@ checkpoint实际加载日志记录`global_step=200, start_epoch=0, start_step=20
 | FSDP基线第四轮 | 1–200 | 22.032196 / 27.25 GiB | 1.155003秒 | 已完整运行，独立对照待完成 |
 | 从checkpoint200恢复第二轮 | 201–400 | 22.032196 / 25.316406 GiB | 1.160107秒 | 已完整恢复并训练，独立对照待完成 |
 
-表内步时包含相同的指标及输入身份观测开销；两行数据步区间不同，不能据此宣称吞吐提升或下降。图中仅展示rank0轨迹，MTP/aux按配置系数0.3/0.0001还原；它不是误差对齐图。**当前精度状态仍为UNVERIFIED，尚未声称LM、MTP、aux连续200步误差≤0.005。** 下一项是同源独立0–400参考，分别核验基线1–200和续训201–400的全部8rank、加权日志及还原未加权分量；下一次最早于2026-10-15 20:05:59（UTC+8）后检查空卡。
+表内步时包含相同的指标及输入身份观测开销；两行数据步区间不同，不能据此宣称吞吐提升或下降。图中仅展示rank0轨迹，MTP/aux按配置系数0.3/0.0001还原；它不是误差对齐图。**当前精度状态仍为UNVERIFIED，尚未声称LM、MTP、aux连续200步误差≤0.005。** 下一项是同源独立0–400参考，分别核验基线1–200和续训201–400的全部8rank、加权日志及还原未加权分量；满足间隔后的首次参考尝试遇到资源冲突，后续记录及下一次允许启动时间见首节。
 
 ![FSDP基线与续训完整轨迹；独立精度验收仍待完成](figures/f637-fsdp8-resume-chain-zh.png)
 

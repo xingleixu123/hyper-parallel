@@ -24,6 +24,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from compare_runs import read_rows
+from strict_compare_runs import _validate_output
+from summarize_fsdp_resume import summarize_resume
 
 
 def main() -> None:
@@ -32,7 +34,15 @@ def main() -> None:
     parser.add_argument("baseline", type=Path)
     parser.add_argument("resumed", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--baseline-manifest", type=Path, required=True)
+    parser.add_argument("--resumed-manifest", type=Path, required=True)
     args = parser.parse_args()
+    manifests = (args.baseline_manifest, args.resumed_manifest)
+    for extension in (".png", ".svg"):
+        _validate_output(args.output.with_suffix(extension), args.baseline, args.resumed, manifests)
+    summary = summarize_resume(args.baseline, args.resumed, *manifests)
+    if summary["problems"]:
+        raise ValueError("Cannot plot a completed chain with failed integrity checks")
     baseline = read_rows(args.baseline, 0)
     resumed = read_rows(args.resumed, 0)
     if sorted(baseline) != list(range(1, 201)) or sorted(resumed) != list(range(201, 401)):
