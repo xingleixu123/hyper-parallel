@@ -1,0 +1,32 @@
+................................................................ [ 11%]
+............ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 24%]
+ssssssssssssssssssssssssssssssssssss.................................... [ 37%]
+........................................................................ [ 50%]
+........................................................................ [ 63%]
+........................................................................ [ 76%]
+.............................................. [ 85%]
+................................................................... [ 97%]
+...............                                                          [100%]
+=============================== warnings summary ===============================
+tests/ut/core/dtensor/test_comm_debug_mode.py::TestCollectiveTracer::test_callback_is_invoked
+  /work/fixes/uneven-full-tensor/hyper_parallel/core/utils/communication.py:416: FutureWarning: torch.distributed.nn.functional.all_reduce is deprecated, use torch.distributed._functional_collectives.all_reduce instead.
+    return dist_func.all_reduce(data, op=resolve_reduce_op(op), group=group)
+
+tests/ut/core/dtensor/test_manual_seed.py::TestManualSeed::test_no_op_on_cpu_mesh_does_not_touch_dispatcher_seed
+  /work/fixes/uneven-full-tensor/hyper_parallel/core/dtensor/random.py:471: UserWarning: DTensor random operators may not have complete support on cpu device mesh
+    if not is_rng_supported_mesh(device_mesh):
+
+tests/ut/core/dtensor/test_manual_seed.py::TestManualSeed::test_no_op_on_cpu_mesh_does_not_touch_dispatcher_seed
+  /work/fixes/uneven-full-tensor/tests/ut/core/dtensor/test_manual_seed.py:72: UserWarning: DTensor manual_seed() may not have complete support on cpu device mesh
+    manual_seed(42, mesh)
+
+tests/ut/core/dtensor/test_random.py::TestIsRngSupportedMesh::test_cpu_mesh_returns_false
+  /work/fixes/uneven-full-tensor/tests/ut/core/dtensor/test_random.py:243: UserWarning: DTensor random operators may not have complete support on cpu device mesh
+    result = is_rng_supported_mesh(mock_mesh)
+
+tests/ut/core/dtensor/test_random.py::TestIsRngSupportedMesh::test_no_device_handle_with_mesh
+  /work/fixes/uneven-full-tensor/tests/ut/core/dtensor/test_random.py:261: UserWarning: DTensor random operators may not have complete support on npu device mesh
+    result = is_rng_supported_mesh(mock_mesh)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+456 passed, 96 skipped, 5 warnings, 39 subtests passed in 3.14s

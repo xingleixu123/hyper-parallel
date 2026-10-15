@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0
+rootdir: /work/fixes/uneven-full-tensor
+collected 2 items
+
+tests/torch/shard/redistribute.py ..
+
+=============================== warnings summary ===============================
+tests/torch/shard/redistribute.py::test_uneven_shard_reconstruction_rejected[dtype0]
+tests/torch/shard/redistribute.py::test_uneven_shard_reconstruction_rejected[dtype1]
+  /work/fixes/uneven-full-tensor/hyper_parallel/core/utils/communication.py:358: FutureWarning: torch.distributed.nn.functional.all_gather is deprecated, use torch.distributed._functional_collectives.all_gather_tensor instead.
+    for tensor in dist_func.all_gather(data, group=group)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 2 passed, 2 warnings in 3.57s =========================

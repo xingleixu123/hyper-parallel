@@ -1,0 +1,97 @@
+[W1015 06:13:28.756275060 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1015 06:13:31.667023600 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1015 06:13:31.848644190 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+{"stage": "distributed", "rank": 1, "logical_shape": [1, 64], "local_shape": [0, 64], "placements": "(Shard(dim=0),)"}
+{"stage": "distributed", "rank": 0, "logical_shape": [1, 64], "local_shape": [1, 64], "placements": "(Shard(dim=0),)"}
+/workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:358: FutureWarning: torch.distributed.nn.functional.all_gather is deprecated, use torch.distributed._functional_collectives.all_gather_tensor instead.
+  for tensor in dist_func.all_gather(data, group=group)
+/workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:358: FutureWarning: torch.distributed.nn.functional.all_gather is deprecated, use torch.distributed._functional_collectives.all_gather_tensor instead.
+  for tensor in dist_func.all_gather(data, group=group)
+{"stage": "reconstructed", "rank": 1, "repetition": 0, "actual_shape": [0, 64]}
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/work/tools/probe_uneven_full_tensor_cpu.py", line 51, in <module>
+[rank1]:     main()
+[rank1]:   File "/work/tools/probe_uneven_full_tensor_cpu.py", line 45, in main
+[rank1]:     torch.testing.assert_close(full, reference, rtol=0, atol=0)
+[rank1]:   File "/workspace/venv/lib/python3.12/site-packages/torch/testing/_comparison.py", line 1631, in assert_close
+[rank1]:     raise error_metas[0].to_error(msg)
+[rank1]: AssertionError: The values for attribute 'shape' do not match: torch.Size([0, 64]) != torch.Size([1, 64]).
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/work/tools/probe_uneven_full_tensor_cpu.py", line 51, in <module>
+[rank0]:     main()
+[rank0]:   File "/work/tools/probe_uneven_full_tensor_cpu.py", line 42, in main
+[rank0]:     full = value.full_tensor()
+[rank0]:            ^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/hyper-parallel/hyper_parallel/core/dtensor/dtensor.py", line 968, in full_tensor
+[rank0]:     out = _tensor_redistribution.redistribution(self, replicated_layout)
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/hyper-parallel/hyper_parallel/core/dtensor/tensor_redistribution.py", line 294, in redistribution
+[rank0]:     return self._redistribution_normal(x, to_layout)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/hyper-parallel/hyper_parallel/core/dtensor/tensor_redistribution.py", line 324, in _redistribution_normal
+[rank0]:     x = self._redistribution_without_shape(x, from_layout, to_layout, key, rank_list)
+[rank0]:         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/hyper-parallel/hyper_parallel/core/dtensor/tensor_redistribution.py", line 222, in _redistribution_without_shape
+[rank0]:     local_x = self._construct_op_operator[op[0]](local_x, *op[1])
+[rank0]:               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/hyper-parallel/hyper_parallel/core/dtensor/tensor_redistribution.py", line 104, in _construct_all_concat_new
+[rank0]:     return _utils.differentiable_all_gather_concat(x, group, concat_size, concat_dim, rank_list)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/hyper-parallel/hyper_parallel/core/utils/communication.py", line 358, in differentiable_all_gather_concat
+[rank0]:     for tensor in dist_func.all_gather(data, group=group)
+[rank0]:                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/nn/functional.py", line 168, in all_gather
+[rank0]:     return _AllGather.apply(group, tensor)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/venv/lib/python3.12/site-packages/torch/autograd/function.py", line 596, in apply
+[rank0]:     return super().apply(*args, **kwargs)  # type: ignore[misc]
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/nn/functional.py", line 408, in forward
+[rank0]:     dist.all_gather(out_tensor_list, tensor, group=group)
+[rank0]:   File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py", line 83, in wrapper
+[rank0]:     return func(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py", line 4216, in all_gather
+[rank0]:     work.wait()
+[rank0]: RuntimeError: [/pytorch/third_party/gloo/gloo/transport/tcp/pair.cc:547] Connection closed by peer [127.0.0.1]:3975
+W1015 06:13:32.132000 62 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 64 closing signal SIGTERM
+E1015 06:13:32.164000 62 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 1 (pid: 65) of binary: /work/venvs/validation/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/work/tools/probe_uneven_full_tensor_cpu.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-15_06:13:32
+  host      : 15d9948357e9
+  rank      : 0 (local_rank: 0)
+  exitcode  : -15 (pid: 64)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 64
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-15_06:13:32
+  host      : 15d9948357e9
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 65) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

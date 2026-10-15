@@ -1,0 +1,87 @@
+Looking in links: /work/tmp/issue211-test-wheels
+Processing /work/tmp/issue211-test-wheels/pytest-9.1.1-py3-none-any.whl
+Processing /work/tmp/issue211-test-wheels/iniconfig-2.3.1-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: packaging>=22 in ./venv/lib/python3.12/site-packages (from pytest==9.1.1) (26.3)
+Processing /work/tmp/issue211-test-wheels/pluggy-1.6.0-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: pygments>=2.7.2 in ./venv/lib/python3.12/site-packages (from pytest==9.1.1) (2.21.0)
+Installing collected packages: pluggy, iniconfig, pytest
+Successfully installed iniconfig-2.3.1 pluggy-1.6.0 pytest-9.1.1
+Obtaining file:///work/fixes/uneven-full-tensor
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: hyper_parallel
+  Building editable for hyper_parallel (pyproject.toml): started
+  Building editable for hyper_parallel (pyproject.toml): finished with status 'done'
+  Created wheel for hyper_parallel: filename=hyper_parallel-0.1.0-0.editable-cp312-cp312-linux_aarch64.whl size=13308 sha256=324c02b7a47353789bc61a3493bc9296c431cdfac973a3fd103070e3cc9711c0
+  Stored in directory: /tmp/pip-ephem-wheel-cache-2cvs5r5_/wheels/6f/2c/b2/81ed24be523ac9de1fc5a3a67e4408cedbd7ee3200e94f8368
+Successfully built hyper_parallel
+Installing collected packages: hyper_parallel
+  Attempting uninstall: hyper_parallel
+    Found existing installation: hyper_parallel 0.1.0
+    Not uninstalling hyper-parallel at /workspace/venv/lib/python3.12/site-packages, outside environment /work/venvs/issue211-tests
+    Can't uninstall 'hyper_parallel'. No files were found to uninstall.
+Successfully installed hyper_parallel-0.1.0
+EDITABLE_IMPORT /work/fixes/uneven-full-tensor/hyper_parallel/__init__.py
+LIGHTWEIGHT_LAUNCHER_PASS
+ssssssssssssssssssssssssssssssssssss.................................... [ 37%]
+........................................................................ [ 50%]
+........................................................................ [ 63%]
+........................................................................ [ 76%]
+.............................................. [ 85%]
+................................................................... [ 97%]
+...............                                                          [100%]
+=============================== warnings summary ===============================
+tests/ut/core/dtensor/test_comm_debug_mode.py::TestCollectiveTracer::test_callback_is_invoked
+  /work/fixes/uneven-full-tensor/hyper_parallel/core/utils/communication.py:416: FutureWarning: torch.distributed.nn.functional.all_reduce is deprecated, use torch.distributed._functional_collectives.all_reduce instead.
+    return dist_func.all_reduce(data, op=resolve_reduce_op(op), group=group)
+
+tests/ut/core/dtensor/test_manual_seed.py::TestManualSeed::test_no_op_on_cpu_mesh_does_not_touch_dispatcher_seed
+  /work/fixes/uneven-full-tensor/hyper_parallel/core/dtensor/random.py:471: UserWarning: DTensor random operators may not have complete support on cpu device mesh
+    if not is_rng_supported_mesh(device_mesh):
+
+tests/ut/core/dtensor/test_manual_seed.py::TestManualSeed::test_no_op_on_cpu_mesh_does_not_touch_dispatcher_seed
+  /work/fixes/uneven-full-tensor/tests/ut/core/dtensor/test_manual_seed.py:72: UserWarning: DTensor manual_seed() may not have complete support on cpu device mesh
+    manual_seed(42, mesh)
+
+tests/ut/core/dtensor/test_random.py::TestIsRngSupportedMesh::test_cpu_mesh_returns_false
+  /work/fixes/uneven-full-tensor/tests/ut/core/dtensor/test_random.py:243: UserWarning: DTensor random operators may not have complete support on cpu device mesh
+    result = is_rng_supported_mesh(mock_mesh)
+
+tests/ut/core/dtensor/test_random.py::TestIsRngSupportedMesh::test_no_device_handle_with_mesh
+  /work/fixes/uneven-full-tensor/tests/ut/core/dtensor/test_random.py:261: UserWarning: DTensor random operators may not have complete support on npu device mesh
+    result = is_rng_supported_mesh(mock_mesh)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+456 passed, 96 skipped, 5 warnings, 39 subtests passed in 3.14s
+AssertionError: torchrun failed with exit code 1
+=============================== warnings summary ===============================
+tests/common/mark_utils.py:38
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.platform_ascend910b - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level1 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.allcards - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+tests/common/mark_utils.py:38
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/torch/shard/test_redistribute.py::test_uneven_shard_reconstruction
+1 failed, 6 warnings in 3.31s

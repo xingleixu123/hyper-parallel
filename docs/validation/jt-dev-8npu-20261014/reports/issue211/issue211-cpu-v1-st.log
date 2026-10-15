@@ -1,0 +1,163 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________________ test_uneven_shard_reconstruction _______________________
+
+    @arg_mark(plat_marks=["cpu_linux", "platform_ascend910b"], level_mark="level0",
+              card_mark="allcards", essential_mark="essential")
+    def test_uneven_shard_reconstruction() -> None:
+        """Both ranks reject unsupported uneven layouts before entering communication."""
+>       parallel_run([
+            TorchCase(REDISTRIBUTE, "test_uneven_shard_reconstruction_rejected", num_proc=2),
+        ])
+
+tests/torch/shard/test_redistribute.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cases = [<tests.common.parallel_case.TorchCase object at 0xffffa25cdaf0>]
+global_num_proc = 8
+
+    def parallel_run(cases: list[TorchCase], global_num_proc: int = 8) -> None:
+        """Run a group of test cases in parallel, assigning disjoint device slices to each.
+    
+        Args:
+            cases: List of TorchCase descriptors to run concurrently.
+                The sum of all ``num_proc`` values must not exceed ``global_num_proc``.
+            global_num_proc: Total device budget for this group. Defaults to 8.
+    
+        Raises:
+            AssertionError: If the total device count exceeds ``global_num_proc``, if any
+                case times out (900 s deadline), or if any child process exits with a
+                non-zero return code.
+        """
+        # auto-assign ports before spawning children (avoids cross-process races)
+        unassigned = [c for c in cases if c.master_port is None]
+        if unassigned:
+            _auto_assign_ports(unassigned)
+    
+        # assign devices
+        sum_num_proc = 0
+        assignments = []
+    
+        for case in cases:
+            num = case.num_proc
+            devices = list(range(sum_num_proc, sum_num_proc + num))
+            assignments.append(devices)
+            sum_num_proc += num
+        # assert sum num_proc
+        assert sum_num_proc <= global_num_proc, (f"sum num_proc {sum_num_proc} greater than "
+                                                 f"global_num_proc {global_num_proc}")
+    
+        # create child process (run_case calls os.setsid to own a process group,
+        # so os.killpg on timeout kills torchrun workers too)
+        processes = []
+        ctx = _parallel_run_context()
+        for _, (case, devices) in enumerate(zip(cases, assignments)):
+            p = ctx.Process(target=run_case, args=(devices, case))
+            p.start()
+            processes.append(p)
+    
+        # wait child process terminates (timeout=420s to prevent infinite hang on distributed deadlock)
+        timed_out = []
+        for i, p in enumerate(processes):
+            p.join(timeout=420)
+            if p.is_alive():
+                try:
+                    os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                p.join()
+                timed_out.append(cases[i].case_name)
+    
+        # check results for all cases
+        if timed_out:
+            raise AssertionError(f"Cases timed out (possible collective deadlock): {timed_out}")
+        failed = [cases[i].case_name for i, p in enumerate(processes) if p.exitcode != 0]
+>       assert not failed, f"List cases failed: {failed}"
+               ^^^^^^^^^^
+E       AssertionError: List cases failed: ['test_uneven_shard_reconstruction_rejected']
+
+tests/common/parallel_case.py:138: AssertionError
+----------------------------- Captured stderr call -----------------------------
+[W1015 06:39:26.170479520 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+E1015 06:39:27.148000 68 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 4) local_rank: 0 (pid: 70) of binary: /work/venvs/issue211-tests/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+pytest FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-15_06:39:27
+  host      : bfc85fe61f9b
+  rank      : 1 (local_rank: 1)
+  exitcode  : 4 (pid: 71) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-15_06:39:27
+  host      : bfc85fe61f9b
+  rank      : 0 (local_rank: 0)
+  exitcode  : 4 (pid: 70) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/usr/local/python3.12.14/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/local/python3.12.14/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/work/fixes/uneven-full-tensor/tests/common/parallel_case.py", line 68, in run_case
+    torchrun_case(case.file_name, case.case_name, case.master_port, case.num_proc)
+  File "/work/fixes/uneven-full-tensor/tests/common/distributed_launcher.py", line 71, in torchrun_case
+    assert result.returncode == 0, f"torchrun failed with exit code {result.returncode}"
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: torchrun failed with exit code 1
+=============================== warnings summary ===============================
+tests/common/mark_utils.py:38
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.platform_ascend910b - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level1 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.allcards - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+tests/common/mark_utils.py:38
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/uneven-full-tensor/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/torch/shard/test_redistribute.py::test_uneven_shard_reconstruction
+1 failed, 6 warnings in 3.31s
