@@ -1,0 +1,11 @@
+{
+  "mode": "fp32",
+  "teacher_values_used": false,
+  "all_resumed_steps": true,
+  "coordinate_or_step_special_case": false,
+  "forward": "unchanged F.linear",
+  "dinput": "dy @ weight",
+  "dweight": "(dy.float().T @ x.float()).bfloat16()",
+  "scope": "Independent head dweight arithmetic-route ablation; not a universal correctness fix",
+  "source_sha256": "9caad4bc489d0bdd9a341290ff3d482692aa14e220e4aa81c1834ad05dcd0ac0"
+}

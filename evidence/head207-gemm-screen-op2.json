@@ -1,0 +1,335 @@
+{
+  "complete": true,
+  "kernel": 2,
+  "hp_forward_call": 1,
+  "input_hashes": {
+    "x": "7e3de7e3e6430d9371c3e6794dbc71fbefa33a09934b81e3fc471b3545591831",
+    "dy": "25faecb2ed4f5d5495dfc40ab5a4093eaf00a579c5dc37e3967bcc3c3afa5eb3"
+  },
+  "torch": "2.12.0+cpu",
+  "torch_npu": "2.12.0",
+  "source_sha256": "d23d1f0121fe7cf9452f954d1690316bb56b9616d08bbbbf421c603001c4a05f",
+  "baseline_matches_actual_hp": true,
+  "results": [
+    {
+      "mode": "nd_transpose_view",
+      "status": "completed",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          1,
+          152064
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "87b51d442d2fc275716af602e7bce52e6657a07768d60aaa0c9982279bb78f07",
+      "comparison": {
+        "size": 778567680,
+        "different_vs_mf": 24071,
+        "different_vs_actual_hp": 0,
+        "max_abs_vs_mf": 3.0517578125e-05,
+        "relative_l2_vs_mf": 1.3803465970349376e-05,
+        "fp64_prior_difference_coordinates_only": {
+          "count": 24071,
+          "mean_error": 9.205501954442465e-09,
+          "max_error": 1.5257294723958204e-05,
+          "closer_than_mf": 10918,
+          "farther_than_mf": 13153,
+          "closer_than_hp": 0,
+          "farther_than_hp": 0,
+          "does_not_cover_new_different_coordinates": true
+        }
+      },
+      "elapsed_seconds_including_analysis": 11.166705340030603
+    },
+    {
+      "mode": "nd_transpose_contiguous",
+      "status": "completed",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          4096,
+          1
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "87b51d442d2fc275716af602e7bce52e6657a07768d60aaa0c9982279bb78f07",
+      "comparison": {
+        "size": 778567680,
+        "different_vs_mf": 24071,
+        "different_vs_actual_hp": 0,
+        "max_abs_vs_mf": 3.0517578125e-05,
+        "relative_l2_vs_mf": 1.3803465970349376e-05,
+        "fp64_prior_difference_coordinates_only": {
+          "count": 24071,
+          "mean_error": 9.205501954442465e-09,
+          "max_error": 1.5257294723958204e-05,
+          "closer_than_mf": 10918,
+          "farther_than_mf": 13153,
+          "closer_than_hp": 0,
+          "farther_than_hp": 0,
+          "does_not_cover_new_different_coordinates": true
+        }
+      },
+      "elapsed_seconds_including_analysis": 10.467884459998459
+    },
+    {
+      "mode": "single_batch_bmm",
+      "status": "completed",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          1,
+          152064,
+          4096
+        ],
+        "left_stride": [
+          152064,
+          1,
+          152064
+        ],
+        "right_shape": [
+          1,
+          4096,
+          5120
+        ],
+        "right_stride": [
+          20971520,
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "c1f2f1a95ab2ca3a83d454c0e83ea789135c66b645fc4792a226a0285786eb4b",
+      "comparison": {
+        "size": 778567680,
+        "different_vs_mf": 10781,
+        "different_vs_actual_hp": 24237,
+        "max_abs_vs_mf": 7.62939453125e-06,
+        "relative_l2_vs_mf": 3.4170367567471694e-06,
+        "fp64_prior_difference_coordinates_only": {
+          "count": 24071,
+          "mean_error": 9.205412083867789e-09,
+          "max_error": 1.5260283401041796e-05,
+          "closer_than_mf": 3786,
+          "farther_than_mf": 1788,
+          "closer_than_hp": 11640,
+          "farther_than_hp": 7390,
+          "does_not_cover_new_different_coordinates": true
+        }
+      },
+      "elapsed_seconds_including_analysis": 10.852942480007187
+    },
+    {
+      "mode": "native_bmmv2",
+      "status": "completed",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          1,
+          152064
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "87b51d442d2fc275716af602e7bce52e6657a07768d60aaa0c9982279bb78f07",
+      "comparison": {
+        "size": 778567680,
+        "different_vs_mf": 24071,
+        "different_vs_actual_hp": 0,
+        "max_abs_vs_mf": 3.0517578125e-05,
+        "relative_l2_vs_mf": 1.3803465970349376e-05,
+        "fp64_prior_difference_coordinates_only": {
+          "count": 24071,
+          "mean_error": 9.205501954442465e-09,
+          "max_error": 1.5257294723958204e-05,
+          "closer_than_mf": 10918,
+          "farther_than_mf": 13153,
+          "closer_than_hp": 0,
+          "farther_than_hp": 0,
+          "does_not_cover_new_different_coordinates": true
+        }
+      },
+      "elapsed_seconds_including_analysis": 15.03054681001231
+    },
+    {
+      "mode": "nz_left",
+      "status": "completed",
+      "formats": {
+        "left": 29,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          4096,
+          1
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "c1f2f1a95ab2ca3a83d454c0e83ea789135c66b645fc4792a226a0285786eb4b",
+      "comparison": {
+        "size": 778567680,
+        "different_vs_mf": 10781,
+        "different_vs_actual_hp": 24237,
+        "max_abs_vs_mf": 7.62939453125e-06,
+        "relative_l2_vs_mf": 3.4170367567471694e-06,
+        "fp64_prior_difference_coordinates_only": {
+          "count": 24071,
+          "mean_error": 9.205412083867789e-09,
+          "max_error": 1.5260283401041796e-05,
+          "closer_than_mf": 3786,
+          "farther_than_mf": 1788,
+          "closer_than_hp": 11640,
+          "farther_than_hp": 7390,
+          "does_not_cover_new_different_coordinates": true
+        }
+      },
+      "elapsed_seconds_including_analysis": 10.92755286989268
+    },
+    {
+      "mode": "nz_both",
+      "status": "completed",
+      "formats": {
+        "left": 29,
+        "right": 29,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          4096,
+          1
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "c1f2f1a95ab2ca3a83d454c0e83ea789135c66b645fc4792a226a0285786eb4b",
+      "comparison": {
+        "size": 778567680,
+        "different_vs_mf": 10781,
+        "different_vs_actual_hp": 24237,
+        "max_abs_vs_mf": 7.62939453125e-06,
+        "relative_l2_vs_mf": 3.4170367567471694e-06,
+        "fp64_prior_difference_coordinates_only": {
+          "count": 24071,
+          "mean_error": 9.205412083867789e-09,
+          "max_error": 1.5260283401041796e-05,
+          "closer_than_mf": 3786,
+          "farther_than_mf": 1788,
+          "closer_than_hp": 11640,
+          "farther_than_hp": 7390,
+          "does_not_cover_new_different_coordinates": true
+        }
+      },
+      "elapsed_seconds_including_analysis": 10.585191890015267
+    },
+    {
+      "mode": "fp32_operands",
+      "status": "completed",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          1,
+          152064
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.float32"
+      },
+      "bf16_sha256": "604ebd5d215f2a8244800d195370763bb8fad6d31665b09bbb6dd2d9c3aa374a",
+      "comparison": {
+        "size": 778567680,
+        "different_vs_mf": 67052,
+        "different_vs_actual_hp": 67139,
+        "max_abs_vs_mf": 6.103515625e-05,
+        "relative_l2_vs_mf": 3.5203871560164075e-05,
+        "fp64_prior_difference_coordinates_only": {
+          "count": 24071,
+          "mean_error": 9.205139537883443e-09,
+          "max_error": 1.5257294723958204e-05,
+          "closer_than_mf": 6875,
+          "farther_than_mf": 5768,
+          "closer_than_hp": 8001,
+          "farther_than_hp": 4729,
+          "does_not_cover_new_different_coordinates": true
+        }
+      },
+      "elapsed_seconds_including_analysis": 10.486786830006167
+    }
+  ],
+  "scope": "Full-size same-input replay only. Runtime/transfer times are not training performance claims. No teacher state or coordinate values enter candidate arithmetic."
+}

@@ -1,0 +1,58 @@
+<frozen runpy>:128: RuntimeWarning: 'torch.distributed.run' found in sys.modules after import of package 'torch.distributed', but prior to execution of 'torch.distributed.run'; this may result in unpredictable behaviour
+[W1015 14:52:06.414726490 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[P12-BROADCAST-FP32] {"scope": "single-card diagnostic only", "teacher_values_used": false, "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa", "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca", "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"}
+[P12-NS-EAGER] active target=muon_jit_probe.graph_jit_ns scope=all
+[P12-THREE-NATIVE-ADJACENT-NPU-SQRT] actual live values; no recorded norm used
+[P12-Q-NATIVE-TILE] live tiled normalization; no recorded values used
+[P12-DENSE-NATIVE-TILE] actual live values; no recorded norm used
+[P12-EXPERT-BMM-EAGER] 3D explicit bmm Gram with RHS view; square/product unchanged
+[P12-DENSE-ADJACENT-TILE] actual live values; no recorded norm used
+Traceback (most recent call last):
+  File "/alignment/phase12/tools-f637/capture_hp_head_gemm_route.py", line 29, in <module>
+    runpy.run_path('/alignment/phase12/tools-f637/capture_hp_routercontig_denseadj_full.py', run_name='__main__')
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/alignment/phase12/tools-f637/capture_hp_routercontig_denseadj_full.py", line 91, in <module>
+    capture_hp_pr180_192.capture_hp_native.main()
+  File "/alignment/phase12/tools-f637/capture_hp_native.py", line 161, in main
+    args.output.mkdir(parents=True, exist_ok=False)
+  File "/usr/local/python3.12.14/lib/python3.12/pathlib.py", line 1311, in mkdir
+    os.mkdir(self, mode)
+FileExistsError: [Errno 17] File exists: '/alignment/phase12/runs/hp-jtf637-sharedup-headmm-control226'
+[ERROR] 2026-10-15-14:52:17 (PID:1574769, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+E1015 14:52:19.215000 1574716 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 0 (pid: 1574769) of binary: /state/jt-recipe-20261014/jt-f637-pr192-venv/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/alignment/phase12/tools-f637/capture_hp_head_gemm_route.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-15_14:52:19
+  host      : localhost
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 1574769) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+[ERROR] 2026-10-15-14:52:19 (PID:1574716, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
