@@ -4,7 +4,7 @@
 
 本单是 JT DeepSeek V3 八卡验证的**总问题单**，统一关联所有已拆分的小问题及独立 PR，维护优先级、复现证据、精度曲线、显存/性能、重计算与续训验收状态。每个已确认的独立缺陷或接口需求各用一个小问题单和一个单提交 PR，两个方向均能回到本单；不把多个缺陷混入同一个修复提交。
 
-**当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2和CP2已完整跑完200步但精度失败；TP2仅完成69步前缀，当前配方完全和选择重算均完整200步×8rank与off基线逐步一致，TP及合法组合仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
+**当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2、CP2、TP2均已完整跑完200步，但三者精度均失败；完全和选择重算均完整200步×8rank与off基线逐步一致，其他合法组合仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
 
 当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部14个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
 
@@ -14,7 +14,7 @@
 
 | 排序 | 问题与影响 | 小问题单 | 独立单提交 PR | 已有证据及剩余边界 |
 |---|---|---|---|---|
-| Top1 | 当前配方EP2、CP2完整200步精度失败，TP及组合矩阵仍待完成 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 旧配方全rank误差超阈值，见历史数据；EP2为0.007523/0.015433/0.138989，CP2为0.011062/0.022786/0.204605（LM/还原MTP/aux）；TP2仅69步，余下矩阵待完成 |
+| Top1 | 当前配方EP2、CP2、TP2完整200步精度失败，组合矩阵仍待完成 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 旧配方全rank误差超阈值，见历史数据；EP2为0.007523/0.015433/0.138989，CP2为0.011062/0.022786/0.204605（LM/还原MTP/aux）；TP2完整200步为0.021448/0.024670/0.155838；余下矩阵待完成 |
 | Top2 | 梯度累积按微批有效 token 归一化，改变整步目标 | [#203](https://github.com/hf1s/hyper-parallel/issues/203) | [#194](https://github.com/hf1s/hyper-parallel/pull/194) | 实际 Trainer 的不等长监督样例，正确梯度 14、旧行为 10；TP2×EP2 LM 误差显著下降但仍未过 0.005 |
 | Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
 | Top4 | 测试调度器覆盖上层NPU可见列表，使设备分配越界 | [#223](https://github.com/hf1s/hyper-parallel/issues/223) | [#224](https://github.com/hf1s/hyper-parallel/pull/224) | 单提交2文件；无设备回归10测试/18子测试通过、两轴检视通过；不等同实际多卡训练验证 |
@@ -27,12 +27,32 @@
 | Top11 | Trainer向NPU写入无效CUDA属性，不能关闭预先开启的HF32 | [#227](https://github.com/hf1s/hyper-parallel/issues/227) | [#228](https://github.com/hf1s/hyper-parallel/pull/228) | 单提交2文件；真实TorchNPU选项及3项CPU测试/2项子测试通过，两轴检视通过；默认HF32关闭，未证明是CP/EP漂移根因，硬件训练未验 |
 | Top12 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
 | Top13 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
-| Top14 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；真实69步前缀确认耗时及reserved漏报；真实8进程CPU/Gloo资源偏差64→0，NPU/PP训练通信仍待回归 |
+| Top14 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；旧69步前缀确认耗时及reserved漏报；新完整200步有51步时间漏报；真实8进程CPU/Gloo资源偏差64→0，NPU/PP训练通信仍待回归 |
 | Top15 | FSDP动态派生的重算wrapper被覆盖报告漏计 | [#229](https://github.com/hf1s/hyper-parallel/issues/229) | [#230](https://github.com/hf1s/hyper-parallel/pull/230) | 真实三处区域报告为一处；单提交2文件，CPU62测试/2子测试、两轴检视及lint通过；仅修报告，NPU训练与性能无新增结论 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
 已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `b540051`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+
+## 最新完整结果：TP2也完成200步，跨并行精度仍未通过（2026-10-16，UTC+8）
+
+TP2第四轮`r129-f637-fp32-tp2-200-r4`完整完成200步×8rank，退出0，517.637332秒后释放八卡，无本任务残留。与FSDP8基线的输入、初态、计数、源码、镜像及数值配方检查通过；独立数值与资源复算也确认原始证据有效，**训练精度FAIL**。LM/还原MTP/aux最大差分别为**0.0214481354/0.0246699651/0.1558382064**，首次超过0.005分别是111/45/19步。旧中断轮共同1–69步的全部loss和梯度范数与本轮差0，未拼接前缀。
+
+![TP2完整200步全部rank精度误差](figures/f637-tp2-r4-200-raw-zh.png)
+
+| 当前配方完整200步 | LM最大差 | 还原MTP最大差 | 还原aux最大差 | 验收 |
+|---|---:|---:|---:|---|
+| EP2 | 0.007523060 | 0.015432835 | 0.138989417 | 未通过 |
+| CP2 | 0.011061668 | 0.022786458 | 0.204604585 | 未通过 |
+| TP2 | 0.021448135 | 0.024669965 | 0.155838206 | 未通过 |
+
+TP2 allocated/reserved峰值17.294672/18.638672GiB，allocated较FSDP8节省4.737524GiB（21.5027%）；逐步8rankMAX、去前20步后的中位步时1.857553秒（+60.8268%），监督token吞吐9957.676842/s（-37.7972%）。实际布局DP4×TP2，开启SP/loss_parallel、每步两个微批并保持路由/专家权重TP复制；不是仅改tp_size。显存下降方向符合分片预期，但本次没有吞吐提升；通信/矩阵尺寸的各自份额尚无profile证明。单次观测含输入采集开销，精度FAIL的配置不能推荐为已验收方案。
+
+rank0有51/200步漏报最慢TP lane时间，最大1.213431毫秒；本轮allocated/reserved没有rank0峰值漏报，与旧69步记录分开。离线汇总已校正，进一步补充#225/PR#226的真实修复前证据；该PR原单提交不变，真实NPU修复后通信成本仍待测。
+
+76份原始文件SHA全部核验，传输重复包两端清理，checkpoint200保留。下一次设备实验最早04:26:53.124037+08，仍需空卡复查；接续改为FSDP/CP2×原生/FP32输入梯度的四臂三步诊断，不改变LR、数据或0.005门槛。
+
+[详细配置、复现和资源解释](reports/f637-tp2-r4-complete/README_ZH.md) · [严格全rank比较](reports/f637-tp2-r4-complete/f637-tp2-r4-strict-comparison.json) · [数值独立复算](reports/f637-tp2-r4-complete/f637-tp2-r4-precision-independent-review.json) · [资源与释放独立审计](reports/f637-tp2-r4-complete/f637-tp2-r4-resource-independent-review.json)。
 
 ## 补充验证：资源统计 PR #226 的真实八进程 CPU 通信
 
@@ -57,7 +77,7 @@
 
 选择重算相对关闭节省2.156555 GiB allocated（9.7882%），中位步时增加6.6760%，监督吞吐下降6.2248%。完全重算再多省0.482708 GiB，而本次步时仅比选择重算多0.2491%；单次观测不能证明稳定速度差异。在当前两主干层加一MTP层配置中，选择重算尚未显示明显更好的性价比。模块消融继续按实际配方/步数注明，旧结果不直接转作当前结论。
 
-76份原始文件SHA核验完成，重复归档已清理；精度与资源由两轴独立复算。MTP/aux为日志按0.3/0.0001系数还原，不是额外采集的加权前张量；梯度结论限于范数。下一轮TP2-r4最早2026-10-16 **03:57:52.019057（UTC+8）**，还须检查空闲，不连续占用八卡。
+76份原始文件SHA核验完成，重复归档已清理；精度与资源由两轴独立复算。MTP/aux为日志按0.3/0.0001系数还原，不是额外采集的加权前张量；梯度结论限于范数。此后TP2-r4已完成200步，见本单新增完整结果；每轮仍需释放后至少20分钟并检查空闲。
 
 [完整中文说明](reports/f637-fsdp8-selective-r3-complete/README_ZH.md) · [严格比较](reports/f637-fsdp8-selective-r3-complete/f637-fsdp8-selective-r3-strict-comparison.json) · [76份原始文件清单](reports/f637-fsdp8-selective-r3-complete/f637-fsdp8-selective-r3-complete-evidence-manifest.json) · [资源逐步结果](reports/f637-fsdp8-selective-r3-complete/f637-fsdp8-selective-r3-all-rank-resources.json) · [数值独立审计](reports/f637-fsdp8-selective-r3-complete/f637-fsdp8-selective-r3-precision-independent-review.json) · [资源独立审计](reports/f637-fsdp8-selective-r3-complete/f637-fsdp8-selective-r3-resource-independent-review.json)。
 
@@ -157,7 +177,7 @@ allocated减少1.325550 GiB，约6.02%；中位步时增加约38.21%。CP2在本
 
 [严格精度比较](reports/f637-cp2-200-complete/f637-cp2-200-strict-comparison.json) · [完整分析](reports/f637-cp2-200-complete/f637-cp2-200-complete-analysis.json) · [76份采集清单](reports/f637-cp2-200-complete/f637-cp2-200-complete-evidence-manifest.json) · [原始8rank记录](reports/f637-cp2-200-complete/raw/runs/r129-f637-fp32-cp2-200) · [全rank资源观测](reports/f637-cp2-200-complete/f637-cp2-200-all-rank-resources.json) · [匹配参考资源](reports/f637-cp2-200-complete/f637-fsdp8-r4-all-rank-resources.json) · [SHA及清理凭据](reports/f637-cp2-200-complete/f637-cp2-200-complete-local-verification.json) · [完整结果独立复算检视](reports/f637-cp2-200-complete/f637-cp2-200-independent-evidence-review.json)。
 
-CP2结束后已完成当前配方FSDP8完整重计算200步，详见本单最新结果；selective现已完成，下一项为TP2完整200步及其余并行矩阵。任何新实验仍须等待上一轮释放后至少20分钟并重新确认空卡。
+CP2结束后已完成当前配方FSDP8完整重计算200步，详见本单最新结果；selective和TP2现已完成；TP2精度仍失败，接续优先做当前配方单变量短步定位，再补齐其余并行矩阵。任何新实验仍须等待上一轮释放后至少20分钟并重新确认空卡。
 
 ## 最新完整结果：EP2的200步精度未通过（2026-10-16，UTC+8）
 

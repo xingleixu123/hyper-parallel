@@ -1,0 +1,114 @@
+{
+  "case": "r129-f637-fp32-tp2-200-r4",
+  "baseline": "r129-f637-fp32-fsdp8-0-200-r4",
+  "status": "COMPLETE_PRECISION_FAIL",
+  "steps_per_rank": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
+  "exit_code": 0,
+  "released": true,
+  "remaining_owned_pids": [],
+  "duration_seconds": 517.6373319900013,
+  "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "unweighted_error_diagnostics": {
+    "lm": 0.021448135375976562,
+    "mtp": 0.02466996510823568,
+    "aux": 0.15583820641040802
+  },
+  "first_divergence": {
+    "lm": {
+      "first_nonzero_step": 1,
+      "first_above_005_step": 111,
+      "steps_above_005": 11,
+      "max_abs": 0.021448135375976562,
+      "max_step": 188
+    },
+    "mtp_unweighted": {
+      "first_nonzero_step": 1,
+      "first_above_005_step": 45,
+      "steps_above_005": 14,
+      "max_abs": 0.02466996510823568,
+      "max_step": 98
+    },
+    "aux_unweighted": {
+      "first_nonzero_step": 1,
+      "first_above_005_step": 19,
+      "steps_above_005": 145,
+      "max_abs": 0.15583820641040802,
+      "max_step": 178
+    },
+    "total": {
+      "first_nonzero_step": 1,
+      "first_above_005_step": 91,
+      "steps_above_005": 17,
+      "max_abs": 0.021886825561523438,
+      "max_step": 188
+    },
+    "grad_norm": {
+      "first_nonzero_step": 1,
+      "first_above_005_step": 13,
+      "steps_above_005": 171,
+      "max_abs": 0.629734992980957,
+      "max_step": 148
+    }
+  },
+  "resource_comparison": {
+    "baseline_median_seconds": 1.1550026535987854,
+    "candidate_median_seconds": 1.857553243637085,
+    "step_time_increase_percent": 60.826751163668355,
+    "allocated_saving_gib": 4.737524032592773,
+    "allocated_saving_percent": 21.502731833600897,
+    "reserved_saving_gib": 8.611328125,
+    "supervised_throughput_change_percent": -37.79720174408276
+  },
+  "prior_incomplete_prefix69": {
+    "case": "r129-f637-fp32-tp2-200-r3",
+    "metric_max_abs": {
+      "lm": 0.0,
+      "mtp_unweighted": 0.0,
+      "aux_unweighted": 0.0,
+      "total": 0.0,
+      "grad_norm": 0.0
+    },
+    "scope": "仅比较旧中断轮和新完整轮共同1–69步的全部rank标量，不拼接前缀或作旧轮性能结论。"
+  },
+  "scope": "完整200步×8rank；loss按固定系数还原。正常完成且输入/初态/配方通过不代表精度达标。资源为包含输入采集的单次匹配观测，精度FAIL故不推荐为已达标方案。",
+  "inputs_sha256": {
+    "evidence/f637-tp2-r4-strict-comparison.json": "de9a9d8df2cf1e42f3d5b45cf6ff27f9656f43dc7375810732dd69001da94d74",
+    "evidence/f637-tp2-r4-all-rank-resources.json": "953af678a3ed5843a3da0d19919106cadfe25e8d527ec3bb5655d2e04a5ee33a",
+    "evidence/f637-fsdp8-r4-all-rank-resources.json": "4a93261f7d53ed185dc43b89d39a4a0e90d8072b8b99ec9640d4c7ca7da28383",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank0.jsonl": "4f35ac8c015ceb0b825d0dff1b9622f2a606f90972c5750f7dd437eabc9e020d",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank1.jsonl": "25605caf8c644034f47bc3a54cc5e90e6f990579320318385e9a18ee690268ec",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank2.jsonl": "0739690e07918e6ff4a248136581376ef323adabd9aef0b780ded900150771a7",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank3.jsonl": "5a7420f75ffd05a3c5add5d145a1748958d5b00c88fc52bbf225642765e896ee",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank4.jsonl": "a982af002a3b8549312fd269adc468014e9b43507563ad00f89dba17e7f183e7",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank5.jsonl": "acdacc90cb0ec46e2f349cbe1ad791b5e1f83d284b3392da2806ab8e6d69cf40",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank6.jsonl": "75e0756cd21aa85b90d3604937d1924a9393d11bf667ce4b21aae73960403e13",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank7.jsonl": "dac61b2cb5ea0b86214fa5dfa231160acfb7585680bcfcefc3b84ef88887bbf5",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank0.jsonl": "e5158a87f5446b65679208b0c036a0369c57524afd22b7f43ded5b0822785c4d",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank1.jsonl": "79db4e3465708f7d954643e58f44a45fe3e5f151b1635eb33465f4eb6db161bc",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank2.jsonl": "5e5848aebab6f5e98c47519bb703e05efb117aa8b28fafe177f970ece6776c87",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank3.jsonl": "7cd759115aa1d7c5984de4a616b4d9ccdb6983bed54aecf89e96ea1d71aa363e",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank4.jsonl": "63ed6fa334a5b65de0085321ab08e0e51b1289f6209a2ab68d0f79c55a8150c5",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank5.jsonl": "85ce834dd2029aa7a768059a4524a9a90c15ac2bfc2ba89ac539c6bd88f67f99",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank6.jsonl": "2d801692a32e746f01b3f592ba63020b858bb6032bc870a313e38965d08b69c0",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank7.jsonl": "aee9568f70b14e7060f948a9a879a7f415b82d4d9f1bf8931e0c562c02cc1e34",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank0.jsonl": "8bbaf4e372250999331d51660bb199aea83229da5dcab91c1751d6aa6f19403d",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank1.jsonl": "62a36b6659c2bcc76104d8e275d46ea245bf33f587d61dc948263a1b34951355",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank2.jsonl": "0901fade99cbc9d57c3d985686c4eccdb85a145b33555736f5b98458630856b4",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank3.jsonl": "c35dd7f6f46eeac42375cd27ee8c7a7ccc63cb45fdc9d2b26facbfcfca2545f6",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank4.jsonl": "d9683b9453dd7b87624bef7ffb61450fb0c8067772a7ba4ab1246774d05792fb",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank5.jsonl": "c4acb6aaa0efd35d7ee85c2f8657b6dc27f146b49c97a60ec35f5e6220827cc5",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank6.jsonl": "7ec81d0b4dabf4fc3b1127fca9d003fcbc413dfae113206c114224382b29bcfc",
+    "runs/r129-f637-fp32-tp2-200-r3/metrics-rank7.jsonl": "ba55ec1e9edf8c38eaf529034f33c5b14f7579fb0aa4b0bef7ce70b879641eab"
+  },
+  "created_at": "2026-10-15T20:09:32.744050+00:00"
+}

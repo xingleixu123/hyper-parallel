@@ -1,0 +1,999 @@
+2026-10-15 19:58:25,651 [INFO] torch_npu.env: get env LOCAL_RANK = 0
+2026-10-15 19:58:26,735 [INFO] torch_npu.env: get env WORLD_SIZE = 8
+2026-10-15 19:58:26,736 [INFO] torch_npu.env: get env MASTER_ADDR = 127.0.0.1
+2026-10-15 19:58:26,736 [INFO] torch_npu.env: get env MASTER_PORT = 30358
+2026-10-15 19:58:26,736 [INFO] torch_npu.env: get env TORCHELASTIC_USE_AGENT_STORE = True
+2026-10-15 19:58:26,910 [INFO] hyper_parallel.trainer.base: Trainer config:
+{
+  "model": {
+    "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.jt_builder.build_jt_model",
+    "config": {
+      "architectures": [
+        "JTDeepseekV3ForCausalLM"
+      ],
+      "vocab_size": 152064,
+      "hidden_size": 5120,
+      "intermediate_size": 12288,
+      "moe_intermediate_size": 1536,
+      "num_hidden_layers": 2,
+      "num_attention_heads": 128,
+      "num_key_value_heads": 128,
+      "n_shared_experts": 2,
+      "n_routed_experts": 8,
+      "routed_scaling_factor": 2.827,
+      "kv_lora_rank": 512,
+      "q_lora_rank": 1536,
+      "qk_rope_head_dim": 64,
+      "v_head_dim": 128,
+      "qk_nope_head_dim": 128,
+      "n_group": 1,
+      "topk_group": 1,
+      "num_experts_per_tok": 2,
+      "norm_topk_prob": true,
+      "hidden_act": "silu",
+      "max_position_embeddings": 262400,
+      "initializer_range": 0.02,
+      "rms_norm_eps": 1e-06,
+      "first_k_dense_replace": 1,
+      "mlp_layer_types": [
+        "dense",
+        "sparse"
+      ],
+      "layer_types": [
+        "full_attention",
+        "full_attention"
+      ],
+      "attention_dropout": 0.0,
+      "rope_parameters": {
+        "rope_type": "default",
+        "rope_theta": 5000000
+      },
+      "rope_interleave": true,
+      "tie_word_embeddings": false,
+      "use_cache": false,
+      "attention_bias": false,
+      "mlp_bias": false,
+      "num_nextn_predict_layers": 1,
+      "mtp_loss_factor": 0.3,
+      "use_pad_tokens": true,
+      "moe_aux_loss_coeff": 0.0001,
+      "moe_router_enable_expert_bias": true,
+      "moe_router_bias_update_rate": 0.001,
+      "enable_chunk_loss": true,
+      "chunk_loss_size": 4096,
+      "expert_fp32_weight_gradients": true
+    },
+    "reference_weights": null
+  },
+  "optimizer": {
+    "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.runtime.jt_optimizer.build_optimizer",
+    "muon_config": {
+      "lr": 0.0001,
+      "weight_decay": 0.1,
+      "momentum": 0.95,
+      "nesterov": true,
+      "ns_steps": 5,
+      "ns_variant": "legacy",
+      "ns_epsilon": 1e-07,
+      "matched_adamw_rms": 0.2,
+      "ns_dtype": "float32"
+    },
+    "adamw_config": {
+      "adamw_lr": 0.0001,
+      "adamw_weight_decay": 0.1,
+      "adamw_betas": [
+        0.9,
+        0.95
+      ],
+      "adamw_eps": 1e-08
+    },
+    "qk_clip_threshold": 100.0,
+    "fp32_main_params": true
+  },
+  "lr_scheduler": {
+    "_target_": "hyper_parallel.components.optim.lr_scheduler.MultiLRScheduler",
+    "lr_decay_style": "constant",
+    "lr_config": {
+      "lr": 0.0001,
+      "min_lr": 0.0001,
+      "lr_warmup_steps": 0,
+      "lr_decay_ratio": 1.0
+    }
+  },
+  "loss_fn": {
+    "_target_": "hyper_parallel.components.losses.ModelOutputLoss"
+  },
+  "model_init_dtype": "float32",
+  "training": {
+    "train_iters": 200,
+    "train_samples": null,
+    "lr_scheduler_iters": 1000,
+    "eval_iters": 0,
+    "global_batch_size": 8,
+    "micro_batch_size": 1,
+    "backend": "hccl",
+    "max_grad_norm": 1.0,
+    "init_device": "meta",
+    "loss_aggregation": "token_weighted",
+    "seed": 42,
+    "enable_full_determinism": true,
+    "gc_steps": 0,
+    "empty_cache_steps": 0,
+    "empty_cache_before_backward": false,
+    "eval_steps": 0,
+    "eval_epochs": 0,
+    "logging_steps": 1,
+    "low_precision": {
+      "enabled": false,
+      "format": "mxfp8_e4m3",
+      "scaling": "mx_block"
+    }
+  },
+  "accelerator": {
+    "tp_size": 2,
+    "cp_size": 1,
+    "ep_size": 1,
+    "pp_size": 1,
+    "sequence_parallel": true,
+    "loss_parallel": true
+  },
+  "fsdp_config": {
+    "dp_shard_size": 4,
+    "edp_shard_size": 1,
+    "replicate_params": [],
+    "mix_precision": {
+      "param_dtype": "bfloat16",
+      "reduce_dtype": "float32",
+      "output_dtype": null,
+      "cast_forward_inputs": false
+    },
+    "enable_offload": false,
+    "reshard_after_forward": true,
+    "reshard_after_backward": true,
+    "requires_grad_sync": true,
+    "backward_prefetch_depth": 1,
+    "forward_prefetch_depth": 1,
+    "comm_fusion": false,
+    "comm_fusion_zero_copy": null
+  },
+  "plan_overrides": [
+    {
+      "match": [
+        "model.layers.*.self_attn",
+        "mtp.layers.*.transformer_layer.self_attn"
+      ],
+      "when": null,
+      "module_type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Attention",
+      "exact_type": true,
+      "replace_module": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MLAAttention",
+        "module_fqn": "",
+        "context": null
+      },
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": {
+        "linear_qkv.weight": {
+          "tp": "replicate"
+        },
+        "q_b_proj.weight": {
+          "tp": "shard(0)"
+        },
+        "kv_b_proj.weight": {
+          "tp": "shard(0)"
+        },
+        "o_proj.weight": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn.*_layernorm",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "replicate"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn.key_rope_gather",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "replicate"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.mlp.shared_experts",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": {
+        "gate_proj.weight": {
+          "tp": "replicate"
+        },
+        "up_proj.weight": {
+          "tp": "replicate"
+        },
+        "down_proj.weight": {
+          "tp": "replicate"
+        }
+      },
+      "in_src": {
+        "x": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "x": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "mtp.layers.*.eh_proj",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": {
+        "weight": {
+          "tp": "replicate"
+        }
+      },
+      "in_src": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "model.layers.[123456789]*.mlp",
+      "when": "ep",
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn"
+      },
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "mtp.layers.*.transformer_layer.mlp",
+      "when": "ep",
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn"
+      },
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "model.layers.[123456789]*.mlp",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": {
+        "gate.weight": {
+          "tp": "replicate",
+          "cp": "replicate"
+        },
+        "experts.gate_up_proj": {
+          "tp": "replicate",
+          "cp": "replicate"
+        },
+        "experts.down_proj": {
+          "tp": "replicate",
+          "cp": "replicate"
+        }
+      },
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)",
+          "cp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)",
+          "cp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)",
+        "cp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)",
+        "cp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "mtp.layers.*.transformer_layer.mlp",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": {
+        "gate.weight": {
+          "tp": "replicate",
+          "cp": "replicate"
+        },
+        "experts.gate_up_proj": {
+          "tp": "replicate",
+          "cp": "replicate"
+        },
+        "experts.down_proj": {
+          "tp": "replicate",
+          "cp": "replicate"
+        }
+      },
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)",
+          "cp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)",
+          "cp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)",
+        "cp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)",
+        "cp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    }
+  ],
+  "mixed_precision": {
+    "enabled": false
+  },
+  "activation_checkpoint": {
+    "mode": "off",
+    "swap_inputs": false,
+    "selection": {
+      "source": "default",
+      "layer_count": null,
+      "layer_indices": null
+    }
+  },
+  "activation_swap": "none",
+  "compile": {
+    "enabled": false,
+    "mode": "default",
+    "fullgraph": false,
+    "dynamic": false,
+    "backend": null,
+    "options": null,
+    "dynamo_cache_size_limit": 256
+  },
+  "dataset": {
+    "_target_": "hyper_parallel.data.online.mapping.MappingTransformDataset",
+    "source_dataset": {
+      "_target_": "datasets.load_from_disk",
+      "dataset_path": "/work/data/sft_data_4k",
+      "keep_in_memory": null,
+      "storage_options": null
+    },
+    "model_assets": {
+      "chat_template": null,
+      "tokenizer": null
+    },
+    "data_transform": {
+      "_target_": "hyper_parallel.data.text.text_transform.PreTokenizedSFTTransform",
+      "input_ids_key": "input_ids",
+      "labels_key": "labels",
+      "boundaries_key": "cu_seqlens",
+      "loss_mask_key": "loss_mask"
+    }
+  },
+  "dataloader": {
+    "_target_": "hyper_parallel.data.batching.FixedBatchDataLoader",
+    "drop_last": true,
+    "num_workers": 0,
+    "batch_sampler": null,
+    "batch_size": null,
+    "seed": 1234,
+    "pin_memory": false,
+    "prefetch_factor": null,
+    "collate_fn": {
+      "_target_": "hyper_parallel.data.batching.build_online_text_collate_fn",
+      "mesh_context": null
+    },
+    "sampler_type": "single",
+    "get_batch": {
+      "_target_": "hyper_parallel.data.batching.TextParallelBatch",
+      "source_type": "online",
+      "attention_mode": "compressed",
+      "reset_position_ids": true,
+      "runtime_input_adapter": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.data.runtime.JTSequenceRuntime"
+      },
+      "causal": true,
+      "sliding_window": null,
+      "reset_attention_mask": false,
+      "eod_mask_loss": false
+    },
+    "data_rearrange_map": null,
+    "data_sharding": false,
+    "use_background_prefetcher": false
+  },
+  "packed_sequence": null,
+  "checkpoint": {
+    "save_ckpt": false,
+    "checkpoint_dir": "/work/checkpoints/r129-f637-fp32-tp2-200-r4",
+    "save_steps": 200,
+    "save_epochs": 0,
+    "is_async": false,
+    "is_peft": false,
+    "save_optimizer": true,
+    "save_train_state": true,
+    "save_extra_state_per_rank": true,
+    "restore_from": null,
+    "restore_optimizer": true,
+    "restore_train_state": true,
+    "restore_dataloader_state": true,
+    "model_save_format": "safetensors",
+    "save_consolidated": "final",
+    "staging_dir": null,
+    "best_metric_key": "default"
+  },
+  "debug": {
+    "check_dataset": null,
+    "check_nan_inf": false,
+    "check_fsdp_runtime": false
+  },
+  "model_integration": {
+    "mode": "build"
+  },
+  "memory": {
+    "enable": false,
+    "start_step": 1,
+    "end_step": 2,
+    "save_path": "./memory_snapshot",
+    "dump_ranks": [
+      0
+    ],
+    "stacks": "all",
+    "max_entries": null,
+    "mem_info": false
+  },
+  "wandb": {
+    "enabled": false,
+    "project": "",
+    "entity": null
+  },
+  "profiler": {
+    "enabled": false,
+    "start_step": 1,
+    "stop_step": 10,
+    "start_on_init": false,
+    "memory": true,
+    "rank_ids": null,
+    "pipeline_stage_leaders": false,
+    "output_path": null,
+    "level": 1,
+    "with_stack": false,
+    "data_simplification": false,
+    "mstx": false,
+    "trace_handler": {
+      "analyse_flag": true,
+      "async_mode": false
+    }
+  },
+  "magi": null,
+  "peft": null
+}
+2026-10-15 19:58:26,911 [INFO] hyper_parallel.trainer.base: Process rank: 0, world size: 8
+2026-10-15 19:58:26,931 [INFO] hyper_parallel.distributed.mesh: Built device mesh (4, 1, 2), dense FSDP mesh (1, 4, 2) and expert FSDP mesh None
+2026-10-15 19:58:26,934 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='model.layers.[123456789]*.mlp' skipped because condition 'ep' is inactive
+2026-10-15 19:58:26,934 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='mtp.layers.*.transformer_layer.mlp' skipped because condition 'ep' is inactive
+2026-10-15 19:58:26,962 [INFO] hyper_parallel.models._transformers.model_builder: FSDP2Manager instantiated with FSDP2Config
+[INFO|configuration_utils.py:1104] 2026-10-15 19:58:26,965 >> Generate config GenerationConfig {
+  "bos_token_id": 0,
+  "eos_token_id": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "use_cache": false
+}
+
+2026-10-15 19:59:40,539 [INFO] hyper_parallel.models._transformers.model_builder: Initialized model state with model-native random initialization
+[rank0]:[W1015 19:59:46.051712440 NPUCachingAllocator.cpp:201] Warning: The current CANN and Soc versions require processing for 32 padding size, with memory allocation. (function operator())
+2026-10-15 19:59:47,559 [INFO] hyper_parallel.models._transformers.model_builder: Running ShardingPlanner.plan(tp=2, cp=1, ep=1, sequence_parallel=True, loss_parallel=True)
+2026-10-15 19:59:47,573 [WARNING] hyper_parallel.distributed._builder.planner: No template for boundary_type=unknown at mtp.layers.0.eh_proj
+2026-10-15 19:59:47,574 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.self_attn (glob '*.self_attn')
+2026-10-15 19:59:47,575 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.self_attn (glob '*.self_attn')
+2026-10-15 19:59:47,575 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.0.self_attn (glob '*.self_attn')
+2026-10-15 19:59:47,575 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.self_attn.q_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 19:59:47,576 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 19:59:47,576 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.self_attn.q_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 19:59:47,576 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.self_attn.kv_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 19:59:47,576 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.0.self_attn.kv_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 19:59:47,576 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.0.self_attn.q_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 19:59:47,577 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module model.layers.0.self_attn.key_rope_gather
+2026-10-15 19:59:47,577 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module model.layers.1.self_attn.key_rope_gather
+2026-10-15 19:59:47,577 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module mtp.layers.0.transformer_layer.self_attn.key_rope_gather
+2026-10-15 19:59:47,578 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.mlp.shared_experts (glob '*.mlp.shared_experts')
+2026-10-15 19:59:47,578 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.mlp.shared_experts (glob '*.mlp.shared_experts')
+2026-10-15 19:59:47,579 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module mtp.layers.0.eh_proj
+2026-10-15 19:59:47,580 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.mlp (glob 'model.layers.[123456789]*.mlp')
+2026-10-15 19:59:47,580 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.mlp (glob 'mtp.layers.*.transformer_layer.mlp')
+/workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+  if self.device.type != 'cpu':
+2026-10-15 19:59:47,976 [INFO] hyper_parallel.distributed.tensor_parallel.head_count: head-count adjustment: mtp.layers.0.transformer_layer.self_attn.num_heads 128 -> 64 (tp_size=2)
+2026-10-15 19:59:47,976 [INFO] hyper_parallel.distributed.tensor_parallel.head_count: head-count adjustment: mtp.layers.0.transformer_layer.self_attn.num_key_value_heads 128 -> 64 (tp_size=2)
+2026-10-15 19:59:48,027 [INFO] hyper_parallel.distributed.tensor_parallel.head_count: head-count adjustment: model.layers.1.self_attn.num_heads 128 -> 64 (tp_size=2)
+2026-10-15 19:59:48,028 [INFO] hyper_parallel.distributed.tensor_parallel.head_count: head-count adjustment: model.layers.1.self_attn.num_key_value_heads 128 -> 64 (tp_size=2)
+2026-10-15 19:59:48,030 [INFO] hyper_parallel.distributed.tensor_parallel.head_count: head-count adjustment: model.layers.0.self_attn.num_heads 128 -> 64 (tp_size=2)
+2026-10-15 19:59:48,030 [INFO] hyper_parallel.distributed.tensor_parallel.head_count: head-count adjustment: model.layers.0.self_attn.num_key_value_heads 128 -> 64 (tp_size=2)
+2026-10-15 19:59:48,082 [INFO] hyper_parallel.distributed._builder.applier: boundary mtp.layers.0.transformer_layer.self_attn: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 19:59:48,083 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary mtp.layers.0.transformer_layer.self_attn: nested boundaries (communication_owner: nested_boundary): ['q_a_layernorm', 'kv_a_layernorm', 'key_rope_gather'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 19:59:48,084 [INFO] hyper_parallel.distributed._builder.applier: boundary mtp.layers.0.transformer_layer.mlp: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 19:59:48,084 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary mtp.layers.0.transformer_layer.mlp: nested boundaries (communication_owner: nested_boundary): ['shared_experts'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 19:59:48,085 [INFO] hyper_parallel.distributed._builder.applier: boundary model.layers.1.self_attn: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 19:59:48,085 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary model.layers.1.self_attn: nested boundaries (communication_owner: nested_boundary): ['q_a_layernorm', 'kv_a_layernorm', 'key_rope_gather'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 19:59:48,085 [INFO] hyper_parallel.distributed._builder.applier: boundary model.layers.1.mlp: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 19:59:48,085 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary model.layers.1.mlp: nested boundaries (communication_owner: nested_boundary): ['shared_experts'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 19:59:48,086 [INFO] hyper_parallel.distributed._builder.applier: boundary model.layers.0.self_attn: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 19:59:48,086 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary model.layers.0.self_attn: nested boundaries (communication_owner: nested_boundary): ['kv_a_layernorm', 'q_a_layernorm', 'key_rope_gather'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 19:59:48,087 [INFO] hyper_parallel.models._transformers.model_builder: Sharding plan applied; source_shard_info keys=46
+2026-10-15 19:59:48,088 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Adapter-declared FSDP child units: ['mtp.layers.0.transformer_layer']
+2026-10-15 19:59:48,191 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Applied source-layout SUM gradient scaling: dp_size=4, cp_size=1, tp_size=2, source_gradient_domain_size=4, factor=0.25, units=4
+2026-10-15 19:59:48,191 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Applied FSDP2 to 3 child units and the root module
+2026-10-15 19:59:48,191 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: FSDP2 wrap applied
+2026-10-15 19:59:48,222 [INFO] hyper_parallel.models._transformers.model_builder: Model moved to npu:0
+2026-10-15 19:59:48,262 [INFO] hyper_parallel.trainer.base: Model config:
+{
+  "transformers_version": "5.13.1",
+  "architectures": [
+    "JTDeepseekV3ForCausalLM"
+  ],
+  "output_hidden_states": false,
+  "return_dict": true,
+  "dtype": null,
+  "chunk_size_feed_forward": 0,
+  "is_encoder_decoder": false,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1"
+  },
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1
+  },
+  "problem_type": null,
+  "vocab_size": 152064,
+  "hidden_size": 5120,
+  "intermediate_size": 12288,
+  "moe_intermediate_size": 1536,
+  "num_hidden_layers": 2,
+  "num_attention_heads": 128,
+  "num_key_value_heads": 128,
+  "n_shared_experts": 2,
+  "n_routed_experts": 8,
+  "routed_scaling_factor": 2.827,
+  "kv_lora_rank": 512,
+  "q_lora_rank": 1536,
+  "qk_rope_head_dim": 64,
+  "v_head_dim": 128,
+  "qk_nope_head_dim": 128,
+  "n_group": 1,
+  "topk_group": 1,
+  "num_experts_per_tok": 2,
+  "norm_topk_prob": true,
+  "hidden_act": "silu",
+  "max_position_embeddings": 262400,
+  "initializer_range": 0.02,
+  "rms_norm_eps": 1e-06,
+  "use_cache": false,
+  "pad_token_id": null,
+  "bos_token_id": 0,
+  "eos_token_id": 1,
+  "tie_word_embeddings": false,
+  "rope_parameters": {
+    "rope_type": "default",
+    "rope_theta": 5000000
+  },
+  "mlp_layer_types": [
+    "dense",
+    "sparse"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "index_topk": 2048,
+  "index_head_dim": 128,
+  "index_n_heads": 64,
+  "mlp_bias": false,
+  "head_dim": 64,
+  "first_k_dense_replace": 1,
+  "layer_types": [
+    "full_attention",
+    "full_attention"
+  ],
+  "qk_head_dim": 192,
+  "_name_or_path": "",
+  "rope_interleave": true,
+  "num_nextn_predict_layers": 1,
+  "mtp_loss_factor": 0.3,
+  "use_pad_tokens": true,
+  "moe_aux_loss_coeff": 0.0001,
+  "moe_router_enable_expert_bias": true,
+  "moe_router_bias_update_rate": 0.001,
+  "enable_chunk_loss": true,
+  "chunk_loss_size": 4096,
+  "expert_fp32_weight_gradients": true,
+  "model_type": "jt_deepseek_v3",
+  "output_attentions": false
+}
+2026-10-15 19:59:48,262 [INFO] torch_npu.env: get env HYPER_PARALLEL_MODEL_INTEGRATION_OUTPUT_DIR = /work/runs/r129-f637-fp32-tp2-200-r4/integration
+2026-10-15 19:59:48,275 [INFO] torch_npu.env: get env PATH = /work/venvs/validation/bin:/workspace/venv/bin:/usr/local/python3.12.14/bin:/usr/local/sbin:/usr/local/Ascend/cann-9.2.0-beta.2/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/profiler/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/ascend_system_advisor/asys:/usr/local/Ascend/cann-9.2.0-beta.2/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.2.0-beta.2/tools/msobjdump:/workspace/venv/bin:/usr/local/python3.12.14/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+/workspace/venv/lib/python3.12/site-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+2026-10-15 19:59:48,416 [INFO] hyper_parallel.components.optim.parameter_groups: Parameters without weight decay: ['model.layers.0.self_attn.q_a_layernorm.weight', 'model.layers.0.self_attn.kv_a_layernorm.weight', 'model.layers.0.input_layernorm.weight', 'model.layers.0.post_attention_layernorm.weight', 'model.layers.1.self_attn.q_a_layernorm.weight', 'model.layers.1.self_attn.kv_a_layernorm.weight', 'model.layers.1.input_layernorm.weight', 'model.layers.1.post_attention_layernorm.weight', 'model.norm.weight', 'mtp.layers.0.enorm.weight', 'mtp.layers.0.hnorm.weight', 'mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight', 'mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight', 'mtp.layers.0.transformer_layer.input_layernorm.weight', 'mtp.layers.0.transformer_layer.post_attention_layernorm.weight', 'mtp.layers.0.final_layernorm.weight']
+2026-10-15 19:59:48,416 [INFO] hyper_parallel.components.optim.builders: Muon optimizer split: 28 Muon parameters, 18 AdamW parameters
+2026-10-15 19:59:48,416 [INFO] hyper_parallel.components.optim.builders: Muon parameters (first 5): ['model.layers.0.self_attn.linear_qkv.weight', 'model.layers.0.self_attn.q_b_proj.weight', 'model.layers.0.self_attn.kv_b_proj.weight', 'model.layers.0.self_attn.o_proj.weight', 'model.layers.0.mlp.gate_proj.weight']
+2026-10-15 19:59:48,417 [INFO] hyper_parallel.components.optim.builders: AdamW parameters (first 5): ['model.embed_tokens.weight', 'model.layers.0.self_attn.q_a_layernorm.weight', 'model.layers.0.self_attn.kv_a_layernorm.weight', 'model.layers.0.input_layernorm.weight', 'model.layers.0.post_attention_layernorm.weight']
+2026-10-15 19:59:48,417 [INFO] hyper_parallel.core.optimizer.dtensor_compat: Detected DTensor backend: 'hyper'.
+2026-10-15 19:59:48,417 [INFO] hyper_parallel.core.optimizer: Effective adamw config: {'lr': 0.0001, 'betas': [0.9, 0.95], 'eps': 1e-08, 'weight_decay': 0.1, 'amsgrad': False, 'maximize': False}
+2026-10-15 19:59:51,710 [INFO] hyper_parallel.core.optimizer.optimizer: [HSDP Batch] group_key=0, num_hsdp_groups=4, num_batch_groups=4, total_sub_batches=4, group_numels=[377487360, 314572800, 289406976, 179322880], max_batch_numel=536870912
+2026-10-15 19:59:51,712 [INFO] hyper_parallel.core.optimizer: Effective muon config: {'lr': 0.0001, 'weight_decay': 0.1, 'matched_adamw_rms': 0.2, 'momentum': (0.95, 0.95), 'nesterov': True, 'ns_steps': 5, 'ns_variant': 'legacy', 'hsdp_replica_count': None, 'ns_epsilon': 1e-07, 'ns_dtype': 'float32', 'ns_coefficients': None, 'zero_rms_scale_mode': 'zero', 'apply_lr_in_update': False}
+2026-10-15 19:59:51,726 [INFO] hyper_parallel.core.optimizer.optimizer: [HSDP Batch] group_key=0, num_hsdp_groups=4, num_batch_groups=4, total_sub_batches=4, group_numels=[377487360, 314572800, 289406976, 179322880], max_batch_numel=536870912
+2026-10-15 19:59:51,739 [INFO] hyper_parallel.trainer.base: Checkpointing is inactive (save_ckpt=false, restore_from=None); no checkpoint callback registered.
+2026-10-15 19:59:51,741 [INFO] torch_npu.env: get env JT_MODULE_PROFILE = 0
+/workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:426: FutureWarning: torch.distributed.nn.functional.reduce_scatter is deprecated, use torch.distributed._functional_collectives.reduce_scatter_tensor instead.
+  output_tensor = dist_func.reduce_scatter(
+/workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:358: FutureWarning: torch.distributed.nn.functional.all_gather is deprecated, use torch.distributed._functional_collectives.all_gather_tensor instead.
+  for tensor in dist_func.all_gather(data, group=group)
+/workspace/hyper-parallel/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py:477: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:423.)
+  pad_ids = pad_ids.reshape(padding, config.num_experts_per_tok) % padding
+[rank0]:[W1015 19:59:52.765780950 ArgSortKernelNpuOpApi.cpp:26] Warning: Warning: kernel [ArgSort] can not support dtype int32 or int64 on AiCore, Now this kernel is running on AiCpu.If you are more concerned about high-performance execution,please cast dtype to float32. (function operator())
+/workspace/hyper-parallel/hyper_parallel/components/losses/_vocab_parallel_cross_entropy.py:57: FutureWarning: torch.distributed.nn.functional.all_reduce is deprecated, use torch.distributed._functional_collectives.all_reduce instead.
+  return dist_func.all_reduce(data, op=reduce_op, group=group)
+Training:   0%|          | 1/200 [00:03<10:22,  3.13s/step, loss=16.8093, grad_norm=22.4735, lr=1.000e-04, foundation_loss/aux=0.000253054, foundation_loss/lm=12.8809, foundation_loss/mtp=3.92815, tokens/s=10455.769, step_time=3.115s] | step=1 epoch=0 data/consumed_samples=8 data/consumed_tokens=32573 data/step_samples=8 data/step_tokens=32573 memory/device_max_allocated_gb=15.3037 memory/device_max_reserved_gb=16.5488 performance/step_time=3.11531 performance/tokens_per_second=10455.8 training/foundation_loss/aux=0.000253054 training/foundation_loss/lm=12.8809 training/foundation_loss/mtp=3.92815 training/grad_norm=22.4735 training/lr=0.0001 training/total_loss=16.8093
+Training:   1%|          | 2/200 [00:09<16:13,  4.92s/step, loss=16.7339, grad_norm=8.05277, lr=1.000e-04, foundation_loss/aux=0.000222707, foundation_loss/lm=12.8491, foundation_loss/mtp=3.88457, tokens/s=7269.549, step_time=2.922s] | step=2 epoch=0 data/consumed_samples=16 data/consumed_tokens=53812 data/step_samples=8 data/step_tokens=21239 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=2.92164 performance/tokens_per_second=7269.55 training/foundation_loss/aux=0.000222707 training/foundation_loss/lm=12.8491 training/foundation_loss/mtp=3.88457 training/grad_norm=8.05277 training/lr=0.0001 training/total_loss=16.7339
+Training:   2%|▏         | 3/200 [00:11<12:51,  3.92s/step, loss=16.318, grad_norm=13.1302, lr=1.000e-04, foundation_loss/aux=0.000240431, foundation_loss/lm=12.4727, foundation_loss/mtp=3.84506, tokens/s=13437.430, step_time=1.849s] | step=3 epoch=0 data/consumed_samples=24 data/consumed_tokens=78660 data/step_samples=8 data/step_tokens=24848 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.84916 performance/tokens_per_second=13437.4 training/foundation_loss/aux=0.000240431 training/foundation_loss/lm=12.4727 training/foundation_loss/mtp=3.84506 training/grad_norm=13.1302 training/lr=0.0001 training/total_loss=16.318
+Training:   2%|▏         | 4/200 [00:13<11:09,  3.42s/step, loss=16.2432, grad_norm=10.1265, lr=1.000e-04, foundation_loss/aux=0.000228311, foundation_loss/lm=12.3839, foundation_loss/mtp=3.85904, tokens/s=5361.480, step_time=1.846s] | step=4 epoch=0 data/consumed_samples=32 data/consumed_tokens=88556 data/step_samples=8 data/step_tokens=9896 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.84576 performance/tokens_per_second=5361.48 training/foundation_loss/aux=0.000228311 training/foundation_loss/lm=12.3839 training/foundation_loss/mtp=3.85904 training/grad_norm=10.1265 training/lr=0.0001 training/total_loss=16.2432
+Training:   2%|▎         | 5/200 [00:15<10:07,  3.12s/step, loss=16.1228, grad_norm=12.4724, lr=1.000e-04, foundation_loss/aux=0.000241548, foundation_loss/lm=12.279, foundation_loss/mtp=3.84355, tokens/s=5217.330, step_time=1.851s] | step=5 epoch=0 data/consumed_samples=40 data/consumed_tokens=98214 data/step_samples=8 data/step_tokens=9658 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85114 performance/tokens_per_second=5217.33 training/foundation_loss/aux=0.000241548 training/foundation_loss/lm=12.279 training/foundation_loss/mtp=3.84355 training/grad_norm=12.4724 training/lr=0.0001 training/total_loss=16.1228
+Training:   3%|▎         | 6/200 [00:17<09:25,  2.92s/step, loss=16.063, grad_norm=8.62195, lr=1.000e-04, foundation_loss/aux=0.000223053, foundation_loss/lm=12.2325, foundation_loss/mtp=3.8303, tokens/s=9324.711, step_time=1.837s] | step=6 epoch=0 data/consumed_samples=48 data/consumed_tokens=115348 data/step_samples=8 data/step_tokens=17134 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.83748 performance/tokens_per_second=9324.71 training/foundation_loss/aux=0.000223053 training/foundation_loss/lm=12.2325 training/foundation_loss/mtp=3.8303 training/grad_norm=8.62195 training/lr=0.0001 training/total_loss=16.063
+Training:   4%|▎         | 7/200 [00:19<08:55,  2.77s/step, loss=15.4059, grad_norm=11.9354, lr=1.000e-04, foundation_loss/aux=0.00022787, foundation_loss/lm=11.6162, foundation_loss/mtp=3.78947, tokens/s=13445.552, step_time=1.860s] | step=7 epoch=0 data/consumed_samples=56 data/consumed_tokens=140360 data/step_samples=8 data/step_tokens=25012 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.86024 performance/tokens_per_second=13445.6 training/foundation_loss/aux=0.00022787 training/foundation_loss/lm=11.6162 training/foundation_loss/mtp=3.78947 training/grad_norm=11.9354 training/lr=0.0001 training/total_loss=15.4059
+Training:   4%|▍         | 8/200 [00:21<08:32,  2.67s/step, loss=15.5507, grad_norm=9.06241, lr=1.000e-04, foundation_loss/aux=0.000225296, foundation_loss/lm=11.7575, foundation_loss/mtp=3.79291, tokens/s=9061.521, step_time=1.852s] | step=8 epoch=0 data/consumed_samples=64 data/consumed_tokens=157142 data/step_samples=8 data/step_tokens=16782 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85201 performance/tokens_per_second=9061.52 training/foundation_loss/aux=0.000225296 training/foundation_loss/lm=11.7575 training/foundation_loss/mtp=3.79291 training/grad_norm=9.06241 training/lr=0.0001 training/total_loss=15.5507
+Training:   4%|▍         | 9/200 [00:23<08:13,  2.58s/step, loss=14.5268, grad_norm=16.0576, lr=1.000e-04, foundation_loss/aux=0.000246984, foundation_loss/lm=10.8131, foundation_loss/mtp=3.71344, tokens/s=12342.762, step_time=1.854s] | step=9 epoch=0 data/consumed_samples=72 data/consumed_tokens=180028 data/step_samples=8 data/step_tokens=22886 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.8542 performance/tokens_per_second=12342.8 training/foundation_loss/aux=0.000246984 training/foundation_loss/lm=10.8131 training/foundation_loss/mtp=3.71344 training/grad_norm=16.0576 training/lr=0.0001 training/total_loss=14.5268
+Training:   5%|▌         | 10/200 [00:25<07:58,  2.52s/step, loss=13.7886, grad_norm=16.716, lr=1.000e-04, foundation_loss/aux=0.000253871, foundation_loss/lm=10.1001, foundation_loss/mtp=3.68832, tokens/s=16462.860, step_time=1.858s] | step=10 epoch=0 data/consumed_samples=80 data/consumed_tokens=210609 data/step_samples=8 data/step_tokens=30581 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85758 performance/tokens_per_second=16462.9 training/foundation_loss/aux=0.000253871 training/foundation_loss/lm=10.1001 training/foundation_loss/mtp=3.68832 training/grad_norm=16.716 training/lr=0.0001 training/total_loss=13.7886
+Training:   6%|▌         | 11/200 [00:27<07:45,  2.46s/step, loss=14.5613, grad_norm=9.13981, lr=1.000e-04, foundation_loss/aux=0.000221382, foundation_loss/lm=10.8562, foundation_loss/mtp=3.70482, tokens/s=11262.384, step_time=1.823s] | step=11 epoch=0 data/consumed_samples=88 data/consumed_tokens=231142 data/step_samples=8 data/step_tokens=20533 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.82315 performance/tokens_per_second=11262.4 training/foundation_loss/aux=0.000221382 training/foundation_loss/lm=10.8562 training/foundation_loss/mtp=3.70482 training/grad_norm=9.13981 training/lr=0.0001 training/total_loss=14.5613
+Training:   6%|▌         | 12/200 [00:29<07:34,  2.42s/step, loss=13.9336, grad_norm=17.5269, lr=1.000e-04, foundation_loss/aux=0.000254898, foundation_loss/lm=10.3092, foundation_loss/mtp=3.62419, tokens/s=4570.319, step_time=1.859s] | step=12 epoch=0 data/consumed_samples=96 data/consumed_tokens=239639 data/step_samples=8 data/step_tokens=8497 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85917 performance/tokens_per_second=4570.32 training/foundation_loss/aux=0.000254898 training/foundation_loss/lm=10.3092 training/foundation_loss/mtp=3.62419 training/grad_norm=17.5269 training/lr=0.0001 training/total_loss=13.9336
+Training:   6%|▋         | 13/200 [00:30<07:24,  2.38s/step, loss=13.8265, grad_norm=17.7563, lr=1.000e-04, foundation_loss/aux=0.00025217, foundation_loss/lm=10.1669, foundation_loss/mtp=3.6594, tokens/s=5909.389, step_time=1.857s] | step=13 epoch=0 data/consumed_samples=104 data/consumed_tokens=250613 data/step_samples=8 data/step_tokens=10974 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85704 performance/tokens_per_second=5909.39 training/foundation_loss/aux=0.00025217 training/foundation_loss/lm=10.1669 training/foundation_loss/mtp=3.6594 training/grad_norm=17.7563 training/lr=0.0001 training/total_loss=13.8265
+Training:   7%|▋         | 14/200 [00:32<07:16,  2.35s/step, loss=14.2871, grad_norm=10.9797, lr=1.000e-04, foundation_loss/aux=0.000255947, foundation_loss/lm=10.6041, foundation_loss/mtp=3.68274, tokens/s=6419.730, step_time=1.861s] | step=14 epoch=0 data/consumed_samples=112 data/consumed_tokens=262563 data/step_samples=8 data/step_tokens=11950 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.86145 performance/tokens_per_second=6419.73 training/foundation_loss/aux=0.000255947 training/foundation_loss/lm=10.6041 training/foundation_loss/mtp=3.68274 training/grad_norm=10.9797 training/lr=0.0001 training/total_loss=14.2871
+Training:   8%|▊         | 15/200 [00:34<07:08,  2.32s/step, loss=13.1964, grad_norm=11.3334, lr=1.000e-04, foundation_loss/aux=0.000250517, foundation_loss/lm=9.62622, foundation_loss/mtp=3.5699, tokens/s=11395.451, step_time=1.839s] | step=15 epoch=0 data/consumed_samples=120 data/consumed_tokens=283524 data/step_samples=8 data/step_tokens=20961 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.83942 performance/tokens_per_second=11395.5 training/foundation_loss/aux=0.000250517 training/foundation_loss/lm=9.62622 training/foundation_loss/mtp=3.5699 training/grad_norm=11.3334 training/lr=0.0001 training/total_loss=13.1964
+Training:   8%|▊         | 16/200 [00:36<07:02,  2.29s/step, loss=12.417, grad_norm=17.6356, lr=1.000e-04, foundation_loss/aux=0.000252268, foundation_loss/lm=8.8594, foundation_loss/mtp=3.55739, tokens/s=15453.784, step_time=1.860s] | step=16 epoch=0 data/consumed_samples=128 data/consumed_tokens=312275 data/step_samples=8 data/step_tokens=28751 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.86045 performance/tokens_per_second=15453.8 training/foundation_loss/aux=0.000252268 training/foundation_loss/lm=8.8594 training/foundation_loss/mtp=3.55739 training/grad_norm=17.6356 training/lr=0.0001 training/total_loss=12.417
+Training:   8%|▊         | 17/200 [00:38<06:55,  2.27s/step, loss=12.6392, grad_norm=10.6901, lr=1.000e-04, foundation_loss/aux=0.000248505, foundation_loss/lm=9.12594, foundation_loss/mtp=3.51306, tokens/s=14066.334, step_time=1.842s] | step=17 epoch=0 data/consumed_samples=136 data/consumed_tokens=338189 data/step_samples=8 data/step_tokens=25914 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.84227 performance/tokens_per_second=14066.3 training/foundation_loss/aux=0.000248505 training/foundation_loss/lm=9.12594 training/foundation_loss/mtp=3.51306 training/grad_norm=10.6901 training/lr=0.0001 training/total_loss=12.6392
+Training:   9%|▉         | 18/200 [00:40<06:50,  2.25s/step, loss=10.5191, grad_norm=17.3625, lr=1.000e-04, foundation_loss/aux=0.000275139, foundation_loss/lm=7.21684, foundation_loss/mtp=3.30202, tokens/s=16144.521, step_time=1.876s] | step=18 epoch=0 data/consumed_samples=144 data/consumed_tokens=368477 data/step_samples=8 data/step_tokens=30288 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.87605 performance/tokens_per_second=16144.5 training/foundation_loss/aux=0.000275139 training/foundation_loss/lm=7.21684 training/foundation_loss/mtp=3.30202 training/grad_norm=17.3625 training/lr=0.0001 training/total_loss=10.5191
+Training:  10%|▉         | 19/200 [00:42<06:44,  2.24s/step, loss=12.9045, grad_norm=25.2795, lr=1.000e-04, foundation_loss/aux=0.000257829, foundation_loss/lm=9.39468, foundation_loss/mtp=3.50955, tokens/s=6570.657, step_time=1.856s] | step=19 epoch=0 data/consumed_samples=152 data/consumed_tokens=380672 data/step_samples=8 data/step_tokens=12195 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85598 performance/tokens_per_second=6570.66 training/foundation_loss/aux=0.000257829 training/foundation_loss/lm=9.39468 training/foundation_loss/mtp=3.50955 training/grad_norm=25.2795 training/lr=0.0001 training/total_loss=12.9045
+Training:  10%|█         | 20/200 [00:44<06:39,  2.22s/step, loss=12.4672, grad_norm=15.3441, lr=1.000e-04, foundation_loss/aux=0.000256525, foundation_loss/lm=9.03742, foundation_loss/mtp=3.42952, tokens/s=4082.252, step_time=1.854s] | step=20 epoch=0 data/consumed_samples=160 data/consumed_tokens=388239 data/step_samples=8 data/step_tokens=7567 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85363 performance/tokens_per_second=4082.25 training/foundation_loss/aux=0.000256525 training/foundation_loss/lm=9.03742 training/foundation_loss/mtp=3.42952 training/grad_norm=15.3441 training/lr=0.0001 training/total_loss=12.4672
+Training:  10%|█         | 21/200 [00:46<06:34,  2.21s/step, loss=11.4597, grad_norm=18.6153, lr=1.000e-04, foundation_loss/aux=0.000284233, foundation_loss/lm=8.12067, foundation_loss/mtp=3.33875, tokens/s=14631.382, step_time=1.858s] | step=21 epoch=0 data/consumed_samples=168 data/consumed_tokens=415427 data/step_samples=8 data/step_tokens=27188 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.8582 performance/tokens_per_second=14631.4 training/foundation_loss/aux=0.000284233 training/foundation_loss/lm=8.12067 training/foundation_loss/mtp=3.33875 training/grad_norm=18.6153 training/lr=0.0001 training/total_loss=11.4597
+Training:  11%|█         | 22/200 [00:48<06:30,  2.19s/step, loss=12.4679, grad_norm=12.2666, lr=1.000e-04, foundation_loss/aux=0.000243196, foundation_loss/lm=9.02791, foundation_loss/mtp=3.43971, tokens/s=5916.586, step_time=1.852s] | step=22 epoch=0 data/consumed_samples=176 data/consumed_tokens=426382 data/step_samples=8 data/step_tokens=10955 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85157 performance/tokens_per_second=5916.59 training/foundation_loss/aux=0.000243196 training/foundation_loss/lm=9.02791 training/foundation_loss/mtp=3.43971 training/grad_norm=12.2666 training/lr=0.0001 training/total_loss=12.4679
+Training:  12%|█▏        | 23/200 [00:50<06:25,  2.18s/step, loss=11.7484, grad_norm=10.0781, lr=1.000e-04, foundation_loss/aux=0.000257638, foundation_loss/lm=8.44696, foundation_loss/mtp=3.30116, tokens/s=11926.004, step_time=1.838s] | step=23 epoch=0 data/consumed_samples=184 data/consumed_tokens=448300 data/step_samples=8 data/step_tokens=21918 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.83783 performance/tokens_per_second=11926 training/foundation_loss/aux=0.000257638 training/foundation_loss/lm=8.44696 training/foundation_loss/mtp=3.30116 training/grad_norm=10.0781 training/lr=0.0001 training/total_loss=11.7484
+Training:  12%|█▏        | 24/200 [00:52<06:21,  2.17s/step, loss=10.3803, grad_norm=16.3529, lr=1.000e-04, foundation_loss/aux=0.000276549, foundation_loss/lm=7.29678, foundation_loss/mtp=3.08326, tokens/s=14692.243, step_time=1.861s] | step=24 epoch=0 data/consumed_samples=192 data/consumed_tokens=475638 data/step_samples=8 data/step_tokens=27338 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.86071 performance/tokens_per_second=14692.2 training/foundation_loss/aux=0.000276549 training/foundation_loss/lm=7.29678 training/foundation_loss/mtp=3.08326 training/grad_norm=16.3529 training/lr=0.0001 training/total_loss=10.3803
+Training:  12%|█▎        | 25/200 [00:54<06:18,  2.16s/step, loss=10.1683, grad_norm=18.8808, lr=1.000e-04, foundation_loss/aux=0.000296691, foundation_loss/lm=7.1285, foundation_loss/mtp=3.03951, tokens/s=10933.257, step_time=1.854s] | step=25 epoch=0 data/consumed_samples=200 data/consumed_tokens=495910 data/step_samples=8 data/step_tokens=20272 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85416 performance/tokens_per_second=10933.3 training/foundation_loss/aux=0.000296691 training/foundation_loss/lm=7.1285 training/foundation_loss/mtp=3.03951 training/grad_norm=18.8808 training/lr=0.0001 training/total_loss=10.1683
+Training:  13%|█▎        | 26/200 [00:55<06:14,  2.15s/step, loss=12.2106, grad_norm=14.0904, lr=1.000e-04, foundation_loss/aux=0.000271601, foundation_loss/lm=9.00063, foundation_loss/mtp=3.20974, tokens/s=1270.540, step_time=1.860s] | step=26 epoch=0 data/consumed_samples=208 data/consumed_tokens=498273 data/step_samples=8 data/step_tokens=2363 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85984 performance/tokens_per_second=1270.54 training/foundation_loss/aux=0.000271601 training/foundation_loss/lm=9.00063 training/foundation_loss/mtp=3.20974 training/grad_norm=14.0904 training/lr=0.0001 training/total_loss=12.2106
+Training:  14%|█▎        | 27/200 [00:57<06:10,  2.14s/step, loss=12.2933, grad_norm=19.5108, lr=1.000e-04, foundation_loss/aux=0.000282401, foundation_loss/lm=9.12073, foundation_loss/mtp=3.17228, tokens/s=8026.954, step_time=1.867s] | step=27 epoch=0 data/consumed_samples=216 data/consumed_tokens=513256 data/step_samples=8 data/step_tokens=14983 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.86659 performance/tokens_per_second=8026.95 training/foundation_loss/aux=0.000282401 training/foundation_loss/lm=9.12073 training/foundation_loss/mtp=3.17228 training/grad_norm=19.5108 training/lr=0.0001 training/total_loss=12.2933
+Training:  14%|█▍        | 28/200 [00:59<06:07,  2.14s/step, loss=9.64746, grad_norm=16.0527, lr=1.000e-04, foundation_loss/aux=0.000281273, foundation_loss/lm=6.87175, foundation_loss/mtp=2.77544, tokens/s=13374.990, step_time=1.858s] | step=28 epoch=0 data/consumed_samples=224 data/consumed_tokens=538106 data/step_samples=8 data/step_tokens=24850 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5605 performance/step_time=1.85795 performance/tokens_per_second=13375 training/foundation_loss/aux=0.000281273 training/foundation_loss/lm=6.87175 training/foundation_loss/mtp=2.77544 training/grad_norm=16.0527 training/lr=0.0001 training/total_loss=9.64746
+Training:  14%|█▍        | 29/200 [01:01<06:03,  2.13s/step, loss=12.3419, grad_norm=19.5409, lr=1.000e-04, foundation_loss/aux=0.000267133, foundation_loss/lm=9.04665, foundation_loss/mtp=3.29499, tokens/s=11807.991, step_time=1.861s] | step=29 epoch=0 data/consumed_samples=232 data/consumed_tokens=560076 data/step_samples=8 data/step_tokens=21970 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.8606 performance/tokens_per_second=11808 training/foundation_loss/aux=0.000267133 training/foundation_loss/lm=9.04665 training/foundation_loss/mtp=3.29499 training/grad_norm=19.5409 training/lr=0.0001 training/total_loss=12.3419
+Training:  15%|█▌        | 30/200 [01:03<06:00,  2.12s/step, loss=11.3634, grad_norm=12.3918, lr=1.000e-04, foundation_loss/aux=0.000294081, foundation_loss/lm=8.28121, foundation_loss/mtp=3.0819, tokens/s=13685.449, step_time=1.866s] | step=30 epoch=0 data/consumed_samples=240 data/consumed_tokens=585617 data/step_samples=8 data/step_tokens=25541 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.86629 performance/tokens_per_second=13685.4 training/foundation_loss/aux=0.000294081 training/foundation_loss/lm=8.28121 training/foundation_loss/mtp=3.0819 training/grad_norm=12.3918 training/lr=0.0001 training/total_loss=11.3634
+Training:  16%|█▌        | 31/200 [01:05<05:57,  2.12s/step, loss=9.03179, grad_norm=12.2749, lr=1.000e-04, foundation_loss/aux=0.000293526, foundation_loss/lm=6.40454, foundation_loss/mtp=2.62696, tokens/s=15431.123, step_time=1.861s] | step=31 epoch=0 data/consumed_samples=248 data/consumed_tokens=614332 data/step_samples=8 data/step_tokens=28715 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.86085 performance/tokens_per_second=15431.1 training/foundation_loss/aux=0.000293526 training/foundation_loss/lm=6.40454 training/foundation_loss/mtp=2.62696 training/grad_norm=12.2749 training/lr=0.0001 training/total_loss=9.03179
+Training:  16%|█▌        | 32/200 [01:07<05:54,  2.11s/step, loss=10.8192, grad_norm=8.71682, lr=1.000e-04, foundation_loss/aux=0.000274043, foundation_loss/lm=7.89, foundation_loss/mtp=2.92895, tokens/s=11083.766, step_time=1.848s] | step=32 epoch=0 data/consumed_samples=256 data/consumed_tokens=634812 data/step_samples=8 data/step_tokens=20480 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.84775 performance/tokens_per_second=11083.8 training/foundation_loss/aux=0.000274043 training/foundation_loss/lm=7.89 training/foundation_loss/mtp=2.92895 training/grad_norm=8.71682 training/lr=0.0001 training/total_loss=10.8192
+Training:  16%|█▋        | 33/200 [01:09<05:51,  2.10s/step, loss=10.2985, grad_norm=7.90279, lr=1.000e-04, foundation_loss/aux=0.000279447, foundation_loss/lm=7.50561, foundation_loss/mtp=2.79259, tokens/s=9293.623, step_time=1.861s] | step=33 epoch=0 data/consumed_samples=264 data/consumed_tokens=652104 data/step_samples=8 data/step_tokens=17292 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.86063 performance/tokens_per_second=9293.62 training/foundation_loss/aux=0.000279447 training/foundation_loss/lm=7.50561 training/foundation_loss/mtp=2.79259 training/grad_norm=7.90279 training/lr=0.0001 training/total_loss=10.2985
+Training:  17%|█▋        | 34/200 [01:11<05:48,  2.10s/step, loss=10.3256, grad_norm=8.5828, lr=1.000e-04, foundation_loss/aux=0.000281852, foundation_loss/lm=7.60862, foundation_loss/mtp=2.71665, tokens/s=7045.761, step_time=1.857s] | step=34 epoch=0 data/consumed_samples=272 data/consumed_tokens=665190 data/step_samples=8 data/step_tokens=13086 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.85729 performance/tokens_per_second=7045.76 training/foundation_loss/aux=0.000281852 training/foundation_loss/lm=7.60862 training/foundation_loss/mtp=2.71665 training/grad_norm=8.5828 training/lr=0.0001 training/total_loss=10.3256
+Training:  18%|█▊        | 35/200 [01:13<05:45,  2.09s/step, loss=11.3447, grad_norm=14.7623, lr=1.000e-04, foundation_loss/aux=0.000297924, foundation_loss/lm=8.47024, foundation_loss/mtp=2.87415, tokens/s=3153.087, step_time=1.868s] | step=35 epoch=0 data/consumed_samples=280 data/consumed_tokens=671081 data/step_samples=8 data/step_tokens=5891 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.86833 performance/tokens_per_second=3153.09 training/foundation_loss/aux=0.000297924 training/foundation_loss/lm=8.47024 training/foundation_loss/mtp=2.87415 training/grad_norm=14.7623 training/lr=0.0001 training/total_loss=11.3447
+Training:  18%|█▊        | 36/200 [01:15<05:42,  2.09s/step, loss=10.8239, grad_norm=11.2952, lr=1.000e-04, foundation_loss/aux=0.00029166, foundation_loss/lm=8.01689, foundation_loss/mtp=2.80667, tokens/s=3815.434, step_time=1.858s] | step=36 epoch=0 data/consumed_samples=288 data/consumed_tokens=678171 data/step_samples=8 data/step_tokens=7090 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.85824 performance/tokens_per_second=3815.43 training/foundation_loss/aux=0.00029166 training/foundation_loss/lm=8.01689 training/foundation_loss/mtp=2.80667 training/grad_norm=11.2952 training/lr=0.0001 training/total_loss=10.8239
+Training:  18%|█▊        | 37/200 [01:17<05:39,  2.08s/step, loss=9.189, grad_norm=10.5729, lr=1.000e-04, foundation_loss/aux=0.000291538, foundation_loss/lm=6.70678, foundation_loss/mtp=2.48193, tokens/s=14020.321, step_time=1.853s] | step=37 epoch=0 data/consumed_samples=296 data/consumed_tokens=704157 data/step_samples=8 data/step_tokens=25986 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.85345 performance/tokens_per_second=14020.3 training/foundation_loss/aux=0.000291538 training/foundation_loss/lm=6.70678 training/foundation_loss/mtp=2.48193 training/grad_norm=10.5729 training/lr=0.0001 training/total_loss=9.189
+Training:  19%|█▉        | 38/200 [01:19<05:36,  2.08s/step, loss=9.04483, grad_norm=9.20774, lr=1.000e-04, foundation_loss/aux=0.000298273, foundation_loss/lm=6.64635, foundation_loss/mtp=2.39818, tokens/s=11327.350, step_time=1.839s] | step=38 epoch=0 data/consumed_samples=304 data/consumed_tokens=724985 data/step_samples=8 data/step_tokens=20828 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.5801 performance/step_time=1.83874 performance/tokens_per_second=11327.3 training/foundation_loss/aux=0.000298273 training/foundation_loss/lm=6.64635 training/foundation_loss/mtp=2.39818 training/grad_norm=9.20774 training/lr=0.0001 training/total_loss=9.04483
+Training:  20%|█▉        | 39/200 [01:20<05:34,  2.08s/step, loss=9.84307, grad_norm=7.78421, lr=1.000e-04, foundation_loss/aux=0.000292407, foundation_loss/lm=7.35518, foundation_loss/mtp=2.48759, tokens/s=8233.370, step_time=1.855s] | step=39 epoch=0 data/consumed_samples=312 data/consumed_tokens=740254 data/step_samples=8 data/step_tokens=15269 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85453 performance/tokens_per_second=8233.37 training/foundation_loss/aux=0.000292407 training/foundation_loss/lm=7.35518 training/foundation_loss/mtp=2.48759 training/grad_norm=7.78421 training/lr=0.0001 training/total_loss=9.84307
+Training:  20%|██        | 40/200 [01:22<05:31,  2.07s/step, loss=11.4796, grad_norm=10.9945, lr=1.000e-04, foundation_loss/aux=0.000291777, foundation_loss/lm=8.67614, foundation_loss/mtp=2.80316, tokens/s=8221.098, step_time=1.860s] | step=40 epoch=0 data/consumed_samples=320 data/consumed_tokens=755542 data/step_samples=8 data/step_tokens=15288 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85961 performance/tokens_per_second=8221.1 training/foundation_loss/aux=0.000291777 training/foundation_loss/lm=8.67614 training/foundation_loss/mtp=2.80316 training/grad_norm=10.9945 training/lr=0.0001 training/total_loss=11.4796
+Training:  20%|██        | 41/200 [01:24<05:28,  2.07s/step, loss=11.5487, grad_norm=12.1025, lr=1.000e-04, foundation_loss/aux=0.000291258, foundation_loss/lm=8.70984, foundation_loss/mtp=2.83858, tokens/s=8843.372, step_time=1.858s] | step=41 epoch=0 data/consumed_samples=328 data/consumed_tokens=771974 data/step_samples=8 data/step_tokens=16432 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85811 performance/tokens_per_second=8843.37 training/foundation_loss/aux=0.000291258 training/foundation_loss/lm=8.70984 training/foundation_loss/mtp=2.83858 training/grad_norm=12.1025 training/lr=0.0001 training/total_loss=11.5487
+Training:  21%|██        | 42/200 [01:26<05:26,  2.06s/step, loss=10.3307, grad_norm=10.3197, lr=1.000e-04, foundation_loss/aux=0.000294264, foundation_loss/lm=7.7274, foundation_loss/mtp=2.60304, tokens/s=8552.238, step_time=1.854s] | step=42 epoch=0 data/consumed_samples=336 data/consumed_tokens=787826 data/step_samples=8 data/step_tokens=15852 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85355 performance/tokens_per_second=8552.24 training/foundation_loss/aux=0.000294264 training/foundation_loss/lm=7.7274 training/foundation_loss/mtp=2.60304 training/grad_norm=10.3197 training/lr=0.0001 training/total_loss=10.3307
+Training:  22%|██▏       | 43/200 [01:28<05:23,  2.06s/step, loss=9.85413, grad_norm=7.60677, lr=1.000e-04, foundation_loss/aux=0.000285797, foundation_loss/lm=7.37579, foundation_loss/mtp=2.47805, tokens/s=7009.549, step_time=1.845s] | step=43 epoch=0 data/consumed_samples=344 data/consumed_tokens=800760 data/step_samples=8 data/step_tokens=12934 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.8452 performance/tokens_per_second=7009.55 training/foundation_loss/aux=0.000285797 training/foundation_loss/lm=7.37579 training/foundation_loss/mtp=2.47805 training/grad_norm=7.60677 training/lr=0.0001 training/total_loss=9.85413
+Training:  22%|██▏       | 44/200 [01:30<05:21,  2.06s/step, loss=8.91199, grad_norm=13.5573, lr=1.000e-04, foundation_loss/aux=0.000295339, foundation_loss/lm=6.64421, foundation_loss/mtp=2.26749, tokens/s=10456.879, step_time=1.847s] | step=44 epoch=0 data/consumed_samples=352 data/consumed_tokens=820069 data/step_samples=8 data/step_tokens=19309 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84654 performance/tokens_per_second=10456.9 training/foundation_loss/aux=0.000295339 training/foundation_loss/lm=6.64421 training/foundation_loss/mtp=2.26749 training/grad_norm=13.5573 training/lr=0.0001 training/total_loss=8.91199
+Training:  22%|██▎       | 45/200 [01:32<05:18,  2.06s/step, loss=8.55291, grad_norm=29.5469, lr=1.000e-04, foundation_loss/aux=0.000290134, foundation_loss/lm=6.39687, foundation_loss/mtp=2.15575, tokens/s=7855.754, step_time=1.857s] | step=45 epoch=0 data/consumed_samples=360 data/consumed_tokens=834659 data/step_samples=8 data/step_tokens=14590 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85724 performance/tokens_per_second=7855.75 training/foundation_loss/aux=0.000290134 training/foundation_loss/lm=6.39687 training/foundation_loss/mtp=2.15575 training/grad_norm=29.5469 training/lr=0.0001 training/total_loss=8.55291
+Training:  23%|██▎       | 46/200 [01:34<05:15,  2.05s/step, loss=9.24714, grad_norm=6.6133, lr=1.000e-04, foundation_loss/aux=0.00029108, foundation_loss/lm=6.92271, foundation_loss/mtp=2.32414, tokens/s=14063.024, step_time=1.835s] | step=46 epoch=0 data/consumed_samples=368 data/consumed_tokens=860460 data/step_samples=8 data/step_tokens=25801 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.83467 performance/tokens_per_second=14063 training/foundation_loss/aux=0.00029108 training/foundation_loss/lm=6.92271 training/foundation_loss/mtp=2.32414 training/grad_norm=6.6133 training/lr=0.0001 training/total_loss=9.24714
+Training:  24%|██▎       | 47/200 [01:36<05:13,  2.05s/step, loss=9.98146, grad_norm=6.40349, lr=1.000e-04, foundation_loss/aux=0.000293017, foundation_loss/lm=7.55364, foundation_loss/mtp=2.42753, tokens/s=9926.395, step_time=1.855s] | step=47 epoch=0 data/consumed_samples=376 data/consumed_tokens=878875 data/step_samples=8 data/step_tokens=18415 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85515 performance/tokens_per_second=9926.39 training/foundation_loss/aux=0.000293017 training/foundation_loss/lm=7.55364 training/foundation_loss/mtp=2.42753 training/grad_norm=6.40349 training/lr=0.0001 training/total_loss=9.98146
+Training:  24%|██▍       | 48/200 [01:38<05:11,  2.05s/step, loss=9.6111, grad_norm=6.60575, lr=1.000e-04, foundation_loss/aux=0.00028248, foundation_loss/lm=7.2223, foundation_loss/mtp=2.38852, tokens/s=7880.425, step_time=1.845s] | step=48 epoch=0 data/consumed_samples=384 data/consumed_tokens=893416 data/step_samples=8 data/step_tokens=14541 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.8452 performance/tokens_per_second=7880.43 training/foundation_loss/aux=0.00028248 training/foundation_loss/lm=7.2223 training/foundation_loss/mtp=2.38852 training/grad_norm=6.60575 training/lr=0.0001 training/total_loss=9.6111
+Training:  24%|██▍       | 49/200 [01:40<05:08,  2.04s/step, loss=8.69577, grad_norm=10.312, lr=1.000e-04, foundation_loss/aux=0.000298597, foundation_loss/lm=6.51445, foundation_loss/mtp=2.18102, tokens/s=15197.840, step_time=1.854s] | step=49 epoch=0 data/consumed_samples=392 data/consumed_tokens=921599 data/step_samples=8 data/step_tokens=28183 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85441 performance/tokens_per_second=15197.8 training/foundation_loss/aux=0.000298597 training/foundation_loss/lm=6.51445 training/foundation_loss/mtp=2.18102 training/grad_norm=10.312 training/lr=0.0001 training/total_loss=8.69577
+Training:  25%|██▌       | 50/200 [01:42<05:06,  2.04s/step, loss=9.3268, grad_norm=7.11657, lr=1.000e-04, foundation_loss/aux=0.000292348, foundation_loss/lm=7.03495, foundation_loss/mtp=2.29155, tokens/s=10425.042, step_time=1.854s] | step=50 epoch=0 data/consumed_samples=400 data/consumed_tokens=940922 data/step_samples=8 data/step_tokens=19323 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85352 performance/tokens_per_second=10425 training/foundation_loss/aux=0.000292348 training/foundation_loss/lm=7.03495 training/foundation_loss/mtp=2.29155 training/grad_norm=7.11657 training/lr=0.0001 training/total_loss=9.3268
+Training:  26%|██▌       | 51/200 [01:43<05:03,  2.04s/step, loss=9.31027, grad_norm=5.22704, lr=1.000e-04, foundation_loss/aux=0.00029716, foundation_loss/lm=7.07471, foundation_loss/mtp=2.23527, tokens/s=13120.685, step_time=1.834s] | step=51 epoch=0 data/consumed_samples=408 data/consumed_tokens=964989 data/step_samples=8 data/step_tokens=24067 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.83428 performance/tokens_per_second=13120.7 training/foundation_loss/aux=0.00029716 training/foundation_loss/lm=7.07471 training/foundation_loss/mtp=2.23527 training/grad_norm=5.22704 training/lr=0.0001 training/total_loss=9.31027
+Training:  26%|██▌       | 52/200 [01:45<05:01,  2.04s/step, loss=8.52608, grad_norm=7.49993, lr=1.000e-04, foundation_loss/aux=0.000301918, foundation_loss/lm=6.48307, foundation_loss/mtp=2.04271, tokens/s=10861.995, step_time=1.858s] | step=52 epoch=0 data/consumed_samples=416 data/consumed_tokens=985167 data/step_samples=8 data/step_tokens=20178 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85767 performance/tokens_per_second=10862 training/foundation_loss/aux=0.000301918 training/foundation_loss/lm=6.48307 training/foundation_loss/mtp=2.04271 training/grad_norm=7.49993 training/lr=0.0001 training/total_loss=8.52608
+Training:  26%|██▋       | 53/200 [01:47<04:58,  2.03s/step, loss=10.2038, grad_norm=5.78752, lr=1.000e-04, foundation_loss/aux=0.000291567, foundation_loss/lm=7.76164, foundation_loss/mtp=2.44189, tokens/s=9234.222, step_time=1.844s] | step=53 epoch=0 data/consumed_samples=424 data/consumed_tokens=1.0022e+06 data/step_samples=8 data/step_tokens=17030 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84423 performance/tokens_per_second=9234.22 training/foundation_loss/aux=0.000291567 training/foundation_loss/lm=7.76164 training/foundation_loss/mtp=2.44189 training/grad_norm=5.78752 training/lr=0.0001 training/total_loss=10.2038
+Training:  27%|██▋       | 54/200 [01:49<04:56,  2.03s/step, loss=8.48467, grad_norm=6.26551, lr=1.000e-04, foundation_loss/aux=0.000303574, foundation_loss/lm=6.41931, foundation_loss/mtp=2.06506, tokens/s=12482.414, step_time=1.842s] | step=54 epoch=0 data/consumed_samples=432 data/consumed_tokens=1.02518e+06 data/step_samples=8 data/step_tokens=22987 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84155 performance/tokens_per_second=12482.4 training/foundation_loss/aux=0.000303574 training/foundation_loss/lm=6.41931 training/foundation_loss/mtp=2.06506 training/grad_norm=6.26551 training/lr=0.0001 training/total_loss=8.48467
+Training:  28%|██▊       | 55/200 [01:51<04:54,  2.03s/step, loss=7.87795, grad_norm=7.54719, lr=1.000e-04, foundation_loss/aux=0.000310401, foundation_loss/lm=5.98199, foundation_loss/mtp=1.89565, tokens/s=9831.577, step_time=1.860s] | step=55 epoch=0 data/consumed_samples=440 data/consumed_tokens=1.04347e+06 data/step_samples=8 data/step_tokens=18287 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.86003 performance/tokens_per_second=9831.58 training/foundation_loss/aux=0.000310401 training/foundation_loss/lm=5.98199 training/foundation_loss/mtp=1.89565 training/grad_norm=7.54719 training/lr=0.0001 training/total_loss=7.87795
+Training:  28%|██▊       | 56/200 [01:53<04:52,  2.03s/step, loss=8.74346, grad_norm=9.7783, lr=1.000e-04, foundation_loss/aux=0.000325807, foundation_loss/lm=6.65255, foundation_loss/mtp=2.09059, tokens/s=14847.937, step_time=1.859s] | step=56 epoch=0 data/consumed_samples=448 data/consumed_tokens=1.07107e+06 data/step_samples=8 data/step_tokens=27601 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85891 performance/tokens_per_second=14847.9 training/foundation_loss/aux=0.000325807 training/foundation_loss/lm=6.65255 training/foundation_loss/mtp=2.09059 training/grad_norm=9.7783 training/lr=0.0001 training/total_loss=8.74346
+Training:  28%|██▊       | 57/200 [01:55<04:49,  2.03s/step, loss=8.22318, grad_norm=5.63037, lr=1.000e-04, foundation_loss/aux=0.000324279, foundation_loss/lm=6.23061, foundation_loss/mtp=1.99224, tokens/s=16654.095, step_time=1.856s] | step=57 epoch=0 data/consumed_samples=456 data/consumed_tokens=1.10198e+06 data/step_samples=8 data/step_tokens=30913 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85618 performance/tokens_per_second=16654.1 training/foundation_loss/aux=0.000324279 training/foundation_loss/lm=6.23061 training/foundation_loss/mtp=1.99224 training/grad_norm=5.63037 training/lr=0.0001 training/total_loss=8.22318
+Training:  29%|██▉       | 58/200 [01:57<04:47,  2.02s/step, loss=10.0464, grad_norm=4.25486, lr=1.000e-04, foundation_loss/aux=0.00030945, foundation_loss/lm=7.65024, foundation_loss/mtp=2.39587, tokens/s=9292.551, step_time=1.830s] | step=58 epoch=0 data/consumed_samples=464 data/consumed_tokens=1.11899e+06 data/step_samples=8 data/step_tokens=17003 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.82975 performance/tokens_per_second=9292.55 training/foundation_loss/aux=0.00030945 training/foundation_loss/lm=7.65024 training/foundation_loss/mtp=2.39587 training/grad_norm=4.25486 training/lr=0.0001 training/total_loss=10.0464
+Training:  30%|██▉       | 59/200 [01:59<04:45,  2.02s/step, loss=11.5418, grad_norm=9.0394, lr=1.000e-04, foundation_loss/aux=0.000297385, foundation_loss/lm=8.86442, foundation_loss/mtp=2.67704, tokens/s=4221.162, step_time=1.860s] | step=59 epoch=0 data/consumed_samples=472 data/consumed_tokens=1.12684e+06 data/step_samples=8 data/step_tokens=7851 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85991 performance/tokens_per_second=4221.16 training/foundation_loss/aux=0.000297385 training/foundation_loss/lm=8.86442 training/foundation_loss/mtp=2.67704 training/grad_norm=9.0394 training/lr=0.0001 training/total_loss=11.5418
+Training:  30%|███       | 60/200 [02:01<04:42,  2.02s/step, loss=10.6805, grad_norm=11.0626, lr=1.000e-04, foundation_loss/aux=0.000313374, foundation_loss/lm=8.23192, foundation_loss/mtp=2.44822, tokens/s=5704.622, step_time=1.866s] | step=60 epoch=0 data/consumed_samples=480 data/consumed_tokens=1.13748e+06 data/step_samples=8 data/step_tokens=10643 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.86568 performance/tokens_per_second=5704.62 training/foundation_loss/aux=0.000313374 training/foundation_loss/lm=8.23192 training/foundation_loss/mtp=2.44822 training/grad_norm=11.0626 training/lr=0.0001 training/total_loss=10.6805
+Training:  30%|███       | 61/200 [02:03<04:40,  2.02s/step, loss=10.2802, grad_norm=4.01168, lr=1.000e-04, foundation_loss/aux=0.00030341, foundation_loss/lm=7.79991, foundation_loss/mtp=2.47996, tokens/s=10972.307, step_time=1.849s] | step=61 epoch=0 data/consumed_samples=488 data/consumed_tokens=1.15777e+06 data/step_samples=8 data/step_tokens=20292 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84938 performance/tokens_per_second=10972.3 training/foundation_loss/aux=0.00030341 training/foundation_loss/lm=7.79991 training/foundation_loss/mtp=2.47996 training/grad_norm=4.01168 training/lr=0.0001 training/total_loss=10.2802
+Training:  31%|███       | 62/200 [02:05<04:38,  2.02s/step, loss=7.18906, grad_norm=6.54593, lr=1.000e-04, foundation_loss/aux=0.00033343, foundation_loss/lm=5.46728, foundation_loss/mtp=1.72145, tokens/s=10597.805, step_time=1.845s] | step=62 epoch=0 data/consumed_samples=496 data/consumed_tokens=1.17733e+06 data/step_samples=8 data/step_tokens=19552 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84491 performance/tokens_per_second=10597.8 training/foundation_loss/aux=0.00033343 training/foundation_loss/lm=5.46728 training/foundation_loss/mtp=1.72145 training/grad_norm=6.54593 training/lr=0.0001 training/total_loss=7.18906
+Training:  32%|███▏      | 63/200 [02:06<04:36,  2.02s/step, loss=7.74359, grad_norm=7.28001, lr=1.000e-04, foundation_loss/aux=0.00034721, foundation_loss/lm=5.89212, foundation_loss/mtp=1.85112, tokens/s=14419.971, step_time=1.842s] | step=63 epoch=0 data/consumed_samples=504 data/consumed_tokens=1.20388e+06 data/step_samples=8 data/step_tokens=26559 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84182 performance/tokens_per_second=14420 training/foundation_loss/aux=0.00034721 training/foundation_loss/lm=5.89212 training/foundation_loss/mtp=1.85112 training/grad_norm=7.28001 training/lr=0.0001 training/total_loss=7.74359
+Training:  32%|███▏      | 64/200 [02:08<04:33,  2.01s/step, loss=8.36118, grad_norm=5.14852, lr=1.000e-04, foundation_loss/aux=0.000327373, foundation_loss/lm=6.35288, foundation_loss/mtp=2.00797, tokens/s=12171.274, step_time=1.820s] | step=64 epoch=0 data/consumed_samples=512 data/consumed_tokens=1.22604e+06 data/step_samples=8 data/step_tokens=22152 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.82002 performance/tokens_per_second=12171.3 training/foundation_loss/aux=0.000327373 training/foundation_loss/lm=6.35288 training/foundation_loss/mtp=2.00797 training/grad_norm=5.14852 training/lr=0.0001 training/total_loss=8.36118
+Training:  32%|███▎      | 65/200 [02:10<04:31,  2.01s/step, loss=9.27435, grad_norm=4.32435, lr=1.000e-04, foundation_loss/aux=0.000309639, foundation_loss/lm=7.06862, foundation_loss/mtp=2.20542, tokens/s=11564.803, step_time=1.845s] | step=65 epoch=0 data/consumed_samples=520 data/consumed_tokens=1.24737e+06 data/step_samples=8 data/step_tokens=21335 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84482 performance/tokens_per_second=11564.8 training/foundation_loss/aux=0.000309639 training/foundation_loss/lm=7.06862 training/foundation_loss/mtp=2.20542 training/grad_norm=4.32435 training/lr=0.0001 training/total_loss=9.27435
+Training:  33%|███▎      | 66/200 [02:12<04:29,  2.01s/step, loss=8.07096, grad_norm=5.87542, lr=1.000e-04, foundation_loss/aux=0.000318417, foundation_loss/lm=6.15541, foundation_loss/mtp=1.91524, tokens/s=11876.832, step_time=1.864s] | step=66 epoch=0 data/consumed_samples=528 data/consumed_tokens=1.26951e+06 data/step_samples=8 data/step_tokens=22139 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.86405 performance/tokens_per_second=11876.8 training/foundation_loss/aux=0.000318417 training/foundation_loss/lm=6.15541 training/foundation_loss/mtp=1.91524 training/grad_norm=5.87542 training/lr=0.0001 training/total_loss=8.07096
+Training:  34%|███▎      | 67/200 [02:14<04:27,  2.01s/step, loss=7.92489, grad_norm=7.2594, lr=1.000e-04, foundation_loss/aux=0.000325865, foundation_loss/lm=6.03553, foundation_loss/mtp=1.88903, tokens/s=13456.244, step_time=1.857s] | step=67 epoch=0 data/consumed_samples=536 data/consumed_tokens=1.2945e+06 data/step_samples=8 data/step_tokens=24988 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85698 performance/tokens_per_second=13456.2 training/foundation_loss/aux=0.000325865 training/foundation_loss/lm=6.03553 training/foundation_loss/mtp=1.88903 training/grad_norm=7.2594 training/lr=0.0001 training/total_loss=7.92489
+Training:  34%|███▍      | 68/200 [02:16<04:25,  2.01s/step, loss=9.45904, grad_norm=6.96135, lr=1.000e-04, foundation_loss/aux=0.000305664, foundation_loss/lm=7.25888, foundation_loss/mtp=2.19986, tokens/s=7438.249, step_time=1.862s] | step=68 epoch=0 data/consumed_samples=544 data/consumed_tokens=1.30835e+06 data/step_samples=8 data/step_tokens=13850 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.862 performance/tokens_per_second=7438.25 training/foundation_loss/aux=0.000305664 training/foundation_loss/lm=7.25888 training/foundation_loss/mtp=2.19986 training/grad_norm=6.96135 training/lr=0.0001 training/total_loss=9.45904
+Training:  34%|███▍      | 69/200 [02:18<04:22,  2.01s/step, loss=9.87049, grad_norm=6.24098, lr=1.000e-04, foundation_loss/aux=0.000326429, foundation_loss/lm=7.52603, foundation_loss/mtp=2.34413, tokens/s=12490.390, step_time=1.862s] | step=69 epoch=0 data/consumed_samples=552 data/consumed_tokens=1.33161e+06 data/step_samples=8 data/step_tokens=23263 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.86247 performance/tokens_per_second=12490.4 training/foundation_loss/aux=0.000326429 training/foundation_loss/lm=7.52603 training/foundation_loss/mtp=2.34413 training/grad_norm=6.24098 training/lr=0.0001 training/total_loss=9.87049
+Training:  35%|███▌      | 70/200 [02:20<04:20,  2.01s/step, loss=7.76474, grad_norm=7.69255, lr=1.000e-04, foundation_loss/aux=0.000348425, foundation_loss/lm=5.93443, foundation_loss/mtp=1.82996, tokens/s=16888.634, step_time=1.861s] | step=70 epoch=0 data/consumed_samples=560 data/consumed_tokens=1.36304e+06 data/step_samples=8 data/step_tokens=31425 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.86072 performance/tokens_per_second=16888.6 training/foundation_loss/aux=0.000348425 training/foundation_loss/lm=5.93443 training/foundation_loss/mtp=1.82996 training/grad_norm=7.69255 training/lr=0.0001 training/total_loss=7.76474
+Training:  36%|███▌      | 71/200 [02:22<04:18,  2.00s/step, loss=7.45451, grad_norm=8.64018, lr=1.000e-04, foundation_loss/aux=0.000336965, foundation_loss/lm=5.68486, foundation_loss/mtp=1.76932, tokens/s=10211.026, step_time=1.853s] | step=71 epoch=0 data/consumed_samples=568 data/consumed_tokens=1.38196e+06 data/step_samples=8 data/step_tokens=18921 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.853 performance/tokens_per_second=10211 training/foundation_loss/aux=0.000336965 training/foundation_loss/lm=5.68486 training/foundation_loss/mtp=1.76932 training/grad_norm=8.64018 training/lr=0.0001 training/total_loss=7.45451
+Training:  36%|███▌      | 72/200 [02:24<04:16,  2.00s/step, loss=7.53793, grad_norm=6.18337, lr=1.000e-04, foundation_loss/aux=0.000334959, foundation_loss/lm=5.74944, foundation_loss/mtp=1.78815, tokens/s=9378.404, step_time=1.851s] | step=72 epoch=0 data/consumed_samples=576 data/consumed_tokens=1.39932e+06 data/step_samples=8 data/step_tokens=17361 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85117 performance/tokens_per_second=9378.4 training/foundation_loss/aux=0.000334959 training/foundation_loss/lm=5.74944 training/foundation_loss/mtp=1.78815 training/grad_norm=6.18337 training/lr=0.0001 training/total_loss=7.53793
+Training:  36%|███▋      | 73/200 [02:26<04:14,  2.00s/step, loss=10.7594, grad_norm=9.58228, lr=1.000e-04, foundation_loss/aux=0.000343828, foundation_loss/lm=8.25739, foundation_loss/mtp=2.50169, tokens/s=11457.197, step_time=1.859s] | step=73 epoch=0 data/consumed_samples=584 data/consumed_tokens=1.42062e+06 data/step_samples=8 data/step_tokens=21304 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85944 performance/tokens_per_second=11457.2 training/foundation_loss/aux=0.000343828 training/foundation_loss/lm=8.25739 training/foundation_loss/mtp=2.50169 training/grad_norm=9.58228 training/lr=0.0001 training/total_loss=10.7594
+Training:  37%|███▋      | 74/200 [02:28<04:12,  2.00s/step, loss=9.37712, grad_norm=5.87787, lr=1.000e-04, foundation_loss/aux=0.000309557, foundation_loss/lm=7.15241, foundation_loss/mtp=2.22439, tokens/s=6958.020, step_time=1.845s] | step=74 epoch=0 data/consumed_samples=592 data/consumed_tokens=1.43346e+06 data/step_samples=8 data/step_tokens=12838 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84507 performance/tokens_per_second=6958.02 training/foundation_loss/aux=0.000309557 training/foundation_loss/lm=7.15241 training/foundation_loss/mtp=2.22439 training/grad_norm=5.87787 training/lr=0.0001 training/total_loss=9.37712
+Training:  38%|███▊      | 75/200 [02:30<04:10,  2.00s/step, loss=9.202, grad_norm=5.17651, lr=1.000e-04, foundation_loss/aux=0.00029411, foundation_loss/lm=7.03698, foundation_loss/mtp=2.16473, tokens/s=5451.867, step_time=1.848s] | step=75 epoch=0 data/consumed_samples=600 data/consumed_tokens=1.44353e+06 data/step_samples=8 data/step_tokens=10073 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84762 performance/tokens_per_second=5451.87 training/foundation_loss/aux=0.00029411 training/foundation_loss/lm=7.03698 training/foundation_loss/mtp=2.16473 training/grad_norm=5.17651 training/lr=0.0001 training/total_loss=9.202
+Training:  38%|███▊      | 76/200 [02:31<04:07,  2.00s/step, loss=9.36915, grad_norm=6.35959, lr=1.000e-04, foundation_loss/aux=0.000314335, foundation_loss/lm=7.16215, foundation_loss/mtp=2.20669, tokens/s=4616.384, step_time=1.875s] | step=76 epoch=0 data/consumed_samples=608 data/consumed_tokens=1.45219e+06 data/step_samples=8 data/step_tokens=8655 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.87484 performance/tokens_per_second=4616.38 training/foundation_loss/aux=0.000314335 training/foundation_loss/lm=7.16215 training/foundation_loss/mtp=2.20669 training/grad_norm=6.35959 training/lr=0.0001 training/total_loss=9.36915
+Training:  38%|███▊      | 77/200 [02:33<04:05,  2.00s/step, loss=9.33404, grad_norm=5.88624, lr=1.000e-04, foundation_loss/aux=0.000317896, foundation_loss/lm=7.12481, foundation_loss/mtp=2.20891, tokens/s=4665.406, step_time=1.857s] | step=77 epoch=0 data/consumed_samples=616 data/consumed_tokens=1.46085e+06 data/step_samples=8 data/step_tokens=8664 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85707 performance/tokens_per_second=4665.41 training/foundation_loss/aux=0.000317896 training/foundation_loss/lm=7.12481 training/foundation_loss/mtp=2.20891 training/grad_norm=5.88624 training/lr=0.0001 training/total_loss=9.33404
+Training:  39%|███▉      | 78/200 [02:35<04:03,  2.00s/step, loss=7.01522, grad_norm=6.91068, lr=1.000e-04, foundation_loss/aux=0.000344433, foundation_loss/lm=5.34469, foundation_loss/mtp=1.67018, tokens/s=12109.544, step_time=1.843s] | step=78 epoch=0 data/consumed_samples=624 data/consumed_tokens=1.48317e+06 data/step_samples=8 data/step_tokens=22318 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.84301 performance/tokens_per_second=12109.5 training/foundation_loss/aux=0.000344433 training/foundation_loss/lm=5.34469 training/foundation_loss/mtp=1.67018 training/grad_norm=6.91068 training/lr=0.0001 training/total_loss=7.01522
+Training:  40%|███▉      | 79/200 [02:37<04:01,  2.00s/step, loss=8.4711, grad_norm=6.60749, lr=1.000e-04, foundation_loss/aux=0.000338122, foundation_loss/lm=6.47744, foundation_loss/mtp=1.99331, tokens/s=6800.188, step_time=1.858s] | step=79 epoch=0 data/consumed_samples=632 data/consumed_tokens=1.49581e+06 data/step_samples=8 data/step_tokens=12637 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85833 performance/tokens_per_second=6800.19 training/foundation_loss/aux=0.000338122 training/foundation_loss/lm=6.47744 training/foundation_loss/mtp=1.99331 training/grad_norm=6.60749 training/lr=0.0001 training/total_loss=8.4711
+Training:  40%|████      | 80/200 [02:39<03:59,  2.00s/step, loss=6.653, grad_norm=11.0658, lr=1.000e-04, foundation_loss/aux=0.00040001, foundation_loss/lm=5.0842, foundation_loss/mtp=1.5684, tokens/s=13713.161, step_time=1.856s] | step=80 epoch=0 data/consumed_samples=640 data/consumed_tokens=1.52126e+06 data/step_samples=8 data/step_tokens=25451 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85595 performance/tokens_per_second=13713.2 training/foundation_loss/aux=0.00040001 training/foundation_loss/lm=5.0842 training/foundation_loss/mtp=1.5684 training/grad_norm=11.0658 training/lr=0.0001 training/total_loss=6.653
+Training:  40%|████      | 81/200 [02:41<03:57,  1.99s/step, loss=8.91124, grad_norm=14.0404, lr=1.000e-04, foundation_loss/aux=0.000365649, foundation_loss/lm=6.85385, foundation_loss/mtp=2.05703, tokens/s=13217.857, step_time=1.862s] | step=81 epoch=0 data/consumed_samples=648 data/consumed_tokens=1.54588e+06 data/step_samples=8 data/step_tokens=24616 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.86233 performance/tokens_per_second=13217.9 training/foundation_loss/aux=0.000365649 training/foundation_loss/lm=6.85385 training/foundation_loss/mtp=2.05703 training/grad_norm=14.0404 training/lr=0.0001 training/total_loss=8.91124
+Training:  41%|████      | 82/200 [02:43<03:55,  1.99s/step, loss=8.25119, grad_norm=6.18108, lr=1.000e-04, foundation_loss/aux=0.000348987, foundation_loss/lm=6.32318, foundation_loss/mtp=1.92767, tokens/s=9968.957, step_time=1.852s] | step=82 epoch=0 data/consumed_samples=656 data/consumed_tokens=1.56434e+06 data/step_samples=8 data/step_tokens=18465 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85225 performance/tokens_per_second=9968.96 training/foundation_loss/aux=0.000348987 training/foundation_loss/lm=6.32318 training/foundation_loss/mtp=1.92767 training/grad_norm=6.18108 training/lr=0.0001 training/total_loss=8.25119
+Training:  42%|████▏     | 83/200 [02:45<03:53,  1.99s/step, loss=9.7033, grad_norm=5.6484, lr=1.000e-04, foundation_loss/aux=0.000332985, foundation_loss/lm=7.43344, foundation_loss/mtp=2.26953, tokens/s=8108.886, step_time=1.855s] | step=83 epoch=0 data/consumed_samples=664 data/consumed_tokens=1.57938e+06 data/step_samples=8 data/step_tokens=15040 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85476 performance/tokens_per_second=8108.89 training/foundation_loss/aux=0.000332985 training/foundation_loss/lm=7.43344 training/foundation_loss/mtp=2.26953 training/grad_norm=5.6484 training/lr=0.0001 training/total_loss=9.7033
+Training:  42%|████▏     | 84/200 [02:47<03:51,  1.99s/step, loss=9.49855, grad_norm=4.78317, lr=1.000e-04, foundation_loss/aux=0.00033266, foundation_loss/lm=7.24535, foundation_loss/mtp=2.25286, tokens/s=7251.477, step_time=1.873s] | step=84 epoch=0 data/consumed_samples=672 data/consumed_tokens=1.59296e+06 data/step_samples=8 data/step_tokens=13580 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.87272 performance/tokens_per_second=7251.48 training/foundation_loss/aux=0.00033266 training/foundation_loss/lm=7.24535 training/foundation_loss/mtp=2.25286 training/grad_norm=4.78317 training/lr=0.0001 training/total_loss=9.49855
+Training:  42%|████▎     | 85/200 [02:49<03:49,  1.99s/step, loss=9.94861, grad_norm=10.3114, lr=1.000e-04, foundation_loss/aux=0.000376059, foundation_loss/lm=7.64386, foundation_loss/mtp=2.30437, tokens/s=3251.728, step_time=1.860s] | step=85 epoch=0 data/consumed_samples=680 data/consumed_tokens=1.59901e+06 data/step_samples=8 data/step_tokens=6048 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85993 performance/tokens_per_second=3251.73 training/foundation_loss/aux=0.000376059 training/foundation_loss/lm=7.64386 training/foundation_loss/mtp=2.30437 training/grad_norm=10.3114 training/lr=0.0001 training/total_loss=9.94861
+Training:  43%|████▎     | 86/200 [02:51<03:46,  1.99s/step, loss=9.77669, grad_norm=6.0612, lr=1.000e-04, foundation_loss/aux=0.000364943, foundation_loss/lm=7.47488, foundation_loss/mtp=2.30145, tokens/s=6263.029, step_time=1.858s] | step=86 epoch=0 data/consumed_samples=688 data/consumed_tokens=1.61064e+06 data/step_samples=8 data/step_tokens=11637 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.85805 performance/tokens_per_second=6263.03 training/foundation_loss/aux=0.000364943 training/foundation_loss/lm=7.47488 training/foundation_loss/mtp=2.30145 training/grad_norm=6.0612 training/lr=0.0001 training/total_loss=9.77669
+Training:  44%|████▎     | 87/200 [02:53<03:44,  1.99s/step, loss=7.93299, grad_norm=5.52494, lr=1.000e-04, foundation_loss/aux=0.000381301, foundation_loss/lm=6.06101, foundation_loss/mtp=1.8716, tokens/s=10401.794, step_time=1.861s] | step=87 epoch=0 data/consumed_samples=696 data/consumed_tokens=1.63e+06 data/step_samples=8 data/step_tokens=19354 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6191 performance/step_time=1.86064 performance/tokens_per_second=10401.8 training/foundation_loss/aux=0.000381301 training/foundation_loss/lm=6.06101 training/foundation_loss/mtp=1.8716 training/grad_norm=5.52494 training/lr=0.0001 training/total_loss=7.93299
+Training:  44%|████▍     | 88/200 [02:55<03:42,  1.99s/step, loss=8.5688, grad_norm=6.95051, lr=1.000e-04, foundation_loss/aux=0.000365759, foundation_loss/lm=6.56739, foundation_loss/mtp=2.00105, tokens/s=5768.658, step_time=1.861s] | step=88 epoch=0 data/consumed_samples=704 data/consumed_tokens=1.64074e+06 data/step_samples=8 data/step_tokens=10738 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86144 performance/tokens_per_second=5768.66 training/foundation_loss/aux=0.000365759 training/foundation_loss/lm=6.56739 training/foundation_loss/mtp=2.00105 training/grad_norm=6.95051 training/lr=0.0001 training/total_loss=8.5688
+Training:  44%|████▍     | 89/200 [02:56<03:40,  1.99s/step, loss=8.25491, grad_norm=4.55314, lr=1.000e-04, foundation_loss/aux=0.000343517, foundation_loss/lm=6.30842, foundation_loss/mtp=1.94615, tokens/s=8937.780, step_time=1.853s] | step=89 epoch=0 data/consumed_samples=712 data/consumed_tokens=1.6573e+06 data/step_samples=8 data/step_tokens=16560 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85281 performance/tokens_per_second=8937.78 training/foundation_loss/aux=0.000343517 training/foundation_loss/lm=6.30842 training/foundation_loss/mtp=1.94615 training/grad_norm=4.55314 training/lr=0.0001 training/total_loss=8.25491
+Training:  45%|████▌     | 90/200 [02:58<03:38,  1.99s/step, loss=7.26964, grad_norm=8.3801, lr=1.000e-04, foundation_loss/aux=0.000395502, foundation_loss/lm=5.58605, foundation_loss/mtp=1.68319, tokens/s=10565.530, step_time=1.860s] | step=90 epoch=0 data/consumed_samples=720 data/consumed_tokens=1.67695e+06 data/step_samples=8 data/step_tokens=19651 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85992 performance/tokens_per_second=10565.5 training/foundation_loss/aux=0.000395502 training/foundation_loss/lm=5.58605 training/foundation_loss/mtp=1.68319 training/grad_norm=8.3801 training/lr=0.0001 training/total_loss=7.26964
+Training:  46%|████▌     | 91/200 [03:00<03:36,  1.99s/step, loss=8.25913, grad_norm=11.449, lr=1.000e-04, foundation_loss/aux=0.000360077, foundation_loss/lm=6.30706, foundation_loss/mtp=1.95171, tokens/s=11725.690, step_time=1.862s] | step=91 epoch=0 data/consumed_samples=728 data/consumed_tokens=1.69878e+06 data/step_samples=8 data/step_tokens=21829 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86164 performance/tokens_per_second=11725.7 training/foundation_loss/aux=0.000360077 training/foundation_loss/lm=6.30706 training/foundation_loss/mtp=1.95171 training/grad_norm=11.449 training/lr=0.0001 training/total_loss=8.25913
+Training:  46%|████▌     | 92/200 [03:02<03:34,  1.99s/step, loss=7.31967, grad_norm=5.15058, lr=1.000e-04, foundation_loss/aux=0.000369974, foundation_loss/lm=5.60565, foundation_loss/mtp=1.71365, tokens/s=9079.472, step_time=1.844s] | step=92 epoch=0 data/consumed_samples=736 data/consumed_tokens=1.71552e+06 data/step_samples=8 data/step_tokens=16740 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84372 performance/tokens_per_second=9079.47 training/foundation_loss/aux=0.000369974 training/foundation_loss/lm=5.60565 training/foundation_loss/mtp=1.71365 training/grad_norm=5.15058 training/lr=0.0001 training/total_loss=7.31967
+Training:  46%|████▋     | 93/200 [03:04<03:32,  1.99s/step, loss=8.19442, grad_norm=4.63056, lr=1.000e-04, foundation_loss/aux=0.000374249, foundation_loss/lm=6.27195, foundation_loss/mtp=1.9221, tokens/s=12414.433, step_time=1.862s] | step=93 epoch=0 data/consumed_samples=744 data/consumed_tokens=1.73863e+06 data/step_samples=8 data/step_tokens=23115 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86195 performance/tokens_per_second=12414.4 training/foundation_loss/aux=0.000374249 training/foundation_loss/lm=6.27195 training/foundation_loss/mtp=1.9221 training/grad_norm=4.63056 training/lr=0.0001 training/total_loss=8.19442
+Training:  47%|████▋     | 94/200 [03:06<03:30,  1.99s/step, loss=8.78268, grad_norm=4.94129, lr=1.000e-04, foundation_loss/aux=0.00036824, foundation_loss/lm=6.70276, foundation_loss/mtp=2.07955, tokens/s=14041.316, step_time=1.864s] | step=94 epoch=0 data/consumed_samples=752 data/consumed_tokens=1.76481e+06 data/step_samples=8 data/step_tokens=26179 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86443 performance/tokens_per_second=14041.3 training/foundation_loss/aux=0.00036824 training/foundation_loss/lm=6.70276 training/foundation_loss/mtp=2.07955 training/grad_norm=4.94129 training/lr=0.0001 training/total_loss=8.78268
+Training:  48%|████▊     | 95/200 [03:08<03:28,  1.98s/step, loss=10.0699, grad_norm=10.5668, lr=1.000e-04, foundation_loss/aux=0.000401881, foundation_loss/lm=7.72356, foundation_loss/mtp=2.34591, tokens/s=5583.116, step_time=1.860s] | step=95 epoch=0 data/consumed_samples=760 data/consumed_tokens=1.7752e+06 data/step_samples=8 data/step_tokens=10384 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85989 performance/tokens_per_second=5583.12 training/foundation_loss/aux=0.000401881 training/foundation_loss/lm=7.72356 training/foundation_loss/mtp=2.34591 training/grad_norm=10.5668 training/lr=0.0001 training/total_loss=10.0699
+Training:  48%|████▊     | 96/200 [03:10<03:26,  1.98s/step, loss=8.60235, grad_norm=4.05576, lr=1.000e-04, foundation_loss/aux=0.00037587, foundation_loss/lm=6.59119, foundation_loss/mtp=2.01079, tokens/s=11469.645, step_time=1.845s] | step=96 epoch=0 data/consumed_samples=768 data/consumed_tokens=1.79635e+06 data/step_samples=8 data/step_tokens=21159 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84478 performance/tokens_per_second=11469.6 training/foundation_loss/aux=0.00037587 training/foundation_loss/lm=6.59119 training/foundation_loss/mtp=2.01079 training/grad_norm=4.05576 training/lr=0.0001 training/total_loss=8.60235
+Training:  48%|████▊     | 97/200 [03:12<03:24,  1.98s/step, loss=11.2086, grad_norm=72.3013, lr=1.000e-04, foundation_loss/aux=0.000381174, foundation_loss/lm=8.53391, foundation_loss/mtp=2.67433, tokens/s=6235.010, step_time=1.862s] | step=97 epoch=0 data/consumed_samples=776 data/consumed_tokens=1.80796e+06 data/step_samples=8 data/step_tokens=11608 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86175 performance/tokens_per_second=6235.01 training/foundation_loss/aux=0.000381174 training/foundation_loss/lm=8.53391 training/foundation_loss/mtp=2.67433 training/grad_norm=72.3013 training/lr=0.0001 training/total_loss=11.2086
+Training:  49%|████▉     | 98/200 [03:14<03:22,  1.98s/step, loss=9.53454, grad_norm=40.8466, lr=1.000e-04, foundation_loss/aux=0.00036694, foundation_loss/lm=7.27428, foundation_loss/mtp=2.25989, tokens/s=11803.914, step_time=1.863s] | step=98 epoch=0 data/consumed_samples=784 data/consumed_tokens=1.82995e+06 data/step_samples=8 data/step_tokens=21987 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86269 performance/tokens_per_second=11803.9 training/foundation_loss/aux=0.00036694 training/foundation_loss/lm=7.27428 training/foundation_loss/mtp=2.25989 training/grad_norm=40.8466 training/lr=0.0001 training/total_loss=9.53454
+Training:  50%|████▉     | 99/200 [03:16<03:20,  1.98s/step, loss=7.9621, grad_norm=5.88611, lr=1.000e-04, foundation_loss/aux=0.000396066, foundation_loss/lm=6.08356, foundation_loss/mtp=1.87814, tokens/s=10137.480, step_time=1.863s] | step=99 epoch=0 data/consumed_samples=792 data/consumed_tokens=1.84883e+06 data/step_samples=8 data/step_tokens=18882 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86259 performance/tokens_per_second=10137.5 training/foundation_loss/aux=0.000396066 training/foundation_loss/lm=6.08356 training/foundation_loss/mtp=1.87814 training/grad_norm=5.88611 training/lr=0.0001 training/total_loss=7.9621
+Training:  50%|█████     | 100/200 [03:18<03:18,  1.98s/step, loss=7.68557, grad_norm=16.0329, lr=1.000e-04, foundation_loss/aux=0.000414015, foundation_loss/lm=5.94635, foundation_loss/mtp=1.73881, tokens/s=12792.696, step_time=1.854s] | step=100 epoch=0 data/consumed_samples=800 data/consumed_tokens=1.87255e+06 data/step_samples=8 data/step_tokens=23722 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85434 performance/tokens_per_second=12792.7 training/foundation_loss/aux=0.000414015 training/foundation_loss/lm=5.94635 training/foundation_loss/mtp=1.73881 training/grad_norm=16.0329 training/lr=0.0001 training/total_loss=7.68557
+Training:  50%|█████     | 101/200 [03:20<03:16,  1.98s/step, loss=7.02127, grad_norm=6.38955, lr=1.000e-04, foundation_loss/aux=0.000430992, foundation_loss/lm=5.38932, foundation_loss/mtp=1.63151, tokens/s=15197.468, step_time=1.861s] | step=101 epoch=0 data/consumed_samples=808 data/consumed_tokens=1.90083e+06 data/step_samples=8 data/step_tokens=28275 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86051 performance/tokens_per_second=15197.5 training/foundation_loss/aux=0.000430992 training/foundation_loss/lm=5.38932 training/foundation_loss/mtp=1.63151 training/grad_norm=6.38955 training/lr=0.0001 training/total_loss=7.02127
+Training:  51%|█████     | 102/200 [03:22<03:14,  1.98s/step, loss=7.0654, grad_norm=5.91482, lr=1.000e-04, foundation_loss/aux=0.00045388, foundation_loss/lm=5.40785, foundation_loss/mtp=1.6571, tokens/s=15177.415, step_time=1.868s] | step=102 epoch=0 data/consumed_samples=816 data/consumed_tokens=1.92918e+06 data/step_samples=8 data/step_tokens=28354 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86817 performance/tokens_per_second=15177.4 training/foundation_loss/aux=0.00045388 training/foundation_loss/lm=5.40785 training/foundation_loss/mtp=1.6571 training/grad_norm=5.91482 training/lr=0.0001 training/total_loss=7.0654
+Training:  52%|█████▏    | 103/200 [03:23<03:12,  1.98s/step, loss=7.85455, grad_norm=9.26523, lr=1.000e-04, foundation_loss/aux=0.000417755, foundation_loss/lm=5.98984, foundation_loss/mtp=1.8643, tokens/s=11888.048, step_time=1.872s] | step=103 epoch=0 data/consumed_samples=824 data/consumed_tokens=1.95143e+06 data/step_samples=8 data/step_tokens=22249 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.87154 performance/tokens_per_second=11888 training/foundation_loss/aux=0.000417755 training/foundation_loss/lm=5.98984 training/foundation_loss/mtp=1.8643 training/grad_norm=9.26523 training/lr=0.0001 training/total_loss=7.85455
+Training:  52%|█████▏    | 104/200 [03:25<03:10,  1.98s/step, loss=8.75313, grad_norm=4.98645, lr=1.000e-04, foundation_loss/aux=0.000402568, foundation_loss/lm=6.72768, foundation_loss/mtp=2.02505, tokens/s=9671.485, step_time=1.863s] | step=104 epoch=0 data/consumed_samples=832 data/consumed_tokens=1.96945e+06 data/step_samples=8 data/step_tokens=18017 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8629 performance/tokens_per_second=9671.48 training/foundation_loss/aux=0.000402568 training/foundation_loss/lm=6.72768 training/foundation_loss/mtp=2.02505 training/grad_norm=4.98645 training/lr=0.0001 training/total_loss=8.75313
+Training:  52%|█████▎    | 105/200 [03:27<03:08,  1.98s/step, loss=8.12819, grad_norm=4.53901, lr=1.000e-04, foundation_loss/aux=0.000405024, foundation_loss/lm=6.23757, foundation_loss/mtp=1.89021, tokens/s=7904.880, step_time=1.861s] | step=105 epoch=0 data/consumed_samples=840 data/consumed_tokens=1.98416e+06 data/step_samples=8 data/step_tokens=14709 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86075 performance/tokens_per_second=7904.88 training/foundation_loss/aux=0.000405024 training/foundation_loss/lm=6.23757 training/foundation_loss/mtp=1.89021 training/grad_norm=4.53901 training/lr=0.0001 training/total_loss=8.12819
+Training:  53%|█████▎    | 106/200 [03:29<03:05,  1.98s/step, loss=7.63737, grad_norm=10.611, lr=1.000e-04, foundation_loss/aux=0.000371372, foundation_loss/lm=5.85124, foundation_loss/mtp=1.78576, tokens/s=8019.642, step_time=1.850s] | step=106 epoch=0 data/consumed_samples=848 data/consumed_tokens=1.99899e+06 data/step_samples=8 data/step_tokens=14835 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84983 performance/tokens_per_second=8019.64 training/foundation_loss/aux=0.000371372 training/foundation_loss/lm=5.85124 training/foundation_loss/mtp=1.78576 training/grad_norm=10.611 training/lr=0.0001 training/total_loss=7.63737
+Training:  54%|█████▎    | 107/200 [03:31<03:03,  1.98s/step, loss=8.46701, grad_norm=7.74532, lr=1.000e-04, foundation_loss/aux=0.000444127, foundation_loss/lm=6.46504, foundation_loss/mtp=2.00152, tokens/s=10057.898, step_time=1.858s] | step=107 epoch=0 data/consumed_samples=856 data/consumed_tokens=2.01768e+06 data/step_samples=8 data/step_tokens=18688 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85804 performance/tokens_per_second=10057.9 training/foundation_loss/aux=0.000444127 training/foundation_loss/lm=6.46504 training/foundation_loss/mtp=2.00152 training/grad_norm=7.74532 training/lr=0.0001 training/total_loss=8.46701
+Training:  54%|█████▍    | 108/200 [03:33<03:01,  1.98s/step, loss=7.361, grad_norm=7.03863, lr=1.000e-04, foundation_loss/aux=0.000451717, foundation_loss/lm=5.63325, foundation_loss/mtp=1.7273, tokens/s=17133.854, step_time=1.861s] | step=108 epoch=0 data/consumed_samples=864 data/consumed_tokens=2.04957e+06 data/step_samples=8 data/step_tokens=31887 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86105 performance/tokens_per_second=17133.9 training/foundation_loss/aux=0.000451717 training/foundation_loss/lm=5.63325 training/foundation_loss/mtp=1.7273 training/grad_norm=7.03863 training/lr=0.0001 training/total_loss=7.361
+Training:  55%|█████▍    | 109/200 [03:35<02:59,  1.98s/step, loss=7.85732, grad_norm=4.39024, lr=1.000e-04, foundation_loss/aux=0.000399568, foundation_loss/lm=6.02671, foundation_loss/mtp=1.83021, tokens/s=8432.013, step_time=1.863s] | step=109 epoch=0 data/consumed_samples=872 data/consumed_tokens=2.06528e+06 data/step_samples=8 data/step_tokens=15710 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86314 performance/tokens_per_second=8432.01 training/foundation_loss/aux=0.000399568 training/foundation_loss/lm=6.02671 training/foundation_loss/mtp=1.83021 training/grad_norm=4.39024 training/lr=0.0001 training/total_loss=7.85732
+Training:  55%|█████▌    | 110/200 [03:37<02:57,  1.98s/step, loss=7.64182, grad_norm=4.74993, lr=1.000e-04, foundation_loss/aux=0.000423619, foundation_loss/lm=5.84821, foundation_loss/mtp=1.79319, tokens/s=15281.082, step_time=1.840s] | step=110 epoch=0 data/consumed_samples=880 data/consumed_tokens=2.0934e+06 data/step_samples=8 data/step_tokens=28119 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84012 performance/tokens_per_second=15281.1 training/foundation_loss/aux=0.000423619 training/foundation_loss/lm=5.84821 training/foundation_loss/mtp=1.79319 training/grad_norm=4.74993 training/lr=0.0001 training/total_loss=7.64182
+Training:  56%|█████▌    | 111/200 [03:39<02:55,  1.98s/step, loss=8.14034, grad_norm=9.33342, lr=1.000e-04, foundation_loss/aux=0.000414092, foundation_loss/lm=6.27318, foundation_loss/mtp=1.86674, tokens/s=8875.574, step_time=1.869s] | step=111 epoch=0 data/consumed_samples=888 data/consumed_tokens=2.10999e+06 data/step_samples=8 data/step_tokens=16592 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8694 performance/tokens_per_second=8875.57 training/foundation_loss/aux=0.000414092 training/foundation_loss/lm=6.27318 training/foundation_loss/mtp=1.86674 training/grad_norm=9.33342 training/lr=0.0001 training/total_loss=8.14034
+Training:  56%|█████▌    | 112/200 [03:41<02:53,  1.98s/step, loss=6.94477, grad_norm=8.31009, lr=1.000e-04, foundation_loss/aux=0.000410322, foundation_loss/lm=5.30782, foundation_loss/mtp=1.63655, tokens/s=10997.002, step_time=1.843s] | step=112 epoch=0 data/consumed_samples=896 data/consumed_tokens=2.13026e+06 data/step_samples=8 data/step_tokens=20271 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84332 performance/tokens_per_second=10997 training/foundation_loss/aux=0.000410322 training/foundation_loss/lm=5.30782 training/foundation_loss/mtp=1.63655 training/grad_norm=8.31009 training/lr=0.0001 training/total_loss=6.94477
+Training:  56%|█████▋    | 113/200 [03:43<02:51,  1.98s/step, loss=8.21428, grad_norm=5.79796, lr=1.000e-04, foundation_loss/aux=0.000416555, foundation_loss/lm=6.29859, foundation_loss/mtp=1.91527, tokens/s=12720.930, step_time=1.857s] | step=113 epoch=0 data/consumed_samples=904 data/consumed_tokens=2.15388e+06 data/step_samples=8 data/step_tokens=23620 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85678 performance/tokens_per_second=12720.9 training/foundation_loss/aux=0.000416555 training/foundation_loss/lm=6.29859 training/foundation_loss/mtp=1.91527 training/grad_norm=5.79796 training/lr=0.0001 training/total_loss=8.21428
+Training:  57%|█████▋    | 114/200 [03:45<02:49,  1.97s/step, loss=7.58041, grad_norm=4.56447, lr=1.000e-04, foundation_loss/aux=0.000412343, foundation_loss/lm=5.81123, foundation_loss/mtp=1.76876, tokens/s=11319.211, step_time=1.847s] | step=114 epoch=0 data/consumed_samples=912 data/consumed_tokens=2.17479e+06 data/step_samples=8 data/step_tokens=20909 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84721 performance/tokens_per_second=11319.2 training/foundation_loss/aux=0.000412343 training/foundation_loss/lm=5.81123 training/foundation_loss/mtp=1.76876 training/grad_norm=4.56447 training/lr=0.0001 training/total_loss=7.58041
+Training:  57%|█████▊    | 115/200 [03:47<02:47,  1.97s/step, loss=8.05325, grad_norm=8.79677, lr=1.000e-04, foundation_loss/aux=0.000419825, foundation_loss/lm=6.15835, foundation_loss/mtp=1.89448, tokens/s=8139.046, step_time=1.857s] | step=115 epoch=0 data/consumed_samples=920 data/consumed_tokens=2.1899e+06 data/step_samples=8 data/step_tokens=15115 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8571 performance/tokens_per_second=8139.05 training/foundation_loss/aux=0.000419825 training/foundation_loss/lm=6.15835 training/foundation_loss/mtp=1.89448 training/grad_norm=8.79677 training/lr=0.0001 training/total_loss=8.05325
+Training:  58%|█████▊    | 116/200 [03:48<02:45,  1.97s/step, loss=8.84195, grad_norm=4.57616, lr=1.000e-04, foundation_loss/aux=0.000391428, foundation_loss/lm=6.75756, foundation_loss/mtp=2.084, tokens/s=5735.680, step_time=1.839s] | step=116 epoch=0 data/consumed_samples=928 data/consumed_tokens=2.20045e+06 data/step_samples=8 data/step_tokens=10546 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.83867 performance/tokens_per_second=5735.68 training/foundation_loss/aux=0.000391428 training/foundation_loss/lm=6.75756 training/foundation_loss/mtp=2.084 training/grad_norm=4.57616 training/lr=0.0001 training/total_loss=8.84195
+Training:  58%|█████▊    | 117/200 [03:50<02:43,  1.97s/step, loss=8.85079, grad_norm=8.29645, lr=1.000e-04, foundation_loss/aux=0.00047572, foundation_loss/lm=6.75341, foundation_loss/mtp=2.0969, tokens/s=7363.837, step_time=1.856s] | step=117 epoch=0 data/consumed_samples=936 data/consumed_tokens=2.21412e+06 data/step_samples=8 data/step_tokens=13668 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8561 performance/tokens_per_second=7363.84 training/foundation_loss/aux=0.00047572 training/foundation_loss/lm=6.75341 training/foundation_loss/mtp=2.0969 training/grad_norm=8.29645 training/lr=0.0001 training/total_loss=8.85079
+Training:  59%|█████▉    | 118/200 [03:52<02:41,  1.97s/step, loss=8.45886, grad_norm=5.04526, lr=1.000e-04, foundation_loss/aux=0.000432301, foundation_loss/lm=6.47208, foundation_loss/mtp=1.98635, tokens/s=7488.212, step_time=1.851s] | step=118 epoch=0 data/consumed_samples=944 data/consumed_tokens=2.22798e+06 data/step_samples=8 data/step_tokens=13862 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85118 performance/tokens_per_second=7488.21 training/foundation_loss/aux=0.000432301 training/foundation_loss/lm=6.47208 training/foundation_loss/mtp=1.98635 training/grad_norm=5.04526 training/lr=0.0001 training/total_loss=8.45886
+Training:  60%|█████▉    | 119/200 [03:54<02:39,  1.97s/step, loss=7.1819, grad_norm=6.02189, lr=1.000e-04, foundation_loss/aux=0.000446469, foundation_loss/lm=5.51673, foundation_loss/mtp=1.66472, tokens/s=11579.907, step_time=1.860s] | step=119 epoch=0 data/consumed_samples=952 data/consumed_tokens=2.24951e+06 data/step_samples=8 data/step_tokens=21535 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85969 performance/tokens_per_second=11579.9 training/foundation_loss/aux=0.000446469 training/foundation_loss/lm=5.51673 training/foundation_loss/mtp=1.66472 training/grad_norm=6.02189 training/lr=0.0001 training/total_loss=7.1819
+Training:  60%|██████    | 120/200 [03:56<02:37,  1.97s/step, loss=8.53488, grad_norm=4.05703, lr=1.000e-04, foundation_loss/aux=0.00042017, foundation_loss/lm=6.54585, foundation_loss/mtp=1.98861, tokens/s=14999.684, step_time=1.860s] | step=120 epoch=0 data/consumed_samples=960 data/consumed_tokens=2.27741e+06 data/step_samples=8 data/step_tokens=27898 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85991 performance/tokens_per_second=14999.7 training/foundation_loss/aux=0.00042017 training/foundation_loss/lm=6.54585 training/foundation_loss/mtp=1.98861 training/grad_norm=4.05703 training/lr=0.0001 training/total_loss=8.53488
+Training:  60%|██████    | 121/200 [03:58<02:35,  1.97s/step, loss=7.72621, grad_norm=4.38711, lr=1.000e-04, foundation_loss/aux=0.000398514, foundation_loss/lm=5.92885, foundation_loss/mtp=1.79696, tokens/s=7645.352, step_time=1.840s] | step=121 epoch=0 data/consumed_samples=968 data/consumed_tokens=2.29148e+06 data/step_samples=8 data/step_tokens=14066 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.83981 performance/tokens_per_second=7645.35 training/foundation_loss/aux=0.000398514 training/foundation_loss/lm=5.92885 training/foundation_loss/mtp=1.79696 training/grad_norm=4.38711 training/lr=0.0001 training/total_loss=7.72621
+Training:  61%|██████    | 122/200 [04:00<02:33,  1.97s/step, loss=7.35923, grad_norm=5.54436, lr=1.000e-04, foundation_loss/aux=0.000423359, foundation_loss/lm=5.66191, foundation_loss/mtp=1.6969, tokens/s=14147.709, step_time=1.860s] | step=122 epoch=0 data/consumed_samples=976 data/consumed_tokens=2.31779e+06 data/step_samples=8 data/step_tokens=26310 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85967 performance/tokens_per_second=14147.7 training/foundation_loss/aux=0.000423359 training/foundation_loss/lm=5.66191 training/foundation_loss/mtp=1.6969 training/grad_norm=5.54436 training/lr=0.0001 training/total_loss=7.35923
+Training:  62%|██████▏   | 123/200 [04:02<02:31,  1.97s/step, loss=6.35111, grad_norm=5.76554, lr=1.000e-04, foundation_loss/aux=0.000471067, foundation_loss/lm=4.87964, foundation_loss/mtp=1.471, tokens/s=14523.136, step_time=1.858s] | step=123 epoch=0 data/consumed_samples=984 data/consumed_tokens=2.34477e+06 data/step_samples=8 data/step_tokens=26978 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85759 performance/tokens_per_second=14523.1 training/foundation_loss/aux=0.000471067 training/foundation_loss/lm=4.87964 training/foundation_loss/mtp=1.471 training/grad_norm=5.76554 training/lr=0.0001 training/total_loss=6.35111
+Training:  62%|██████▏   | 124/200 [04:04<02:29,  1.97s/step, loss=9.0294, grad_norm=8.28983, lr=1.000e-04, foundation_loss/aux=0.000423289, foundation_loss/lm=6.9073, foundation_loss/mtp=2.12168, tokens/s=5028.075, step_time=1.865s] | step=124 epoch=0 data/consumed_samples=992 data/consumed_tokens=2.35414e+06 data/step_samples=8 data/step_tokens=9375 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86453 performance/tokens_per_second=5028.07 training/foundation_loss/aux=0.000423289 training/foundation_loss/lm=6.9073 training/foundation_loss/mtp=2.12168 training/grad_norm=8.28983 training/lr=0.0001 training/total_loss=9.0294
+Training:  62%|██████▎   | 125/200 [04:06<02:27,  1.97s/step, loss=10.0063, grad_norm=12.3371, lr=1.000e-04, foundation_loss/aux=0.000425287, foundation_loss/lm=7.64939, foundation_loss/mtp=2.35652, tokens/s=1658.222, step_time=1.864s] | step=125 epoch=0 data/consumed_samples=1000 data/consumed_tokens=2.35723e+06 data/step_samples=8 data/step_tokens=3091 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86404 performance/tokens_per_second=1658.22 training/foundation_loss/aux=0.000425287 training/foundation_loss/lm=7.64939 training/foundation_loss/mtp=2.35652 training/grad_norm=12.3371 training/lr=0.0001 training/total_loss=10.0063
+Training:  63%|██████▎   | 126/200 [04:08<02:25,  1.97s/step, loss=9.91182, grad_norm=9.58216, lr=1.000e-04, foundation_loss/aux=0.000418596, foundation_loss/lm=7.533, foundation_loss/mtp=2.3784, tokens/s=3248.275, step_time=1.861s] | step=126 epoch=0 data/consumed_samples=1008 data/consumed_tokens=2.36328e+06 data/step_samples=8 data/step_tokens=6044 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86068 performance/tokens_per_second=3248.28 training/foundation_loss/aux=0.000418596 training/foundation_loss/lm=7.533 training/foundation_loss/mtp=2.3784 training/grad_norm=9.58216 training/lr=0.0001 training/total_loss=9.91182
+Training:  64%|██████▎   | 127/200 [04:10<02:23,  1.97s/step, loss=9.7495, grad_norm=8.69091, lr=1.000e-04, foundation_loss/aux=0.000426053, foundation_loss/lm=7.37306, foundation_loss/mtp=2.37601, tokens/s=4556.209, step_time=1.865s] | step=127 epoch=0 data/consumed_samples=1016 data/consumed_tokens=2.37177e+06 data/step_samples=8 data/step_tokens=8496 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86471 performance/tokens_per_second=4556.21 training/foundation_loss/aux=0.000426053 training/foundation_loss/lm=7.37306 training/foundation_loss/mtp=2.37601 training/grad_norm=8.69091 training/lr=0.0001 training/total_loss=9.7495
+Training:  64%|██████▍   | 128/200 [04:12<02:21,  1.97s/step, loss=8.01999, grad_norm=7.23828, lr=1.000e-04, foundation_loss/aux=0.000444401, foundation_loss/lm=6.09005, foundation_loss/mtp=1.92949, tokens/s=5834.300, step_time=1.865s] | step=128 epoch=0 data/consumed_samples=1024 data/consumed_tokens=2.38265e+06 data/step_samples=8 data/step_tokens=10881 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86501 performance/tokens_per_second=5834.3 training/foundation_loss/aux=0.000444401 training/foundation_loss/lm=6.09005 training/foundation_loss/mtp=1.92949 training/grad_norm=7.23828 training/lr=0.0001 training/total_loss=8.01999
+Training:  64%|██████▍   | 129/200 [04:13<02:19,  1.97s/step, loss=8.24306, grad_norm=5.95214, lr=1.000e-04, foundation_loss/aux=0.000381718, foundation_loss/lm=6.32612, foundation_loss/mtp=1.91656, tokens/s=11010.062, step_time=1.856s] | step=129 epoch=0 data/consumed_samples=1032 data/consumed_tokens=2.40309e+06 data/step_samples=8 data/step_tokens=20434 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85594 performance/tokens_per_second=11010.1 training/foundation_loss/aux=0.000381718 training/foundation_loss/lm=6.32612 training/foundation_loss/mtp=1.91656 training/grad_norm=5.95214 training/lr=0.0001 training/total_loss=8.24306
+Training:  65%|██████▌   | 130/200 [04:15<02:17,  1.97s/step, loss=8.71495, grad_norm=6.78162, lr=1.000e-04, foundation_loss/aux=0.000399588, foundation_loss/lm=6.70486, foundation_loss/mtp=2.00969, tokens/s=6263.000, step_time=1.867s] | step=130 epoch=0 data/consumed_samples=1040 data/consumed_tokens=2.41478e+06 data/step_samples=8 data/step_tokens=11692 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86684 performance/tokens_per_second=6263 training/foundation_loss/aux=0.000399588 training/foundation_loss/lm=6.70486 training/foundation_loss/mtp=2.00969 training/grad_norm=6.78162 training/lr=0.0001 training/total_loss=8.71495
+Training:  66%|██████▌   | 131/200 [04:17<02:15,  1.97s/step, loss=7.74575, grad_norm=6.8259, lr=1.000e-04, foundation_loss/aux=0.000396873, foundation_loss/lm=5.96963, foundation_loss/mtp=1.77572, tokens/s=8092.522, step_time=1.858s] | step=131 epoch=0 data/consumed_samples=1048 data/consumed_tokens=2.42981e+06 data/step_samples=8 data/step_tokens=15033 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85764 performance/tokens_per_second=8092.52 training/foundation_loss/aux=0.000396873 training/foundation_loss/lm=5.96963 training/foundation_loss/mtp=1.77572 training/grad_norm=6.8259 training/lr=0.0001 training/total_loss=7.74575
+Training:  66%|██████▌   | 132/200 [04:19<02:13,  1.97s/step, loss=7.0614, grad_norm=6.64812, lr=1.000e-04, foundation_loss/aux=0.000402601, foundation_loss/lm=5.44091, foundation_loss/mtp=1.62009, tokens/s=8117.379, step_time=1.868s] | step=132 epoch=0 data/consumed_samples=1056 data/consumed_tokens=2.44498e+06 data/step_samples=8 data/step_tokens=15167 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86846 performance/tokens_per_second=8117.38 training/foundation_loss/aux=0.000402601 training/foundation_loss/lm=5.44091 training/foundation_loss/mtp=1.62009 training/grad_norm=6.64812 training/lr=0.0001 training/total_loss=7.0614
+Training:  66%|██████▋   | 133/200 [04:21<02:11,  1.97s/step, loss=8.34566, grad_norm=5.46585, lr=1.000e-04, foundation_loss/aux=0.000405543, foundation_loss/lm=6.41389, foundation_loss/mtp=1.93136, tokens/s=16072.221, step_time=1.854s] | step=133 epoch=0 data/consumed_samples=1064 data/consumed_tokens=2.47478e+06 data/step_samples=8 data/step_tokens=29804 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85438 performance/tokens_per_second=16072.2 training/foundation_loss/aux=0.000405543 training/foundation_loss/lm=6.41389 training/foundation_loss/mtp=1.93136 training/grad_norm=5.46585 training/lr=0.0001 training/total_loss=8.34566
+Training:  67%|██████▋   | 134/200 [04:23<02:09,  1.97s/step, loss=8.84152, grad_norm=5.74374, lr=1.000e-04, foundation_loss/aux=0.000385123, foundation_loss/lm=6.79608, foundation_loss/mtp=2.04506, tokens/s=10222.505, step_time=1.859s] | step=134 epoch=0 data/consumed_samples=1072 data/consumed_tokens=2.49379e+06 data/step_samples=8 data/step_tokens=19003 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85894 performance/tokens_per_second=10222.5 training/foundation_loss/aux=0.000385123 training/foundation_loss/lm=6.79608 training/foundation_loss/mtp=2.04506 training/grad_norm=5.74374 training/lr=0.0001 training/total_loss=8.84152
+Training:  68%|██████▊   | 135/200 [04:25<02:07,  1.97s/step, loss=7.45819, grad_norm=5.46986, lr=1.000e-04, foundation_loss/aux=0.000391371, foundation_loss/lm=5.74189, foundation_loss/mtp=1.71591, tokens/s=8683.094, step_time=1.850s] | step=135 epoch=0 data/consumed_samples=1080 data/consumed_tokens=2.50985e+06 data/step_samples=8 data/step_tokens=16065 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85015 performance/tokens_per_second=8683.09 training/foundation_loss/aux=0.000391371 training/foundation_loss/lm=5.74189 training/foundation_loss/mtp=1.71591 training/grad_norm=5.46986 training/lr=0.0001 training/total_loss=7.45819
+Training:  68%|██████▊   | 136/200 [04:27<02:05,  1.97s/step, loss=8.89475, grad_norm=4.62028, lr=1.000e-04, foundation_loss/aux=0.000388067, foundation_loss/lm=6.82503, foundation_loss/mtp=2.06934, tokens/s=10031.478, step_time=1.858s] | step=136 epoch=0 data/consumed_samples=1088 data/consumed_tokens=2.52849e+06 data/step_samples=8 data/step_tokens=18643 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85845 performance/tokens_per_second=10031.5 training/foundation_loss/aux=0.000388067 training/foundation_loss/lm=6.82503 training/foundation_loss/mtp=2.06934 training/grad_norm=4.62028 training/lr=0.0001 training/total_loss=8.89475
+Training:  68%|██████▊   | 137/200 [04:29<02:03,  1.97s/step, loss=9.19767, grad_norm=12.6555, lr=1.000e-04, foundation_loss/aux=0.000414914, foundation_loss/lm=6.98383, foundation_loss/mtp=2.21343, tokens/s=7374.795, step_time=1.862s] | step=137 epoch=0 data/consumed_samples=1096 data/consumed_tokens=2.54223e+06 data/step_samples=8 data/step_tokens=13734 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86229 performance/tokens_per_second=7374.79 training/foundation_loss/aux=0.000414914 training/foundation_loss/lm=6.98383 training/foundation_loss/mtp=2.21343 training/grad_norm=12.6555 training/lr=0.0001 training/total_loss=9.19767
+Training:  69%|██████▉   | 138/200 [04:31<02:01,  1.97s/step, loss=8.94759, grad_norm=7.12252, lr=1.000e-04, foundation_loss/aux=0.00042114, foundation_loss/lm=6.76937, foundation_loss/mtp=2.17779, tokens/s=5534.194, step_time=1.856s] | step=138 epoch=0 data/consumed_samples=1104 data/consumed_tokens=2.5525e+06 data/step_samples=8 data/step_tokens=10270 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85574 performance/tokens_per_second=5534.19 training/foundation_loss/aux=0.00042114 training/foundation_loss/lm=6.76937 training/foundation_loss/mtp=2.17779 training/grad_norm=7.12252 training/lr=0.0001 training/total_loss=8.94759
+Training:  70%|██████▉   | 139/200 [04:33<01:59,  1.97s/step, loss=8.70974, grad_norm=6.1398, lr=1.000e-04, foundation_loss/aux=0.000414175, foundation_loss/lm=6.5572, foundation_loss/mtp=2.15212, tokens/s=7077.040, step_time=1.859s] | step=139 epoch=0 data/consumed_samples=1112 data/consumed_tokens=2.56565e+06 data/step_samples=8 data/step_tokens=13155 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85883 performance/tokens_per_second=7077.04 training/foundation_loss/aux=0.000414175 training/foundation_loss/lm=6.5572 training/foundation_loss/mtp=2.15212 training/grad_norm=6.1398 training/lr=0.0001 training/total_loss=8.70974
+Training:  70%|███████   | 140/200 [04:35<01:57,  1.97s/step, loss=8.2553, grad_norm=5.67442, lr=1.000e-04, foundation_loss/aux=0.00041728, foundation_loss/lm=6.2865, foundation_loss/mtp=1.96838, tokens/s=4384.540, step_time=1.856s] | step=140 epoch=0 data/consumed_samples=1120 data/consumed_tokens=2.57379e+06 data/step_samples=8 data/step_tokens=8139 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8563 performance/tokens_per_second=4384.54 training/foundation_loss/aux=0.00041728 training/foundation_loss/lm=6.2865 training/foundation_loss/mtp=1.96838 training/grad_norm=5.67442 training/lr=0.0001 training/total_loss=8.2553
+Training:  70%|███████   | 141/200 [04:37<01:55,  1.97s/step, loss=7.67612, grad_norm=8.58354, lr=1.000e-04, foundation_loss/aux=0.000448953, foundation_loss/lm=5.92129, foundation_loss/mtp=1.75439, tokens/s=8914.456, step_time=1.857s] | step=141 epoch=0 data/consumed_samples=1128 data/consumed_tokens=2.59035e+06 data/step_samples=8 data/step_tokens=16555 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8571 performance/tokens_per_second=8914.46 training/foundation_loss/aux=0.000448953 training/foundation_loss/lm=5.92129 training/foundation_loss/mtp=1.75439 training/grad_norm=8.58354 training/lr=0.0001 training/total_loss=7.67612
+Training:  71%|███████   | 142/200 [04:38<01:53,  1.96s/step, loss=7.10855, grad_norm=5.89262, lr=1.000e-04, foundation_loss/aux=0.000395606, foundation_loss/lm=5.48952, foundation_loss/mtp=1.61863, tokens/s=11253.746, step_time=1.826s] | step=142 epoch=0 data/consumed_samples=1136 data/consumed_tokens=2.6109e+06 data/step_samples=8 data/step_tokens=20554 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.82641 performance/tokens_per_second=11253.7 training/foundation_loss/aux=0.000395606 training/foundation_loss/lm=5.48952 training/foundation_loss/mtp=1.61863 training/grad_norm=5.89262 training/lr=0.0001 training/total_loss=7.10855
+Training:  72%|███████▏  | 143/200 [04:40<01:51,  1.96s/step, loss=7.0858, grad_norm=6.66984, lr=1.000e-04, foundation_loss/aux=0.000437795, foundation_loss/lm=5.46027, foundation_loss/mtp=1.62509, tokens/s=14894.760, step_time=1.860s] | step=143 epoch=0 data/consumed_samples=1144 data/consumed_tokens=2.63861e+06 data/step_samples=8 data/step_tokens=27709 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86032 performance/tokens_per_second=14894.8 training/foundation_loss/aux=0.000437795 training/foundation_loss/lm=5.46027 training/foundation_loss/mtp=1.62509 training/grad_norm=6.66984 training/lr=0.0001 training/total_loss=7.0858
+Training:  72%|███████▏  | 144/200 [04:42<01:49,  1.96s/step, loss=7.27711, grad_norm=12.1172, lr=1.000e-04, foundation_loss/aux=0.000456559, foundation_loss/lm=5.55854, foundation_loss/mtp=1.71812, tokens/s=15432.160, step_time=1.866s] | step=144 epoch=0 data/consumed_samples=1152 data/consumed_tokens=2.6674e+06 data/step_samples=8 data/step_tokens=28791 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86565 performance/tokens_per_second=15432.2 training/foundation_loss/aux=0.000456559 training/foundation_loss/lm=5.55854 training/foundation_loss/mtp=1.71812 training/grad_norm=12.1172 training/lr=0.0001 training/total_loss=7.27711
+Training:  72%|███████▎  | 145/200 [04:44<01:48,  1.96s/step, loss=6.5057, grad_norm=9.57236, lr=1.000e-04, foundation_loss/aux=0.000476153, foundation_loss/lm=5.00505, foundation_loss/mtp=1.50018, tokens/s=15012.153, step_time=1.860s] | step=145 epoch=0 data/consumed_samples=1160 data/consumed_tokens=2.69532e+06 data/step_samples=8 data/step_tokens=27919 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85976 performance/tokens_per_second=15012.2 training/foundation_loss/aux=0.000476153 training/foundation_loss/lm=5.00505 training/foundation_loss/mtp=1.50018 training/grad_norm=9.57236 training/lr=0.0001 training/total_loss=6.5057
+Training:  73%|███████▎  | 146/200 [04:46<01:46,  1.96s/step, loss=7.38478, grad_norm=16.7393, lr=1.000e-04, foundation_loss/aux=0.000469976, foundation_loss/lm=5.75178, foundation_loss/mtp=1.63254, tokens/s=11477.391, step_time=1.861s] | step=146 epoch=0 data/consumed_samples=1168 data/consumed_tokens=2.71668e+06 data/step_samples=8 data/step_tokens=21365 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86149 performance/tokens_per_second=11477.4 training/foundation_loss/aux=0.000469976 training/foundation_loss/lm=5.75178 training/foundation_loss/mtp=1.63254 training/grad_norm=16.7393 training/lr=0.0001 training/total_loss=7.38478
+Training:  74%|███████▎  | 147/200 [04:48<01:44,  1.96s/step, loss=10.7619, grad_norm=7.18866, lr=1.000e-04, foundation_loss/aux=0.000423199, foundation_loss/lm=8.30256, foundation_loss/mtp=2.45889, tokens/s=12258.690, step_time=1.856s] | step=147 epoch=0 data/consumed_samples=1176 data/consumed_tokens=2.73944e+06 data/step_samples=8 data/step_tokens=22755 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85623 performance/tokens_per_second=12258.7 training/foundation_loss/aux=0.000423199 training/foundation_loss/lm=8.30256 training/foundation_loss/mtp=2.45889 training/grad_norm=7.18866 training/lr=0.0001 training/total_loss=10.7619
+Training:  74%|███████▍  | 148/200 [04:50<01:42,  1.96s/step, loss=8.62845, grad_norm=7.41763, lr=1.000e-04, foundation_loss/aux=0.00036656, foundation_loss/lm=6.64873, foundation_loss/mtp=1.97936, tokens/s=11552.329, step_time=1.848s] | step=148 epoch=0 data/consumed_samples=1184 data/consumed_tokens=2.76079e+06 data/step_samples=8 data/step_tokens=21354 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84846 performance/tokens_per_second=11552.3 training/foundation_loss/aux=0.00036656 training/foundation_loss/lm=6.64873 training/foundation_loss/mtp=1.97936 training/grad_norm=7.41763 training/lr=0.0001 training/total_loss=8.62845
+Training:  74%|███████▍  | 149/200 [04:52<01:40,  1.96s/step, loss=10.2092, grad_norm=10.4549, lr=1.000e-04, foundation_loss/aux=0.00043918, foundation_loss/lm=7.85833, foundation_loss/mtp=2.35047, tokens/s=5434.700, step_time=1.860s] | step=149 epoch=0 data/consumed_samples=1192 data/consumed_tokens=2.7709e+06 data/step_samples=8 data/step_tokens=10107 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85972 performance/tokens_per_second=5434.7 training/foundation_loss/aux=0.00043918 training/foundation_loss/lm=7.85833 training/foundation_loss/mtp=2.35047 training/grad_norm=10.4549 training/lr=0.0001 training/total_loss=10.2092
+Training:  75%|███████▌  | 150/200 [04:54<01:38,  1.96s/step, loss=8.61896, grad_norm=10.4244, lr=1.000e-04, foundation_loss/aux=0.000455248, foundation_loss/lm=6.62557, foundation_loss/mtp=1.99294, tokens/s=5386.907, step_time=1.862s] | step=150 epoch=0 data/consumed_samples=1200 data/consumed_tokens=2.78093e+06 data/step_samples=8 data/step_tokens=10029 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86174 performance/tokens_per_second=5386.91 training/foundation_loss/aux=0.000455248 training/foundation_loss/lm=6.62557 training/foundation_loss/mtp=1.99294 training/grad_norm=10.4244 training/lr=0.0001 training/total_loss=8.61896
+Training:  76%|███████▌  | 151/200 [04:56<01:36,  1.96s/step, loss=6.11638, grad_norm=11.2659, lr=1.000e-04, foundation_loss/aux=0.000492567, foundation_loss/lm=4.72411, foundation_loss/mtp=1.39178, tokens/s=13941.990, step_time=1.858s] | step=151 epoch=0 data/consumed_samples=1208 data/consumed_tokens=2.80683e+06 data/step_samples=8 data/step_tokens=25903 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85791 performance/tokens_per_second=13942 training/foundation_loss/aux=0.000492567 training/foundation_loss/lm=4.72411 training/foundation_loss/mtp=1.39178 training/grad_norm=11.2659 training/lr=0.0001 training/total_loss=6.11638
+Training:  76%|███████▌  | 152/200 [04:58<01:34,  1.96s/step, loss=8.34956, grad_norm=7.12236, lr=1.000e-04, foundation_loss/aux=0.00049116, foundation_loss/lm=6.4512, foundation_loss/mtp=1.89786, tokens/s=4900.847, step_time=1.863s] | step=152 epoch=0 data/consumed_samples=1216 data/consumed_tokens=2.81596e+06 data/step_samples=8 data/step_tokens=9129 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86274 performance/tokens_per_second=4900.85 training/foundation_loss/aux=0.00049116 training/foundation_loss/lm=6.4512 training/foundation_loss/mtp=1.89786 training/grad_norm=7.12236 training/lr=0.0001 training/total_loss=8.34956
+Training:  76%|███████▋  | 153/200 [05:00<01:32,  1.96s/step, loss=7.48328, grad_norm=8.32839, lr=1.000e-04, foundation_loss/aux=0.000404817, foundation_loss/lm=5.76636, foundation_loss/mtp=1.71652, tokens/s=13061.034, step_time=1.848s] | step=153 epoch=0 data/consumed_samples=1224 data/consumed_tokens=2.8401e+06 data/step_samples=8 data/step_tokens=24141 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84832 performance/tokens_per_second=13061 training/foundation_loss/aux=0.000404817 training/foundation_loss/lm=5.76636 training/foundation_loss/mtp=1.71652 training/grad_norm=8.32839 training/lr=0.0001 training/total_loss=7.48328
+Training:  77%|███████▋  | 154/200 [05:02<01:30,  1.96s/step, loss=9.24956, grad_norm=5.30586, lr=1.000e-04, foundation_loss/aux=0.000418418, foundation_loss/lm=7.11325, foundation_loss/mtp=2.13589, tokens/s=6149.516, step_time=1.855s] | step=154 epoch=0 data/consumed_samples=1232 data/consumed_tokens=2.85151e+06 data/step_samples=8 data/step_tokens=11405 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85462 performance/tokens_per_second=6149.52 training/foundation_loss/aux=0.000418418 training/foundation_loss/lm=7.11325 training/foundation_loss/mtp=2.13589 training/grad_norm=5.30586 training/lr=0.0001 training/total_loss=9.24956
+Training:  78%|███████▊  | 155/200 [05:04<01:28,  1.96s/step, loss=7.42653, grad_norm=4.39261, lr=1.000e-04, foundation_loss/aux=0.000430859, foundation_loss/lm=5.73233, foundation_loss/mtp=1.69377, tokens/s=12370.796, step_time=1.864s] | step=155 epoch=0 data/consumed_samples=1240 data/consumed_tokens=2.87456e+06 data/step_samples=8 data/step_tokens=23054 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86358 performance/tokens_per_second=12370.8 training/foundation_loss/aux=0.000430859 training/foundation_loss/lm=5.73233 training/foundation_loss/mtp=1.69377 training/grad_norm=4.39261 training/lr=0.0001 training/total_loss=7.42653
+Training:  78%|███████▊  | 156/200 [05:05<01:26,  1.96s/step, loss=8.83504, grad_norm=6.00754, lr=1.000e-04, foundation_loss/aux=0.000389751, foundation_loss/lm=6.7923, foundation_loss/mtp=2.04234, tokens/s=4697.237, step_time=1.857s] | step=156 epoch=0 data/consumed_samples=1248 data/consumed_tokens=2.88328e+06 data/step_samples=8 data/step_tokens=8722 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85684 performance/tokens_per_second=4697.24 training/foundation_loss/aux=0.000389751 training/foundation_loss/lm=6.7923 training/foundation_loss/mtp=2.04234 training/grad_norm=6.00754 training/lr=0.0001 training/total_loss=8.83504
+Training:  78%|███████▊  | 157/200 [05:07<01:24,  1.96s/step, loss=8.18263, grad_norm=6.45706, lr=1.000e-04, foundation_loss/aux=0.000426036, foundation_loss/lm=6.29204, foundation_loss/mtp=1.89017, tokens/s=7108.309, step_time=1.861s] | step=157 epoch=0 data/consumed_samples=1256 data/consumed_tokens=2.89651e+06 data/step_samples=8 data/step_tokens=13230 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8612 performance/tokens_per_second=7108.31 training/foundation_loss/aux=0.000426036 training/foundation_loss/lm=6.29204 training/foundation_loss/mtp=1.89017 training/grad_norm=6.45706 training/lr=0.0001 training/total_loss=8.18263
+Training:  79%|███████▉  | 158/200 [05:09<01:22,  1.96s/step, loss=8.67536, grad_norm=6.98006, lr=1.000e-04, foundation_loss/aux=0.000420888, foundation_loss/lm=6.64198, foundation_loss/mtp=2.03296, tokens/s=8068.087, step_time=1.857s] | step=158 epoch=0 data/consumed_samples=1264 data/consumed_tokens=2.91149e+06 data/step_samples=8 data/step_tokens=14979 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85657 performance/tokens_per_second=8068.09 training/foundation_loss/aux=0.000420888 training/foundation_loss/lm=6.64198 training/foundation_loss/mtp=2.03296 training/grad_norm=6.98006 training/lr=0.0001 training/total_loss=8.67536
+Training:  80%|███████▉  | 159/200 [05:11<01:20,  1.96s/step, loss=9.03624, grad_norm=3.92207, lr=1.000e-04, foundation_loss/aux=0.000403187, foundation_loss/lm=6.94073, foundation_loss/mtp=2.0951, tokens/s=10340.471, step_time=1.839s] | step=159 epoch=0 data/consumed_samples=1272 data/consumed_tokens=2.9305e+06 data/step_samples=8 data/step_tokens=19012 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8386 performance/tokens_per_second=10340.5 training/foundation_loss/aux=0.000403187 training/foundation_loss/lm=6.94073 training/foundation_loss/mtp=2.0951 training/grad_norm=3.92207 training/lr=0.0001 training/total_loss=9.03624
+Training:  80%|████████  | 160/200 [05:13<01:18,  1.96s/step, loss=8.6245, grad_norm=4.35523, lr=1.000e-04, foundation_loss/aux=0.000379113, foundation_loss/lm=6.61319, foundation_loss/mtp=2.01093, tokens/s=5987.347, step_time=1.855s] | step=160 epoch=0 data/consumed_samples=1280 data/consumed_tokens=2.94161e+06 data/step_samples=8 data/step_tokens=11104 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85458 performance/tokens_per_second=5987.35 training/foundation_loss/aux=0.000379113 training/foundation_loss/lm=6.61319 training/foundation_loss/mtp=2.01093 training/grad_norm=4.35523 training/lr=0.0001 training/total_loss=8.6245
+Training:  80%|████████  | 161/200 [05:15<01:16,  1.96s/step, loss=7.37259, grad_norm=5.50777, lr=1.000e-04, foundation_loss/aux=0.000460431, foundation_loss/lm=5.67663, foundation_loss/mtp=1.6955, tokens/s=11132.144, step_time=1.851s] | step=161 epoch=0 data/consumed_samples=1288 data/consumed_tokens=2.96221e+06 data/step_samples=8 data/step_tokens=20602 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85068 performance/tokens_per_second=11132.1 training/foundation_loss/aux=0.000460431 training/foundation_loss/lm=5.67663 training/foundation_loss/mtp=1.6955 training/grad_norm=5.50777 training/lr=0.0001 training/total_loss=7.37259
+Training:  81%|████████  | 162/200 [05:17<01:14,  1.96s/step, loss=6.59923, grad_norm=5.26439, lr=1.000e-04, foundation_loss/aux=0.000433648, foundation_loss/lm=5.07298, foundation_loss/mtp=1.52582, tokens/s=11007.146, step_time=1.871s] | step=162 epoch=0 data/consumed_samples=1296 data/consumed_tokens=2.9828e+06 data/step_samples=8 data/step_tokens=20591 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.87069 performance/tokens_per_second=11007.1 training/foundation_loss/aux=0.000433648 training/foundation_loss/lm=5.07298 training/foundation_loss/mtp=1.52582 training/grad_norm=5.26439 training/lr=0.0001 training/total_loss=6.59923
+Training:  82%|████████▏ | 163/200 [05:19<01:12,  1.96s/step, loss=7.72406, grad_norm=6.57988, lr=1.000e-04, foundation_loss/aux=0.000460048, foundation_loss/lm=5.91762, foundation_loss/mtp=1.80598, tokens/s=16480.159, step_time=1.861s] | step=163 epoch=0 data/consumed_samples=1304 data/consumed_tokens=3.01347e+06 data/step_samples=8 data/step_tokens=30667 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86084 performance/tokens_per_second=16480.2 training/foundation_loss/aux=0.000460048 training/foundation_loss/lm=5.91762 training/foundation_loss/mtp=1.80598 training/grad_norm=6.57988 training/lr=0.0001 training/total_loss=7.72406
+Training:  82%|████████▏ | 164/200 [05:21<01:10,  1.96s/step, loss=8.03056, grad_norm=9.12264, lr=1.000e-04, foundation_loss/aux=0.00046266, foundation_loss/lm=6.19118, foundation_loss/mtp=1.83892, tokens/s=2752.734, step_time=1.864s] | step=164 epoch=0 data/consumed_samples=1312 data/consumed_tokens=3.0186e+06 data/step_samples=8 data/step_tokens=5131 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86397 performance/tokens_per_second=2752.73 training/foundation_loss/aux=0.00046266 training/foundation_loss/lm=6.19118 training/foundation_loss/mtp=1.83892 training/grad_norm=9.12264 training/lr=0.0001 training/total_loss=8.03056
+Training:  82%|████████▎ | 165/200 [05:23<01:08,  1.96s/step, loss=7.9159, grad_norm=8.30147, lr=1.000e-04, foundation_loss/aux=0.000466954, foundation_loss/lm=6.0486, foundation_loss/mtp=1.86683, tokens/s=6693.402, step_time=1.860s] | step=165 epoch=0 data/consumed_samples=1320 data/consumed_tokens=3.03105e+06 data/step_samples=8 data/step_tokens=12447 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85959 performance/tokens_per_second=6693.4 training/foundation_loss/aux=0.000466954 training/foundation_loss/lm=6.0486 training/foundation_loss/mtp=1.86683 training/grad_norm=8.30147 training/lr=0.0001 training/total_loss=7.9159
+Training:  83%|████████▎ | 166/200 [05:25<01:06,  1.96s/step, loss=7.08933, grad_norm=5.46146, lr=1.000e-04, foundation_loss/aux=0.000459125, foundation_loss/lm=5.43155, foundation_loss/mtp=1.65733, tokens/s=14800.233, step_time=1.855s] | step=166 epoch=0 data/consumed_samples=1328 data/consumed_tokens=3.0585e+06 data/step_samples=8 data/step_tokens=27456 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85511 performance/tokens_per_second=14800.2 training/foundation_loss/aux=0.000459125 training/foundation_loss/lm=5.43155 training/foundation_loss/mtp=1.65733 training/grad_norm=5.46146 training/lr=0.0001 training/total_loss=7.08933
+Training:  84%|████████▎ | 167/200 [05:27<01:04,  1.96s/step, loss=7.73402, grad_norm=4.18099, lr=1.000e-04, foundation_loss/aux=0.000385843, foundation_loss/lm=5.9564, foundation_loss/mtp=1.77723, tokens/s=11369.535, step_time=1.831s] | step=167 epoch=0 data/consumed_samples=1336 data/consumed_tokens=3.07933e+06 data/step_samples=8 data/step_tokens=20823 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.83147 performance/tokens_per_second=11369.5 training/foundation_loss/aux=0.000385843 training/foundation_loss/lm=5.9564 training/foundation_loss/mtp=1.77723 training/grad_norm=4.18099 training/lr=0.0001 training/total_loss=7.73402
+Training:  84%|████████▍ | 168/200 [05:28<01:02,  1.96s/step, loss=8.25991, grad_norm=4.01209, lr=1.000e-04, foundation_loss/aux=0.00039468, foundation_loss/lm=6.32081, foundation_loss/mtp=1.93871, tokens/s=9679.828, step_time=1.837s] | step=168 epoch=0 data/consumed_samples=1344 data/consumed_tokens=3.09711e+06 data/step_samples=8 data/step_tokens=17786 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.83743 performance/tokens_per_second=9679.83 training/foundation_loss/aux=0.00039468 training/foundation_loss/lm=6.32081 training/foundation_loss/mtp=1.93871 training/grad_norm=4.01209 training/lr=0.0001 training/total_loss=8.25991
+Training:  84%|████████▍ | 169/200 [05:30<01:00,  1.96s/step, loss=6.87822, grad_norm=6.2907, lr=1.000e-04, foundation_loss/aux=0.000474866, foundation_loss/lm=5.33647, foundation_loss/mtp=1.54127, tokens/s=9286.630, step_time=1.857s] | step=169 epoch=0 data/consumed_samples=1352 data/consumed_tokens=3.11436e+06 data/step_samples=8 data/step_tokens=17249 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8574 performance/tokens_per_second=9286.63 training/foundation_loss/aux=0.000474866 training/foundation_loss/lm=5.33647 training/foundation_loss/mtp=1.54127 training/grad_norm=6.2907 training/lr=0.0001 training/total_loss=6.87822
+Training:  85%|████████▌ | 170/200 [05:32<00:58,  1.96s/step, loss=7.26217, grad_norm=4.8563, lr=1.000e-04, foundation_loss/aux=0.000455048, foundation_loss/lm=5.5989, foundation_loss/mtp=1.66281, tokens/s=11562.923, step_time=1.856s] | step=170 epoch=0 data/consumed_samples=1360 data/consumed_tokens=3.13583e+06 data/step_samples=8 data/step_tokens=21466 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85645 performance/tokens_per_second=11562.9 training/foundation_loss/aux=0.000455048 training/foundation_loss/lm=5.5989 training/foundation_loss/mtp=1.66281 training/grad_norm=4.8563 training/lr=0.0001 training/total_loss=7.26217
+Training:  86%|████████▌ | 171/200 [05:34<00:56,  1.96s/step, loss=7.59168, grad_norm=5.63424, lr=1.000e-04, foundation_loss/aux=0.00045559, foundation_loss/lm=5.83722, foundation_loss/mtp=1.75401, tokens/s=10693.655, step_time=1.851s] | step=171 epoch=0 data/consumed_samples=1368 data/consumed_tokens=3.15562e+06 data/step_samples=8 data/step_tokens=19796 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85119 performance/tokens_per_second=10693.7 training/foundation_loss/aux=0.00045559 training/foundation_loss/lm=5.83722 training/foundation_loss/mtp=1.75401 training/grad_norm=5.63424 training/lr=0.0001 training/total_loss=7.59168
+Training:  86%|████████▌ | 172/200 [05:36<00:54,  1.96s/step, loss=8.31819, grad_norm=9.50055, lr=1.000e-04, foundation_loss/aux=0.000427808, foundation_loss/lm=6.42741, foundation_loss/mtp=1.89035, tokens/s=4045.171, step_time=1.858s] | step=172 epoch=0 data/consumed_samples=1376 data/consumed_tokens=3.16314e+06 data/step_samples=8 data/step_tokens=7515 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85777 performance/tokens_per_second=4045.17 training/foundation_loss/aux=0.000427808 training/foundation_loss/lm=6.42741 training/foundation_loss/mtp=1.89035 training/grad_norm=9.50055 training/lr=0.0001 training/total_loss=8.31819
+Training:  86%|████████▋ | 173/200 [05:38<00:52,  1.96s/step, loss=7.90468, grad_norm=3.66134, lr=1.000e-04, foundation_loss/aux=0.000409316, foundation_loss/lm=6.0834, foundation_loss/mtp=1.82087, tokens/s=12390.111, step_time=1.835s] | step=173 epoch=0 data/consumed_samples=1384 data/consumed_tokens=3.18588e+06 data/step_samples=8 data/step_tokens=22737 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.83509 performance/tokens_per_second=12390.1 training/foundation_loss/aux=0.000409316 training/foundation_loss/lm=6.0834 training/foundation_loss/mtp=1.82087 training/grad_norm=3.66134 training/lr=0.0001 training/total_loss=7.90468
+Training:  87%|████████▋ | 174/200 [05:40<00:50,  1.96s/step, loss=6.751, grad_norm=5.30779, lr=1.000e-04, foundation_loss/aux=0.000435746, foundation_loss/lm=5.19058, foundation_loss/mtp=1.55998, tokens/s=9468.630, step_time=1.855s] | step=174 epoch=0 data/consumed_samples=1392 data/consumed_tokens=3.20344e+06 data/step_samples=8 data/step_tokens=17566 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85518 performance/tokens_per_second=9468.63 training/foundation_loss/aux=0.000435746 training/foundation_loss/lm=5.19058 training/foundation_loss/mtp=1.55998 training/grad_norm=5.30779 training/lr=0.0001 training/total_loss=6.751
+Training:  88%|████████▊ | 175/200 [05:42<00:48,  1.96s/step, loss=6.88297, grad_norm=3.95965, lr=1.000e-04, foundation_loss/aux=0.000431603, foundation_loss/lm=5.29771, foundation_loss/mtp=1.58483, tokens/s=10195.651, step_time=1.853s] | step=175 epoch=0 data/consumed_samples=1400 data/consumed_tokens=3.22234e+06 data/step_samples=8 data/step_tokens=18895 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85324 performance/tokens_per_second=10195.7 training/foundation_loss/aux=0.000431603 training/foundation_loss/lm=5.29771 training/foundation_loss/mtp=1.58483 training/grad_norm=3.95965 training/lr=0.0001 training/total_loss=6.88297
+Training:  88%|████████▊ | 176/200 [05:44<00:46,  1.96s/step, loss=7.05086, grad_norm=9.46164, lr=1.000e-04, foundation_loss/aux=0.00046, foundation_loss/lm=5.43168, foundation_loss/mtp=1.61872, tokens/s=11588.256, step_time=1.837s] | step=176 epoch=0 data/consumed_samples=1408 data/consumed_tokens=3.24362e+06 data/step_samples=8 data/step_tokens=21287 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.83695 performance/tokens_per_second=11588.3 training/foundation_loss/aux=0.00046 training/foundation_loss/lm=5.43168 training/foundation_loss/mtp=1.61872 training/grad_norm=9.46164 training/lr=0.0001 training/total_loss=7.05086
+Training:  88%|████████▊ | 177/200 [05:46<00:44,  1.96s/step, loss=6.65967, grad_norm=3.93543, lr=1.000e-04, foundation_loss/aux=0.000435017, foundation_loss/lm=5.12085, foundation_loss/mtp=1.53839, tokens/s=12072.523, step_time=1.858s] | step=177 epoch=0 data/consumed_samples=1416 data/consumed_tokens=3.26605e+06 data/step_samples=8 data/step_tokens=22427 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85769 performance/tokens_per_second=12072.5 training/foundation_loss/aux=0.000435017 training/foundation_loss/lm=5.12085 training/foundation_loss/mtp=1.53839 training/grad_norm=3.93543 training/lr=0.0001 training/total_loss=6.65967
+Training:  89%|████████▉ | 178/200 [05:48<00:43,  1.96s/step, loss=7.20194, grad_norm=3.58751, lr=1.000e-04, foundation_loss/aux=0.000427708, foundation_loss/lm=5.5463, foundation_loss/mtp=1.65521, tokens/s=15621.610, step_time=1.860s] | step=178 epoch=0 data/consumed_samples=1424 data/consumed_tokens=3.2951e+06 data/step_samples=8 data/step_tokens=29053 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8598 performance/tokens_per_second=15621.6 training/foundation_loss/aux=0.000427708 training/foundation_loss/lm=5.5463 training/foundation_loss/mtp=1.65521 training/grad_norm=3.58751 training/lr=0.0001 training/total_loss=7.20194
+Training:  90%|████████▉ | 179/200 [05:50<00:41,  1.96s/step, loss=7.4675, grad_norm=4.74814, lr=1.000e-04, foundation_loss/aux=0.000426351, foundation_loss/lm=5.75999, foundation_loss/mtp=1.70708, tokens/s=7090.642, step_time=1.858s] | step=179 epoch=0 data/consumed_samples=1432 data/consumed_tokens=3.30827e+06 data/step_samples=8 data/step_tokens=13171 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85752 performance/tokens_per_second=7090.64 training/foundation_loss/aux=0.000426351 training/foundation_loss/lm=5.75999 training/foundation_loss/mtp=1.70708 training/grad_norm=4.74814 training/lr=0.0001 training/total_loss=7.4675
+Training:  90%|█████████ | 180/200 [05:52<00:39,  1.96s/step, loss=6.93518, grad_norm=3.98905, lr=1.000e-04, foundation_loss/aux=0.00041378, foundation_loss/lm=5.34013, foundation_loss/mtp=1.59463, tokens/s=8864.545, step_time=1.861s] | step=180 epoch=0 data/consumed_samples=1440 data/consumed_tokens=3.32477e+06 data/step_samples=8 data/step_tokens=16493 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86056 performance/tokens_per_second=8864.54 training/foundation_loss/aux=0.00041378 training/foundation_loss/lm=5.34013 training/foundation_loss/mtp=1.59463 training/grad_norm=3.98905 training/lr=0.0001 training/total_loss=6.93518
+Training:  90%|█████████ | 181/200 [05:53<00:37,  1.96s/step, loss=9.32981, grad_norm=3.44512, lr=1.000e-04, foundation_loss/aux=0.000392814, foundation_loss/lm=7.15235, foundation_loss/mtp=2.17707, tokens/s=7599.900, step_time=1.856s] | step=181 epoch=0 data/consumed_samples=1448 data/consumed_tokens=3.33887e+06 data/step_samples=8 data/step_tokens=14104 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85581 performance/tokens_per_second=7599.9 training/foundation_loss/aux=0.000392814 training/foundation_loss/lm=7.15235 training/foundation_loss/mtp=2.17707 training/grad_norm=3.44512 training/lr=0.0001 training/total_loss=9.32981
+Training:  91%|█████████ | 182/200 [05:55<00:35,  1.96s/step, loss=9.33788, grad_norm=3.32035, lr=1.000e-04, foundation_loss/aux=0.000394207, foundation_loss/lm=7.15182, foundation_loss/mtp=2.18567, tokens/s=14534.234, step_time=1.844s] | step=182 epoch=0 data/consumed_samples=1456 data/consumed_tokens=3.36567e+06 data/step_samples=8 data/step_tokens=26803 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84413 performance/tokens_per_second=14534.2 training/foundation_loss/aux=0.000394207 training/foundation_loss/lm=7.15182 training/foundation_loss/mtp=2.18567 training/grad_norm=3.32035 training/lr=0.0001 training/total_loss=9.33788
+Training:  92%|█████████▏| 183/200 [05:57<00:33,  1.96s/step, loss=6.70165, grad_norm=5.06876, lr=1.000e-04, foundation_loss/aux=0.000452822, foundation_loss/lm=5.16874, foundation_loss/mtp=1.53246, tokens/s=14814.397, step_time=1.868s] | step=183 epoch=0 data/consumed_samples=1464 data/consumed_tokens=3.39335e+06 data/step_samples=8 data/step_tokens=27675 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86812 performance/tokens_per_second=14814.4 training/foundation_loss/aux=0.000452822 training/foundation_loss/lm=5.16874 training/foundation_loss/mtp=1.53246 training/grad_norm=5.06876 training/lr=0.0001 training/total_loss=6.70165
+Training:  92%|█████████▏| 184/200 [05:59<00:31,  1.95s/step, loss=5.70853, grad_norm=5.33725, lr=1.000e-04, foundation_loss/aux=0.000473369, foundation_loss/lm=4.40308, foundation_loss/mtp=1.30498, tokens/s=16957.681, step_time=1.854s] | step=184 epoch=0 data/consumed_samples=1472 data/consumed_tokens=3.4248e+06 data/step_samples=8 data/step_tokens=31448 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8545 performance/tokens_per_second=16957.7 training/foundation_loss/aux=0.000473369 training/foundation_loss/lm=4.40308 training/foundation_loss/mtp=1.30498 training/grad_norm=5.33725 training/lr=0.0001 training/total_loss=5.70853
+Training:  92%|█████████▎| 185/200 [06:01<00:29,  1.95s/step, loss=7.2658, grad_norm=4.14694, lr=1.000e-04, foundation_loss/aux=0.000393399, foundation_loss/lm=5.59579, foundation_loss/mtp=1.66962, tokens/s=8913.525, step_time=1.840s] | step=185 epoch=0 data/consumed_samples=1480 data/consumed_tokens=3.44119e+06 data/step_samples=8 data/step_tokens=16397 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.83956 performance/tokens_per_second=8913.52 training/foundation_loss/aux=0.000393399 training/foundation_loss/lm=5.59579 training/foundation_loss/mtp=1.66962 training/grad_norm=4.14694 training/lr=0.0001 training/total_loss=7.2658
+Training:  93%|█████████▎| 186/200 [06:03<00:27,  1.95s/step, loss=6.88072, grad_norm=5.53078, lr=1.000e-04, foundation_loss/aux=0.000477857, foundation_loss/lm=5.28252, foundation_loss/mtp=1.59773, tokens/s=14859.656, step_time=1.842s] | step=186 epoch=0 data/consumed_samples=1488 data/consumed_tokens=3.46857e+06 data/step_samples=8 data/step_tokens=27377 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84237 performance/tokens_per_second=14859.7 training/foundation_loss/aux=0.000477857 training/foundation_loss/lm=5.28252 training/foundation_loss/mtp=1.59773 training/grad_norm=5.53078 training/lr=0.0001 training/total_loss=6.88072
+Training:  94%|█████████▎| 187/200 [06:05<00:25,  1.95s/step, loss=6.99208, grad_norm=5.13059, lr=1.000e-04, foundation_loss/aux=0.000447478, foundation_loss/lm=5.37596, foundation_loss/mtp=1.61567, tokens/s=6893.810, step_time=1.863s] | step=187 epoch=0 data/consumed_samples=1496 data/consumed_tokens=3.48142e+06 data/step_samples=8 data/step_tokens=12845 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86327 performance/tokens_per_second=6893.81 training/foundation_loss/aux=0.000447478 training/foundation_loss/lm=5.37596 training/foundation_loss/mtp=1.61567 training/grad_norm=5.13059 training/lr=0.0001 training/total_loss=6.99208
+Training:  94%|█████████▍| 188/200 [06:07<00:23,  1.95s/step, loss=7.17291, grad_norm=9.12494, lr=1.000e-04, foundation_loss/aux=0.000444848, foundation_loss/lm=5.52475, foundation_loss/mtp=1.64771, tokens/s=1912.443, step_time=1.858s] | step=188 epoch=0 data/consumed_samples=1504 data/consumed_tokens=3.48497e+06 data/step_samples=8 data/step_tokens=3553 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85783 performance/tokens_per_second=1912.44 training/foundation_loss/aux=0.000444848 training/foundation_loss/lm=5.52475 training/foundation_loss/mtp=1.64771 training/grad_norm=9.12494 training/lr=0.0001 training/total_loss=7.17291
+Training:  94%|█████████▍| 189/200 [06:09<00:21,  1.95s/step, loss=8.51486, grad_norm=8.40459, lr=1.000e-04, foundation_loss/aux=0.000431519, foundation_loss/lm=6.52699, foundation_loss/mtp=1.98744, tokens/s=4337.456, step_time=1.857s] | step=189 epoch=0 data/consumed_samples=1512 data/consumed_tokens=3.49302e+06 data/step_samples=8 data/step_tokens=8053 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85662 performance/tokens_per_second=4337.46 training/foundation_loss/aux=0.000431519 training/foundation_loss/lm=6.52699 training/foundation_loss/mtp=1.98744 training/grad_norm=8.40459 training/lr=0.0001 training/total_loss=8.51486
+Training:  95%|█████████▌| 190/200 [06:11<00:19,  1.95s/step, loss=7.86044, grad_norm=5.09349, lr=1.000e-04, foundation_loss/aux=0.000385895, foundation_loss/lm=6.05004, foundation_loss/mtp=1.81002, tokens/s=11398.577, step_time=1.857s] | step=190 epoch=0 data/consumed_samples=1520 data/consumed_tokens=3.51418e+06 data/step_samples=8 data/step_tokens=21163 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85664 performance/tokens_per_second=11398.6 training/foundation_loss/aux=0.000385895 training/foundation_loss/lm=6.05004 training/foundation_loss/mtp=1.81002 training/grad_norm=5.09349 training/lr=0.0001 training/total_loss=7.86044
+Training:  96%|█████████▌| 191/200 [06:13<00:17,  1.95s/step, loss=7.45781, grad_norm=5.98178, lr=1.000e-04, foundation_loss/aux=0.000432053, foundation_loss/lm=5.73327, foundation_loss/mtp=1.7241, tokens/s=11800.326, step_time=1.869s] | step=191 epoch=0 data/consumed_samples=1528 data/consumed_tokens=3.53623e+06 data/step_samples=8 data/step_tokens=22049 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86851 performance/tokens_per_second=11800.3 training/foundation_loss/aux=0.000432053 training/foundation_loss/lm=5.73327 training/foundation_loss/mtp=1.7241 training/grad_norm=5.98178 training/lr=0.0001 training/total_loss=7.45781
+Training:  96%|█████████▌| 192/200 [06:15<00:15,  1.95s/step, loss=7.30901, grad_norm=4.84101, lr=1.000e-04, foundation_loss/aux=0.000424987, foundation_loss/lm=5.6104, foundation_loss/mtp=1.69818, tokens/s=9716.548, step_time=1.860s] | step=192 epoch=0 data/consumed_samples=1536 data/consumed_tokens=3.5543e+06 data/step_samples=8 data/step_tokens=18069 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85961 performance/tokens_per_second=9716.55 training/foundation_loss/aux=0.000424987 training/foundation_loss/lm=5.6104 training/foundation_loss/mtp=1.69818 training/grad_norm=4.84101 training/lr=0.0001 training/total_loss=7.30901
+Training:  96%|█████████▋| 193/200 [06:17<00:13,  1.95s/step, loss=7.07576, grad_norm=9.47675, lr=1.000e-04, foundation_loss/aux=0.000425823, foundation_loss/lm=5.44827, foundation_loss/mtp=1.62706, tokens/s=9687.222, step_time=1.860s] | step=193 epoch=0 data/consumed_samples=1544 data/consumed_tokens=3.57232e+06 data/step_samples=8 data/step_tokens=18015 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85967 performance/tokens_per_second=9687.22 training/foundation_loss/aux=0.000425823 training/foundation_loss/lm=5.44827 training/foundation_loss/mtp=1.62706 training/grad_norm=9.47675 training/lr=0.0001 training/total_loss=7.07576
+Training:  97%|█████████▋| 194/200 [06:18<00:11,  1.95s/step, loss=7.35346, grad_norm=5.2177, lr=1.000e-04, foundation_loss/aux=0.00040847, foundation_loss/lm=5.66393, foundation_loss/mtp=1.68912, tokens/s=13667.120, step_time=1.851s] | step=194 epoch=0 data/consumed_samples=1552 data/consumed_tokens=3.59762e+06 data/step_samples=8 data/step_tokens=25300 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85116 performance/tokens_per_second=13667.1 training/foundation_loss/aux=0.00040847 training/foundation_loss/lm=5.66393 training/foundation_loss/mtp=1.68912 training/grad_norm=5.2177 training/lr=0.0001 training/total_loss=7.35346
+Training:  98%|█████████▊| 195/200 [06:20<00:09,  1.95s/step, loss=6.70818, grad_norm=3.71678, lr=1.000e-04, foundation_loss/aux=0.000445809, foundation_loss/lm=5.16608, foundation_loss/mtp=1.54165, tokens/s=14971.936, step_time=1.866s] | step=195 epoch=0 data/consumed_samples=1560 data/consumed_tokens=3.62555e+06 data/step_samples=8 data/step_tokens=27932 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86562 performance/tokens_per_second=14971.9 training/foundation_loss/aux=0.000445809 training/foundation_loss/lm=5.16608 training/foundation_loss/mtp=1.54165 training/grad_norm=3.71678 training/lr=0.0001 training/total_loss=6.70818
+Training:  98%|█████████▊| 196/200 [06:22<00:07,  1.95s/step, loss=6.72603, grad_norm=5.15601, lr=1.000e-04, foundation_loss/aux=0.000505442, foundation_loss/lm=5.16483, foundation_loss/mtp=1.5607, tokens/s=17418.451, step_time=1.865s] | step=196 epoch=0 data/consumed_samples=1568 data/consumed_tokens=3.65804e+06 data/step_samples=8 data/step_tokens=32493 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.86544 performance/tokens_per_second=17418.5 training/foundation_loss/aux=0.000505442 training/foundation_loss/lm=5.16483 training/foundation_loss/mtp=1.5607 training/grad_norm=5.15601 training/lr=0.0001 training/total_loss=6.72603
+Training:  98%|█████████▊| 197/200 [06:24<00:05,  1.95s/step, loss=7.06272, grad_norm=4.23105, lr=1.000e-04, foundation_loss/aux=0.000432517, foundation_loss/lm=5.41129, foundation_loss/mtp=1.651, tokens/s=10557.294, step_time=1.845s] | step=197 epoch=0 data/consumed_samples=1576 data/consumed_tokens=3.67752e+06 data/step_samples=8 data/step_tokens=19479 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.84508 performance/tokens_per_second=10557.3 training/foundation_loss/aux=0.000432517 training/foundation_loss/lm=5.41129 training/foundation_loss/mtp=1.651 training/grad_norm=4.23105 training/lr=0.0001 training/total_loss=7.06272
+Training:  99%|█████████▉| 198/200 [06:26<00:03,  1.95s/step, loss=9.25213, grad_norm=3.36975, lr=1.000e-04, foundation_loss/aux=0.000389978, foundation_loss/lm=7.10116, foundation_loss/mtp=2.15058, tokens/s=10152.983, step_time=1.830s] | step=198 epoch=0 data/consumed_samples=1584 data/consumed_tokens=3.69611e+06 data/step_samples=8 data/step_tokens=18584 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.8304 performance/tokens_per_second=10153 training/foundation_loss/aux=0.000389978 training/foundation_loss/lm=7.10116 training/foundation_loss/mtp=2.15058 training/grad_norm=3.36975 training/lr=0.0001 training/total_loss=9.25213
+Training: 100%|█████████▉| 199/200 [06:28<00:01,  1.95s/step, loss=8.86291, grad_norm=5.12776, lr=1.000e-04, foundation_loss/aux=0.000397625, foundation_loss/lm=6.8, foundation_loss/mtp=2.06251, tokens/s=7068.879, step_time=1.852s] | step=199 epoch=0 data/consumed_samples=1592 data/consumed_tokens=3.7092e+06 data/step_samples=8 data/step_tokens=13092 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85206 performance/tokens_per_second=7068.88 training/foundation_loss/aux=0.000397625 training/foundation_loss/lm=6.8 training/foundation_loss/mtp=2.06251 training/grad_norm=5.12776 training/lr=0.0001 training/total_loss=8.86291
+Training: 100%|██████████| 200/200 [06:30<00:00,  1.95s/step, loss=10.1466, grad_norm=9.25548, lr=1.000e-04, foundation_loss/aux=0.000442722, foundation_loss/lm=7.76643, foundation_loss/mtp=2.37971, tokens/s=2479.289, step_time=1.853s] | step=200 epoch=0 data/consumed_samples=1600 data/consumed_tokens=3.71379e+06 data/step_samples=8 data/step_tokens=4593 memory/device_max_allocated_gb=17.2947 memory/device_max_reserved_gb=18.6387 performance/step_time=1.85255 performance/tokens_per_second=2479.29 training/foundation_loss/aux=0.000442722 training/foundation_loss/lm=7.76643 training/foundation_loss/mtp=2.37971 training/grad_norm=9.25548 training/lr=0.0001 training/total_loss=10.1466
+2026-10-15 20:06:22,266 [INFO] hyper_parallel.trainer.runtime.logging: VRAM usage after epoch 1: cur 3.52GB, max 17.29GB.
+/workspace/venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
