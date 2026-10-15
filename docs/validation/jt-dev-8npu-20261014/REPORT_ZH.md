@@ -1,3 +1,15 @@
+## 最新完整基线与问题关联（2026-10-15）
+
+129第四轮已完整完成FSDP0–200：8个rank各200条记录，退出码0，376.65秒后正常释放全部设备，无本任务残留PID。输入全局哈希跨rank一致，逐步及累计计数核对通过，全部数值有限；step200累计1600样本、3713791个监督token。峰值allocated/reserved为22.032196/27.25 GiB，排除前20步后中位步时1.155003秒，包含固定观测开销；单轮测量不证明性能收益。
+
+checkpoint200包含完整25个文件、27973262840字节，文件均在本轮时间窗口写入；小文件哈希已记录，未对大张量文件宣称全量哈希校验。76份运行证据逐文件验证通过，重复压缩包两端已清理。**本轮只是基线运行完整；checkpoint实际可恢复性、200–400续训精度以及独立连续400参考仍待验证。** 下一轮最早在2026-10-15 19:17:55（UTC+8）之后重新检查空卡，不提前占用。
+
+[200步全rank核验](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-complete-analysis.json) · [checkpoint清单](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-checkpoint-inventory.json) · [释放凭据](reports/f637-fsdp8-r4-complete/r129-f637-fp32-fsdp8-0-200-r4.receipt.json) · [采集校验](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-complete-local-verification.json)。
+
+![最新基线200步训练轨迹；独立精度验收仍待完成](figures/f637-fsdp8-r4-200-zh.png)
+
+本报告现在汇总10个已确认独立问题和10个单提交PR，另将尚未拆出单一根因的跨拓扑200步精度缺口列为Top1。新增CPU设备索引问题为[#218](https://github.com/hf1s/hyper-parallel/issues/218)→[#219](https://github.com/hf1s/hyper-parallel/pull/219)；服务端已核对该PR基点JT_dev、fork、3个文件和单提交`86930ddc7263f6ff53a79b504b9e8db33dc83e3b`，当前没有完整CI通过证据。详细根因、复现、修复前后回归、风险边界及证据链接均以中文填写，机器检查要求的PR模板标题保持原文。[PR核对凭据](reports/cpu-device-index/pr-219-receipt.json)。
+
 ## 最新八卡基线执行与让卡记录（2026-10-15）
 
 最新上游 `f637ef7` 加已检视修复的集成源为 `18602c4524dc664b81b2bad9a7b624455ce1494f`。129第三轮从0启动，全部8个rank记录step1–150，有限值检查通过；step150累计1200个样本、2780930个监督token。约307.33秒后3号卡出现其他容器进程，PID命名空间和控制组不同，刷新后仍存在。本任务只释放自己的容器，退出137、无本任务残留设备PID；外部进程仍在。**本轮未完成200步，没有checkpoint200，不能开始本轮200–400续训或声明精度达标；冲突轮次不作为性能收益依据。**
@@ -10,13 +22,13 @@
 
 离线比较入口新增完整200步、8rank、独立执行容器凭据、源码/镜像/数值配方一致性、rank/输入身份和累计数据计数检查，同时检查加权日志与还原后的LM/MTP/aux绝对差≤0.005；输出禁止覆盖输入证据。20个合成CPU反例检查通过，[工具验证记录](reports/f637-fsdp8-r3-interrupted/strict-loss-gate-validation.json)明确标注非训练结果。新增文件SHA绑定、参考轨迹连续性和跨rank全局摘要一致性核验；[两轴复审均通过](reports/f637-fsdp8-r3-interrupted/strict-loss-gate-final-review.json)，不改变此前原始训练日志。
 
-总单、9个小问题及9个独立单提交PR共19项已回读核对，[双向关联与提交数](reports/f637-fsdp8-r2-interrupted/github-chinese-full-link-audit.json)完整。上一轮[31步全rank摘要](reports/f637-fsdp8-r2-interrupted/f637-fsdp8-r2-interrupted-analysis.json)和[释放凭据](reports/f637-fsdp8-r2-interrupted/r129-f637-fp32-fsdp8-0-200-r2.receipt.json)保留。125已准备匹配基线、续训和连续参考配置；每轮结束后至少间隔20分钟再检查空卡，全部资源操作只针对本任务容器。
+此前总单、9个小问题及9个独立单提交PR共19项已回读核对，[双向关联与提交数](reports/f637-fsdp8-r2-interrupted/github-chinese-full-link-audit.json)完整。上一轮[31步全rank摘要](reports/f637-fsdp8-r2-interrupted/f637-fsdp8-r2-interrupted-analysis.json)和[释放凭据](reports/f637-fsdp8-r2-interrupted/r129-f637-fp32-fsdp8-0-200-r2.receipt.json)保留。125已准备匹配基线、续训和连续参考配置；每轮结束后至少间隔20分钟再检查空卡，全部资源操作只针对本任务容器。
 
 ## 125 初始化失败与独立 CPU 接口缺陷（2026-10-15）
 
 125在满足20分钟间隔、宿主机八卡空闲后尝试匹配基线，约94.34秒后退出1，尚无训练步。8卡已全部释放、无本任务残留设备PID；36份采集文件校验后删除两端重复压缩包。日志先报告无法取得ascend_hal设备数，随后JT模型构造出现字符串索引TypeError。[启动失败摘要](reports/cpu-device-index/r125-f637-fsdp8-startup-failure-analysis.json)、[原始rank3异常](reports/cpu-device-index/startup-rank3-stderr.log)、[释放凭据](reports/cpu-device-index/r125-f637-fp32-fsdp8-0-200.receipt.json)。
 
-这涉及两个不同边界。第一，CPU后端的`torch.cpu.current_device()`返回`"cpu"`，`get_device_id()`直接转交给`torch.device(type,index)`，使JT的CPU构建失败；不挂NPU的最小复现已确认。修复使CPU返回无索引`None`，CUDA/NPU仍保留当前整数索引；JT测试不再把该API固定mock为0，改走真实CPU分支。修复前5失败/17通过/5子测试通过，修复后**20项测试和7项子测试通过，19.06秒**；最小复现也通过，规范/验收条件两轴检视通过，静态检查基点和补丁均6条既有告警、无新增。第一次测试容器缺pytest、未收集测试，单独保存失败记录；安装隔离测试依赖后才取得以上结果。[修复与检视](reports/cpu-device-index/cpu-device-index-review.json)、[红回归](reports/cpu-device-index/r125-cpu-device-index-red-r2.log)、[绿回归](reports/cpu-device-index/r125-cpu-device-index-green.log)。
+这涉及两个不同边界。第一，已单独提交 [小问题 #218](https://github.com/hf1s/hyper-parallel/issues/218) 与 [PR #219](https://github.com/hf1s/hyper-parallel/pull/219)，单提交 `86930dd`。CPU后端的`torch.cpu.current_device()`返回`"cpu"`，`get_device_id()`直接转交给`torch.device(type,index)`，使JT的CPU构建失败；不挂NPU的最小复现已确认。修复使CPU返回无索引`None`，CUDA/NPU仍保留当前整数索引；JT测试不再把该API固定mock为0，改走真实CPU分支。修复前5失败/17通过/5子测试通过，修复后**20项测试和7项子测试通过，19.06秒**；最小复现也通过，规范/验收条件两轴检视通过，静态检查基点和补丁均6条既有告警、无新增。第一次测试容器缺pytest、未收集测试，单独保存失败记录；安装隔离测试依赖后才取得以上结果。[修复与检视](reports/cpu-device-index/cpu-device-index-review.json)、[红回归](reports/cpu-device-index/r125-cpu-device-index-red-r2.log)、[绿回归](reports/cpu-device-index/r125-cpu-device-index-green.log)。
 
 第二，125同挂载方式的只读npu-smi查询返回`device is used / -8020`，129相同查询正常；驱动主库解析均指向各自主机的挂载库。现有证据只说明125的新容器不可用，尚不能把具体容器或驱动版本认定为根因。没有停止其他容器、修改全机共享开关或升级驱动。**CPU修复不代表NPU发现问题已解决，也不产生八卡训练或性能结论。**
 
@@ -74,10 +86,11 @@ rank0 已输出8种配置各2步的16条损失记录，其中包含新增的 `ch
 | Top8 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
 | Top9 | Muon NS 精度无法显式配置并从 checkpoint 恢复 | [#210](https://github.com/hf1s/hyper-parallel/issues/210) | [#201](https://github.com/hf1s/hyper-parallel/pull/201) | 保留 BF16 默认；CPU、8 卡和 2 卡 ST 通过；可选 FP32 成本须匹配配方评估 |
 | Top10 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend 补丁回归待运行 |
+| Top11 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
 
 ## 统一验收标准与执行顺序
 
@@ -160,10 +173,11 @@ rank0 已输出8种配置各2步的16条损失记录，其中包含新增的 `ch
 
 ## 待完成清单与资源约束
 
-- [x] 已确认9个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
+- [x] 已确认10个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
 - [x] 旧六项修复配方 FSDP0–200、200→400 与连续参考全 rank 零误差；关闭/完整/选择重算200步已完成。
 - [x] 129 固定旧基点 `521d3a8` 的 FP32 配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续；未完成独立连续400参考。
-- [ ] 最新 `f637ef7` 基点的 FSDP0–200、checkpoint200→400及独立连续400步完成；逐 rank 加权和未加权 loss 全部≤0.005。
+- [x] 最新 `f637ef7` 集成源的 FSDP0–200 运行完成，8rank数据完整，checkpoint200文件清单齐全。
+- [ ] 从本轮checkpoint200续训至400，并完成独立连续400参考；逐rank加权和未加权loss全部≤0.005。
 - [ ] 新配方 TP/CP/EP 及合法组合200步全部达到相同门槛，剩余根因分别修复并建单。
 - [ ] #214 的 Ascend/HCCL 补丁回归。
 - [x] 完成 MF / Megatron 重算配置能力对照，明确当前 JT 与 MF 式模块/层范围、排除及通信配置的差距。
