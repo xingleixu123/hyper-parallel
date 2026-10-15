@@ -1,0 +1,286 @@
+{
+  "created_at": "2026-10-15T12:45:30.155729+00:00",
+  "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+  "scope": "配置/源码与checkpoint张量头推导；不是14组NPU运行结果或显存峰值预测",
+  "header_input_sha256": "aa01055768e5a2509b1b54f21ea5a73fc002e6cf0b83259c7c63a65645cc4e8d",
+  "header_offset_size_dtype_checks": "PASS_8_FILES",
+  "saved_tensor_bytes": {
+    "model": 10871930944,
+    "optimizer": 17100701696
+  },
+  "per_rank_saved_payload": [
+    {
+      "file": "_rank0_.safetensors",
+      "bytes": {
+        "model": 1358991392,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579104
+    },
+    {
+      "file": "_rank1_.safetensors",
+      "bytes": {
+        "model": 1358991392,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579104
+    },
+    {
+      "file": "_rank2_.safetensors",
+      "bytes": {
+        "model": 1358991360,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579072
+    },
+    {
+      "file": "_rank3_.safetensors",
+      "bytes": {
+        "model": 1358991360,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579072
+    },
+    {
+      "file": "_rank4_.safetensors",
+      "bytes": {
+        "model": 1358991360,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579072
+    },
+    {
+      "file": "_rank5_.safetensors",
+      "bytes": {
+        "model": 1358991360,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579072
+    },
+    {
+      "file": "_rank6_.safetensors",
+      "bytes": {
+        "model": 1358991360,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579072
+    },
+    {
+      "file": "_rank7_.safetensors",
+      "bytes": {
+        "model": 1358991360,
+        "optimizer": 2137587712
+      },
+      "tensor_payload_bytes": 3496579072
+    }
+  ],
+  "saved_model_tensor_elements_including_buffers": 2717982736,
+  "embedding_and_lm_head_share_of_saved_model_bytes": 0.5729011223565035,
+  "routed_experts_share_of_saved_model_bytes": 0.13888512057127356,
+  "embedding_and_lm_head_bytes": 6228541440,
+  "routed_experts_bytes": 1509949440,
+  "matrix_config_mesh_checks": "PASS_14_CONFIGS",
+  "matrix": [
+    {
+      "case": "r129-f637-fp32-tp2-200",
+      "tp": 2,
+      "cp": 1,
+      "ep": 1,
+      "dp": 4,
+      "dense_fsdp_shard": 4,
+      "expert_fsdp_shard": null,
+      "micro_batches_per_step": 2,
+      "experts_per_ep_rank": 8,
+      "cp_sequence_partition": 4096,
+      "recompute": "off",
+      "config_sha256": "9e03f4606e8db042a2c2fb8f59c1425281a847bfe3ab19f3f2324f64e6fddcee"
+    },
+    {
+      "case": "r129-f637-fp32-ep2-200",
+      "tp": 1,
+      "cp": 1,
+      "ep": 2,
+      "dp": 8,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": 4,
+      "micro_batches_per_step": 1,
+      "experts_per_ep_rank": 4,
+      "cp_sequence_partition": 4096,
+      "recompute": "off",
+      "config_sha256": "6cd074ade956ce07e4a6b35356e1472618640943aaa7450f83e4a0fd28f3194e"
+    },
+    {
+      "case": "r129-f637-fp32-cp2-200",
+      "tp": 1,
+      "cp": 2,
+      "ep": 1,
+      "dp": 4,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": null,
+      "micro_batches_per_step": 2,
+      "experts_per_ep_rank": 8,
+      "cp_sequence_partition": 2048,
+      "recompute": "off",
+      "config_sha256": "771dfbe96dafd170d5af728cd0eb14596dc61ccdcd2e35f4ae86f66bf75d6bba"
+    },
+    {
+      "case": "r129-f637-fp32-fsdp8-full-200",
+      "tp": 1,
+      "cp": 1,
+      "ep": 1,
+      "dp": 8,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": null,
+      "micro_batches_per_step": 1,
+      "experts_per_ep_rank": 8,
+      "cp_sequence_partition": 4096,
+      "recompute": "full",
+      "config_sha256": "eb55d3576f8fb69e9a94ca2dd6666c26119a243a17d6416c914e086323c12920"
+    },
+    {
+      "case": "r129-f637-fp32-fsdp8-selective-200",
+      "tp": 1,
+      "cp": 1,
+      "ep": 1,
+      "dp": 8,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": null,
+      "micro_batches_per_step": 1,
+      "experts_per_ep_rank": 8,
+      "cp_sequence_partition": 4096,
+      "recompute": "selective",
+      "config_sha256": "ebd67afaa4be29ce27749432ae856b0fa56ebaeda6a88889b78720e963d4c02e"
+    },
+    {
+      "case": "r129-f637-fp32-tp4-200",
+      "tp": 4,
+      "cp": 1,
+      "ep": 1,
+      "dp": 2,
+      "dense_fsdp_shard": 2,
+      "expert_fsdp_shard": null,
+      "micro_batches_per_step": 4,
+      "experts_per_ep_rank": 8,
+      "cp_sequence_partition": 4096,
+      "recompute": "off",
+      "config_sha256": "5b0e70e0928c3e08aad48cdcaacca7bcf0ba96022716bb191b26673610729a68"
+    },
+    {
+      "case": "r129-f637-fp32-ep4-200",
+      "tp": 1,
+      "cp": 1,
+      "ep": 4,
+      "dp": 8,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": 2,
+      "micro_batches_per_step": 1,
+      "experts_per_ep_rank": 2,
+      "cp_sequence_partition": 4096,
+      "recompute": "off",
+      "config_sha256": "f3c8f7d63d76b8f32362747a7ddb2ce112f86c7f83770891e440a8213775e7cc"
+    },
+    {
+      "case": "r129-f637-fp32-ep8-200",
+      "tp": 1,
+      "cp": 1,
+      "ep": 8,
+      "dp": 8,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": 1,
+      "micro_batches_per_step": 1,
+      "experts_per_ep_rank": 1,
+      "cp_sequence_partition": 4096,
+      "recompute": "off",
+      "config_sha256": "42ebc59c609ff8a5b43149345fcc8c77b3ac36be3bf666e8e5164a8fde243cae"
+    },
+    {
+      "case": "r129-f637-fp32-cp4-200",
+      "tp": 1,
+      "cp": 4,
+      "ep": 1,
+      "dp": 2,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": null,
+      "micro_batches_per_step": 4,
+      "experts_per_ep_rank": 8,
+      "cp_sequence_partition": 1024,
+      "recompute": "off",
+      "config_sha256": "08878b78c3d0c8ba2e3c5ea6e480d6e2260269554629d2f6ca5d15ab031cafa4"
+    },
+    {
+      "case": "r129-f637-fp32-tp2ep2-200",
+      "tp": 2,
+      "cp": 1,
+      "ep": 2,
+      "dp": 4,
+      "dense_fsdp_shard": 4,
+      "expert_fsdp_shard": 4,
+      "micro_batches_per_step": 2,
+      "experts_per_ep_rank": 4,
+      "cp_sequence_partition": 4096,
+      "recompute": "off",
+      "config_sha256": "a3687e4bfb18308c414f7bb404130bae878bb7fa7b2f5132a911e5db9bdd729a"
+    },
+    {
+      "case": "r129-f637-fp32-tp4ep4-200",
+      "tp": 4,
+      "cp": 1,
+      "ep": 4,
+      "dp": 2,
+      "dense_fsdp_shard": 2,
+      "expert_fsdp_shard": 2,
+      "micro_batches_per_step": 4,
+      "experts_per_ep_rank": 2,
+      "cp_sequence_partition": 4096,
+      "recompute": "off",
+      "config_sha256": "ec8887b109e44a7d04cef67312ac9814351aa70c7ca1ac8a6235059fec890bf7"
+    },
+    {
+      "case": "r129-f637-fp32-cp2ep2-200",
+      "tp": 1,
+      "cp": 2,
+      "ep": 2,
+      "dp": 4,
+      "dense_fsdp_shard": 8,
+      "expert_fsdp_shard": 4,
+      "micro_batches_per_step": 2,
+      "experts_per_ep_rank": 4,
+      "cp_sequence_partition": 2048,
+      "recompute": "off",
+      "config_sha256": "d1526a256501230fdaa9cc0c73fb3e78ebb8fdcb70f53086dbef6ce65b3eb56e"
+    },
+    {
+      "case": "r129-f637-fp32-tp2cp2ep2-200",
+      "tp": 2,
+      "cp": 2,
+      "ep": 2,
+      "dp": 2,
+      "dense_fsdp_shard": 4,
+      "expert_fsdp_shard": 4,
+      "micro_batches_per_step": 4,
+      "experts_per_ep_rank": 4,
+      "cp_sequence_partition": 2048,
+      "recompute": "off",
+      "config_sha256": "88d2c21154fcb2a4c10767cce9e66a75cf68a4f56dba6264e642831fee468f1d"
+    },
+    {
+      "case": "r129-f637-fp32-tp2cp2ep4-200",
+      "tp": 2,
+      "cp": 2,
+      "ep": 4,
+      "dp": 2,
+      "dense_fsdp_shard": 4,
+      "expert_fsdp_shard": 2,
+      "micro_batches_per_step": 4,
+      "experts_per_ep_rank": 2,
+      "cp_sequence_partition": 2048,
+      "recompute": "off",
+      "config_sha256": "c72807daa1eb22f194f2a97413e630c3531e2b51a47a50ddd48889c704077aa3"
+    }
+  ],
+  "limitations": [
+    "checkpoint载荷是序列化模型/优化器状态，不能直接当作NPU常驻或峰值allocated",
+    "保存的model项包括buffer，不称可训练参数精确计数",
+    "理论通信/切分方向不保证实际速度提升；所有精度和性能结论仍须实际完整匹配运行"
+  ]
+}
