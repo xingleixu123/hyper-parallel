@@ -1,0 +1,112 @@
+{
+  "complete": true,
+  "diagnostic_only": true,
+  "checks": [
+    {
+      "label": "main",
+      "weight_exact_training": false,
+      "momentum_exact_training": true,
+      "weight_exact_mf_training": true,
+      "mf_weight_sha256": "688c6394cf60719ef863ec4ae2c8bae9dd163058cec60c57c1742e29a54fef30",
+      "weight_sha256": "688c6394cf60719ef863ec4ae2c8bae9dd163058cec60c57c1742e29a54fef30",
+      "expected_weight_sha256": "b2f681606a74e7ab8eb520e6b2961ec01226a16db6f1ae0bb847f536df449171",
+      "momentum_sha256": "6c1d262324125353d2ba358dd5cacaa9f2166d568bc0a8d6b68075390bd98291",
+      "optimizer_step": 222
+    },
+    {
+      "label": "mtp",
+      "weight_exact_training": false,
+      "momentum_exact_training": true,
+      "weight_exact_mf_training": true,
+      "mf_weight_sha256": "69a503adc7bac2da74fdce7f8117b70d144deb384d4de1a5cb9775c19fc3e1b7",
+      "weight_sha256": "69a503adc7bac2da74fdce7f8117b70d144deb384d4de1a5cb9775c19fc3e1b7",
+      "expected_weight_sha256": "ecf83171e16cde9c084c7a97c5f797a6755fe4deda746cedc1644f8c344ef3f7",
+      "momentum_sha256": "b0d79933e85062d6803318d6af60416766c4e04e8a186dfc1b8cbbf1024cec8a",
+      "optimizer_step": 222
+    }
+  ],
+  "records": [
+    {
+      "label": "main",
+      "arrays": [
+        {
+          "name": "pre_ns",
+          "shape": [
+            1536,
+            5120
+          ],
+          "sha256": "a04226b200afb473f69a11a6877ec1350df940c5f950bdd448163c45364797ab"
+        },
+        {
+          "name": "normalized",
+          "shape": [
+            1536,
+            5120
+          ],
+          "sha256": "15a57671a42651e7b6bb8eb55223a5bc2ae8fbfe6dcef21ec69d541af9f91e79"
+        },
+        {
+          "name": "ns_output",
+          "shape": [
+            1536,
+            5120
+          ],
+          "sha256": "5dbfcc404f87429ab77d6b39751664e11636e2d6793485b7b4bb2204184e2cc0"
+        }
+      ],
+      "norm_fp64": 0.5353835196232806,
+      "scalar": {
+        "square_sum": 0.28663554787635803,
+        "denominator": 0.5353837013244629
+      }
+    },
+    {
+      "label": "mtp",
+      "arrays": [
+        {
+          "name": "pre_ns",
+          "shape": [
+            1536,
+            5120
+          ],
+          "sha256": "9ee41ece3dfadda796a7b86f89091fee3056c7d7cf3595e792717a8b6305678d"
+        },
+        {
+          "name": "normalized",
+          "shape": [
+            1536,
+            5120
+          ],
+          "sha256": "35c3f6099d3908f68033ca646e4a742c39377584dc339aefd1689b9251fd3429"
+        },
+        {
+          "name": "ns_output",
+          "shape": [
+            1536,
+            5120
+          ],
+          "sha256": "c0ff7c2fe07ace66cf323c3879ba7407ab421956ec8f751f19e2c2c95d47fbd2"
+        }
+      ],
+      "norm_fp64": 0.007673997054362041,
+      "scalar": {
+        "square_sum": 5.889022577321157e-05,
+        "denominator": 0.007674097083508968
+      }
+    }
+  ],
+  "broadcast_policy": {
+    "scope": "single-card diagnostic only",
+    "teacher_values_used": false,
+    "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa",
+    "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca",
+    "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"
+  },
+  "q_factor": {
+    "variant": "npu",
+    "original_sha256": "597469f630f74fd592ec0f791d94227e84e8da584495010ac8813e9580419465",
+    "candidate_sha256": "83d6ea28062d4da0a8746a4d26e45a995e5035a914153d9833ef9ab21cdc1e22"
+  },
+  "source_sha256": "b32f30b94dfe9898b48c506fbf5e90b4f58254683542ca495d69ea1594fa0aa8",
+  "warning": "Only full weight and momentum fidelity establishes a replay of actual training."
+}

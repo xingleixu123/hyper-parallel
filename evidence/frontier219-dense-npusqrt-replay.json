@@ -1,0 +1,62 @@
+{
+  "complete": true,
+  "diagnostic_only": true,
+  "checks": [
+    {
+      "label": "down",
+      "weight_exact_mf_training": true,
+      "momentum_exact_training": true,
+      "weight_sha256": "3752f7ebd6756b1c4f93f8ea3889cacc8b5df4ee959ec9bc5f856cb6b7f1f808",
+      "expected_weight_sha256": "3752f7ebd6756b1c4f93f8ea3889cacc8b5df4ee959ec9bc5f856cb6b7f1f808",
+      "momentum_sha256": "b35f993ce4f97271bb33fad72db0b57ee36b914672886059e713b705a530c86f",
+      "optimizer_step": 219
+    }
+  ],
+  "records": [
+    {
+      "label": "down",
+      "piece": 0,
+      "explicit_normalization_exact": true,
+      "scalar": {
+        "square_sum": 3.1080162525177,
+        "norm": 1.7629566192626953,
+        "denominator": 1.7629567384719849
+      },
+      "arrays": [
+        {
+          "name": "pre_ns",
+          "shape": [
+            5120,
+            12288
+          ],
+          "sha256": "8e64a222cbab98edaad10478d0310ddd5d59a3cd98aad860b9c5f4f7df0beddf"
+        },
+        {
+          "name": "normalized",
+          "shape": [
+            5120,
+            12288
+          ],
+          "sha256": "fd58c06f15b2462e32174ab85a6f8261a1e64fa57729e733b78f7ee1c5c9af80"
+        },
+        {
+          "name": "ns_output",
+          "shape": [
+            5120,
+            12288
+          ],
+          "sha256": "b1af3c96fec16196f142cf54e894113ee917db61b31833f5c12d502262c4d1f8"
+        }
+      ]
+    }
+  ],
+  "broadcast_policy": {
+    "scope": "single-card diagnostic only",
+    "teacher_values_used": false,
+    "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa",
+    "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca",
+    "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"
+  },
+  "source_sha256": "826be192560b4ffea9336e13424edf826b26df5b9d017aec3dd6c16684017cbc",
+  "warning": "Only full weight and momentum fidelity establishes a replay of actual training."
+}

@@ -1,0 +1,132 @@
+{
+  "complete": true,
+  "diagnostic_only": true,
+  "checks": [
+    {
+      "label": "expert",
+      "weight_exact_mf_training": true,
+      "momentum_exact_training": true,
+      "weight_sha256": "93aff78feee5fcc017a30b46a3e8a4706bcb7d5e2a19494841f03b16929e66ff",
+      "expected_weight_sha256": "93aff78feee5fcc017a30b46a3e8a4706bcb7d5e2a19494841f03b16929e66ff",
+      "momentum_sha256": "4a7050f0b7382ac5c31f057df5331ddf4e85078339d082cee6ac25492abe0e84",
+      "optimizer_step": 219
+    }
+  ],
+  "records": [
+    {
+      "piece": 0,
+      "norm_fp64": [
+        0.050304912853697134,
+        0.04425148620845421,
+        0.0065299138586462245,
+        0.008960127692489654,
+        0.05292322196758898,
+        0.005492863492945206,
+        0.004590122151220762,
+        0.6571035233272869
+      ],
+      "norm_fp32": [
+        0.05030491203069687,
+        0.04425148665904999,
+        0.006529913749545813,
+        0.008960127830505371,
+        0.05292322114109993,
+        0.0054928637109696865,
+        0.004590122029185295,
+        0.6571035385131836
+      ],
+      "denominator_candidate": [
+        0.05029296875,
+        0.044189453125,
+        0.00653076171875,
+        0.00897216796875,
+        0.052978515625,
+        0.0054931640625,
+        0.00457763671875,
+        0.65625
+      ],
+      "arrays": [
+        {
+          "name": "normalized",
+          "shape": [
+            8,
+            1536,
+            5120
+          ],
+          "sha256": "83529da536de832a4ab4d81a4ce4b6c49b6a77fd8f11db713704dd5e9b56b530"
+        },
+        {
+          "name": "ns_output",
+          "shape": [
+            8,
+            1536,
+            5120
+          ],
+          "sha256": "1b06fec641ae241b8331f66e2ffa2d62c2fe0b0099379b7187ab265e68059ffb"
+        }
+      ]
+    },
+    {
+      "piece": 1,
+      "norm_fp64": [
+        0.04958337725172811,
+        0.044627838285389174,
+        0.006332316201710827,
+        0.009070677709475318,
+        0.05050893497236759,
+        0.005456459186672755,
+        0.004493163562905562,
+        0.6505250540414039
+      ],
+      "norm_fp32": [
+        0.049583375453948975,
+        0.0446278378367424,
+        0.006332315970212221,
+        0.009070676751434803,
+        0.05050893500447273,
+        0.005456459242850542,
+        0.004493163898587227,
+        0.6505250334739685
+      ],
+      "denominator_candidate": [
+        0.049560546875,
+        0.044677734375,
+        0.00634765625,
+        0.00909423828125,
+        0.050537109375,
+        0.005462646484375,
+        0.004486083984375,
+        0.65234375
+      ],
+      "arrays": [
+        {
+          "name": "normalized",
+          "shape": [
+            8,
+            1536,
+            5120
+          ],
+          "sha256": "a508b001162815c92c359959d8db98dbb663719288b5abceb2305e9713ef8709"
+        },
+        {
+          "name": "ns_output",
+          "shape": [
+            8,
+            1536,
+            5120
+          ],
+          "sha256": "59b0e0feb473fb9d64caf3bf92240f675334313cb78d571bb92d5ab577d82a77"
+        }
+      ]
+    }
+  ],
+  "broadcast_policy": {
+    "scope": "single-card diagnostic only",
+    "teacher_values_used": false,
+    "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa",
+    "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca",
+    "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"
+  },
+  "source_sha256": "b772c5c5ea58707b4ca504ffa5b3a80e9f29026f6e817ffc61a96450be8ae610",
+  "warning": "Only full weight and momentum fidelity establishes a replay of actual training."
+}

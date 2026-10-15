@@ -1,5 +1,5 @@
 {
-  "complete_runs": 84,
+  "complete_runs": 87,
   "excluded": [
     {
       "run": "hp-cann92-jt81-best-mf-bias-diag",
@@ -8593,6 +8593,408 @@
       },
       "numerical_passed": false,
       "scope": "独立归档兼容语义消融；不代表未修改的库默认配方"
+    },
+    {
+      "run": "hp-jtf637-norm219-dense400",
+      "source_revision": {
+        "commit": "9213a97147020fb75e7a98a40f7e7b636f98d349",
+        "upstream_commit": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+        "included_prs": [
+          180,
+          186,
+          192
+        ],
+        "files": [
+          {
+            "path": "docs/guide/trainer/yaml_config.md",
+            "sha256": "d040b970ccd4825e94cf9136bec98bcce40667c5b289f68925aafe843eee31a4"
+          },
+          {
+            "path": "examples/training_demo/jt_deepseek_v3/hp_4k_1_card.yaml",
+            "sha256": "8d87e26e313dac4149e2381e837777b248628e22b1572619b6b0047f32a62f9e"
+          },
+          {
+            "path": "hyper_parallel/components/losses/chunked_cross_entropy.py",
+            "sha256": "c04523a41332786e375d6ca6cc16b3a2c4abc92e2fac88179180318aede0b3dc"
+          },
+          {
+            "path": "hyper_parallel/distributed/context_parallel/mla_context_parallel.py",
+            "sha256": "2b2cb46255ab34e142157345e476565c8e847a25e721534303bc660914bf4be7"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+            "sha256": "2b02c3ec956e1eea7497e6075f184b4895b3ad3da76859ea9f67b6410ba87106"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+            "sha256": "48805960068f49dca055a6f03fa440bf9def9ecf0a22e82664bf368af4097bc5"
+          },
+          {
+            "path": "hyper_parallel/trainer/base.py",
+            "sha256": "ac9694cd1c0462a8282884d04911ba0394049b68d74e10ec32783e02fbe98511"
+          },
+          {
+            "path": "hyper_parallel/trainer/config/training.py",
+            "sha256": "dd031eb16a283d4a5ea416151a10f5cc5d4837093e64979ca3462f8eb80e3cf4"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/metrics.py",
+            "sha256": "7977dd6f462f4ed2e24e615e0b9a2e70f071626b3a556c9a5750a80afa004298"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/random.py",
+            "sha256": "aef29f61a90824b35faaac4dfa93e2806ce62dc98fda2713d3aa3b38e2e07be7"
+          },
+          {
+            "path": "tests/ut/auto_models/test_projected_cross_entropy.py",
+            "sha256": "acc9f716e86034351c7b66f3a88aec6ceaf289aa34ecf6af92b94d014bd999ee"
+          },
+          {
+            "path": "tests/ut/models/jt_deepseek_v3/test_jt_packed.py",
+            "sha256": "6e80ef23309fd10d457a19a29328db986233d5920d07ee47e7b206d5c9cbf763"
+          },
+          {
+            "path": "tests/ut/trainer/runtime/test_random.py",
+            "sha256": "8ef3264da1d1e2ca108940e47d0fba98ab9c6ed2eccde04e49a82e8a9eb1b23c"
+          },
+          {
+            "path": "tests/ut/trainer/test_config_overrides.py",
+            "sha256": "6b9ae652ad1529d5953b532c5e945e3e4792819a56b706b71577cfad14cdc881"
+          },
+          {
+            "path": "tests/ut/trainer/test_loss_metrics.py",
+            "sha256": "6180255a7877f8eb06cfd6c3deb4feeac0dc06db45987084c69b6906b96f0fd7"
+          }
+        ]
+      },
+      "metrics_sha256": "de5caaaf6d84084deb21b1bcd767ab6e5d089f654f3349aa602cede0e9cc95da",
+      "comparison": "evidence/norm219-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.3294095993041992,
+          "max_step": 397,
+          "mean": 0.012239972352981568,
+          "last": 0.021805763244628906,
+          "passed": false,
+          "over_window_tolerance": 66
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.3023219108581543,
+          "max_step": 397,
+          "mean": 0.009964942932128906,
+          "last": 0.024553298950195312,
+          "passed": false,
+          "over_window_tolerance": 54
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.05891776084899902,
+          "max_step": 399,
+          "mean": 0.00341445654630661,
+          "last": 0.002658843994140625,
+          "passed": false,
+          "over_window_tolerance": 37
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.19639253616333008,
+          "max_step": 399,
+          "mean": 0.011381521821022004,
+          "last": 0.008862813313802675,
+          "passed": false,
+          "over_window_tolerance": 100
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 0.00013345384625717996,
+          "max_step": 398,
+          "mean": 8.269683545921001e-06,
+          "last": 8.813539226539436e-05,
+          "passed": true,
+          "over_window_tolerance": 0
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 1.3345384625717998,
+          "max_step": 398,
+          "mean": 0.08269683545920997,
+          "last": 0.8813539226539433,
+          "passed": false,
+          "over_window_tolerance": 126
+        }
+      },
+      "numerical_passed": false,
+      "scope": "独立归档归一化消融；保留前阶段分段兼容因素，不代表未修改的库默认配方"
+    },
+    {
+      "run": "hp-jtf637-norm219-expert400",
+      "source_revision": {
+        "commit": "9213a97147020fb75e7a98a40f7e7b636f98d349",
+        "upstream_commit": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+        "included_prs": [
+          180,
+          186,
+          192
+        ],
+        "files": [
+          {
+            "path": "docs/guide/trainer/yaml_config.md",
+            "sha256": "d040b970ccd4825e94cf9136bec98bcce40667c5b289f68925aafe843eee31a4"
+          },
+          {
+            "path": "examples/training_demo/jt_deepseek_v3/hp_4k_1_card.yaml",
+            "sha256": "8d87e26e313dac4149e2381e837777b248628e22b1572619b6b0047f32a62f9e"
+          },
+          {
+            "path": "hyper_parallel/components/losses/chunked_cross_entropy.py",
+            "sha256": "c04523a41332786e375d6ca6cc16b3a2c4abc92e2fac88179180318aede0b3dc"
+          },
+          {
+            "path": "hyper_parallel/distributed/context_parallel/mla_context_parallel.py",
+            "sha256": "2b2cb46255ab34e142157345e476565c8e847a25e721534303bc660914bf4be7"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+            "sha256": "2b02c3ec956e1eea7497e6075f184b4895b3ad3da76859ea9f67b6410ba87106"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+            "sha256": "48805960068f49dca055a6f03fa440bf9def9ecf0a22e82664bf368af4097bc5"
+          },
+          {
+            "path": "hyper_parallel/trainer/base.py",
+            "sha256": "ac9694cd1c0462a8282884d04911ba0394049b68d74e10ec32783e02fbe98511"
+          },
+          {
+            "path": "hyper_parallel/trainer/config/training.py",
+            "sha256": "dd031eb16a283d4a5ea416151a10f5cc5d4837093e64979ca3462f8eb80e3cf4"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/metrics.py",
+            "sha256": "7977dd6f462f4ed2e24e615e0b9a2e70f071626b3a556c9a5750a80afa004298"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/random.py",
+            "sha256": "aef29f61a90824b35faaac4dfa93e2806ce62dc98fda2713d3aa3b38e2e07be7"
+          },
+          {
+            "path": "tests/ut/auto_models/test_projected_cross_entropy.py",
+            "sha256": "acc9f716e86034351c7b66f3a88aec6ceaf289aa34ecf6af92b94d014bd999ee"
+          },
+          {
+            "path": "tests/ut/models/jt_deepseek_v3/test_jt_packed.py",
+            "sha256": "6e80ef23309fd10d457a19a29328db986233d5920d07ee47e7b206d5c9cbf763"
+          },
+          {
+            "path": "tests/ut/trainer/runtime/test_random.py",
+            "sha256": "8ef3264da1d1e2ca108940e47d0fba98ab9c6ed2eccde04e49a82e8a9eb1b23c"
+          },
+          {
+            "path": "tests/ut/trainer/test_config_overrides.py",
+            "sha256": "6b9ae652ad1529d5953b532c5e945e3e4792819a56b706b71577cfad14cdc881"
+          },
+          {
+            "path": "tests/ut/trainer/test_loss_metrics.py",
+            "sha256": "6180255a7877f8eb06cfd6c3deb4feeac0dc06db45987084c69b6906b96f0fd7"
+          }
+        ]
+      },
+      "metrics_sha256": "2b10c726a85b24a8639869b684db3390710ef835aabceaa903c27756c7f16cd3",
+      "comparison": "evidence/norm219-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.11208820343017578,
+          "max_step": 399,
+          "mean": 0.004717956781387329,
+          "last": 0.025595664978027344,
+          "passed": false,
+          "over_window_tolerance": 46
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.10780048370361328,
+          "max_step": 399,
+          "mean": 0.003030824661254883,
+          "last": 0.011883735656738281,
+          "passed": false,
+          "over_window_tolerance": 27
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.06583666801452637,
+          "max_step": 376,
+          "mean": 0.002867550551891327,
+          "last": 0.013720035552978516,
+          "passed": false,
+          "over_window_tolerance": 31
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.21945556004842093,
+          "max_step": 376,
+          "mean": 0.00955850183963775,
+          "last": 0.04573345184326172,
+          "passed": false,
+          "over_window_tolerance": 95
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 1.2281774776056408e-05,
+          "max_step": 377,
+          "mean": 1.859025795944033e-06,
+          "last": 7.93841956183317e-06,
+          "passed": true,
+          "over_window_tolerance": 0
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 0.12281774776056409,
+          "max_step": 377,
+          "mean": 0.01859025795944035,
+          "last": 0.07938419561833143,
+          "passed": false,
+          "over_window_tolerance": 130
+        }
+      },
+      "numerical_passed": false,
+      "scope": "独立归档归一化消融；保留前阶段分段兼容因素，不代表未修改的库默认配方"
+    },
+    {
+      "run": "hp-jtf637-norm219-both400",
+      "source_revision": {
+        "commit": "9213a97147020fb75e7a98a40f7e7b636f98d349",
+        "upstream_commit": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+        "included_prs": [
+          180,
+          186,
+          192
+        ],
+        "files": [
+          {
+            "path": "docs/guide/trainer/yaml_config.md",
+            "sha256": "d040b970ccd4825e94cf9136bec98bcce40667c5b289f68925aafe843eee31a4"
+          },
+          {
+            "path": "examples/training_demo/jt_deepseek_v3/hp_4k_1_card.yaml",
+            "sha256": "8d87e26e313dac4149e2381e837777b248628e22b1572619b6b0047f32a62f9e"
+          },
+          {
+            "path": "hyper_parallel/components/losses/chunked_cross_entropy.py",
+            "sha256": "c04523a41332786e375d6ca6cc16b3a2c4abc92e2fac88179180318aede0b3dc"
+          },
+          {
+            "path": "hyper_parallel/distributed/context_parallel/mla_context_parallel.py",
+            "sha256": "2b2cb46255ab34e142157345e476565c8e847a25e721534303bc660914bf4be7"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+            "sha256": "2b02c3ec956e1eea7497e6075f184b4895b3ad3da76859ea9f67b6410ba87106"
+          },
+          {
+            "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+            "sha256": "48805960068f49dca055a6f03fa440bf9def9ecf0a22e82664bf368af4097bc5"
+          },
+          {
+            "path": "hyper_parallel/trainer/base.py",
+            "sha256": "ac9694cd1c0462a8282884d04911ba0394049b68d74e10ec32783e02fbe98511"
+          },
+          {
+            "path": "hyper_parallel/trainer/config/training.py",
+            "sha256": "dd031eb16a283d4a5ea416151a10f5cc5d4837093e64979ca3462f8eb80e3cf4"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/metrics.py",
+            "sha256": "7977dd6f462f4ed2e24e615e0b9a2e70f071626b3a556c9a5750a80afa004298"
+          },
+          {
+            "path": "hyper_parallel/trainer/runtime/random.py",
+            "sha256": "aef29f61a90824b35faaac4dfa93e2806ce62dc98fda2713d3aa3b38e2e07be7"
+          },
+          {
+            "path": "tests/ut/auto_models/test_projected_cross_entropy.py",
+            "sha256": "acc9f716e86034351c7b66f3a88aec6ceaf289aa34ecf6af92b94d014bd999ee"
+          },
+          {
+            "path": "tests/ut/models/jt_deepseek_v3/test_jt_packed.py",
+            "sha256": "6e80ef23309fd10d457a19a29328db986233d5920d07ee47e7b206d5c9cbf763"
+          },
+          {
+            "path": "tests/ut/trainer/runtime/test_random.py",
+            "sha256": "8ef3264da1d1e2ca108940e47d0fba98ab9c6ed2eccde04e49a82e8a9eb1b23c"
+          },
+          {
+            "path": "tests/ut/trainer/test_config_overrides.py",
+            "sha256": "6b9ae652ad1529d5953b532c5e945e3e4792819a56b706b71577cfad14cdc881"
+          },
+          {
+            "path": "tests/ut/trainer/test_loss_metrics.py",
+            "sha256": "6180255a7877f8eb06cfd6c3deb4feeac0dc06db45987084c69b6906b96f0fd7"
+          }
+        ]
+      },
+      "metrics_sha256": "b24f240fd091279a7575c6886d93fdcaab2a0a6061f2bd13a36e8e584d1ae64d",
+      "comparison": "evidence/norm219-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.44328880310058594,
+          "max_step": 399,
+          "mean": 0.01191871166229248,
+          "last": 0.044295310974121094,
+          "passed": false,
+          "over_window_tolerance": 66
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.37813854217529297,
+          "max_step": 399,
+          "mean": 0.009357179403305054,
+          "last": 0.048064231872558594,
+          "passed": false,
+          "over_window_tolerance": 43
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.06525325775146484,
+          "max_step": 399,
+          "mean": 0.00370712012052536,
+          "last": 0.0036859512329101562,
+          "passed": false,
+          "over_window_tolerance": 35
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.2175108591715489,
+          "max_step": 399,
+          "mean": 0.012357067068417847,
+          "last": 0.012286504109701113,
+          "passed": false,
+          "over_window_tolerance": 99
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 0.00013595441831275822,
+          "max_step": 397,
+          "mean": 7.278077007038517e-06,
+          "last": 8.282507825642827e-05,
+          "passed": true,
+          "over_window_tolerance": 0
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 1.359544183127582,
+          "max_step": 397,
+          "mean": 0.07278077007038519,
+          "last": 0.8282507825642824,
+          "passed": false,
+          "over_window_tolerance": 122
+        }
+      },
+      "numerical_passed": false,
+      "scope": "独立归档归一化消融；保留前阶段分段兼容因素，不代表未修改的库默认配方"
     }
   ]
 }
