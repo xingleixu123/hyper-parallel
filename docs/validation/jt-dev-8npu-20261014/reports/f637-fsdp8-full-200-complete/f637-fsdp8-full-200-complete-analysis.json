@@ -1,0 +1,67 @@
+{
+  "case": "r129-f637-fp32-fsdp8-full-200-r4",
+  "status": "COMPLETE_PRECISION_PASS",
+  "steps_per_rank": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
+  "exit_code": 0,
+  "released": true,
+  "duration_seconds": 383.77589921999606,
+  "precision": {
+    "lm": 0.0,
+    "mtp": 0.0,
+    "aux": 0.0
+  },
+  "weighted_errors": {
+    "training/total_loss": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    }
+  },
+  "input_mismatches": 0,
+  "initial_mismatches": [],
+  "complete_fixed_recipe_audit_findings": [],
+  "resource_observations": {
+    "baseline_median_seconds": 1.1550026535987854,
+    "full_median_seconds": 1.2351799607276917,
+    "extra_step_seconds": 0.08017730712890625,
+    "step_time_increase_percent": 6.941742244408516,
+    "allocated_saving_gib": 2.639263153076172,
+    "allocated_saving_percent": 11.979119774056688,
+    "reserved_saving_gib": 2.9296875,
+    "baseline_supervised_tokens_per_second": 16008.406569244611,
+    "full_supervised_tokens_per_second": 14969.751191829126,
+    "supervised_throughput_change_percent": -6.488187146689239,
+    "saved_gib_per_extra_step_second": 32.91783233418974,
+    "scope": "同129主机、源码、镜像与数值配方；逐步全8rank MAX、时间去前20步，显存保留全200步累计峰值。仅单次观测，不是重复实验置信区间或纯无插桩/端到端性能。"
+  },
+  "strict_comparator_sha256": "086b969fa8f114748322c163bc307b2af880ccdb1093deabb08cdb1b820739fc"
+}

@@ -4,7 +4,7 @@
 
 本单是 JT DeepSeek V3 八卡验证的**总问题单**，统一关联所有已拆分的小问题及独立 PR，维护优先级、复现证据、精度曲线、显存/性能、重计算与续训验收状态。每个已确认的独立缺陷或接口需求各用一个小问题单和一个单提交 PR，两个方向均能回到本单；不把多个缺陷混入同一个修复提交。
 
-**当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2和CP2已完整跑完200步但精度失败；TP2仅完成69步前缀，TP及合法组合、完整/选择重算仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
+**当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2和CP2已完整跑完200步但精度失败；TP2仅完成69步前缀，当前配方完全重算200步×8rank已与off基线逐步一致，选择重算、TP及合法组合仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
 
 当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部14个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
 
@@ -19,7 +19,7 @@
 | Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
 | Top4 | 测试调度器覆盖上层NPU可见列表，使设备分配越界 | [#223](https://github.com/hf1s/hyper-parallel/issues/223) | [#224](https://github.com/hf1s/hyper-parallel/pull/224) | 单提交2文件；无设备回归10测试/18子测试通过、两轴检视通过；不等同实际多卡训练验证 |
 | Top5 | CP 分块输出损失的支持与回归覆盖 | [#205](https://github.com/hf1s/hyper-parallel/issues/205) | [#199](https://github.com/hf1s/hyper-parallel/pull/199) | 功能已由上游 #186 合入；#199 收敛为独立回归，新基点 CPU20项/25子测试及129四卡短步ST通过；每组2步，不代替200步验收 |
-| Top6 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；旧配方full/selective各200步零误差，当前配方仍待验证 |
+| Top6 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；当前配方full200步×8rank全部loss/梯度范数零误差，两个主干层和一个MTP层均包裹；selective待验 |
 | Top7 | 重计算重放重复提交专家路由 token 计数 | [#207](https://github.com/hf1s/hyper-parallel/issues/207) | [#196](https://github.com/hf1s/hyper-parallel/pull/196) | 保留必要张量运算，只约束持久副作用；均匀重复计数未必改变 sign 型 bias 更新，不能虚构旧 loss 漂移 |
 | Top8 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 最新固定配方201–400×8rank累计/逐步计数与独立400参考一致；各loss与梯度最大差0；集成结果不全部归因于本PR |
 | Top9 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
@@ -34,6 +34,33 @@
 
 已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `b540051`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
 
+## 最新完整结果：完全重算200步精度通过及性价比（2026-10-16，UTC+8）
+
+`r129-f637-fp32-fsdp8-full-200-r4`在全局冷却与八卡空闲复查后启动，完整完成200步×8rank，退出0，383.775899秒后释放设备，无本任务PID残留。保持源码`18602c4`、JT_dev基点`f637ef7`、CANN9.2.0-beta.2、同一镜像/数据/全局batch/优化器与FP32专家主梯度及NS配方；归一化数值配方SHA为`c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5`。比较对象是独立进程完成的同配方off基线，不是本轮自比较。
+
+| 全部8rank、完整200步最大绝对差 | LM | 日志MTP（×0.3） | 按系数还原MTP | 日志aux（×0.0001） | 按系数还原aux | 总loss | 梯度范数 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| full 对 off | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+全部初态、输入身份、步/rank覆盖、有限值、LR/计数、源码/镜像与配方检查通过。还原分量由加权日志除以配置系数得到，**没有额外采集加权前张量**；因此不把日志还原冒称独立原始张量观测。严格比较及两项独立原始证据复算均保留供复核。
+
+![完全重算200步与off逐步一致，误差覆盖全部8rank](figures/f637-fsdp8-full-200-raw-zh.png)
+
+| 同129主机、同配方、同build采集口径 | off 基线 | full 完全重算 | full相对off |
+|---|---:|---:|---:|
+| 逐步全部rank MAX、去20步后中位秒/步 | 1.155002654 | 1.235179961 | +6.9417% |
+| 有效监督token/s，数据只计一次 | 16008.406569 | 14969.751192 | -6.4882% |
+| 全200步累计峰值allocated GiB | 22.032196045 | 19.392932892 | -2.639263153（-11.9791%） |
+| 全200步累计峰值reserved GiB | 27.250000000 | 24.320312500 | -2.929687500 |
+
+重放增加计算、减少保留激活，与此处步时上升和显存下降的方向一致；这只是本小层数模型的一次匹配观测，不能外推完整模型，也不是重复实验置信区间或无插桩端到端吞吐。时间观测保留输入身份及指标采集，显存数值是整轮累计峰值，allocated与reserved分别报告。下一轮selective将用相同口径比较，模块消融另注明实测步数，不能用旧配方模块数据替代当前结果。
+
+实际构建日志与模块清单覆盖两个主干解码层及一个MTP解码层。当前固定源码未集成仅修报告的#230，旧报告仍可能把两个动态派生wrapper漏计为总计1；这是#229中已独立复现的统计问题，不能反推本轮只重算了一个区域。该训练结果属于修复集成源，不把全部零误差或全部显存收益归因于单个PR。
+
+76份原始文件逐一验证大小/SHA，两端重复压缩包均已清理。下一次NPU实验必须晚于2026-10-16 02:29:49.787256（UTC+8），再由守卫核验空闲设备；不提前占卡。
+
+[严格精度比较](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-strict-comparison.json) · [完整分析](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-complete-analysis.json) · [76份采集清单](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-r4-complete-evidence-manifest.json) · [8rank原始证据](reports/f637-fsdp8-full-200-complete/raw/runs/r129-f637-fp32-fsdp8-full-200-r4) · [全rank资源](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-all-rank-resources.json) · [匹配off资源](reports/f637-fsdp8-full-200-complete/f637-fsdp8-r4-all-rank-resources.json) · [SHA与清理凭据](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-r4-complete-local-verification.json) · [精度独立复算](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-independent-evidence-review.json) · [资源独立复算](reports/f637-fsdp8-full-200-complete/f637-fsdp8-full-200-resource-independent-review.json)。
+
 ## 最新补充：重算覆盖报告的独立修复及第三次让卡（2026-10-16，UTC+8）
 
 新增中文小问题[#229](https://github.com/hf1s/hyper-parallel/issues/229)及单提交草稿PR[#230](https://github.com/hf1s/hyper-parallel/pull/230)，提交`b54005154e8d9ae3b2e1728ba106d2d628e6053e`，两文件。原报告按实例类名识别wrapper，遗漏FSDP动态生成的`HSDPCheckpointWrapper`。真实八rank构建日志和最终模块树均显示3处区域，报告却只计MTP一处。修复按完整基类身份检查MRO，保持报告结构与训练数学。
@@ -42,11 +69,11 @@
 
 [复现、完整测试及检视](reports/checkpoint-wrapper-inventory/README_ZH.md) · [真实三处/报告一处证据](reports/checkpoint-wrapper-inventory/checkpoint-inventory-real-run-observation.json) · [文件SHA](reports/checkpoint-wrapper-inventory/manifest.json) · [当前head CI原始状态](reports/checkpoint-wrapper-inventory-publication/checkpoint-inventory-current-head-ci.json)。
 
-`full-200-r3`在前轮释放满20分钟后启动，初始化后4号卡出现不同namespace/cgroup的外部进程，守卫仅停止本任务容器；0个完整步、exit137、115.91秒释放，设备上无本任务PID残留。60份原始文件全部核验，公开59份，外部身份明细仅留本地；两端重复归档已删。新的`full-200-r4`保留已验证数值文本，实际Trainer和模型配置解析通过；2026-10-16 02:03（UTC+8）在复查125/129空卡后启动129的守卫重试，结果仍待完成，不把配置通过写成训练通过。
+`full-200-r3`在前轮释放满20分钟后启动，初始化后4号卡出现不同namespace/cgroup的外部进程，守卫仅停止本任务容器；0个完整步、exit137、115.91秒释放，设备上无本任务PID残留。60份原始文件全部核验，公开59份，外部身份明细仅留本地；两端重复归档已删。新的`full-200-r4`保留已验证数值文本，实际Trainer和模型配置解析通过；2026-10-16 02:03（UTC+8）在复查125/129空卡后启动129的守卫重试，现已完成200步，结果与证据见本单最新完整重算一节；保留前三轮原始失败或让卡记录。
 
 [中断采集与清理](reports/f637-fsdp8-full-r3-interrupted/f637-fsdp8-full-r3-interrupted-local-verification.json) · [公开原始文件清单](reports/f637-fsdp8-full-r3-interrupted/public-manifest.json) · [r4实际镜像预检](reports/f637-fsdp8-full-r3-interrupted/f637-yaml-config-preflight-r4.json)。本阶段CPU临时checkout、专用venv、输入归档及暂存文件共88,781,402字节已清理，保留最终源码、测试证据、当前step200 checkpoint及用户镜像：[清理凭据](reports/checkpoint-wrapper-inventory-publication/checkpoint-inventory-scratch-cleanup.json)。
 
-## 最新执行记录：重试配置类型错误已修正，完全重算仍待训练（2026-10-16，UTC+8）
+## 前期执行记录：第二次重试的配置类型错误已修正（2026-10-16，UTC+8）
 
 `r129-f637-fp32-fsdp8-full-200-r2`在129空卡并满足20分钟间隔后启动，但在模型配置构造时报`rms_norm_eps`需要float却收到字符串，0步、退出1，37.01秒后释放全部设备。原因是我重新生成重试配置时，用JSON序列化把`1.0e-06/1.0e-07/1.0e-08`写成`1e-06/1e-07/1e-08`，被实际YAML解析器作为字符串读取；同时影响RMSNorm、Muon NS和AdamW的epsilon字段。这是本任务实验配置生成错误，没有作为新的库缺陷提交PR。
 
@@ -93,7 +120,7 @@ allocated减少1.325550 GiB，约6.02%；中位步时增加约38.21%。CP2在本
 
 [严格精度比较](reports/f637-cp2-200-complete/f637-cp2-200-strict-comparison.json) · [完整分析](reports/f637-cp2-200-complete/f637-cp2-200-complete-analysis.json) · [76份采集清单](reports/f637-cp2-200-complete/f637-cp2-200-complete-evidence-manifest.json) · [原始8rank记录](reports/f637-cp2-200-complete/raw/runs/r129-f637-fp32-cp2-200) · [全rank资源观测](reports/f637-cp2-200-complete/f637-cp2-200-all-rank-resources.json) · [匹配参考资源](reports/f637-cp2-200-complete/f637-fsdp8-r4-all-rank-resources.json) · [SHA及清理凭据](reports/f637-cp2-200-complete/f637-cp2-200-complete-local-verification.json) · [完整结果独立复算检视](reports/f637-cp2-200-complete/f637-cp2-200-independent-evidence-review.json)。
 
-下一项为当前配方FSDP8完整重计算200步，与已完成的off基线对照；然后验证selective及其余并行矩阵。任何新实验仍须等待本轮释放后至少20分钟并重新确认空卡。
+CP2结束后已完成当前配方FSDP8完整重计算200步，详见本单最新结果；下一项为selective及其余并行矩阵。任何新实验仍须等待上一轮释放后至少20分钟并重新确认空卡。
 
 ## 最新完整结果：EP2的200步精度未通过（2026-10-16，UTC+8）
 
@@ -212,16 +239,17 @@ allocated减少1.325550 GiB，约6.02%；中位步时增加约38.21%。CP2在本
 
 ## 待完成清单与资源约束
 
-- [x] 已确认12个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
+- [x] 已确认14个独立问题，各有中文小问题单与独立单提交 PR，正文双向关联并具有原生父子关系。
 - [x] 旧六项修复配方 FSDP0–200、200→400 与连续参考全 rank 零误差；关闭/完整/选择重算200步已完成。
 - [x] 129 固定旧基点 `521d3a8` 的 FP32 配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续；未完成独立连续400参考。
 - [x] 最新 `f637ef7` 集成源的 FSDP0–200 运行完成，8rank数据完整，checkpoint200文件清单齐全。
 - [x] 从本轮checkpoint200完整续训至400，8rank各200步、退出0、输入与累计计数连续。
 - [x] 完成本轮独立连续400参考；基线及续训各200步×8rank，LM和加权/还原MTP/aux最大差均为0。
 - [ ] 新配方 TP/CP/EP 及合法组合200步全部达到相同门槛，剩余根因分别修复并建单。
-- [ ] #214 的 Ascend/HCCL 补丁回归。
+- [x] #214 的 Ascend/HCCL 两卡与四卡定向补丁回归通过；不替代完整训练验收。
 - [x] 完成 MF / Megatron 重算配置能力对照，明确当前 JT 与 MF 式模块/层范围、排除及通信配置的差距。
-- [ ] 按最终配方复核关闭/完整/选择重算200步及资源收益；模块选择消融按其实际步数报告。
+- [x] 当前固定配方关闭与完全重算200步×8rank严格通过，完整重算allocated减少2.639263 GiB，步时增加6.9417%。
+- [ ] 完成当前固定配方选择重算200步及资源收益；模块选择消融按其实际步数报告。
 - [ ] 外部维护者评审、当前提交对应的完整 CI、最终回归与合入确认。
 
 仅在125/129获准的空闲设备上运行，优先保证其他实验；任何两轮 NPU 实验之间全局至少间隔20分钟，等待期间不占卡，冲突只释放本任务容器，不停止他人进程。八卡训练每轮有900秒上限，不常驻排队占卡。清理仅限本任务已核验无用的临时数据和重复压缩包，当前checkpoint200继续用于跨拓扑step200参数/优化器差异定位，确认不再需要后清理；原始镜像、共享数据和其他任务文件不删除。

@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec / independent evidence acceptance",
+  "reviewer": "review_token_spec",
+  "reviewed_at_utc": "2026-10-15T18:20:13.529105+00:00",
+  "status": "PASS",
+  "precision_status": "PASS",
+  "reference": "r129-f637-fp32-fsdp8-0-200-r4",
+  "candidate": "r129-f637-fp32-fsdp8-full-200-r4",
+  "conclusion_zh": "PASS：独立读取两次运行各200步×8rank原始记录，LM/MTP/aux/total/grad最大绝对差全部为0；MTP除以0.3、aux除以0.0001后仍为0。输入、48项完整初始化状态哈希、计数、LR及起止状态一致，实际配方仅重算和checkpoint输出设置不同，独立容器均退出0且释放。原strict与complete-analysis结论准确。",
+  "findings": [],
+  "method_zh": [
+    "仅使用Python标准库读取同一字节快照；未导入、执行或复用strict_compare_runs及资源汇总器实现。",
+    "逐文件重算两份manifest全部bytes/SHA并校验所需rank输入与receipt覆盖；再对照local-verification和比较报告绑定的manifest SHA。",
+    "逐rank核对step=1..200、rank身份、0→200起止、有限数值、累计token/sample从零累加；逐步检查全8rank输入SHA一致及两运行输入/计数/LR相等。",
+    "比较全部8rank的48项state_dict初态shape/dtype/SHA和参数布局；递归枚举实际resolved配置差异，核对源码、空patch、镜像和不同容器执行记录。",
+    "直接逐点计算5项scalar绝对差，再按实际0.3/0.0001系数还原MTP/aux误差，核对所有逐步误差和摘要。",
+    "额外独立复算逐步全8rank MAX资源、去前20步的时间中位数和单份token吞吐、全200步累计显存峰值。"
+  ],
+  "manifests": [
+    {
+      "case": "r129-f637-fp32-fsdp8-0-200-r4",
+      "manifest": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-r4-complete-evidence-manifest.json",
+      "manifest_sha256": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11",
+      "verified_files": 76,
+      "all_file_bytes_and_sha256_match": true,
+      "required_inputs_and_receipt_bound": true,
+      "declared_archive_sha256": "0c5a6d0b92480395f6b44b678bc5f09ffb8a3488ce263e28f131c9219fc63c34"
+    },
+    {
+      "case": "r129-f637-fp32-fsdp8-full-200-r4",
+      "manifest": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-full-r4-complete-evidence-manifest.json",
+      "manifest_sha256": "0dd0824342de7127b2d4b6a7a2fba05e42ae642b5dae6309a0b1a6f92af0724f",
+      "verified_files": 76,
+      "all_file_bytes_and_sha256_match": true,
+      "required_inputs_and_receipt_bound": true,
+      "declared_archive_sha256": "560bdeb051c69686924590b1b417e5f85b50fe4a4a18950afa3244c3dc61723e"
+    }
+  ],
+  "steps_per_rank": {
+    "reference": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "candidate": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ]
+  },
+  "comparisons_per_scalar": 1600,
+  "weighted_scalar_errors": {
+    "training/total_loss": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    }
+  },
+  "unweighted_errors": {
+    "lm": 0.0,
+    "mtp": 0.0,
+    "aux": 0.0
+  },
+  "absolute_tolerance": 0.005,
+  "per_rank_max_errors": {
+    "training/total_loss": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/lm": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/mtp": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/aux": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/grad_norm": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "input_and_state_checks": {
+    "input_mismatches": 0,
+    "initial_mismatches": 0,
+    "initial_state_entries_per_rank": 48,
+    "initial_state_checks_across_all_16_rank_records": true,
+    "distinct_global_inputs": 200,
+    "counters_and_lr_mismatches": 0,
+    "consumed_tokens_at_200": 3713791.0,
+    "consumed_samples_at_200": 1600.0,
+    "reference_restore_from": null,
+    "candidate_restore_from": null,
+    "start_global_step": 0,
+    "complete_global_step": 200,
+    "parameter_layouts_match": true
+  },
+  "trajectory_examples": {
+    "step1": {
+      "training/total_loss": 16.809673309326172,
+      "training/foundation_loss/lm": 12.881054878234863,
+      "training/foundation_loss/mtp": 3.928363800048828,
+      "training/foundation_loss/aux": 0.0002530855708755553,
+      "training/grad_norm": 22.47356605529785
+    },
+    "step200": {
+      "training/total_loss": 10.140850067138672,
+      "training/foundation_loss/lm": 7.763036251068115,
+      "training/foundation_loss/mtp": 2.3773622512817383,
+      "training/foundation_loss/aux": 0.0004517149063758552,
+      "training/grad_norm": 9.312154769897461
+    }
+  },
+  "configuration_differences": [
+    {
+      "path": ".activation_checkpoint.mode",
+      "reference": "off",
+      "candidate": "full"
+    },
+    {
+      "path": ".checkpoint.checkpoint_dir",
+      "reference": "/work/checkpoints/r129-f637-fp32-fsdp8",
+      "candidate": "/work/checkpoints/r129-f637-fp32-fsdp8-full-200-r4"
+    },
+    {
+      "path": ".checkpoint.save_ckpt",
+      "reference": true,
+      "candidate": false
+    }
+  ],
+  "execution": [
+    {
+      "case": "r129-f637-fp32-fsdp8-0-200-r4",
+      "host": "129",
+      "container_id": "d41078daf90e05af851ddd097afbd8995b7e7eafce8d08c21292839642315b40",
+      "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_wall": 1792061480.743742,
+      "finished_wall": 1792061857.393936,
+      "exit_code": 0,
+      "released": true,
+      "duration_seconds": 376.6501968099983,
+      "remaining_owned_pids": []
+    },
+    {
+      "case": "r129-f637-fp32-fsdp8-full-200-r4",
+      "host": "129",
+      "container_id": "a2700ed5908d814e83135c32c4f3c9f3ceafd1b5317031ffbc0abd7a1ea5d275",
+      "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_wall": 1792087388.3621273,
+      "finished_wall": 1792087772.1380208,
+      "exit_code": 0,
+      "released": true,
+      "duration_seconds": 383.77589921999606,
+      "remaining_owned_pids": []
+    }
+  ],
+  "capture_helpers_same_bytes": [
+    {
+      "name": "capture_precision_training.py",
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "name": "capture_training.py",
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "name": "expert_probe.py",
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "name": "fp32_wgrad_experiment.py",
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "name": "module_profile.py",
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "name": "ns_batch_trace.py",
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "name": "precision_experiments.py",
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    }
+  ],
+  "activation_checkpoint_evidence": {
+    "build_log_wrapped_count_each_rank": 3,
+    "final_tree_wrappers": [
+      {
+        "forward_signature": "(*args: Any, **kwargs: Any) -> Any",
+        "fqn": "model.layers.0",
+        "training": true,
+        "type": "abc.HSDPCheckpointWrapper"
+      },
+      {
+        "forward_signature": "(*args: Any, **kwargs: Any) -> Any",
+        "fqn": "model.layers.1",
+        "training": true,
+        "type": "abc.HSDPCheckpointWrapper"
+      },
+      {
+        "forward_signature": "(*args: Any, **kwargs: Any) -> Any",
+        "fqn": "mtp.layers.0.transformer_layer",
+        "training": true,
+        "type": "hyper_parallel.core.activation_memory.wrapper.CheckpointWrapper"
+      }
+    ],
+    "build_logs": [
+      {
+        "rank": 0,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/0/stderr.log",
+        "sha256": "51e257109bc4d1a1c24343c2985d1c03d3b22f272d71ffe2d4c3002e6c80617d"
+      },
+      {
+        "rank": 1,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/1/stderr.log",
+        "sha256": "02e55e37ad954d63b9d2356d92f0c4fced6ae065792e0b94b7650ecf3be1e31b"
+      },
+      {
+        "rank": 2,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/2/stderr.log",
+        "sha256": "d413ec273be3a5278c1a72f81a6d2d9f06da60cc2c94c6293008f69ee33a6e54"
+      },
+      {
+        "rank": 3,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/3/stderr.log",
+        "sha256": "db8502006fba978dad56997540a10afd355086aad4d81411a4172c1f29a8790d"
+      },
+      {
+        "rank": 4,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/4/stderr.log",
+        "sha256": "9dfae7c74f6c1fc06be50f323fe86953a0c5625787d5dcf1717ee392d3824f91"
+      },
+      {
+        "rank": 5,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/5/stderr.log",
+        "sha256": "d30334f5a0d284ede64f3c5001a26e7aa376b3d494f47cf997c6b472d3d4115c"
+      },
+      {
+        "rank": 6,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/6/stderr.log",
+        "sha256": "b149a5507bface29471bb9e818d3ae9037abd649e9b84b53288082bc27af73a4"
+      },
+      {
+        "rank": 7,
+        "path": "runs/r129-f637-fp32-fsdp8-full-200-r4/worker-logs/none_my5elwpx/attempt_0/7/stderr.log",
+        "sha256": "4ebe3eba44623b850473bcc018d847a8ac9ad72f0dbb2238df098303c3052581"
+      }
+    ],
+    "legacy_activation_checkpoint_json_count": 1,
+    "note_zh": "旧inventory漏计动态HSDP子类的已知报告缺陷仍存在于本次固定源码；原始树与八rank构建日志证明三处wrapper。它不改变本次scalar比较结果。"
+  },
+  "resources": {
+    "r129-f637-fp32-fsdp8-0-200-r4": {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": 1.1550026535987854,
+      "summed_step_seconds": 207.7378523349762,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 16008.406569244611,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.25,
+      "rank0_time_underreport_steps": 0
+    },
+    "r129-f637-fp32-fsdp8-full-200-r4": {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": 1.2351799607276917,
+      "summed_step_seconds": 222.15145444869995,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 14969.751191829126,
+      "allocated_gib": 19.392932891845703,
+      "reserved_gib": 24.3203125,
+      "rank0_time_underreport_steps": 0
+    }
+  },
+  "resource_comparison": {
+    "baseline_median_seconds": 1.1550026535987854,
+    "full_median_seconds": 1.2351799607276917,
+    "extra_step_seconds": 0.08017730712890625,
+    "step_time_increase_percent": 6.941742244408511,
+    "allocated_saving_gib": 2.639263153076172,
+    "allocated_saving_percent": 11.979119774056688,
+    "reserved_saving_gib": 2.9296875,
+    "baseline_supervised_tokens_per_second": 16008.406569244611,
+    "full_supervised_tokens_per_second": 14969.751191829126,
+    "supervised_throughput_change_percent": -6.488187146689239,
+    "saved_gib_per_extra_step_second": 32.91783233418974
+  },
+  "strict_comparison_and_complete_analysis_match": true,
+  "boundaries_zh": [
+    "本结论只覆盖此固定FP32专家wgrad/FP32 NS配方下FSDP full重算0–200对off基线；不扩展到selective、TP/CP/EP或full重算续训。",
+    "初态证据是完整pre-sharding state_dict哈希及起始参数布局；未捕获最终完整参数/逐元素梯度，grad仅为已记录grad_norm。",
+    "未加权MTP/aux由日志加权标量及实际系数推导，不是另行捕获乘系数前的张量。",
+    "checkpoint.restore_from双方均为空；本次是从头训练比较，不能替代已有独立续训验收。",
+    "资源是单次同主机build模式观测，保留输入CPU拷贝/hash开销，排除20步仅作用于时间；不是无插桩端到端性能或重复实验置信区间。",
+    "两份manifest的每文件原始字节均已重算；归档已清理，仅核对manifest/local-verification中记录的archive SHA一致，未重新读取归档。",
+    "无NPU/容器启动、源码修改或GitHub操作；只写本检视JSON。"
+  ],
+  "reviewed_summary_inputs": [
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-r4-complete-evidence-manifest.json",
+      "bytes": 15109,
+      "sha256": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-full-r4-complete-evidence-manifest.json",
+      "bytes": 15338,
+      "sha256": "0dd0824342de7127b2d4b6a7a2fba05e42ae642b5dae6309a0b1a6f92af0724f"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-full-r4-complete-local-verification.json",
+      "bytes": 210,
+      "sha256": "cd89563b72848a30263d8dafc9a8d9b23156bcf30a5a14662757c5337f147df6"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-full-200-strict-comparison.json",
+      "bytes": 13376,
+      "sha256": "142513b5c3301bbebc6004c0aa0c1f1b4cc12ac7c54073eb8db407de66094e9b"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-full-200-complete-analysis.json",
+      "bytes": 1878,
+      "sha256": "6da675b60f536bdd1398ee836b4c848f5cea6c9322201449e26815825ec18627"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-r4-all-rank-resources.json",
+      "bytes": 47532,
+      "sha256": "4a93261f7d53ed185dc43b89d39a4a0e90d8072b8b99ec9640d4c7ca7da28383"
+    },
+    {
+      "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\f637-fsdp8-full-200-all-rank-resources.json",
+      "bytes": 48420,
+      "sha256": "4809ad497ef6eaa73002e391a2610aad2244aba8361d05202f2eede0a1591b16"
+    }
+  ]
+}
