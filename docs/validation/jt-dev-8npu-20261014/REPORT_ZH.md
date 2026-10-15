@@ -24,12 +24,22 @@
 | Top8 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 最新固定配方201–400×8rank累计/逐步计数与独立400参考一致；各loss与梯度最大差0；集成结果不全部归因于本PR |
 | Top9 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
 | Top10 | Muon NS 精度无法显式配置并从 checkpoint 恢复 | [#210](https://github.com/hf1s/hyper-parallel/issues/210) | [#201](https://github.com/hf1s/hyper-parallel/pull/201) | 保留 BF16 默认；CPU、8 卡和 2 卡 ST 通过；可选 FP32 成本须匹配配方评估 |
-| Top11 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend 补丁回归待运行 |
+| Top11 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
 | Top12 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
 已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+
+## 最新补充：#214 的 Ascend 两卡／四卡回归通过（2026-10-15）
+
+在独立单提交`453618aaad72c3a2f9fb7bf367cd31ca45437d17`、原CANN9.2.0-beta.2镜像上重新运行：两卡各通过FP32/BF16两个测试，四卡各通过Partial归约测试。2、1、3、4行交替覆盖合法等长、空分片、一般非整除、重复调用及缓存变换；非法源/目标分片和直接Partial入口一致拒绝，合法重建或归约后重建均要求独立参考零误差。
+
+实验`r129-pr214-uneven-st4-r2`退出0，80.32秒后释放0–3号卡，无本任务设备PID残留；源码与patch干净，editable导入路径核验通过。24份原始文件大小/SHA逐一核对，两端重复归档已删除；[规范及验收两轴独立复核](reports/pr214-uneven-npu-st-r2/pr214-uneven-npu-st-r2-two-axis-review.json)均通过。该结果补齐#211／#214的Ascend/HCCL定向回归，不替代八卡200步loss门槛，也不宣称吞吐或显存收益；小问题仍开启、PR仍为单提交草稿。
+
+[验证分析](reports/pr214-uneven-npu-st-r2/pr214-uneven-npu-st-r2-analysis.json) · [24份采集清单](reports/pr214-uneven-npu-st-r2/pr214-uneven-npu-st-r2-evidence-manifest.json) · [两端清理与SHA核验](reports/pr214-uneven-npu-st-r2/pr214-uneven-npu-st-r2-local-verification.json) · [原始两卡／四卡日志](reports/pr214-uneven-npu-st-r2/raw/runs/r129-pr214-uneven-st4-r2) · [释放凭据](reports/pr214-uneven-npu-st-r2/raw/scheduling/r129-pr214-uneven-st4-r2.receipt.json)。此前收集失败及入口修复证据保留在上一轮记录中。
+
+下一次实验最早在2026-10-15 23:12:35（UTC+8）重新检查空闲卡，继续同固定配方TP2第三轮200步。125的只读namespace快照中，先前普通ns0的全部8卡映射已经消失，TP2请求的12份固定文件也已逐一核对；尚未以新容器验证设备发现，不能提前判定已完全恢复。若后续在125运行，跨主机的性能差异必须单列，不能当作并行收益。
 
 ## 本轮补充：四卡短步回归、独立选卡修复与资源让出（2026-10-15）
 
@@ -39,7 +49,7 @@
 
 #214首轮按间隔启动四卡后，测试收集报`ModuleNotFoundError: No module named tests`，两卡阶段0用例、四卡阶段未启动；容器退出1，30.88秒后已释放。根因为回归脚本从日志目录运行，操作脚本已改为从源码目录启动且禁用pytest缓存，独立绝对日志路径及资源约束保持不变。无NPU容器复核两个入口共3个测试节点收集成功；规范/需求两轴复审通过。这是入口修复，不是#214 NPU算法通过证据。[首轮分析](reports/pr214-uneven-npu-st/pr214-uneven-npu-st-analysis.json) · [14份原始采集清单](reports/pr214-uneven-npu-st/pr214-uneven-npu-st-evidence-manifest.json) · [无设备收集预检](reports/pr214-uneven-npu-st/pr214-fixed-runner-cpu-collection-r2.log) · [脚本复审](reports/pr214-uneven-npu-st/pr214-fixed-runner-two-axis-review.json)。首次CPU预检还有Windows传输换行问题，原记录保留，按bytes传输修正后才得到成功结果。
 
-当前全局设备空窗从#214释放重新计满20分钟，最早2026-10-15 22:46:34（UTC+8）重新检查空闲卡；没有预占卡。下一轮#214重新回归后继续当前固定配方200步矩阵。重复压缩包两端已清理，另清理已用完的源码导入bundle和35.23MB远端CPU复现checkout；当前step200 checkpoint保留供跨拓扑参数/优化器定位。
+上述首轮后的空窗已满足，并完成本节之前记录的第二轮Ascend回归；最新实验间隔按第二轮释放重新计满20分钟。重复压缩包两端已清理，另清理已用完的源码导入bundle和35.23MB远端CPU复现checkout；当前step200 checkpoint保留供跨拓扑参数/优化器定位。
 
 ## 最新验收：FSDP基线与续训两个200步窗口均通过（2026-10-15）
 

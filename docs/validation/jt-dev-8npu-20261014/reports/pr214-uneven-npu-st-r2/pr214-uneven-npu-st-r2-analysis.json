@@ -1,0 +1,89 @@
+{
+  "case": "r129-pr214-uneven-st4-r2",
+  "source": "453618aaad72c3a2f9fb7bf367cd31ca45437d17",
+  "status": "PASS_ASCEND_TWO_AND_FOUR_RANK_ST",
+  "container_id": "997461027dae32efd0b2275282154b4ac8d575c3b9fac10493ba6a0d92b9d06b",
+  "devices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "duration_seconds": 80.31852613999945,
+  "exit_code": 0,
+  "released": true,
+  "remaining_owned_pids": [],
+  "source_patch_changed": false,
+  "source_status_clean": true,
+  "runner_sha256": "97128a3829837066a88561b32607cebec30989a250ff7034be7d1747b077d07c",
+  "groups": [
+    {
+      "phase": "two-rank",
+      "world_size": 2,
+      "exit_code": 0,
+      "ranks": [
+        {
+          "rank": 0,
+          "passed": 2,
+          "warnings": 19,
+          "seconds": 19.6,
+          "path": "runs/r129-pr214-uneven-st4-r2/two-rank-logs/none_ogqsa98k/attempt_0/0/stdout.log",
+          "sha256": "22df353bb46477fe31b3e66f83ed556ee0219f37323eacfcac7b21544045df79"
+        },
+        {
+          "rank": 1,
+          "passed": 2,
+          "warnings": 17,
+          "seconds": 19.59,
+          "path": "runs/r129-pr214-uneven-st4-r2/two-rank-logs/none_ogqsa98k/attempt_0/1/stdout.log",
+          "sha256": "95a5fa7b5b164a48cb08dd1915709abfb737f1d778e421aa6cb3d27aa79b3b73"
+        }
+      ]
+    },
+    {
+      "phase": "four-rank",
+      "world_size": 4,
+      "exit_code": 0,
+      "ranks": [
+        {
+          "rank": 0,
+          "passed": 1,
+          "warnings": 18,
+          "seconds": 20.19,
+          "path": "runs/r129-pr214-uneven-st4-r2/four-rank-logs/none_9395cigq/attempt_0/0/stdout.log",
+          "sha256": "8e0c9210b6a9642e5964b9ed9ba9c08bdb7cf2044a4a61f82cd4a59ca944c515"
+        },
+        {
+          "rank": 1,
+          "passed": 1,
+          "warnings": 17,
+          "seconds": 20.19,
+          "path": "runs/r129-pr214-uneven-st4-r2/four-rank-logs/none_9395cigq/attempt_0/1/stdout.log",
+          "sha256": "4edadf83dfe8d027634481f501f90b308a59ce93cee85db781abac6f839f01b8"
+        },
+        {
+          "rank": 2,
+          "passed": 1,
+          "warnings": 17,
+          "seconds": 20.19,
+          "path": "runs/r129-pr214-uneven-st4-r2/four-rank-logs/none_9395cigq/attempt_0/2/stdout.log",
+          "sha256": "4edadf83dfe8d027634481f501f90b308a59ce93cee85db781abac6f839f01b8"
+        },
+        {
+          "rank": 3,
+          "passed": 1,
+          "warnings": 17,
+          "seconds": 20.19,
+          "path": "runs/r129-pr214-uneven-st4-r2/four-rank-logs/none_9395cigq/attempt_0/3/stdout.log",
+          "sha256": "4edadf83dfe8d027634481f501f90b308a59ce93cee85db781abac6f839f01b8"
+        }
+      ]
+    }
+  ],
+  "coverage": "两卡FP32/BF16按2/1/3/4行交替验证Shard重建与目标分片：非整除一致拒绝，等长重复重建零误差；四卡(Shard,Partial)直接归约非整除一致拒绝，合法布局归约后重建零误差。",
+  "limits": "这是#214原独立提交的Ascend/HCCL定向回归，不是八卡200步loss验收，无性能/显存收益结论。",
+  "evidence_files": 24,
+  "manifest_sha256": "6c01a099d2c766c43dec3b99094cbb08e5ec14a7b27b3040a17cea83fe3f77e0",
+  "next_global_launch_not_before_utc": "2026-10-15T15:12:34.084584+00:00",
+  "next_global_launch_not_before_plus08": "2026-10-15T23:12:34.084584+08:00"
+}
