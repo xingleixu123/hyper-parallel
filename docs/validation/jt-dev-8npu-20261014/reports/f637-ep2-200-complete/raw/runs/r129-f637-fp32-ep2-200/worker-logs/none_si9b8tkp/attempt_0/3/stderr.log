@@ -1,0 +1,62 @@
+2026-10-15 16:00:06,413 [INFO] torch_npu.env: get env LOCAL_RANK = 3
+2026-10-15 16:00:07,465 [INFO] torch_npu.env: get env WORLD_SIZE = 8
+2026-10-15 16:00:07,465 [INFO] torch_npu.env: get env MASTER_ADDR = 127.0.0.1
+2026-10-15 16:00:07,465 [INFO] torch_npu.env: get env MASTER_PORT = 30342
+2026-10-15 16:00:07,465 [INFO] torch_npu.env: get env TORCHELASTIC_USE_AGENT_STORE = True
+2026-10-15 16:00:07,579 [INFO] hyper_parallel.trainer.base: Process rank: 3, world size: 8
+2026-10-15 16:00:07,596 [INFO] hyper_parallel.distributed.mesh: Built device mesh (8, 1, 1), dense FSDP mesh (1, 8, 1) and expert FSDP mesh (4, 2)
+2026-10-15 16:00:07,607 [INFO] hyper_parallel.models._transformers.model_builder: FSDP2Manager instantiated with FSDP2Config
+2026-10-15 16:01:08,982 [INFO] hyper_parallel.models._transformers.model_builder: Initialized model state with model-native random initialization
+2026-10-15 16:01:16,431 [INFO] hyper_parallel.models._transformers.model_builder: Running ShardingPlanner.plan(tp=1, cp=1, ep=2, sequence_parallel=False, loss_parallel=False)
+2026-10-15 16:01:16,446 [WARNING] hyper_parallel.distributed._builder.planner: No template for boundary_type=unknown at mtp.layers.0.eh_proj
+2026-10-15 16:01:16,447 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.self_attn (glob '*.self_attn')
+2026-10-15 16:01:16,447 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.self_attn (glob '*.self_attn')
+2026-10-15 16:01:16,448 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.0.self_attn (glob '*.self_attn')
+2026-10-15 16:01:16,448 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.self_attn.q_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 16:01:16,448 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 16:01:16,449 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.self_attn.q_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 16:01:16,449 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.self_attn.kv_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 16:01:16,449 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.0.self_attn.kv_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 16:01:16,449 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.0.self_attn.q_a_layernorm (glob '*.self_attn.*_layernorm')
+2026-10-15 16:01:16,450 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module model.layers.0.self_attn.key_rope_gather
+2026-10-15 16:01:16,450 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module model.layers.1.self_attn.key_rope_gather
+2026-10-15 16:01:16,450 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module mtp.layers.0.transformer_layer.self_attn.key_rope_gather
+2026-10-15 16:01:16,451 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.mlp.shared_experts (glob '*.mlp.shared_experts')
+2026-10-15 16:01:16,451 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.mlp.shared_experts (glob '*.mlp.shared_experts')
+2026-10-15 16:01:16,452 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: insert the spec of module mtp.layers.0.eh_proj
+2026-10-15 16:01:16,452 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into model.layers.1.mlp (glob 'model.layers.[123456789]*.mlp')
+2026-10-15 16:01:16,452 [INFO] hyper_parallel.distributed._builder.rule_resolver: plan_overrides: merge into mtp.layers.0.transformer_layer.mlp (glob 'mtp.layers.*.transformer_layer.mlp')
+2026-10-15 16:01:16,458 [INFO] hyper_parallel.distributed._builder.parameter_sharding: virtual-EP mesh: using {'edp_shard': 4, 'ep': 2} for parameter sharding, explicit compute injection, and FSDP source metadata
+2026-10-15 16:01:16,803 [INFO] hyper_parallel.distributed._builder.applier: boundary mtp.layers.0.transformer_layer.self_attn: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 16:01:16,803 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary mtp.layers.0.transformer_layer.self_attn: nested boundaries (communication_owner: nested_boundary): ['q_a_layernorm', 'kv_a_layernorm', 'key_rope_gather'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 16:01:16,804 [INFO] hyper_parallel.distributed._builder.applier: boundary mtp.layers.0.transformer_layer.mlp: injection[local_compute_fn], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 16:01:16,804 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key cp_mesh filled by framework (NoneType)
+2026-10-15 16:01:16,805 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key ep_mesh filled by framework (DeviceMesh)
+2026-10-15 16:01:16,805 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key mesh filled by framework (DeviceMesh)
+2026-10-15 16:01:16,805 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key module filled by framework (JTDeepseekV3MoE)
+2026-10-15 16:01:16,805 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key tp_mesh filled by framework (NoneType)
+2026-10-15 16:01:16,805 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary mtp.layers.0.transformer_layer.mlp: nested boundaries (communication_owner: nested_boundary): ['shared_experts'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 16:01:16,806 [INFO] hyper_parallel.distributed._builder.applier: boundary model.layers.1.self_attn: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 16:01:16,806 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary model.layers.1.self_attn: nested boundaries (communication_owner: nested_boundary): ['q_a_layernorm', 'kv_a_layernorm', 'key_rope_gather'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 16:01:16,807 [INFO] hyper_parallel.distributed._builder.applier: boundary model.layers.1.mlp: injection[local_compute_fn], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 16:01:16,807 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key cp_mesh filled by framework (NoneType)
+2026-10-15 16:01:16,807 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key ep_mesh filled by framework (DeviceMesh)
+2026-10-15 16:01:16,807 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key mesh filled by framework (DeviceMesh)
+2026-10-15 16:01:16,807 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key module filled by framework (JTDeepseekV3MoE)
+2026-10-15 16:01:16,807 [INFO] hyper_parallel.distributed._builder.rule_resolver: local_compute_fn factory hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn: context key tp_mesh filled by framework (NoneType)
+2026-10-15 16:01:16,807 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary model.layers.1.mlp: nested boundaries (communication_owner: nested_boundary): ['shared_experts'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 16:01:16,808 [INFO] hyper_parallel.distributed._builder.applier: boundary model.layers.0.self_attn: injection[the module's own forward (no fn injected, region_dispatch=False declared)], region_dispatch=False → black-box hosting (local execution inside the region, propagation checks skipped, declarative rewrap)
+2026-10-15 16:01:16,808 [INFO] hyper_parallel.distributed._builder.applier: local-region boundary model.layers.0.self_attn: nested boundaries (communication_owner: nested_boundary): ['kv_a_layernorm', 'q_a_layernorm', 'key_rope_gather'] — their return values are already in the declared out_dst layout with TP communication sealed inside; the region compute MUST NOT apply compensating collectives (all-reduce/reduce-scatter/all-gather) to them
+2026-10-15 16:01:16,808 [INFO] hyper_parallel.models._transformers.model_builder: Sharding plan applied; source_shard_info keys=46
+2026-10-15 16:01:16,810 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Adapter-declared FSDP child units: ['mtp.layers.0.transformer_layer']
+2026-10-15 16:01:16,970 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Applied source-layout SUM gradient scaling: dp_size=8, cp_size=1, tp_size=1, source_gradient_domain_size=8, factor=0.125, units=6
+2026-10-15 16:01:16,970 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Applied FSDP2 to 5 child units and the root module
+2026-10-15 16:01:16,970 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: FSDP2 wrap applied
+2026-10-15 16:01:17,002 [INFO] hyper_parallel.models._transformers.model_builder: Model moved to npu:3
+2026-10-15 16:01:17,045 [INFO] torch_npu.env: get env HYPER_PARALLEL_MODEL_INTEGRATION_OUTPUT_DIR = /work/runs/r129-f637-fp32-ep2-200/integration
+/workspace/venv/lib/python3.12/site-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+2026-10-15 16:01:35,123 [INFO] hyper_parallel.trainer.base: Checkpointing is inactive (save_ckpt=false, restore_from=None); no checkpoint callback registered.
+2026-10-15 16:01:35,123 [INFO] torch_npu.env: get env JT_MODULE_PROFILE = 0
+/workspace/hyper-parallel/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py:477: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:423.)
+  pad_ids = pad_ids.reshape(padding, config.num_experts_per_tok) % padding

@@ -1,0 +1,69 @@
+{
+  "case": "r129-f637-fp32-ep2-200",
+  "status": "COMPLETE_PRECISION_FAIL",
+  "steps_per_rank": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200
+  ],
+  "exit_code": 0,
+  "released": true,
+  "duration_seconds": 407.33422883999447,
+  "precision": {
+    "lm": 0.007523059844970703,
+    "mtp": 0.01543283462524414,
+    "aux": 0.13898941688239574
+  },
+  "first_unweighted_exceeding_steps": {
+    "lm": 106,
+    "mtp": 45,
+    "aux": 33
+  },
+  "weighted_errors": {
+    "training/total_loss": {
+      "max_abs": 0.008121490478515625,
+      "step": 125,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.007523059844970703,
+      "step": 185,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.004629850387573242,
+      "step": 45,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 1.3898941688239574e-05,
+      "step": 172,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.2519245147705078,
+      "step": 106,
+      "rank": 0
+    }
+  },
+  "input_mismatches": 0,
+  "initial_mismatches": [],
+  "complete_fixed_recipe_audit_findings": [],
+  "resource_observations": {
+    "baseline_median_seconds": 1.1550026535987854,
+    "ep2_median_seconds": 1.3174351453781128,
+    "step_time_increase_percent": 14.063386891208985,
+    "allocated_saving_gib": 1.1035423278808594,
+    "allocated_saving_percent": 5.008771370910214,
+    "reserved_saving_gib": 0.974609375,
+    "baseline_supervised_tokens_per_second": 16008.406569244611,
+    "ep2_supervised_tokens_per_second": 14034.328352485634,
+    "scope": "同129主机、源码/镜像/数值配方；逐步全部rank耗时MAX，去前20步；显存为进程累计峰值。单次观测且精度失败，不作为等精度最终并行收益。"
+  },
+  "strict_comparator_sha256": "086b969fa8f114748322c163bc307b2af880ccdb1093deabb08cdb1b820739fc"
+}
