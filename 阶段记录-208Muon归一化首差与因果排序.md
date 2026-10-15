@@ -122,3 +122,8 @@ Q＋router相对本轮对照的total、原始MTP、原始aux平均绝对误差�
 ## 问题单与PR归属
 
 总问题[#217](https://github.com/hf1s/hyper-parallel/issues/217)持续关联所有发现。单分片Muon精度问题[#215](https://github.com/hf1s/hyper-parallel/issues/215)→独立PR[#213](https://github.com/hf1s/hyper-parallel/pull/213)；K-shift显式配置[#187](https://github.com/hf1s/hyper-parallel/issues/187)→PR[#192](https://github.com/hf1s/hyper-parallel/pull/192)；单微批恒等梯度[#216](https://github.com/hf1s/hyper-parallel/issues/216)→已合并PR[#180](https://github.com/hf1s/hyper-parallel/pull/180)。均有中文说明及总单反向关联。本轮新增两项暂作为兼容性消融记录，未证明需要无条件修改产品默认，不以合并大PR掩盖正确性或负面结果。
+
+
+## 后续首差：212步，已通过完整观察保真
+
+新增独立组合的26步只读模型哈希观察正常结束；26步loss、梯度范数、实际输入和恢复与既有短窗逐值相同，配置、49冻结源、因素实际调用及观察器源码核验均通过。201–211步48项模型状态FP32/BF16全部精确；212步首次38项FP32、29项BF16不同，213步扩散为46项FP32。212总loss仍精确，梯度范数HP10.83714771270752、MF10.837157249450684，已经在更新之前出现分歧。下一优先级据此改为212的裁剪前梯度与范数归约；没有证据将其直接判为优化器状态问题。此次只读复验不新增完整200步计数，也未保存模型大数组。见[完整保真与首差审计](evidence/normalization-frontier226-audit.json)。
