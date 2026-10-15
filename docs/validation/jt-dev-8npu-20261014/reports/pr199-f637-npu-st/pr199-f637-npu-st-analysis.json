@@ -1,0 +1,344 @@
+{
+  "case": "r129-pr199-f637-st4-r2",
+  "source": "e9fc94d376ca7380c13a5e09c0020b34a75dc1d2",
+  "status": "PASS_FOUR_RANK_SHORT_ST",
+  "container_id": "d6436e24a2bc7d2b567961b06b9a22879efa2586b8f7e9ce47a4834644d85c89",
+  "devices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "duration_seconds": 73.9862581999987,
+  "exit_code": 0,
+  "released": true,
+  "remaining_owned_pids": [],
+  "ranks": [
+    {
+      "rank": 0,
+      "passed": 1,
+      "warnings": 21,
+      "seconds": 44.78,
+      "sha256": "2e2a37d3646a86958f06fe2ea7602ef1d2e5529a13ac4050fe370b36fbc437f2"
+    },
+    {
+      "rank": 1,
+      "passed": 1,
+      "warnings": 21,
+      "seconds": 44.85,
+      "sha256": "4f35c4af9d1da312fd42ba50b8ee31c115f5b0b101b671f451a9c3f8c8fdaae2"
+    },
+    {
+      "rank": 2,
+      "passed": 1,
+      "warnings": 21,
+      "seconds": 44.86,
+      "sha256": "e455b488423711026ca1a628c7d6c1a3ab600e96f051669f1c2cce580c9d005e"
+    },
+    {
+      "rank": 3,
+      "passed": 1,
+      "warnings": 21,
+      "seconds": 44.86,
+      "sha256": "e455b488423711026ca1a628c7d6c1a3ab600e96f051669f1c2cce580c9d005e"
+    }
+  ],
+  "coverage": "CP两种策略分别覆盖TP1、TP2、TP2+SP，另含chunk48两种组合和packed注意力对照；训练组合每种2步。",
+  "limits": "各rank的1个pytest入口内运行8组训练用例；不是200步loss<=0.005验收，不用于性能收益比较。",
+  "next_global_launch_not_before_utc": "2026-10-15T14:25:39.082847+00:00",
+  "training_case_records": [
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 1,
+      "cp": 4,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.322129726409912,
+        "foundation_loss/mtp": 1.8852537870407104,
+        "foundation_loss/aux": 0.00021517073037102818
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.322048664093018,
+        "foundation_loss/mtp": 1.8852577209472656,
+        "foundation_loss/aux": 0.00021517084678635
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 1,
+      "cp": 4,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.253185272216797,
+        "foundation_loss/mtp": 1.8832253217697144,
+        "foundation_loss/aux": 0.00020517720258794725
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.252798080444336,
+        "foundation_loss/mtp": 1.883129596710205,
+        "foundation_loss/aux": 0.00020514166681095958
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 2,
+      "cp": 2,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.322129726409912,
+        "foundation_loss/mtp": 1.8852537870407104,
+        "foundation_loss/aux": 0.00021517073037102818
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.322139263153076,
+        "foundation_loss/mtp": 1.8853195905685425,
+        "foundation_loss/aux": 0.00021517339337151498
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 2,
+      "cp": 2,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.253185749053955,
+        "foundation_loss/mtp": 1.8832221031188965,
+        "foundation_loss/aux": 0.00020517737721093
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.2529096603393555,
+        "foundation_loss/mtp": 1.883198857307434,
+        "foundation_loss/aux": 0.00020508634042926133
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 2,
+      "cp": 2,
+      "sp": true,
+      "chunk_size": 0,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.322266578674316,
+        "foundation_loss/mtp": 1.8852983713150024,
+        "foundation_loss/aux": 0.000215154534089379
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.322139263153076,
+        "foundation_loss/mtp": 1.8853195905685425,
+        "foundation_loss/aux": 0.00021517339337151498
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 2,
+      "cp": 2,
+      "sp": true,
+      "chunk_size": 0,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.25259256362915,
+        "foundation_loss/mtp": 1.8832048177719116,
+        "foundation_loss/aux": 0.00020512440823949873
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.253265857696533,
+        "foundation_loss/mtp": 1.883163571357727,
+        "foundation_loss/aux": 0.0002051784540526569
+      }
+    },
+    {
+      "strategy": "latent_kv_head",
+      "tp": 1,
+      "cp": 4,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.3221306800842285,
+        "foundation_loss/mtp": 1.8852537870407104,
+        "foundation_loss/aux": 0.00021517073037102818
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.322049617767334,
+        "foundation_loss/mtp": 1.885266661643982,
+        "foundation_loss/aux": 0.0002151562657672912
+      }
+    },
+    {
+      "strategy": "latent_kv_head",
+      "tp": 1,
+      "cp": 4,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.253185272216797,
+        "foundation_loss/mtp": 1.8832255601882935,
+        "foundation_loss/aux": 0.00020517720258794725
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.252998352050781,
+        "foundation_loss/mtp": 1.8831061124801636,
+        "foundation_loss/aux": 0.00020513325580395758
+      }
+    },
+    {
+      "strategy": "latent_kv_head",
+      "tp": 2,
+      "cp": 2,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.322129726409912,
+        "foundation_loss/mtp": 1.8852537870407104,
+        "foundation_loss/aux": 0.00021517073037102818
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.32218599319458,
+        "foundation_loss/mtp": 1.8852908611297607,
+        "foundation_loss/aux": 0.00021516726701520383
+      }
+    },
+    {
+      "strategy": "latent_kv_head",
+      "tp": 2,
+      "cp": 2,
+      "sp": false,
+      "chunk_size": 0,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.253185272216797,
+        "foundation_loss/mtp": 1.883221983909607,
+        "foundation_loss/aux": 0.00020517737721093
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.253416061401367,
+        "foundation_loss/mtp": 1.8831722736358643,
+        "foundation_loss/aux": 0.00020517788652796298
+      }
+    },
+    {
+      "strategy": "latent_kv_head",
+      "tp": 2,
+      "cp": 2,
+      "sp": true,
+      "chunk_size": 0,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.322266578674316,
+        "foundation_loss/mtp": 1.8852983713150024,
+        "foundation_loss/aux": 0.000215154534089379
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.32218599319458,
+        "foundation_loss/mtp": 1.8852908611297607,
+        "foundation_loss/aux": 0.00021516728156711906
+      }
+    },
+    {
+      "strategy": "latent_kv_head",
+      "tp": 2,
+      "cp": 2,
+      "sp": true,
+      "chunk_size": 0,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.25259256362915,
+        "foundation_loss/mtp": 1.8832048177719116,
+        "foundation_loss/aux": 0.00020512440823949873
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.252879619598389,
+        "foundation_loss/mtp": 1.883147120475769,
+        "foundation_loss/aux": 0.0002051159826805815
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 1,
+      "cp": 4,
+      "sp": false,
+      "chunk_size": 48,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.3221306800842285,
+        "foundation_loss/mtp": 1.885253667831421,
+        "foundation_loss/aux": 0.00021517073037102818
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.322048664093018,
+        "foundation_loss/mtp": 1.8852580785751343,
+        "foundation_loss/aux": 0.00021517081768251956
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 1,
+      "cp": 4,
+      "sp": false,
+      "chunk_size": 48,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.253185749053955,
+        "foundation_loss/mtp": 1.8832252025604248,
+        "foundation_loss/aux": 0.00020517720258794725
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.252967834472656,
+        "foundation_loss/mtp": 1.8831167221069336,
+        "foundation_loss/aux": 0.00020516951917670667
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 2,
+      "cp": 2,
+      "sp": true,
+      "chunk_size": 48,
+      "step": 1,
+      "reference": {
+        "foundation_loss/lm": 6.322266101837158,
+        "foundation_loss/mtp": 1.8852983713150024,
+        "foundation_loss/aux": 0.000215154534089379
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.322139739990234,
+        "foundation_loss/mtp": 1.8853195905685425,
+        "foundation_loss/aux": 0.00021517339337151498
+      }
+    },
+    {
+      "strategy": "expanded_ulysses",
+      "tp": 2,
+      "cp": 2,
+      "sp": true,
+      "chunk_size": 48,
+      "step": 2,
+      "reference": {
+        "foundation_loss/lm": 6.252584457397461,
+        "foundation_loss/mtp": 1.8832030296325684,
+        "foundation_loss/aux": 0.00020512440823949873
+      },
+      "candidate": {
+        "foundation_loss/lm": 6.253267288208008,
+        "foundation_loss/mtp": 1.8831634521484375,
+        "foundation_loss/aux": 0.0002051784540526569
+      }
+    }
+  ],
+  "max_abs_logged_components_rank0_short_cases": {
+    "foundation_loss/lm": 0.000682830810546875,
+    "foundation_loss/mtp": 0.00011944770812988281,
+    "foundation_loss/aux": 9.103678166866302e-08
+  }
+}

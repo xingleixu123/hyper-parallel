@@ -1,0 +1,36 @@
+.
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/torch/context_parallel/_test_jt_mla_cp.py::test_jt_mla_cp_training
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    if self.device.type != 'cpu':
+
+tests/torch/context_parallel/_test_jt_mla_cp.py::test_jt_mla_cp_training
+  /workspace/hyper-parallel/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py:464: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:423.)
+    pad_ids = pad_ids.reshape(padding, config.num_experts_per_tok) % padding
+
+tests/torch/context_parallel/_test_jt_mla_cp.py::test_jt_mla_cp_training
+  /workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:410: FutureWarning: torch.distributed.nn.functional.all_to_all_single is deprecated, use torch.distributed._functional_collectives.all_to_all_single instead.
+    return dist_func.all_to_all_single(output_tensor, input_data, group=group)
+
+tests/torch/context_parallel/_test_jt_mla_cp.py::test_jt_mla_cp_training
+  /workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:416: FutureWarning: torch.distributed.nn.functional.all_reduce is deprecated, use torch.distributed._functional_collectives.all_reduce instead.
+    return dist_func.all_reduce(data, op=resolve_reduce_op(op), group=group)
+
+tests/torch/context_parallel/_test_jt_mla_cp.py::test_jt_mla_cp_training
+  /workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:358: FutureWarning: torch.distributed.nn.functional.all_gather is deprecated, use torch.distributed._functional_collectives.all_gather_tensor instead.
+    for tensor in dist_func.all_gather(data, group=group)
+
+tests/torch/context_parallel/_test_jt_mla_cp.py::test_jt_mla_cp_training
+  /workspace/hyper-parallel/hyper_parallel/components/losses/_vocab_parallel_cross_entropy.py:57: FutureWarning: torch.distributed.nn.functional.all_reduce is deprecated, use torch.distributed._functional_collectives.all_reduce instead.
+    return dist_func.all_reduce(data, op=reduce_op, group=group)
+
+tests/torch/context_parallel/_test_jt_mla_cp.py::test_jt_mla_cp_training
+  /workspace/hyper-parallel/hyper_parallel/core/utils/communication.py:426: FutureWarning: torch.distributed.nn.functional.reduce_scatter is deprecated, use torch.distributed._functional_collectives.reduce_scatter_tensor instead.
+    output_tensor = dist_func.reduce_scatter(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 21 warnings in 44.85s

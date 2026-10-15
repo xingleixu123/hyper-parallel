@@ -1,0 +1,613 @@
+.FFFF.FF..                                             [100%]
+=================================== FAILURES ===================================
+____ TestParallelCase.test_explicit_budget_still_limits_a_larger_selection _____
+
+self = <test_parallel_case.TestParallelCase testMethod=test_explicit_budget_still_limits_a_larger_selection>
+
+    def test_explicit_budget_still_limits_a_larger_selection(self) -> None:
+        """The inherited list does not override a smaller caller-specified budget."""
+        os.environ["ASCEND_RT_VISIBLE_DEVICES"] = "4,5,6,7"
+        with self.assertRaisesRegex(ValueError, "global_num_proc=2"):
+>           parallel_case.parallel_run([TorchCase("worker.py", "case", num_proc=3)], global_num_proc=2)
+
+tests/ut/common/test_parallel_case.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def parallel_run(cases: list[TorchCase], global_num_proc: int = 8) -> None:
+        """Run a group of test cases in parallel, assigning disjoint device slices to each.
+    
+        Args:
+            cases: List of TorchCase descriptors to run concurrently.
+                The sum of all ``num_proc`` values must not exceed ``global_num_proc``.
+            global_num_proc: Total device budget for this group. Defaults to 8.
+    
+        Raises:
+            AssertionError: If the total device count exceeds ``global_num_proc``, if any
+                case times out (900 s deadline), or if any child process exits with a
+                non-zero return code.
+        """
+        # auto-assign ports before spawning children (avoids cross-process races)
+        unassigned = [c for c in cases if c.master_port is None]
+        if unassigned:
+            _auto_assign_ports(unassigned)
+    
+        # assign devices
+        sum_num_proc = 0
+        assignments = []
+    
+        for case in cases:
+            num = case.num_proc
+            devices = list(range(sum_num_proc, sum_num_proc + num))
+            assignments.append(devices)
+            sum_num_proc += num
+        # assert sum num_proc
+>       assert sum_num_proc <= global_num_proc, (f"sum num_proc {sum_num_proc} greater than "
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                 f"global_num_proc {global_num_proc}")
+E       AssertionError: sum num_proc 3 greater than global_num_proc 2
+
+tests/common/parallel_case.py:110: AssertionError
+____ TestParallelCase.test_inherited_devices_are_split_without_renumbering _____
+
+self = <test_parallel_case.TestParallelCase testMethod=test_inherited_devices_are_split_without_renumbering>
+
+    def test_inherited_devices_are_split_without_renumbering(self) -> None:
+        """Two groups keep the parent's sparse device IDs and do not overlap."""
+        os.environ["ASCEND_RT_VISIBLE_DEVICES"] = "1,3,5,7"
+        cases = [TorchCase("worker.py", "first", num_proc=2), TorchCase("worker.py", "second", num_proc=2)]
+        parallel_case.parallel_run(cases)
+>       self.assertEqual(self._assigned_devices(), [[1, 3], [5, 7]])
+E       AssertionError: Lists differ: [[0, 1], [2, 3]] != [[1, 3], [5, 7]]
+E       
+E       First differing element 0:
+E       [0, 1]
+E       [1, 3]
+E       
+E       - [[0, 1], [2, 3]]
+E       ?   ^  ^    ^  ^
+E       
+E       + [[1, 3], [5, 7]]
+E       ?   ^  ^    ^  ^
+
+tests/ut/common/test_parallel_case.py:51: AssertionError
+_ TestParallelCase.test_insufficient_visible_devices_fail_before_side_effects __
+
+self = <test_parallel_case.TestParallelCase testMethod=test_insufficient_visible_devices_fail_before_side_effects>
+
+    def test_insufficient_visible_devices_fail_before_side_effects(self) -> None:
+        """A budget larger than the inherited selection cannot widen that selection."""
+        os.environ["ASCEND_RT_VISIBLE_DEVICES"] = "4,6"
+>       with self.assertRaisesRegex(ValueError, "Requested 3 processes, but only 2 devices"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:71: AssertionError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (num_proc=0) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+>               with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:98: AssertionError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (global_num_proc=0) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+                with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                    parallel_case.parallel_run([TorchCase("worker.py", "case", num_proc=count)])
+            with self.subTest(global_num_proc=count):
+                with self.assertRaisesRegex(ValueError, "global_num_proc.*positive integer"):
+>                   parallel_case.parallel_run([TorchCase("worker.py", "case")], global_num_proc=count)
+
+tests/ut/common/test_parallel_case.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def parallel_run(cases: list[TorchCase], global_num_proc: int = 8) -> None:
+        """Run a group of test cases in parallel, assigning disjoint device slices to each.
+    
+        Args:
+            cases: List of TorchCase descriptors to run concurrently.
+                The sum of all ``num_proc`` values must not exceed ``global_num_proc``.
+            global_num_proc: Total device budget for this group. Defaults to 8.
+    
+        Raises:
+            AssertionError: If the total device count exceeds ``global_num_proc``, if any
+                case times out (900 s deadline), or if any child process exits with a
+                non-zero return code.
+        """
+        # auto-assign ports before spawning children (avoids cross-process races)
+        unassigned = [c for c in cases if c.master_port is None]
+        if unassigned:
+            _auto_assign_ports(unassigned)
+    
+        # assign devices
+        sum_num_proc = 0
+        assignments = []
+    
+        for case in cases:
+            num = case.num_proc
+            devices = list(range(sum_num_proc, sum_num_proc + num))
+            assignments.append(devices)
+            sum_num_proc += num
+        # assert sum num_proc
+>       assert sum_num_proc <= global_num_proc, (f"sum num_proc {sum_num_proc} greater than "
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                 f"global_num_proc {global_num_proc}")
+E       AssertionError: sum num_proc 1 greater than global_num_proc 0
+
+tests/common/parallel_case.py:110: AssertionError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (num_proc=-1) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+>               with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:98: AssertionError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (global_num_proc=-1) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+                with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                    parallel_case.parallel_run([TorchCase("worker.py", "case", num_proc=count)])
+            with self.subTest(global_num_proc=count):
+                with self.assertRaisesRegex(ValueError, "global_num_proc.*positive integer"):
+>                   parallel_case.parallel_run([TorchCase("worker.py", "case")], global_num_proc=count)
+
+tests/ut/common/test_parallel_case.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def parallel_run(cases: list[TorchCase], global_num_proc: int = 8) -> None:
+        """Run a group of test cases in parallel, assigning disjoint device slices to each.
+    
+        Args:
+            cases: List of TorchCase descriptors to run concurrently.
+                The sum of all ``num_proc`` values must not exceed ``global_num_proc``.
+            global_num_proc: Total device budget for this group. Defaults to 8.
+    
+        Raises:
+            AssertionError: If the total device count exceeds ``global_num_proc``, if any
+                case times out (900 s deadline), or if any child process exits with a
+                non-zero return code.
+        """
+        # auto-assign ports before spawning children (avoids cross-process races)
+        unassigned = [c for c in cases if c.master_port is None]
+        if unassigned:
+            _auto_assign_ports(unassigned)
+    
+        # assign devices
+        sum_num_proc = 0
+        assignments = []
+    
+        for case in cases:
+            num = case.num_proc
+            devices = list(range(sum_num_proc, sum_num_proc + num))
+            assignments.append(devices)
+            sum_num_proc += num
+        # assert sum num_proc
+>       assert sum_num_proc <= global_num_proc, (f"sum num_proc {sum_num_proc} greater than "
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                 f"global_num_proc {global_num_proc}")
+E       AssertionError: sum num_proc 1 greater than global_num_proc -1
+
+tests/common/parallel_case.py:110: AssertionError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (num_proc=True) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+>               with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:98: AssertionError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (global_num_proc=True) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+                with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                    parallel_case.parallel_run([TorchCase("worker.py", "case", num_proc=count)])
+            with self.subTest(global_num_proc=count):
+>               with self.assertRaisesRegex(ValueError, "global_num_proc.*positive integer"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:101: AssertionError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (num_proc=1.5) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+                with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+>                   parallel_case.parallel_run([TorchCase("worker.py", "case", num_proc=count)])
+
+tests/ut/common/test_parallel_case.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def parallel_run(cases: list[TorchCase], global_num_proc: int = 8) -> None:
+        """Run a group of test cases in parallel, assigning disjoint device slices to each.
+    
+        Args:
+            cases: List of TorchCase descriptors to run concurrently.
+                The sum of all ``num_proc`` values must not exceed ``global_num_proc``.
+            global_num_proc: Total device budget for this group. Defaults to 8.
+    
+        Raises:
+            AssertionError: If the total device count exceeds ``global_num_proc``, if any
+                case times out (900 s deadline), or if any child process exits with a
+                non-zero return code.
+        """
+        # auto-assign ports before spawning children (avoids cross-process races)
+        unassigned = [c for c in cases if c.master_port is None]
+        if unassigned:
+            _auto_assign_ports(unassigned)
+    
+        # assign devices
+        sum_num_proc = 0
+        assignments = []
+    
+        for case in cases:
+            num = case.num_proc
+>           devices = list(range(sum_num_proc, sum_num_proc + num))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: 'float' object cannot be interpreted as an integer
+
+tests/common/parallel_case.py:106: TypeError
+_ TestParallelCase.test_invalid_process_counts_fail_before_side_effects (global_num_proc=1.5) _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+                with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                    parallel_case.parallel_run([TorchCase("worker.py", "case", num_proc=count)])
+            with self.subTest(global_num_proc=count):
+>               with self.assertRaisesRegex(ValueError, "global_num_proc.*positive integer"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:101: AssertionError
+____ TestParallelCase.test_invalid_process_counts_fail_before_side_effects _____
+
+self = <test_parallel_case.TestParallelCase testMethod=test_invalid_process_counts_fail_before_side_effects>
+
+    def test_invalid_process_counts_fail_before_side_effects(self) -> None:
+        """Non-positive and non-integer sizes cannot produce overlapping slices."""
+        for count in (0, -1, True, 1.5):
+            with self.subTest(num_proc=count):
+                with self.assertRaisesRegex(ValueError, "num_proc.*positive integer"):
+                    parallel_case.parallel_run([TorchCase("worker.py", "case", num_proc=count)])
+            with self.subTest(global_num_proc=count):
+                with self.assertRaisesRegex(ValueError, "global_num_proc.*positive integer"):
+                    parallel_case.parallel_run([TorchCase("worker.py", "case")], global_num_proc=count)
+>       self.context.Process.assert_not_called()
+
+tests/ut/common/test_parallel_case.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='_parallel_run_context().Process' id='281471615816992'>
+
+    def assert_not_called(self):
+        """assert that the mock was never called.
+        """
+        if self.call_count != 0:
+            msg = ("Expected '%s' to not have been called. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'Process' to not have been called. Called 5 times.
+E           Calls: [call(target=<function run_case at 0xffff37b191c0>, args=([], <tests.common.parallel_case.TorchCase object at 0xffff37ad3380>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([], <tests.common.parallel_case.TorchCase object at 0xffff37c69430>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37c692e0>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bbfb60>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bbf620>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive()].
+
+/usr/local/python3.12.14/lib/python3.12/unittest/mock.py:910: AssertionError
+----------------------------- Captured stdout call -----------------------------
+uuuuuuuu
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='4,') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='4,,6') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='-1') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='4, 6') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='a') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='4,4') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='4,04') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='6,4') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_ TestParallelCase.test_malformed_visibility_fails_before_side_effects (visible='４') _
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+>               with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/common/test_parallel_case.py:89: AssertionError
+_____ TestParallelCase.test_malformed_visibility_fails_before_side_effects _____
+
+self = <test_parallel_case.TestParallelCase testMethod=test_malformed_visibility_fails_before_side_effects>
+
+    def test_malformed_visibility_fails_before_side_effects(self) -> None:
+        """Reject ambiguous selections instead of silently enabling other devices."""
+        for visible in ("", "4,", "4,,6", "-1", "4, 6", "a", "4,4", "4,04", "6,4", "４"):
+            with self.subTest(visible=visible):
+                os.environ["ASCEND_RT_VISIBLE_DEVICES"] = visible
+                with self.assertRaisesRegex(ValueError, "ASCEND_RT_VISIBLE_DEVICES"):
+                    parallel_case.parallel_run([TorchCase("worker.py", "case")])
+>       self.context.Process.assert_not_called()
+
+tests/ut/common/test_parallel_case.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='_parallel_run_context().Process' id='281471616927504'>
+
+    def assert_not_called(self):
+        """assert that the mock was never called.
+        """
+        if self.call_count != 0:
+            msg = ("Expected '%s' to not have been called. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'Process' to not have been called. Called 10 times.
+E           Calls: [call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37c3c170>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bce6c0>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bce7b0>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bccbf0>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bcd5e0>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bcdd90>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bcf920>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bcdd60>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bce720>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive(),
+E            call(target=<function run_case at 0xffff37b191c0>, args=([0], <tests.common.parallel_case.TorchCase object at 0xffff37bcfe30>)),
+E            call().start(),
+E            call().join(timeout=420),
+E            call().is_alive()].
+
+/usr/local/python3.12.14/lib/python3.12/unittest/mock.py:910: AssertionError
+----------------------------- Captured stdout call -----------------------------
+uuuuuuuuuu
+______ TestParallelCase.test_single_group_inherits_selected_four_devices _______
+
+self = <test_parallel_case.TestParallelCase testMethod=test_single_group_inherits_selected_four_devices>
+
+    def test_single_group_inherits_selected_four_devices(self) -> None:
+        """A four-rank case fits a four-device selection with the default budget."""
+        os.environ["ASCEND_RT_VISIBLE_DEVICES"] = "4,5,6,7"
+        parallel_case.parallel_run([TorchCase("worker.py", "case", 23456, 4)])
+>       self.assertEqual(self._assigned_devices(), [[4, 5, 6, 7]])
+E       AssertionError: Lists differ: [[0, 1, 2, 3]] != [[4, 5, 6, 7]]
+E       
+E       First differing element 0:
+E       [0, 1, 2, 3]
+E       [4, 5, 6, 7]
+E       
+E       - [[0, 1, 2, 3]]
+E       + [[4, 5, 6, 7]]
+
+tests/ut/common/test_parallel_case.py:59: AssertionError
+=========================== short test summary info ============================
+FAILED tests/ut/common/test_parallel_case.py::TestParallelCase::test_explicit_budget_still_limits_a_larger_selection
+FAILED tests/ut/common/test_parallel_case.py::TestParallelCase::test_inherited_devices_are_split_without_renumbering
+FAILED tests/ut/common/test_parallel_case.py::TestParallelCase::test_insufficient_visible_devices_fail_before_side_effects
+SUBFAILED(num_proc=0) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(global_num_proc=0) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(num_proc=-1) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(global_num_proc=-1) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(num_proc=True) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(global_num_proc=True) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(num_proc=1.5) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(global_num_proc=1.5) tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+FAILED tests/ut/common/test_parallel_case.py::TestParallelCase::test_invalid_process_counts_fail_before_side_effects
+SUBFAILED(visible='') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='4,') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='4,,6') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='-1') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='4, 6') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='a') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='4,4') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='4,04') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='6,4') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+SUBFAILED(visible='４') tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+FAILED tests/ut/common/test_parallel_case.py::TestParallelCase::test_malformed_visibility_fails_before_side_effects
+FAILED tests/ut/common/test_parallel_case.py::TestParallelCase::test_single_group_inherits_selected_four_devices
+24 failed, 4 passed in 0.47s
+
+Authorized users only. All activities may be monitored and reported.
