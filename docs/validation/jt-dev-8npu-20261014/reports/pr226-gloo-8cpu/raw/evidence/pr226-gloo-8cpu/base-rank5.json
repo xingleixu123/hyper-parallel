@@ -1,0 +1,287 @@
+{
+  "mode": "base",
+  "rank": 5,
+  "world_size": 8,
+  "backend": "gloo",
+  "torch_version": "2.12.0+cpu",
+  "source_root": "/work/tmp/pr226-gloo-source/base",
+  "callback_sha256": "f83e3fa5c5dabe37af299adb016045c2e6430abac010bef4cadc8a6189b9517d",
+  "runtime_distributed_sha256": "d73eab0a6db16fa2780a8a8aac7240b69b6b221a8bbc877355160e1c5d29a000",
+  "probe_sha256": "ae867463fa96a87f334604568565998a4bb247e01f776c745c71b32b8ba539d5",
+  "npu_initialized": false,
+  "records": [
+    {
+      "layout": "dp2_cp2_tp2_group_boundary",
+      "rank": 5,
+      "step": 1,
+      "data_group_ranks": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "cp_size": 2,
+      "expected": {
+        "performance/step_time": 9.0,
+        "performance/tokens_per_second": 2.6666666666666665,
+        "memory/device_max_allocated_gb": 13.0,
+        "memory/device_max_reserved_gb": 17.0,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 24.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 4.0,
+        "training/foundation_loss/lm": 5.0,
+        "training/total_loss": 5.0,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001
+      },
+      "actual": {
+        "training/total_loss": 5.0,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001,
+        "training/foundation_loss/lm": 5.0,
+        "performance/step_time": 9.0,
+        "performance/tokens_per_second": 2.6666666666666665,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 24.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 4.0,
+        "memory/device_max_allocated_gb": 13.0,
+        "memory/device_max_reserved_gb": 17.0
+      },
+      "mismatches": {}
+    },
+    {
+      "layout": "dp2_cp2_tp2_group_boundary",
+      "rank": 5,
+      "step": 2,
+      "data_group_ranks": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "cp_size": 2,
+      "expected": {
+        "performance/step_time": 18.0,
+        "performance/tokens_per_second": 1.3333333333333333,
+        "memory/device_max_allocated_gb": 26.0,
+        "memory/device_max_reserved_gb": 34.0,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 48.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 8.0,
+        "training/foundation_loss/lm": 5.0,
+        "training/total_loss": 5.0,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001
+      },
+      "actual": {
+        "training/total_loss": 5.0,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001,
+        "training/foundation_loss/lm": 5.0,
+        "performance/step_time": 18.0,
+        "performance/tokens_per_second": 1.3333333333333333,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 48.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 8.0,
+        "memory/device_max_allocated_gb": 26.0,
+        "memory/device_max_reserved_gb": 34.0
+      },
+      "mismatches": {}
+    },
+    {
+      "layout": "dp2_cp2_pp2_group_boundary",
+      "rank": 5,
+      "step": 1,
+      "data_group_ranks": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "cp_size": 2,
+      "expected": {
+        "performance/step_time": 9.0,
+        "performance/tokens_per_second": 2.6666666666666665,
+        "memory/device_max_allocated_gb": 13.0,
+        "memory/device_max_reserved_gb": 17.0,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 24.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 4.0,
+        "training/foundation_loss/lm": 6.5,
+        "training/total_loss": 6.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001
+      },
+      "actual": {
+        "training/total_loss": 6.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001,
+        "training/foundation_loss/lm": 6.5,
+        "performance/step_time": 9.0,
+        "performance/tokens_per_second": 2.6666666666666665,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 24.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 4.0,
+        "memory/device_max_allocated_gb": 7.0,
+        "memory/device_max_reserved_gb": 8.0
+      },
+      "mismatches": {
+        "memory/device_max_allocated_gb": {
+          "actual": 7.0,
+          "expected": 13.0
+        },
+        "memory/device_max_reserved_gb": {
+          "actual": 8.0,
+          "expected": 17.0
+        }
+      }
+    },
+    {
+      "layout": "dp2_cp2_pp2_group_boundary",
+      "rank": 5,
+      "step": 2,
+      "data_group_ranks": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "cp_size": 2,
+      "expected": {
+        "performance/step_time": 18.0,
+        "performance/tokens_per_second": 1.3333333333333333,
+        "memory/device_max_allocated_gb": 26.0,
+        "memory/device_max_reserved_gb": 34.0,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 48.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 8.0,
+        "training/foundation_loss/lm": 6.5,
+        "training/total_loss": 6.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001
+      },
+      "actual": {
+        "training/total_loss": 6.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001,
+        "training/foundation_loss/lm": 6.5,
+        "performance/step_time": 18.0,
+        "performance/tokens_per_second": 1.3333333333333333,
+        "data/step_tokens": 24.0,
+        "data/consumed_tokens": 48.0,
+        "data/step_samples": 4.0,
+        "data/consumed_samples": 8.0,
+        "memory/device_max_allocated_gb": 14.0,
+        "memory/device_max_reserved_gb": 16.0
+      },
+      "mismatches": {
+        "memory/device_max_allocated_gb": {
+          "actual": 14.0,
+          "expected": 26.0
+        },
+        "memory/device_max_reserved_gb": {
+          "actual": 16.0,
+          "expected": 34.0
+        }
+      }
+    },
+    {
+      "layout": "world_dp8_control",
+      "rank": 5,
+      "step": 1,
+      "data_group_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "cp_size": 1,
+      "expected": {
+        "performance/step_time": 9.0,
+        "performance/tokens_per_second": 5.333333333333333,
+        "memory/device_max_allocated_gb": 13.0,
+        "memory/device_max_reserved_gb": 17.0,
+        "data/step_tokens": 48.0,
+        "data/consumed_tokens": 48.0,
+        "data/step_samples": 16.0,
+        "data/consumed_samples": 16.0,
+        "training/foundation_loss/lm": 4.5,
+        "training/total_loss": 4.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001
+      },
+      "actual": {
+        "training/total_loss": 4.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001,
+        "training/foundation_loss/lm": 4.5,
+        "performance/step_time": 9.0,
+        "performance/tokens_per_second": 5.333333333333333,
+        "data/step_tokens": 48.0,
+        "data/consumed_tokens": 48.0,
+        "data/step_samples": 16.0,
+        "data/consumed_samples": 16.0,
+        "memory/device_max_allocated_gb": 13.0,
+        "memory/device_max_reserved_gb": 17.0
+      },
+      "mismatches": {}
+    },
+    {
+      "layout": "world_dp8_control",
+      "rank": 5,
+      "step": 2,
+      "data_group_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "cp_size": 1,
+      "expected": {
+        "performance/step_time": 18.0,
+        "performance/tokens_per_second": 2.6666666666666665,
+        "memory/device_max_allocated_gb": 26.0,
+        "memory/device_max_reserved_gb": 34.0,
+        "data/step_tokens": 48.0,
+        "data/consumed_tokens": 96.0,
+        "data/step_samples": 16.0,
+        "data/consumed_samples": 32.0,
+        "training/foundation_loss/lm": 4.5,
+        "training/total_loss": 4.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001
+      },
+      "actual": {
+        "training/total_loss": 4.5,
+        "training/grad_norm": 0.5,
+        "training/lr": 0.001,
+        "training/foundation_loss/lm": 4.5,
+        "performance/step_time": 18.0,
+        "performance/tokens_per_second": 2.6666666666666665,
+        "data/step_tokens": 48.0,
+        "data/consumed_tokens": 96.0,
+        "data/step_samples": 16.0,
+        "data/consumed_samples": 32.0,
+        "memory/device_max_allocated_gb": 26.0,
+        "memory/device_max_reserved_gb": 34.0
+      },
+      "mismatches": {}
+    }
+  ],
+  "scope_zh": "真实CPU/Gloo通信，时钟和显存读数为注入哨兵；仅检验归约边界，不是NPU显存测量或TP/PP训练。"
+}

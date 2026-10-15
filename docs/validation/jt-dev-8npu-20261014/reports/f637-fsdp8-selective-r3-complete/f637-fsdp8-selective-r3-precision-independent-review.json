@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-15T19:44:15.970335+00:00",
+  "review_axis": "Spec / 独立原始证据数值审计",
+  "status": "PASS",
+  "reference": "r129-f637-fp32-fsdp8-0-200-r4",
+  "candidate": "r129-f637-fp32-fsdp8-selective-200-r3",
+  "conclusion_zh": "本轮独立selective运行完整完成1–200步、全部8rank。与关闭重算的独立FSDP8基线比较，LM、日志加权MTP/aux、total及grad_norm的1600对数值逐项完全一致；按实际0.3/0.0001还原的MTP/aux误差也为0，满足绝对误差≤0.005。输入、初态、计数、源码、配方和完成证据一致，selective构建确实包含三个训练态wrapper。",
+  "findings": [],
+  "methods_zh": [
+    "独立Python标准库审计，未导入或调用strict_compare_runs/compare_runs，未执行训练、模型或NPU操作。先读取并冻结文件字节，核对两份manifest共152个文件的实际大小与SHA，再从这些字节解析raw记录。",
+    "逐rank强制200条、step恰为1到200且有序、rank匹配、所有标量有限；start=0/epoch0、complete=200/epoch1、restore_from=None、EXIT_CODE和receipt均0且释放。",
+    "每步先核对同一运行8rank的global input SHA一致，再跨运行逐rank逐步比较完整input_identity；200个步骤hash互异。核对每步token/sample及从step1累计的计数、LR一致。",
+    "核对16份完整初始化state_dict摘要各48项的FQN/shape/dtype/SHA，以及16份起始参数清单各46项完全一致；该初态摘要由完整初始化后、分片前的state_dict逐张量计算，不是参数采样。",
+    "从raw逐项计算abs(candidate-reference)及每步跨rank最大误差，最后才和已有严格结果的总最大值、200点曲线、损失系数及配方指纹交叉比对。",
+    "完整resolved配置逐字段比较，仅允许本次实际出现的off→selective、checkpoint保存开关和路径三项差异；integration配置副本与resolved一致。独立重算已声明的规范化配方SHA作为额外交叉核对。",
+    "结合8rank构建日志、最终模块清单和固定源码的selective context_fn包装调用确认模式生效；不以有缺陷的旧wrapper计数单独判断。"
+  ],
+  "integrity": {
+    "r129-f637-fp32-fsdp8-0-200-r4": {
+      "manifest": "evidence/f637-fsdp8-r4-complete-evidence-manifest.json",
+      "manifest_sha256": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11",
+      "files_verified": 76,
+      "all_bytes_and_sha256_match": true,
+      "exact_run_file_set_plus_receipt": true,
+      "recorded_archive_sha256": "0c5a6d0b92480395f6b44b678bc5f09ffb8a3488ce263e28f131c9219fc63c34",
+      "archive_rechecked": false
+    },
+    "r129-f637-fp32-fsdp8-selective-200-r3": {
+      "manifest": "evidence/f637-fsdp8-selective-r3-complete-evidence-manifest.json",
+      "manifest_sha256": "ea5c11341c93e182ccf4991819fb02c4e2e61011758573bf96d2258ea4c2aec0",
+      "files_verified": 76,
+      "all_bytes_and_sha256_match": true,
+      "exact_run_file_set_plus_receipt": true,
+      "recorded_archive_sha256": "c6d69bef6ebc5843d1c7c1955f2c7422d11b7e74af2bbdaaf3fc4a9e407c3545",
+      "archive_rechecked": false
+    }
+  },
+  "strict_report_sha256": "118b0eb341ddbd8e6fbbb1db34a54fa4754e2b6d3ec566f06aa47e3ce0db1891",
+  "complete_local_verification_sha256": "b30a8b8fd71af91f937018826aaf72673cee0087c4b321b55eee28b8ca3bb23b",
+  "completion": {
+    "ranks": 8,
+    "steps": [
+      1,
+      200
+    ],
+    "rows_per_rank_each_run": 200,
+    "scalar_pairs_per_metric": 1600,
+    "start_global_step": 0,
+    "final_global_step": 200,
+    "restore_from": null,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "released": [
+      true,
+      true
+    ],
+    "remaining_owned_pids_empty": true,
+    "distinct_container_identities": true,
+    "execution_windows_do_not_overlap": true,
+    "candidate_duration_seconds": 394.86102199000015
+  },
+  "source_and_recipe": {
+    "source_commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_status_clean": true,
+    "same_immutable_image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "normalized_recipe_sha256_each": [
+      "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5",
+      "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5"
+    ],
+    "resolved_config_sha256": {
+      "r129-f637-fp32-fsdp8-0-200-r4": "dfb276d6b985e0d6197888d4480c340611bc2ab42a3d58c89121a1319457f782",
+      "r129-f637-fp32-fsdp8-selective-200-r3": "d7ab61e3af54bf173289cb3e59afa0346c601687000c2b8bd50c3f126ab87561"
+    },
+    "actual_configuration_differences": [
+      {
+        "path": "/activation_checkpoint/mode",
+        "reference": "off",
+        "candidate": "selective"
+      },
+      {
+        "path": "/checkpoint/checkpoint_dir",
+        "reference": "/work/checkpoints/r129-f637-fp32-fsdp8",
+        "candidate": "/work/checkpoints/r129-f637-fp32-fsdp8-selective-200-r3"
+      },
+      {
+        "path": "/checkpoint/save_ckpt",
+        "reference": true,
+        "candidate": false
+      }
+    ],
+    "same_capture_helpers_sha256": {
+      "capture_precision_training.py": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6",
+      "capture_training.py": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+      "expert_probe.py": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f",
+      "fp32_wgrad_experiment.py": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670",
+      "module_profile.py": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c",
+      "ns_batch_trace.py": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e",
+      "precision_experiments.py": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    "reviewed_fixed_source_files_sha256": {
+      "hyper_parallel/distributed/activation_checkpoint.py": "ccb0cf8023569c4114fa567bd4c2bd3a54fd70b50b1a805efdd0410ca5ea326b",
+      "hyper_parallel/core/activation_memory/wrapper.py": "3283c73da08a6342b86287305f5ef931d2dbd44af73b89a92c44a273d9bb89af",
+      "hyper_parallel/tools/model_integration/tensor_probes.py": "65fd9112101e6d978ecb5e52bfbcd9173752d95754d441d49da1cc55007a9b46"
+    },
+    "model_integration_mode": "build",
+    "precision": {
+      "expert_weight_gradients": "float32",
+      "muon_ns_dtype": "float32",
+      "fsdp_param_dtype": "bfloat16",
+      "fsdp_reduce_dtype": "float32"
+    }
+  },
+  "numerical_results": {
+    "tolerance_absolute": 0.005,
+    "weighted_status": "PASS",
+    "derived_unweighted_status": "PASS",
+    "logged_max_absolute_errors": {
+      "training/total_loss": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/lm": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/mtp": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/aux": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/grad_norm": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      }
+    },
+    "derived_unweighted_max_absolute_errors": {
+      "lm": 0.0,
+      "mtp": 0.0,
+      "aux": 0.0
+    },
+    "coefficients": {
+      "mtp_loss_factor": 0.3,
+      "moe_aux_loss_coeff": 0.0001
+    },
+    "derivation_zh": "LM为日志原量；MTP/aux为日志加权标量绝对差分别除以0.3/0.0001，非直接采集乘系数前张量。",
+    "per_rank": [
+      {
+        "rank": 0,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      },
+      {
+        "rank": 1,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      },
+      {
+        "rank": 2,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      },
+      {
+        "rank": 3,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      },
+      {
+        "rank": 4,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      },
+      {
+        "rank": 5,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      },
+      {
+        "rank": 6,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      },
+      {
+        "rank": 7,
+        "reference_rows": 200,
+        "candidate_rows": 200,
+        "max_abs": {
+          "training/total_loss": 0.0,
+          "training/foundation_loss/lm": 0.0,
+          "training/foundation_loss/mtp": 0.0,
+          "training/foundation_loss/aux": 0.0,
+          "training/grad_norm": 0.0
+        }
+      }
+    ],
+    "all_200_per_step_maxima_are_zero": true,
+    "input_identity_mismatches": 0,
+    "data_or_lr_mismatches": 0,
+    "unique_global_input_hashes": 200,
+    "initial_state_entries_per_rank": 48,
+    "initial_state_json_sha256_all_16": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "final_consumed_tokens": 3713791,
+    "final_consumed_samples": 1600
+  },
+  "selective_construction": {
+    "resolved_activation_checkpoint": {
+      "mode": "selective",
+      "swap_inputs": false,
+      "selection": {
+        "source": "default",
+        "layer_count": null,
+        "layer_indices": null
+      }
+    },
+    "compile_enabled": false,
+    "actual_training_wrappers": [
+      {
+        "fqn": "model.layers.0",
+        "type": "abc.HSDPCheckpointWrapper",
+        "training": true
+      },
+      {
+        "fqn": "model.layers.1",
+        "type": "abc.HSDPCheckpointWrapper",
+        "training": true
+      },
+      {
+        "fqn": "mtp.layers.0.transformer_layer",
+        "type": "hyper_parallel.core.activation_memory.wrapper.CheckpointWrapper",
+        "training": true
+      }
+    ],
+    "baseline_wrappers": [],
+    "rank_log_evidence": [
+      {
+        "rank": 0,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/0/stderr.log",
+        "line": 553,
+        "sha256": "26214d5a68aac72f28d1399bcb03673b5687d4c6b3e1416ffc7a1b7edaac30d4"
+      },
+      {
+        "rank": 1,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/1/stderr.log",
+        "line": 12,
+        "sha256": "d28fd2c692846f6a965ea0d3712bb1c179bc3c15a811a6ed1944433fc5fb05ff"
+      },
+      {
+        "rank": 2,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/2/stderr.log",
+        "line": 12,
+        "sha256": "a27a286d0a17223215c41d7e7322ce29f826fe3abafe9fdbb43641c653137818"
+      },
+      {
+        "rank": 3,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/3/stderr.log",
+        "line": 12,
+        "sha256": "055d0542d685b2c37c28d345f2dc6d8997aed48caacdfa9de61d0f93b603fe77"
+      },
+      {
+        "rank": 4,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/4/stderr.log",
+        "line": 12,
+        "sha256": "9ef583c3c6bef1f70033023f180e43b4c1208150e438f94529e6b9c8b5d672df"
+      },
+      {
+        "rank": 5,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/5/stderr.log",
+        "line": 12,
+        "sha256": "c13426c9842a91882fe0376ea931cc0f6df231de34dc6c5ca6f02b4fef43f285"
+      },
+      {
+        "rank": 6,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/6/stderr.log",
+        "line": 12,
+        "sha256": "2521560dced754d4d2c324b077c9bfc339ab12318b6ae8f457877035cff2f654"
+      },
+      {
+        "rank": 7,
+        "path": "runs/r129-f637-fp32-fsdp8-selective-200-r3/worker-logs/none_p7wdn3op/attempt_0/7/stderr.log",
+        "line": 12,
+        "sha256": "c69b68db214b511ecf011e02c6d05051b05337eac2f49c427314f1f5ddd1e383"
+      }
+    ],
+    "legacy_wrapper_report_count": 1,
+    "legacy_report_note_zh": "固定训练源码尚含已独立发现的wrapper盘点缺陷：按类名只识别MTP wrapper，漏报两个FSDP动态派生的HSDPCheckpointWrapper。实际inventory显示三个wrapper，8rank各记录Selective applied to 3；此处不把旧count=1当作只重算一层，也未修改原证据。",
+    "source_contract_zh": "固定源码activation_checkpoint.py:1013–1025为eager selective安装context_fn；:1128–1140按selective分支执行并记录数量。CheckpointWrapper.forward调用checkpoint，训练态保留。"
+  },
+  "supplemental_resource_observations": {
+    "independently_recomputed": {
+      "r129-f637-fp32-fsdp8-0-200-r4": {
+        "median_step_seconds_after_20_warmup_steps": 1.1550026535987854,
+        "summed_step_seconds_after_20_warmup_steps": 207.7378523349762,
+        "supervised_tokens_after_20_warmup_steps": 3325552.0,
+        "supervised_tokens_per_second": 16008.406569244611,
+        "allocated_gib_all_200_steps": 22.032196044921875,
+        "reserved_gib_all_200_steps": 27.25
+      },
+      "r129-f637-fp32-fsdp8-selective-200-r3": {
+        "median_step_seconds_after_20_warmup_steps": 1.2321109771728516,
+        "summed_step_seconds_after_20_warmup_steps": 221.52741825580597,
+        "supervised_tokens_after_20_warmup_steps": 3325552.0,
+        "supervised_tokens_per_second": 15011.920538702172,
+        "allocated_gib_all_200_steps": 19.875640869140625,
+        "reserved_gib_all_200_steps": 24.7890625
+      }
+    },
+    "candidate_summary_matches_raw": true,
+    "scope_zh": "时间先逐步全8rank MAX，再取第21–200步中位数；token只计一次。显存为全部200步累计峰值MAX，保留预热。仅单次匹配运行观测，包含输入CPU拷贝/hash开销，不据此推断稳定性能收益。"
+  },
+  "boundaries_zh": [
+    "仅验收本固定配方的FSDP8 selective 0–200相对off基线；本轮不重新验收续训、full、TP、CP、EP、其他选择策略或组合矩阵。",
+    "本轮独立完成200步，未与先前被中断的109步或48步拼接。",
+    "grad_norm一致不等价于所有梯度元素或训练后参数逐字节一致；MTP/aux未加权结果为日志反推。输入与初始化一致性依据运行时保存的完整hash摘要，未重新生成训练数据或权重。",
+    "配置、模块类型、源码和执行日志确认selective包装参与训练；没有逐算子replay计数或模块时间/显存剖析，因此不声称特定算子实际重放次数及最优重算性价比。",
+    "两端重复压缩归档已清理，本次复核全部留存原始文件的大小/SHA；manifest保留的archive_sha256仅为历史采集指纹，没有声称重新验证已删除归档。"
+  ]
+}

@@ -1,0 +1,590 @@
+{
+  "status": "PASS",
+  "axis": "Standards / 证据归档与执行边界",
+  "reviewed_at_utc": "2026-10-15T19:39:07.762137+00:00",
+  "summary_zh": "两项既有问题均关闭；58份证据与压缩归档逐字节一致，v1/v2版本、部署和实际导入指纹一致且分开保存。v2每个rank、布局和步骤均符合独立局部/全局oracle。没有新增规范阻断或需处理的启发式气味。",
+  "base": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+  "head": "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7",
+  "closed_findings": [
+    {
+      "id": "base_oracle_too_weak",
+      "status": "CLOSED",
+      "file": "tools/check_resource_metrics_gloo.py",
+      "lines": [
+        101,
+        118,
+        173,
+        175
+      ],
+      "evidence_zh": "基点按selected_ranks局部MAX逐项校验，修复按world MAX校验；实际key集合、world对照及数据/loss均严格校验。v2基点64项全局指标差异全部符合局部oracle，head全局差异0；各48个观测。"
+    },
+    {
+      "id": "failure_exit_evidence_skipped",
+      "status": "CLOSED",
+      "file": "tools/run_resource_metrics_gloo.sh",
+      "lines": [
+        19,
+        27
+      ],
+      "evidence_zh": "显式set +e捕获timeout/torchrun返回，恢复set -e后先写退出码，再以非零测试结果传播失败。本轮两模式exit文件均0；异常分支按代码审查确认，未另发起故障注入。"
+    }
+  ],
+  "hard_violations": [],
+  "heuristic_findings": [],
+  "standards": {
+    "path": "D:\\01-work\\hyper-parallel\\.agent\\rules\\code-style.md",
+    "sha256": "fb951b583e7319cf23edffc184fbbbbc830e1092a5f9a0bdcc1561b65046b46e",
+    "applied_sections": [
+      "Error Handling And Imports",
+      "Design Rules",
+      "Command Execution And Security",
+      "Fix Over Evade"
+    ]
+  },
+  "source_archives": {
+    "base": {
+      "commit": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+      "verified_git_blobs": 1946,
+      "callback_sha256": "f83e3fa5c5dabe37af299adb016045c2e6430abac010bef4cadc8a6189b9517d",
+      "runtime_sha256": "d73eab0a6db16fa2780a8a8aac7240b69b6b221a8bbc877355160e1c5d29a000"
+    },
+    "head": {
+      "commit": "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7",
+      "verified_git_blobs": 1946,
+      "callback_sha256": "9db09efaac8bfc1a05d3a257e5fc31d83d19ae012081cfe495ecace0fba5503a",
+      "runtime_sha256": "d73eab0a6db16fa2780a8a8aac7240b69b6b221a8bbc877355160e1c5d29a000"
+    }
+  },
+  "results": {
+    "v1": {
+      "base": {
+        "rank_count": 8,
+        "observations": 48,
+        "global_metric_mismatches": 64,
+        "local_or_global_oracle_mismatches": 0,
+        "world_control_mismatches": 0,
+        "data_or_loss_mismatches": 0,
+        "mismatches_by_layout": {
+          "dp2_cp2_tp2_group_boundary": 32,
+          "dp2_cp2_pp2_group_boundary": 32,
+          "world_dp8_control": 0
+        }
+      },
+      "head": {
+        "rank_count": 8,
+        "observations": 48,
+        "global_metric_mismatches": 0,
+        "local_or_global_oracle_mismatches": 0,
+        "world_control_mismatches": 0,
+        "data_or_loss_mismatches": 0,
+        "mismatches_by_layout": {
+          "dp2_cp2_tp2_group_boundary": 0,
+          "dp2_cp2_pp2_group_boundary": 0,
+          "world_dp8_control": 0
+        }
+      }
+    },
+    "v2": {
+      "base": {
+        "rank_count": 8,
+        "observations": 48,
+        "global_metric_mismatches": 64,
+        "local_or_global_oracle_mismatches": 0,
+        "world_control_mismatches": 0,
+        "data_or_loss_mismatches": 0,
+        "mismatches_by_layout": {
+          "dp2_cp2_tp2_group_boundary": 32,
+          "dp2_cp2_pp2_group_boundary": 32,
+          "world_dp8_control": 0
+        }
+      },
+      "head": {
+        "rank_count": 8,
+        "observations": 48,
+        "global_metric_mismatches": 0,
+        "local_or_global_oracle_mismatches": 0,
+        "world_control_mismatches": 0,
+        "data_or_loss_mismatches": 0,
+        "mismatches_by_layout": {
+          "dp2_cp2_tp2_group_boundary": 0,
+          "dp2_cp2_pp2_group_boundary": 0,
+          "world_dp8_control": 0
+        }
+      }
+    }
+  },
+  "checks": [
+    {
+      "check": "清单无重复且含58文件",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "58份原始文件大小及SHA256匹配",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "证据压缩包大小和SHA256匹配",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "证据压缩包恰好包含清单58文件",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "证据压缩包成员与原始文件逐字节一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "base源码归档与v1/v2部署清单一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "base源码归档commit标记一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "base归档1946文件与固定Git树完整一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "base部署callback指纹准确",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "head源码归档与v1/v2部署清单一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "head源码归档commit标记一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "head归档1946文件与固定Git树完整一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "head部署callback指纹准确",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2当前部署文件绑定:tools/check_resource_metrics_gloo.py",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2当前部署文件绑定:tools/run_resource_metrics_gloo.sh",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2当前部署文件绑定:tmp/pr226-gloo-base.tar.gz",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2当前部署文件绑定:tmp/pr226-gloo-head.tar.gz",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1冻结脚本匹配独立部署:check_resource_metrics_gloo.py",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1冻结脚本匹配独立部署:run_resource_metrics_gloo.sh",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2冻结脚本匹配独立部署:check_resource_metrics_gloo.py",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2冻结脚本匹配独立部署:run_resource_metrics_gloo.sh",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/v2脚本版本保持分离",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/base全部rank逐项独立复算及summary一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/base预期基点差异或修复一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/baselauncher最终摘要和退出码准确",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/baseeditable安装指向对应树",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/head全部rank逐项独立复算及summary一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/head预期基点差异或修复一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/headlauncher最终摘要和退出码准确",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1/headeditable安装指向对应树",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/base全部rank逐项独立复算及summary一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/base预期基点差异或修复一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/baselauncher最终摘要和退出码准确",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/baseeditable安装指向对应树",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/head全部rank逐项独立复算及summary一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/head预期基点差异或修复一致",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/headlauncher最终摘要和退出码准确",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2/headeditable安装指向对应树",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v1退出与无NPU设备边界",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "v2退出与无NPU设备边界",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "check": "两次执行独立且先后不重叠",
+      "status": "PASS",
+      "details": null
+    }
+  ],
+  "checked_input_count": 64,
+  "input_sha256": {
+    "evidence/pr226-gloo-evidence-manifest.json": {
+      "bytes": 10468,
+      "sha256": "66ce8977e342eb8a087fd2e2592df99ea4e62c5c1927d07f710510115de6d468"
+    },
+    "evidence/pr226-gloo-8cpu/base-editable.log": {
+      "bytes": 1268,
+      "sha256": "dbe5f223662c93bd8fa4eb2cda2fe1a5017bd002b04c833b17aed4ca4c656481"
+    },
+    "evidence/pr226-gloo-8cpu/base-exit.txt": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "evidence/pr226-gloo-8cpu/base-launcher.log": {
+      "bytes": 2058,
+      "sha256": "3eda2e8fadd6fb7c122263d3cdd96a62c470ae96441b42f1a3fead399a717a5f"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank0.json": {
+      "bytes": 9444,
+      "sha256": "f47ed461f623b255ec530a287fe90bd627ba635dd4a3b02027078ed4b64a25a3"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank1.json": {
+      "bytes": 8540,
+      "sha256": "c20e7727bf8b2f7e9934a8976992478d7bfe38332aab00304f9572fb73131cc8"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank2.json": {
+      "bytes": 9444,
+      "sha256": "67cb65ab3c5540cdfa04e042078381511352c521cde00b719cee6efca54e6656"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank3.json": {
+      "bytes": 8540,
+      "sha256": "8568a46eb1219cee060cb337a5bb75bdf42c49a8bf0b9c85ddc3e4f0c043191c"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank4.json": {
+      "bytes": 9464,
+      "sha256": "c3f80547c13b166c56ceb1da48128156fc1f37fc7cb8b74581b044d4bdd8fcb2"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank5.json": {
+      "bytes": 8560,
+      "sha256": "eaa022f7752ce9af6c9ab74586e6c86faa1c22cf8b8c8f33a408112487cced72"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank6.json": {
+      "bytes": 9464,
+      "sha256": "2f4dbd06dd9e3e9f4612978fd1cf86a8e67d367f7bc965f52290be44b8d14d44"
+    },
+    "evidence/pr226-gloo-8cpu/base-rank7.json": {
+      "bytes": 8560,
+      "sha256": "6c3d072590f55fd63aa581d77e3daad685b3ea891621566a36a3f5baa67c6788"
+    },
+    "evidence/pr226-gloo-8cpu/base-summary.json": {
+      "bytes": 573,
+      "sha256": "f8e01974849688de1fdcd6d85fe5486df92c9dd3306c6671fec7e3ad32057d69"
+    },
+    "evidence/pr226-gloo-8cpu/check_resource_metrics_gloo.py": {
+      "bytes": 8608,
+      "sha256": "ae867463fa96a87f334604568565998a4bb247e01f776c745c71b32b8ba539d5"
+    },
+    "evidence/pr226-gloo-8cpu/head-editable.log": {
+      "bytes": 1153,
+      "sha256": "f7ebe595a04723baa29d1d98cb726da5ec465fe41b351d9da521c73168f8a9e5"
+    },
+    "evidence/pr226-gloo-8cpu/head-exit.txt": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "evidence/pr226-gloo-8cpu/head-launcher.log": {
+      "bytes": 2053,
+      "sha256": "5d52e79823a17557c094dea50ff5bbdf525b8379678376b0603a0c2a1cac57d7"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank0.json": {
+      "bytes": 8122,
+      "sha256": "725d5f6ed2f734704eac30f9b0cda22b28041e823f8a52425065573129653ec5"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank1.json": {
+      "bytes": 8122,
+      "sha256": "813c5d34b0b10256ed834734aef392c393f0c78a621276ea264115cd9abcd120"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank2.json": {
+      "bytes": 8122,
+      "sha256": "acb5180f58250faac943d6242dca9fbd914b203cd9cb08609fc20656bc93c55b"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank3.json": {
+      "bytes": 8122,
+      "sha256": "60a11a6785896f0e9584ac9ba74594d4798034bf12f47d40cc382484a2d3f7be"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank4.json": {
+      "bytes": 8122,
+      "sha256": "da4f3cea7b4d7a95f59cd8bca722bfc732e1326bd6c1bf9c6341ee306a7a7a76"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank5.json": {
+      "bytes": 8122,
+      "sha256": "ecc2d37603255af832be6d81ecf9c47ab9255efe6e4eea56896d2a9920ef4ed5"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank6.json": {
+      "bytes": 8122,
+      "sha256": "613fc778b4048b56e7cf2bb4d0d7581f96412847685eef6be65b9512296dc716"
+    },
+    "evidence/pr226-gloo-8cpu/head-rank7.json": {
+      "bytes": 8122,
+      "sha256": "21b04c9eec409233f6a511f4f531bcf8290fc42d45e7a07fe8da7a5361dda391"
+    },
+    "evidence/pr226-gloo-8cpu/head-summary.json": {
+      "bytes": 568,
+      "sha256": "2d0614ebed3628d7226f815fa647361c364e7885b5dd885bf13a9ec1ceee8d89"
+    },
+    "evidence/pr226-gloo-8cpu/run_resource_metrics_gloo.sh": {
+      "bytes": 1111,
+      "sha256": "bc0f11da7c88219f9de08effe22fb5fb0b1150c29af258b584e680518f514ee4"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-editable.log": {
+      "bytes": 1271,
+      "sha256": "ae2e2f72bc06c925f600ac18c670a0e8bd14d3b2fe0c855b48792c134e2ce12e"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-exit.txt": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-launcher.log": {
+      "bytes": 2377,
+      "sha256": "ea78ddb8a752dd223594f6e0e7c60e198faf53300997a06abf88c179b0c36608"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank0.json": {
+      "bytes": 12700,
+      "sha256": "1445736630d45d47da36d3bf0a961a111135d666b326427d1a94ba59c4fe8213"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank1.json": {
+      "bytes": 11798,
+      "sha256": "5552c1c3e477a9e51eb773e85f7227a3b25e747b622b2f09618ef2c05c3c0324"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank2.json": {
+      "bytes": 12700,
+      "sha256": "90ee7c775ae602d044bb49920685e66fce4cc8712145d8d139d4353a34084716"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank3.json": {
+      "bytes": 11798,
+      "sha256": "63c5999b47a21e7a1c1f4ad5c9dc1b0ec1d6548812e93914e647c36a6462fa7b"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank4.json": {
+      "bytes": 12748,
+      "sha256": "f19a6ccbd4c9471b35f1f63fec662fdd5493007a54488c01777eb6c8844e0ae1"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank5.json": {
+      "bytes": 11846,
+      "sha256": "e56ffbb14ba872a58c2aba306e9607f3d24ece638d7dc88bafee26e5229655e3"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank6.json": {
+      "bytes": 12748,
+      "sha256": "7bb9c971178ba42111a3cce873ce3ba3eda2fc2c6d86b355a706a0bc6b66b46b"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-rank7.json": {
+      "bytes": 11846,
+      "sha256": "15c1d1019daad9b9fdbdb12ad719d013afd7937f1bc0185f8079a78661944cd5"
+    },
+    "evidence/pr226-gloo-8cpu-v2/base-summary.json": {
+      "bytes": 992,
+      "sha256": "78a0540b48b7666520823808b4567050cf777a0f801f6ff92772cf3eb08aec5c"
+    },
+    "evidence/pr226-gloo-8cpu-v2/check_resource_metrics_gloo.py": {
+      "bytes": 10177,
+      "sha256": "6b9ed62287f5c573ba71d73e7e358f675c1b5d1d698aac74866a5da1aea2c780"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-editable.log": {
+      "bytes": 1153,
+      "sha256": "fc4ebf17c2b9b48b9ef51af9ccbcc377cb28f0f822077516d6a1eae288d44b74"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-exit.txt": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-launcher.log": {
+      "bytes": 2372,
+      "sha256": "65fed535ee2ac125f9161d598771f6ffe6b7b346369987c0cafe4d527a542941"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank0.json": {
+      "bytes": 11378,
+      "sha256": "4bab73136fd8d591495379072fe999bd0d7c6e53e2c922c8a5a2627b53a333ff"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank1.json": {
+      "bytes": 11380,
+      "sha256": "04f171204884c126a7df4db6a9101ba2fa354ed4a353bc99f3956e426903f4f0"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank2.json": {
+      "bytes": 11378,
+      "sha256": "a9673466fd43fe19f85a1b96bb5cf6bfe6abacacf4a9a6bbb9cebc7e15e520af"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank3.json": {
+      "bytes": 11380,
+      "sha256": "981a0e25fac7df14c558fbaeb156a206eff2a573f65b62f99e007a77909e4b2a"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank4.json": {
+      "bytes": 11406,
+      "sha256": "6227528fdfbd44f60eec78d552b0999dc0e2f2bab5e6090913ed5f92c60dd516"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank5.json": {
+      "bytes": 11408,
+      "sha256": "f94a3ee29afd13803138e504cbc6847be4b0254e8065dca59bbf1906a66e29f7"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank6.json": {
+      "bytes": 11406,
+      "sha256": "a9fd4edd1144dc9f5a7fa58571503a4ab0c1518943ba6011b63b778a7e1b22ce"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-rank7.json": {
+      "bytes": 11408,
+      "sha256": "adbec6d376f993d753f558f979771f5dc40ab4fc2bbdf418b05edc93537069c3"
+    },
+    "evidence/pr226-gloo-8cpu-v2/head-summary.json": {
+      "bytes": 987,
+      "sha256": "2f8accb46202637e2b78eb07f5d876cf56124deef5284bb580aa622ec8ec112a"
+    },
+    "evidence/pr226-gloo-8cpu-v2/run_resource_metrics_gloo.sh": {
+      "bytes": 1281,
+      "sha256": "a35243bfdcf36ce6e9c68f8ef32ccdd9bc76c049ca798e4d0ee7260e1882b111"
+    },
+    "evidence/pr226-gloo-8cpu-v2.container.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/pr226-gloo-8cpu-v2.receipt.json": {
+      "bytes": 709,
+      "sha256": "b42905e2514673416189a34b25e30a7bb80836638758aa436098e34bb31abc9f"
+    },
+    "evidence/pr226-gloo-8cpu.container.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "evidence/pr226-gloo-8cpu.receipt.json": {
+      "bytes": 703,
+      "sha256": "2031a30d771a898774b14645573421d964112a60821dde082aa33d1ae7389ef0"
+    },
+    "evidence/pr226-gloo-deployment.json": {
+      "bytes": 1037,
+      "sha256": "534953029a127f33507c655a3f110d1ac791af1fb0bfbdaada134e83a86f0220"
+    },
+    "evidence/pr226-gloo-v2-deployment.json": {
+      "bytes": 1033,
+      "sha256": "1e22e63d2213420375413dec15b2388f26b3fe3c306962758e068ff7002aff50"
+    },
+    "tmp/pr226-gloo-evidence.tar.gz": {
+      "bytes": 20206,
+      "sha256": "633f63f6e5ad69b3557a8c0f5ebeb7342898e975c0a37834e2ad85c66275327d"
+    },
+    "tmp/pr226-gloo-base.tar.gz": {
+      "bytes": 8417135,
+      "sha256": "6d72696307fa59a60f5af828913c74378e0ea22e0b5dc7e7256c3997c39d572f"
+    },
+    "tmp/pr226-gloo-head.tar.gz": {
+      "bytes": 8418292,
+      "sha256": "a735cb6dadeebae55477b7a169b29f505c881cb451c564445db86469afd5e812"
+    },
+    "tools/check_resource_metrics_gloo.py": {
+      "bytes": 10177,
+      "sha256": "6b9ed62287f5c573ba71d73e7e358f675c1b5d1d698aac74866a5da1aea2c780"
+    },
+    "tools/run_resource_metrics_gloo.sh": {
+      "bytes": 1281,
+      "sha256": "a35243bfdcf36ce6e9c68f8ef32ccdd9bc76c049ca798e4d0ee7260e1882b111"
+    }
+  },
+  "execution_boundaries_zh": [
+    "真实CPU/Gloo八进程通信；时钟和显存是注入哨兵，不是真实NPU资源读数，不是TP/PP训练或200步精度/性能验收。",
+    "两次receipt均devices=[]、exit=0、removed=true；16份v2 rank记录均backend=gloo、torch=2.12.0+cpu、npu_initialized=false。",
+    "receipt source_commit=18602c是环境挂载源，不当作测试分支；测试base/head由独立Git归档、editable安装日志、脚本内import路径检查及callback/runtime哈希共同绑定。",
+    "base summary PASS表示准确重现预期缺陷，不能解释成基点实现正确；v1保持原始证据，v2严格oracle门禁仅以v2脚本及结果为依据。",
+    "容器移除凭据已核；临时checkout/venv/压缩包清理由主代理后续执行，本审查不宣称已清理。源码归档内容已核完，本审查无需继续占用临时展开目录。",
+    "本审查仅本机只读复算和Git对象核对，未运行训练、Gloo进程或远端操作，唯一写入为本审计JSON。"
+  ]
+}
