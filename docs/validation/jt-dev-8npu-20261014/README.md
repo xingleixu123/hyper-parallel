@@ -1,3 +1,7 @@
+## 2026-10-15 中文问题总索引更新
+
+[详细中文总单 #202](https://github.com/hf1s/hyper-parallel/issues/202) 已关联9个子问题和各自单提交PR；[当前中文报告](REPORT_ZH.md)记录上游 #186 合入、新基点 PR #199 回归及129资源冲突中断。下方旧轮次数据按原始源码保留，不能视作新基点验收。
+
 # JT DeepSeek V3: eight-910B validation evidence
 
 Experiments resumed with explicit authorization on 2026-10-15, using idle devices on hosts 125 or 129, a global minimum 20-minute interval after each release, and bounded per-run containers. Other jobs are never stopped. This snapshot records completed measurements and known failures; the complete parallel matrix remains unaccepted.

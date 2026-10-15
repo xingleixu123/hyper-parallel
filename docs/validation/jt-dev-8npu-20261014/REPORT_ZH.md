@@ -1,109 +1,139 @@
-# JT DeepSeek-V3：当前结果与问题排序
+# JT 八卡验证：中文总问题单、独立 PR 与当前证据
 
-**2026-10-15 已获授权在 125/129 空闲时恢复；每轮释放设备后至少间隔 20 分钟，不停止其他人的实验。** 以下已完成结果来自此前 125 的固定环境：FSDP 的 0→200、checkpoint200→400 已通过，跨拓扑精度仍有失败，不能宣布整体完成。最新 JT_dev 为 `521d3a8`，已合入用户指定的 [PR #180](https://github.com/hf1s/hyper-parallel/pull/180)。129 已使用 `/home/jt_image` 中经校验的 `jt-clean:hp-910b-20261009`（CANN 9.2.0-beta.2）完成新的 FSDP 0–200：8 rank 全步数、初始状态和输入记录完整，退出成功；尚待 200–400 续训及独立连续 400 步参考，不能把完整性通过当作跨运行精度通过。
+本地整合准备：最新上游 f637ef7 加已验证独立修复，整合集成源 `9271e026c422e68cabd7dc0b0824bc5550cfa34e` 已准备，CPU 集成回归及新一轮 NPU 基线尚待执行。原有生产试验目录、配置与 checkpoint 暂时保留以便追溯。
 
-[PR/Issue 双向索引](https://github.com/hf1s/hyper-parallel/issues/202)。公开总问题单：[#202](https://github.com/hf1s/hyper-parallel/issues/202)。
+## 上游更新与资源进展（2026-10-15）
 
-## 129 新镜像基线进展
+上游随后合入 #186，JT_dev 推进到 `f637ef7ee4d4b416800716f1ebaaae7709b8a06a`，包含 CP 分块损失支持、MLA 布局调整和 `enable_chunk_loss`/`chunk_loss_size` 配置。此前 `521d3a8` 的基线与续训证据属于固定旧轮次，不能改写为新基点结论。该轮连续400参考在 step168 出现外部设备进程，本任务已释放容器，保留中断日志，不计为完整参考，也没有停止他人任务。接下来先集成新基点，再按0–200→checkpoint200–400→独立连续400的顺序重建匹配参考。
 
-源代码为最新 JT_dev `521d3a8`（含 #180）集成既有六项修复及 #200/#201，固定源 `a345081`、补丁 SHA256 `80310710…`。镜像 ID `5f9e677f…`；未使用镜像内旧 checkout。`r129-jtclean-fp32-fsdp8-build-0-200` 于 2026-10-15 完成，实验耗时 383.54 秒，去掉前 20 步后中位步时 1.17048 秒，峰值 allocated 22.28220 GiB / reserved 27.50391 GiB。保留 checkpoint200 共 27.973 GB 供续训，当前仅做了文件与 safetensors 头部完整性校验，恢复加载尚未验证。
+原 #199 与 #186 的生产功能重叠，现已保留上游实现并收敛为 #205 的独立回归测试：两个文件、单提交 `e9fc94d376ca7380c13a5e09c0020b34a75dc1d2`。新基点 CPU 20项测试、25项子测试通过，两轴检视通过；新基点四卡 ST 尚待运行，不沿用旧 NPU 通过结论。所有资源操作继续遵守空闲检查和全局20分钟间隔。
 
-八卡已释放且实验容器已删除；全局冷却结束时间不早于 2026-10-15T14:44:05（Asia/Shanghai），随后仍须重新确认八卡空闲。81 个日志及配置证据已下载并逐文件校验 SHA256；详见 [基线完整性](reports/jtclean-fsdp8-baseline-integrity.json)、[checkpoint 清单](reports/jtclean-checkpoint200-inventory.json)、[镜像与依赖预检](reports/jtclean-cpu-preflight.json)。129 与 125 驱动/固件不同，精度和性能对比使用各自同机参考。
+## 总体目标与当前结论
 
-## 按影响排序的问题
+本单是 JT DeepSeek V3 八卡验证的**总问题单**，统一关联所有已拆分的小问题及独立 PR，维护优先级、复现证据、精度曲线、显存/性能、重计算与续训验收状态。每个已确认的独立缺陷或接口需求各用一个小问题单和一个单提交 PR，两个方向均能回到本单；不把多个缺陷混入同一个修复提交。
 
-| Top | 问题与影响 | 当前证据与处理 |
-|---|---|---|
-| 1 | 跨 FSDP/TP/CP/EP 的 200 步精度仍超出 0.005 | 专家 BF16 权重梯度分区舍入和 Muon 更新敏感性已有独立算子及首步证据；TP 还有上游差异。FP32 专家梯度加完整 FP32 NS 的 EP2、CP2、TP2×EP2 长跑仍失败。生产补丁在125仅完成新的FSDP基线200步，完整矩阵未验收；现按新的资源间隔恢复定位。 |
-| 2 | 梯度累积时使用错误的有效 token 分母 | [PR #194](https://github.com/hf1s/hyper-parallel/pull/194)。改为整步有效 token 数。TP2+EP2 的 LM 最大偏差由 0.92238 降至 0.01248，仍需处理 Top1。CPU 重现与真实 200 步对照均已保留。 |
-| 3 | FSDP 初始化后保留完整源参数，浪费大量显存 | [PR #198](https://github.com/hf1s/hyper-parallel/pull/198)。释放已经消费的初始化容器引用。EP2 节省 9.422 GiB，CP2 节省 10.125 GiB；各 200 步、8 rank 同拓扑 loss/梯度误差均为 0。约 0.1% 的步时变化视为噪声。 |
-| 4 | CP 拒绝分块输出 loss，阻断低显存训练 | [PR #199](https://github.com/hf1s/hyper-parallel/pull/199)。实现全 CP 有效 token 分母，重放不重复 collective。4 卡 ST 通过；demo 的 CP2 已能完成 200 步，跨拓扑数值问题仍单独跟踪。 |
-| 5 | full 重算未覆盖完整 MTP decoder | [PR #195](https://github.com/hf1s/hyper-parallel/pull/195)。补齐 trunk/MTP block 识别、幂等与 JT 重入路径约束。旧配置 loss 相同并不能证明重算覆盖正确。 |
-| 6 | 重算重放再次提交 MoE 路由计数 | [PR #196](https://github.com/hf1s/hyper-parallel/pull/196)。保留张量计算，只禁止重放的持久统计更新。覆盖 full/selective、不同 loss 路径及多微批；修复后 FSDP full/selective 200 步误差均为 0。 |
-| 7 | 续训后累计 token/sample 监控从零开始 | [PR #197](https://github.com/hf1s/hyper-parallel/pull/197)。保存并恢复 meter 累计量，兼容旧 checkpoint。真实续训 200 步、8 rank 的 loss/梯度/累计计数与连续参考均一致。 |
-| 8 | 专家局部权重梯度先舍入到BF16，FP32归约不能恢复 | [PR #200](https://github.com/hf1s/hyper-parallel/pull/200)。提供默认关闭的FP32累加选项，显式参数归属及FSDP消费。CPU与真实2卡累积/共享权重/重算ST通过；尚不代表跨拓扑200步达标。 |
-| 9 | Muon NS输入、计算及更新传输的精度无法配置和恢复 | [PR #201](https://github.com/hf1s/hyper-parallel/pull/201)。保留BF16默认，新增可持久化的FP32选项和旧checkpoint兼容。CPU及真实8卡/2卡ST通过；原成本归因已撤回，保留BF16默认；两项精度选项合用在相同观测设置下步时增加24.25%，不能单独归因于NS。 |
-| 10 | 普通 Shard 非整除重建错误，可能导致 rank 间通信不一致 | [Issue #211](https://github.com/hf1s/hyper-parallel/issues/211)。独立双进程 Gloo 已重现；补丁在 redistribution 与直接 reduce_partial 入口一致拒绝不支持的普通分片。DTensor UT 457 passed、41 subtests，双/四进程 ST 2 passed；Ascend 补丁回归待空闲设备，独立 PR 正在提交。 |
+**当前总体尚未验收通过。** 最高优先级仍是 TP/CP/EP 相对 FSDP 的 200 步误差超过 0.005。六项修复集成的旧配方已做到 FSDP 续训及 full/selective 重算全 rank 零误差；新生产 FP32 专家梯度＋FP32 NS 配方必须使用自己匹配的参考，不能继承旧配方结论。
 
-八个 PR 均为独立单提交，并经过 Standards / Spec 两轴检视及相应测试。当前仍为 draft，GitHub 没有已验证的完整 CI 成功结果；详细状态见 `evidence/pr-*-receipt.json`。目前修复中，#194 的正确性优先级最高，#198 的实测显存收益最明确。
+截至 2026-10-15，129 已完成新环境 FSDP 0–200，再从该 checkpoint 续训 201–400；每段 8 rank 的全部 200 步、退出/完成标记、有限值记录完整，step201 累计样本恢复为 1608，累计监督 token 为 3720095，200→201 边界检查通过。**该固定轮次的独立连续400参考在step168因资源冲突被释放，未完成。当前只确认基线/续训运行完整性与计数连续性，不声明新配方续训loss对齐通过。** 续训收尾检测到外部 PID，该轮时间暂不用于性能对比。
 
-![源参数生命周期修复的显存收益](figures/source-parameter-lifetime.png)
+## 按影响排序的问题、子问题与独立 PR
 
-## FSDP 顺序与验收口径
+排序依据依次是训练目标正确性、运行阻断、资源浪费、重算与恢复语义、精度配置和诊断可靠性。表中的“测试通过”不代表问题已合入或完整 CI 已通过；所有小问题保持开启，PR 保持草稿。
 
-先从 step0 训练至 step200，落 checkpoint，再加载它完成 step201–400，并与独立连续400步参考逐步比较。含 #180 的原版本和六项修复集成都已完成这一顺序。
+| 排序 | 问题与影响 | 小问题单 | 独立单提交 PR | 已有证据及剩余边界 |
+|---|---|---|---|---|
+| Top1 | 完整 TP/CP/EP 矩阵 200 步精度仍不达标 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 下表保留全 rank 最大误差；短跑、改 loss 权重或改变参考配方均不能替代验收 |
+| Top2 | 梯度累积按微批有效 token 归一化，改变整步目标 | [#203](https://github.com/hf1s/hyper-parallel/issues/203) | [#194](https://github.com/hf1s/hyper-parallel/pull/194) | 实际 Trainer 的不等长监督样例，正确梯度 14、旧行为 10；TP2×EP2 LM 误差显著下降但仍未过 0.005 |
+| Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
+| Top4 | CP 分块输出损失的支持与回归覆盖 | [#205](https://github.com/hf1s/hyper-parallel/issues/205) | [#199](https://github.com/hf1s/hyper-parallel/pull/199) | 功能已由上游 #186 合入；#199 收敛为独立回归，新基点 CPU20项/25子测试通过，NPU待运行 |
+| Top5 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；集成 full/selective 各 200 步零误差，成本见下文 |
+| Top6 | 重计算重放重复提交专家路由 token 计数 | [#207](https://github.com/hf1s/hyper-parallel/issues/207) | [#196](https://github.com/hf1s/hyper-parallel/pull/196) | 保留必要张量运算，只约束持久副作用；均匀重复计数未必改变 sign 型 bias 更新，不能虚构旧 loss 漂移 |
+| Top7 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 旧配方恢复计数和连续参考完全相同；129 新配方恢复边界正确，完整数值对照待连续参考 |
+| Top8 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
+| Top9 | Muon NS 精度无法显式配置并从 checkpoint 恢复 | [#210](https://github.com/hf1s/hyper-parallel/issues/210) | [#201](https://github.com/hf1s/hyper-parallel/pull/201) | 保留 BF16 默认；CPU、8 卡和 2 卡 ST 通过；可选 FP32 成本须匹配配方评估 |
+| Top10 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend 补丁回归待运行 |
 
-六项修复源 `ec2e16bce26e497519c573f0a8d87a538a329197` 的基线和续训，全部8rank的 LM、MTP、aux、total loss 及梯度范数最大绝对差均为0。续训累计 token/sample 也逐步相同。曲线误差取所有rank最大值，不使用平均误差代替门槛。
+目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-![FSDP 0到200](figures/reviewed-fsdp8-baseline.png)
+已固定的独立提交：#194 `bad2550`、#195 `67e8ef5`、#196 `83d3d7c`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `0ae5739`、#201 `59a03c6`、#214 `453618a`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
 
-![FSDP 从200续训到400](figures/reviewed-fsdp8-resume.png)
+## 统一验收标准与执行顺序
 
-模型日志中的 MTP 带0.3权重，aux带0.0001权重。证据同时保留日志值和去权重后的分量；新补充检查也对未加权分量使用0.005。已有全部误差为0的通过项不受口径影响。原始完整性检查仍验证8rank、全部步骤、初始张量、逐步输入身份、LR、退出状态和完成标记。
+1. 固定源码、镜像、CANN、数据及优化器配方，先跑 **FSDP8 的 step1–200**，保存 step200 checkpoint；另起进程加载后跑 **step201–400**，再与独立连续 step1–400 参考比较。
+2. 固定全局 batch8、微批1、序列4096、seed42、输入顺序、学习率与初始化。合法 TP、CP、EP 及混合策略各跑 200 步，与同精度配方的 FSDP8 比较。改变精度选项必须重新建立基线、续训与连续参考。
+3. 检查全部 8 rank、全部 step 的最大绝对差，LM、MTP、aux 均须 ≤0.005；同时保存并检查日志加权量和未加权量。日志 MTP 系数为 0.3，aux 为 0.0001，不能用系数掩盖原始分量误差。
+4. 初始化/输入身份、步数、rank 覆盖、LR、有限值、退出码、完成标记、恢复计数另外验收。输入哈希相同不能替代 loss 验收；运行完成和自比较零误差也不能替代独立参考。
+5. 关闭、完整、选择重算各跑 200 步；模块选择消融注明步数和测量边界。报告 allocated/reserved 峰值及预热后中位步时，数据采集开销保持一致。
+6. 每个修复以独立最小回归、相应分布式用例和规范/验收条件两轴检视作为证据；保留首次失败与修复后结果。开放问题不能仅靠 PR 已创建或某个标签关闭。
 
-## 当前数值诊断
+## 当前长跑精度数据
 
-以下为明确标记的诊断插桩，比较双方使用相同数值配方。它们不能代替生产实现验收。
+以下是 125 六项修复集成源 `ec2e16b` 的旧配方，所有误差取全 rank、全 step 最大值：
 
-| FP32专家梯度 + 完整FP32 NS（含runtime观测） | LM最大差 | 日志MTP最大差 | 日志aux最大差 | 未加权MTP最大差 | 未加权aux最大差 | 观测含开销秒/步 | 观测峰值allocated GiB |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| FSDP8参考，200步 | — | — | — | — | — | 6.39175 | 22.28220 |
-| EP2，200步 | 0.0194788 | 0.00905466 | 0.0000128801 | 0.0301822 | 0.128801 | 6.59964 | 21.18306 |
-| CP2，200步 | 0.0152731 | 0.0106752 | 0.0000170822 | 0.0355840 | 0.170822 | 7.06310 | 20.70665 |
-| TP2+EP2，200步 | 0.0149679 | 0.00571430 | 0.0000107335 | 0.0190477 | 0.107335 | 7.46236 | 15.93807 |
+| 策略，均 200 步 | LM 最大差 | 日志 MTP 最大差（×0.3） | 日志 aux 最大差（×0.0001） | 结论 |
+|---|---:|---:|---:|---|
+| FSDP 0–200 对连续参考 | 0 | 0 | 0 | 通过 |
+| FSDP checkpoint200→400 对连续参考 | 0 | 0 | 0 | 通过，含原始分量和累计计数 |
+| 完整/选择重算对关闭重算 | 0 | 0 | 0 | 通过 |
+| TP2，复制专家 | 0.014084816 | 0.006210327 | 0.0000172808 | 未通过 |
+| EP2 | 0.014165878 | 0.003723621 | 0.0000124761 | 未通过 |
+| EP4 | 0.015380383 | 0.005264282 | 0.0000185563 | 未通过 |
+| CP2 | 0.022237778 | 0.005699873 | 0.0000214768 | 未通过 |
+| CP4 | 0.013643265 | 0.006476164 | 0.0000156689 | 未通过 |
+| TP2×EP2，整步 token 分母修复后 | 0.012481689 | 0.004909277 | 0.000013115 | 未通过 |
 
-性能口径修正：上表四次诊断都开启了`model_integration: runtime`，原始性能基线使用`build`。此前把约6.8倍时间差归因于FP32 NS不成立，现撤回该归因；同口径数据现见下方成本记录；两项生产精度选项合用步时增加24.25%。EP/CP/TP的200步精度仍未达标。专家梯度补丁、Muon精度选项分别通过独立检视和CPU回归；两者合并后的定向CPU回归为133 passed、83 subtests。修正测试清理接口和空分片观察方式后，专家梯度真实2卡ST为1 passed，Muon真实8卡/2卡ST为2 passed，数值容差未放宽；首次失败证据保留。生产配置FSDP8、EP2、CP2、TP2×EP2各3步集成已完成，全部8rank退出成功且短跑误差小于0.005；不作为200步通过结论。
+例如 CP4 未加权 MTP/aux 最大差为 0.021587213/0.156689202，TP2 为约 0.02070109/0.17280778。未加权 aux 也未达标。新生产 FP32 配方的 3 步集成通过仅证明短跑路径；早期诊断包装器的 200 步仍失败且梯度布局不同，不能当作生产补丁验收。
 
-TP 首步的完整分块哈希已将首次偏离定位到第一层输出投影：Q/KV投影输出与 `o_proj` 完整输入共4,608块完全一致，而attention输出采样最大差0.015625。只升高归约精度没有改善；局部投影也使用FP32时，匹配FP32参考的最大差降为0.0009765625，非零采样点比例从38.4%降到0.039%，但后续MLP仍放大残差。FP32投影会改变基线配方，不能与旧BF16基线混用。
+![FSDP 基线逐步对齐](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-fsdp8-baseline.png)
 
-FSDP/TP的实际NS矩阵批次一致；EP/CP有4个参数从singleton变为batch2。逐矩阵NS以及叠加CPU FP64范数的三步消融均完成，仍存在非零差异。稳定范数使EP首步28个受观测参数在裁剪前后和更新后的摘要一致；该覆盖未包含全部专家参数，且CPU拷贝仅用于定位。
+![FSDP 续训逐步对齐](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-fsdp8-resume.png)
 
-纯TP首次测试被融合gate/up连续切分保护拒绝。随后合法的“TP2稠密层、复制专家”配置完成3步：LM最大差0.0004425048828125、加权MTP 0.0002281665802001953、加权aux 5.0320522859692574e-8，全rank初始状态/输入/LR/步骤检查通过。该纯TP配置和EP4均已完成200步，仍未通过：LM最大差分别为0.014084816和0.015380383，未加权MTP为0.02070109和0.01754761，未加权aux为0.17280778和0.18556311。纯TP长跑继承runtime参数观测，7.13563秒/步不用于同原始build基线的性能比较；build模式200步现已完成，loss/梯度与runtime逐步完全相同；步时1.41685秒。成对阶段计时已保留。EP4使用build模式，记录1.02918秒/步、21.32290GiB allocated；该口径仍含输入身份采集。CP4已完成200步，LM最大差0.013643265、加权MTP 0.006476164，仍失败；步时1.67070秒，allocated 20.21775GiB。稠密层FP32权重梯度消融未消除CP首步的小参数梯度差异。CP首步所有采样前向边界相同；MTP输出梯度最早出现3.64e-12差异，embedding返回梯度的采样相对L2达到0.00633。该结果限于已采样坐标。进一步检查确认LM/MTP/aux的首步loss标量梯度相同；固定512位置的loss分块使MTP decoder输出和主干最终norm输出采样梯度一致，但更早层仍有差异，embedding梯度相对L2从0.00633降至0.00532。该分块消融只跑首步，未达到200步验收。详见[定位记录](reports/precision-localization-plan-v5.md)。
+![CP4 未加权 200 步误差](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-cp4-off-200-raw.png)
 
-![CP首步梯度偏离](figures/cp-first-backward-divergence.png)
+![TP2 未加权 200 步误差](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-tp2-replicated-experts-build-200-raw.png)
 
-![纯TP复制专家200步](figures/reviewed-tp2-replicated-experts-200-raw.png)
+## 数值定位进展与未确认事项
 
-![EP4的200步](figures/reviewed-ep4-off-200-raw.png)
+- 梯度累积分母错误已单独修复，但不能解释全部剩余漂移。源参数释放前后同拓扑 200 步 loss/梯度范数完全一致，显存修复没有改变数值轨迹。
+- TP 首步 Q/KV 投影和输出投影完整输入共 4608 个哈希块相同，首次已定位的输出偏离在第一层输出投影。局部投影使用 FP32 后，采样最大差从 0.015625 降至 0.0009765625，后续 MLP 仍放大残差；该消融改变数值配方，不能直接与旧 BF16 基线混比。
+- EP/CP 的四个 NS 参数从单矩阵变为矩阵批次2。逐矩阵 NS 和 CPU FP64 范数的三步消融仍有非零差异；首步 28 个被观测参数哈希相同不代表全部专家参数相同。
+- CP 首步仅有采样边界证据，不能称已定位完整根因。固定 512 位置 loss 分块使部分反向边界一致，但 embedding 梯度相对 L2 仍约 0.00532；只跑一步，不能替代 200 步验收。
+- 重算灵活性仍是待完成需求：当前 JT YAML 尚未提供 MF 式任意模块路径/层范围、排除及通信重算配置。已有模块消融使用实验包装器；不能将 `selective` 名称视作相同接口。
 
-![TP首步偏离位置](figures/tp-first-divergence.png)
+## 显存、吞吐与重计算性价比
 
-![TP输出投影精度消融](figures/tp-row-precision-ablation.png)
+同一 build 观测口径、预热20步后中位时间如下，保留输入身份采集开销。这里的小层数配置尚未从并行切分取得吞吐收益，内存收益也随策略而异；不能外推完整 DeepSeek 模型。
 
-![EP2诊断：未加权分量](figures/fpgmm-nsall32-ep2-200-raw.png)
+| 策略 | 秒/步 | allocated 峰值 GiB |
+|---|---:|---:|
+| FSDP8 | 0.937752 | 22.633759 |
+| EP2 | 1.020075 | 21.183023 |
+| EP4 | 1.029181 | 21.322903 |
+| CP2 | 1.285255 | 21.058210 |
+| CP4 | 1.670697 | 20.217754 |
+| TP2，复制专家 | 1.416853 | 17.771236 |
+| FSDP8，FP32 专家梯度＋FP32 NS | 1.165173 | 22.282196 |
 
-![CP2诊断：未加权分量](figures/fpgmm-nsall32-cp2-200-raw.png)
+#198 的同拓扑前后比较：EP2 从 30.605194 降至 21.183023 GiB，CP2 从 31.183506 降至 21.058210 GiB；约 0.1% 的步时变化不足以证明吞吐收益。#200+#201 合用步时增加 24.25%，这是组合成本；此前约 6.8 倍的 NS 成本归因混入运行时观测，已撤回。
 
-![TP2与EP2组合诊断：未加权分量](figures/fpgmm-nsall32-tp2ep2-200-raw.png)
+重算独立40步消融：full 节省约3.095 GiB、步时增加9.13%；selective 节省2.407 GiB、增加8.50%；单独 MLP 节省0.853 GiB、增加1.91%；只重算 MTP 未降低整步峰值、时间增加约2.99%。MLP＋norm 另有200步全 rank 零误差，节省约1.165 GiB、步时增加约2%。模块事件时间为含子调用的时间，不能嵌套相加；进入/退出 allocated 差也不能当作保存激活大小。
 
-完整阶段证据：[并行数值诊断](reports/parallel-numerical-diagnosis.md)。
+![源参数释放的显存收益](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/source-parameter-lifetime.png)
 
-## 重计算性价比与灵活度
+![模块重算成本比较](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/recompute-module-cost.png)
 
-在本任务小模型、GBS8、seq4096下，关闭重算吞吐最高。40步独立A/B中，full节省3.095GiB、增加9.13%步时；现有selective节省2.407GiB、增加8.50%；单独MLP节省0.853GiB、增加1.91%。单独MTP block重算没有降低整步峰值，却增加约2.99%步时。norm的小幅时间差接近噪声。
+[同口径时间与显存原始记录](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/matching-build-topology-costs.md)；[重算成本与口径](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/recompute-cost-analysis.md)；[MF/Megatron 固定源码对照](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/recompute-reference-comparison.md)。
 
-MLP+norm组合另有200步验证，全部8rank的loss/梯度差为0，节省1.165GiB，步时增加约2%。这些模块选择为实验wrapper。JT当前YAML尚不具备MF的任意模块路径/层范围、排除及通信重算配置能力，不能把现有`selective`名称当作同等接口。
+## 固定环境、复现入口与证据
 
-![重算策略成本](figures/recompute-module-cost.png)
+此前已测固定基点 `JT_dev@521d3a8a9aa62353327093ab1258ca2c22006e8b` 已合入 #180（head `5de3cceab094bbed18915d1a9c9231ca220629ca`）。旧八卡测量从 `ad1c553`＋#180 开始，四项修复集成源 `6e762be`、六项源 `ec2e16b`；129 当前整合源 `a3450812a3bb737e74b8433928acc6fc18374433`，再应用 #200/#201 生产补丁，补丁 SHA256 `803107108b505cd7ab7eafb7c625eb125ae0679e97cb1482f0914f3b3213f784`。
 
-![模块调用的时间与分配变化](figures/recompute-module-events.png)
+硬件：8×Ascend 910B3 64 GiB。CANN 9.2.0-beta.2 / V100R001C12B086，Python 3.12.14，Torch 2.12.0+cpu，TorchNPU 2.12.0，transformers 5.13.1。129 镜像 `jt-clean:hp-910b-20261009`，ID `sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d`，从 `/home/jt_image/four-images-clean-20261009/HP-910B/hp-910b-arrow.tar.gz` 校验后载入。镜像内原代码较旧，实际导入的是挂载并验证过的 editable checkout。
 
-模块events是inclusive时间；进入/退出allocated差含输出和临时分配，不是保存激活大小。不能相加嵌套时间，也不能把单次运行的步间分布称为重复实验置信区间。完整口径及最新MF/Megatron固定源码引用见[成本分析](reports/recompute-cost-analysis.md)、[接口与源码对照](reports/recompute-reference-comparison.md)。
+模型：两层主干＋一层 MTP、8个路由专家，序列4096、全局 batch8、微批1、seed42、固定 LR0.0001，Muon/AdamW 原有优化配方。真实 Arrow 数据4710行，原数据留在实验机，公开证据只包含配置、标量和身份哈希，不上传训练文本。
 
-## 环境与数据保留
+训练入口为 `examples/training_demo/jt_deepseek_v3`，使用证据中的完整 YAML、8进程启动及固定环境；逐步标量、输入哈希和退出标记必须一起采集。可复现配置示例：[CP4 200步](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/configs/reviewed-cp4-off-200.yaml)、[TP2 复制专家200步](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/configs/reviewed-tp2-replicated-experts-build-200.yaml)。[配置、原始标量、曲线和脚本索引](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/README.md)、[完整中文报告](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/REPORT_ZH.md)、[CP4 全步比较](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/reviewed-cp4-off-200-comparison.json)。各小问题提供其专用最小复现和回归命令。
 
-125的隔离目录为 `/home/xxl/jt-dev-8npu-20261014`，8×Ascend910B3 64GiB。CANN为9.2.0-beta.2 / V100R001C12B086，torch/torch_npu 2.12.0，Python3.12.14。最新核对JT_dev为`ad1c553`，#180 head为`5de3cce`。本任务模型为示例的两层trunk、一层MTP、8个路由专家，不能外推为完整DeepSeek模型的性能结论。
+与 #145 的旧源码、单卡参考、100步问题以及 #190 的 MF 单卡对齐范围不同；本单固定 FSDP8、200步和恢复参考。尚没有能解释全部跨拓扑200步偏差的单一最小根因，后续证据确认后继续拆单。
 
-所有比较保留配置、源码提交/patch、editable导入路径、全rank标量、初始化及输入哈希、清单和可编辑SVG。完成续训对照后，按清单清理四份大型checkpoint，累计约104GiB；仅处理本任务文件。现已停止全部四条本任务队列及容器，未影响其他任务；保留生产FP32配方的step200 checkpoint约26GiB供后续明确恢复时使用。
+## 待完成清单与资源约束
 
-## 暂停时补充证据
+- [x] 已确认9个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
+- [x] 旧六项修复配方 FSDP0–200、200→400 与连续参考全 rank 零误差；关闭/完整/选择重算200步已完成。
+- [x] 129 最新环境新配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续。
+- [ ] 新配方独立连续400步完成；基线/续训逐 rank 加权和未加权 loss 全部≤0.005。
+- [ ] 新配方 TP/CP/EP 及合法组合200步全部达到相同门槛，剩余根因分别修复并建单。
+- [ ] #214 的 Ascend/HCCL 补丁回归。
+- [ ] 按最终配方复核重算选择及资源收益，落实经验证的灵活配置方案。
+- [ ] 外部维护者评审、当前提交对应的完整 CI、最终回归与合入确认。
 
-[同口径时间与显存](reports/matching-build-topology-costs.md)：本两层主干加一层MTP配置中，EP2/EP4/CP2/CP4/TP2均未获得吞吐收益；不同并行切分降低显存但增加通信或微批开销。比较保留输入CPU拷贝/哈希开销，单次结果不能外推完整DeepSeek模型。
+仅在125/129获准的空闲设备上运行，优先保证其他实验；任何两轮 NPU 实验之间全局至少间隔20分钟，等待期间不占卡，冲突只释放本任务容器，不停止他人进程。八卡训练每轮有900秒上限，不常驻排队占卡。清理仅限本任务已核验无用的临时数据和重复压缩包，checkpoint200 保留到续训与连续参考比对完毕；原始镜像、共享数据和其他任务文件不删除。
 
-![CP4完整200步原始分量](figures/reviewed-cp4-off-200-raw.png)
 
-![TP2 build模式完整200步原始分量](figures/reviewed-tp2-replicated-experts-build-200-raw.png)
+## 本次归档补充材料
 
-另发现空分片下 `DTensor.full_tensor()` 重建形状异常：逻辑[1,64]在两rank分别返回[2,64]和[0,64]，原始失败日志已保留。独立修复尚未实现；Muon ST最终对本地分片进行零容差比较，不能视为此重建问题已解决。
-
-新的生产FP32专家权重梯度＋FP32 NS配方完成FSDP 0–200及完整性自检，但续训200–400、独立连续400参考和生产配方跨拓扑200步均未开始。当前暂停不是完整目标验收通过。
+- [中文标题与父子问题关联回读凭据](reports/github-chinese-publication-receipt.json)
+- [PR #199 新基点 CPU 日志](reports/pr199-f637/pr199-f637-cpu-ut.log)和[源码、单提交、两轴检视记录](reports/pr199-f637/pr199-f637-rewrite.json)
+- [129 续训与中断参考的全 rank 标量](scalars/jtclean-resume-and-interrupted-reference.csv)
+- [续训自完整性检查](reports/jtclean-resume-integrity.json)，仅用于完整性核验，不是独立数值比较
+- [连续参考中断与设备释放凭据](reports/r129-jtclean-fp32-fsdp8-build-continuous400.receipt.json)
