@@ -1,0 +1,36 @@
+Looking in links: /work/tmp/issue211-test-wheels
+Processing ./tmp/issue211-test-wheels/pytest-9.1.1-py3-none-any.whl
+Processing ./tmp/issue211-test-wheels/iniconfig-2.3.1-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: packaging>=22 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (26.3)
+Processing ./tmp/issue211-test-wheels/pluggy-1.6.0-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: pygments>=2.7.2 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (2.21.0)
+Installing collected packages: pluggy, iniconfig, pytest
+Successfully installed iniconfig-2.3.1 pluggy-1.6.0 pytest-9.1.1
+Obtaining file:///work/fixes/pr195-cpu-fixture
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: hyper_parallel
+  Building editable for hyper_parallel (pyproject.toml): started
+  Building editable for hyper_parallel (pyproject.toml): finished with status 'done'
+  Created wheel for hyper_parallel: filename=hyper_parallel-0.1.0-0.editable-cp312-cp312-linux_aarch64.whl size=13311 sha256=0645297ecbdcadfde83b9f84e297e9b9d1686a7dafdb92b0b023516f712bd04a
+  Stored in directory: /tmp/pip-ephem-wheel-cache-cwiulyrc/wheels/68/72/95/d750ef65201f5f70ae54ff25082faa04015501f539efe5c7be
+Successfully built hyper_parallel
+Installing collected packages: hyper_parallel
+  Attempting uninstall: hyper_parallel
+    Found existing installation: hyper_parallel 0.1.0
+    Not uninstalling hyper-parallel at /workspace/venv/lib/python3.12/site-packages, outside environment /work/venvs/pr195-cpu-fixture
+    Can't uninstall 'hyper_parallel'. No files were found to uninstall.
+Successfully installed hyper_parallel-0.1.0
+EDITABLE_IMPORT /work/fixes/pr195-cpu-fixture/hyper_parallel/__init__.py
+tests/common/mark_utils.py:41
+  /work/fixes/pr195-cpu-fixture/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_public_recompute_covers_mtp_and_preserves_aux_gradients
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    if self.device.type != 'cpu':
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+21 passed, 21 warnings, 16 subtests passed in 31.02s
