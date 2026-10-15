@@ -1,0 +1,968 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_exact_except_length_path": true,
+      "unchanged_SOURCE_REVISION.json": true,
+      "unchanged_PROBE_SOURCE_MANIFEST.json": true,
+      "unchanged_HEAD_GEMM_ROUTE.json": true,
+      "unchanged_SHARED_UP_FP32_FACTOR.json": true,
+      "unchanged_ADAMW_ARCHIVE_ARITHMETIC.json": true,
+      "unchanged_Q_NS_ADJACENT_FACTOR.json": true,
+      "unchanged_ROUTER_NS_NPU_SQRT_FACTOR.json": true,
+      "unchanged_WEIGHTED_DVM_FACTOR.json": true,
+      "unchanged_PACKED_SEMANTICS_FACTOR.json": true,
+      "unchanged_NORM219_FACTOR.json": true,
+      "unchanged_Q_NPU_SQRT222_FACTOR.json": true,
+      "exact26_HEAD_GEMM_ROUTE_CALLS.jsonl": true,
+      "exact26_Q_NS_ADJACENT_CALLS.jsonl": true,
+      "exact26_ROUTER_NS_NPU_SQRT_CALLS.jsonl": true,
+      "exact26_CLIP_REDUCTION.jsonl": true,
+      "exact26_WEIGHTED_DVM_CALLS.jsonl": true,
+      "exact26_PACKED_SEMANTICS_CALLS.jsonl": true,
+      "exact26_NORM219_CALLS.jsonl": true,
+      "49_frozen_sources": true,
+      "observer_source": true,
+      "all42_boundaries": true
+    },
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_exact_except_path": true,
+      "observer_source": true,
+      "helper_source": true,
+      "all26_observations": true,
+      "all40_boundaries": true
+    }
+  },
+  "observations": [
+    {
+      "mf_name": "model.decoder.layers.0.input_layernorm",
+      "hp_name": "model.layers.0.input_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.input_layernorm",
+      "hp_name": "model.layers.0.input_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.self_attention.q_layernorm",
+      "hp_name": "model.layers.0.self_attn.q_a_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        1536
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        1536
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 6291456,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.self_attention.q_layernorm",
+      "hp_name": "model.layers.0.self_attn.q_a_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        1536
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        1536
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 6291456,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.self_attention.kv_layernorm",
+      "hp_name": "model.layers.0.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        512
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        512
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 2097152,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.self_attention.kv_layernorm",
+      "hp_name": "model.layers.0.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        512
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        512
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 2097152,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.self_attention.linear_proj",
+      "hp_name": "model.layers.0.self_attn.o_proj",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        16384
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        16384
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 67108864,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.self_attention.linear_proj",
+      "hp_name": "model.layers.0.self_attn.o_proj",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.pre_mlp_layernorm",
+      "hp_name": "model.layers.0.post_attention_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.0.pre_mlp_layernorm",
+      "hp_name": "model.layers.0.post_attention_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.input_layernorm",
+      "hp_name": "model.layers.1.input_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.input_layernorm",
+      "hp_name": "model.layers.1.input_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.self_attention.q_layernorm",
+      "hp_name": "model.layers.1.self_attn.q_a_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        1536
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        1536
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 6291456,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.self_attention.q_layernorm",
+      "hp_name": "model.layers.1.self_attn.q_a_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        1536
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        1536
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 6291456,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.self_attention.kv_layernorm",
+      "hp_name": "model.layers.1.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        512
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        512
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 2097152,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.self_attention.kv_layernorm",
+      "hp_name": "model.layers.1.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        512
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        512
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 2097152,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.self_attention.linear_proj",
+      "hp_name": "model.layers.1.self_attn.o_proj",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        16384
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        16384
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 67108864,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.self_attention.linear_proj",
+      "hp_name": "model.layers.1.self_attn.o_proj",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.pre_mlp_layernorm",
+      "hp_name": "model.layers.1.post_attention_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.pre_mlp_layernorm",
+      "hp_name": "model.layers.1.post_attention_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.layers.1.mlp",
+      "hp_name": "model.layers.1.mlp",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.float32",
+      "elements": 20971520,
+      "fp32_bitwise_different": 16709109,
+      "bf16_different": 0,
+      "max_abs": 0.12890625,
+      "mean_abs": 0.009550005831293618,
+      "l2_error_squared": 4507.01985293837,
+      "relative_l2": 0.00167263852440831
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.input_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.input_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.input_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.input_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.self_attention.q_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        1536
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        1536
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 6291456,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.self_attention.q_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        1536
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        1536
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 6291456,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.self_attention.kv_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        512
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        512
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 2097152,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.self_attention.kv_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        512
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        512
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 2097152,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.self_attention.linear_proj",
+      "hp_name": "mtp.layers.0.transformer_layer.self_attn.o_proj",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        16384
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        16384
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 67108864,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.self_attention.linear_proj",
+      "hp_name": "mtp.layers.0.transformer_layer.self_attn.o_proj",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.pre_mlp_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.pre_mlp_layernorm",
+      "hp_name": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.transformer_layer.mlp",
+      "hp_name": "mtp.layers.0.transformer_layer.mlp",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.float32",
+      "elements": 20971520,
+      "fp32_bitwise_different": 13035106,
+      "bf16_different": 0,
+      "max_abs": 0.03125,
+      "mean_abs": 0.0027288389973769258,
+      "l2_error_squared": 407.78686055329433,
+      "relative_l2": 0.0017382355065849514
+    },
+    {
+      "mf_name": "model.decoder.final_layernorm",
+      "hp_name": "model.norm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.float32",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.decoder.final_layernorm",
+      "hp_name": "model.norm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.enorm",
+      "hp_name": "mtp.layers.0.enorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.enorm",
+      "hp_name": "mtp.layers.0.enorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "hp_name": "mtp.layers.0.hnorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.float32",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "hp_name": "mtp.layers.0.hnorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.final_layernorm",
+      "hp_name": "mtp.layers.0.final_layernorm",
+      "kind": "input",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_name": "model.mtp.layers.0.final_layernorm",
+      "hp_name": "mtp.layers.0.final_layernorm",
+      "kind": "output",
+      "hp_shape": [
+        1,
+        4096,
+        5120
+      ],
+      "mf_shape": [
+        4096,
+        1,
+        5120
+      ],
+      "hp_dtype": "torch.bfloat16",
+      "elements": 20971520,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    }
+  ],
+  "source_sha256": "5e6f74a4a1bcca2b8c4b2852176ed6b86ca23ec5f155523862d22ffc5ca5c37b",
+  "scope": "All values of40 norm/projection/MoE boundaries; BF16 round equivalence reported separately."
+}

@@ -1,0 +1,99 @@
+{
+  "complete": true,
+  "diagnostic_only": true,
+  "results": [
+    {
+      "branch": "mtp",
+      "call": 1,
+      "mode": "native_mm",
+      "exact_hp_native": true,
+      "different_hp_native": 0,
+      "mf_comparison": {
+        "elements": 20971520,
+        "fp32_bitwise_different": 0,
+        "bf16_different": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "l2_error_squared": 0.0,
+        "relative_l2": 0.0
+      },
+      "shape": [
+        4096,
+        5120
+      ],
+      "output_sha256": "0e3015dd9732c7a023bbc4e1b3af29821dc00154234f285b6d0e92fab48f166b",
+      "storage_metadata": null
+    },
+    {
+      "branch": "mtp",
+      "call": 1,
+      "mode": "diagnostic_mf_dy_rows",
+      "exact_hp_native": true,
+      "different_hp_native": 0,
+      "mf_comparison": {
+        "elements": 20971520,
+        "fp32_bitwise_different": 0,
+        "bf16_different": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "l2_error_squared": 0.0,
+        "relative_l2": 0.0
+      },
+      "shape": [
+        4096,
+        5120
+      ],
+      "output_sha256": "0e3015dd9732c7a023bbc4e1b3af29821dc00154234f285b6d0e92fab48f166b",
+      "storage_metadata": null
+    },
+    {
+      "branch": "main",
+      "call": 2,
+      "mode": "native_mm",
+      "exact_hp_native": true,
+      "different_hp_native": 0,
+      "mf_comparison": {
+        "elements": 20971520,
+        "fp32_bitwise_different": 9,
+        "bf16_different": 9,
+        "max_abs": 2.9802322387695312e-08,
+        "mean_abs": 1.918777636777946e-15,
+        "l2_error_squared": 9.202863814709918e-16,
+        "relative_l2": 8.981252056502468e-07
+      },
+      "shape": [
+        4096,
+        5120
+      ],
+      "output_sha256": "ba253ea0963349f5973bedfe79c4b9c8a7a22a3d2dfe6d2a2c28a60536abef86",
+      "storage_metadata": null
+    },
+    {
+      "branch": "main",
+      "call": 2,
+      "mode": "diagnostic_mf_dy_rows",
+      "exact_hp_native": false,
+      "different_hp_native": 9,
+      "mf_comparison": {
+        "elements": 20971520,
+        "fp32_bitwise_different": 0,
+        "bf16_different": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "l2_error_squared": 0.0,
+        "relative_l2": 0.0
+      },
+      "shape": [
+        4096,
+        5120
+      ],
+      "output_sha256": "571a2b5c3bfdb686b7bf72880059c94e2956d97de0e9d02d6b00a5afa3b9d905",
+      "storage_metadata": null
+    }
+  ],
+  "source_sha256": "a330fff7bd7532a7291ccffd584d6c1d700975ec775a49b888f692030d76c525",
+  "teacher_values_used": true,
+  "not_an_independent_training_candidate": true,
+  "scope": "Original full shapes and actual HP BF16 operands; replace only four observed MF dy rows in a diagnostic replay; compare every20971520 output; both original controls must exactly reproduce HP.",
+  "mf_operand_scope": "Four full vocabulary rows audited separately; MF full dy not observed, so unmatched inputs outside those rows are not excluded."
+}

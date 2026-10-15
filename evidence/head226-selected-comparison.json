@@ -1,0 +1,265 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_exact_except_length_path": true,
+      "unchanged_SOURCE_REVISION.json": true,
+      "unchanged_PROBE_SOURCE_MANIFEST.json": true,
+      "unchanged_HEAD_GEMM_ROUTE.json": true,
+      "unchanged_SHARED_UP_FP32_FACTOR.json": true,
+      "unchanged_ADAMW_ARCHIVE_ARITHMETIC.json": true,
+      "unchanged_Q_NS_ADJACENT_FACTOR.json": true,
+      "unchanged_ROUTER_NS_NPU_SQRT_FACTOR.json": true,
+      "unchanged_WEIGHTED_DVM_FACTOR.json": true,
+      "unchanged_PACKED_SEMANTICS_FACTOR.json": true,
+      "unchanged_NORM219_FACTOR.json": true,
+      "unchanged_Q_NPU_SQRT222_FACTOR.json": true,
+      "exact26_HEAD_GEMM_ROUTE_CALLS.jsonl": true,
+      "exact26_Q_NS_ADJACENT_CALLS.jsonl": true,
+      "exact26_ROUTER_NS_NPU_SQRT_CALLS.jsonl": true,
+      "exact26_CLIP_REDUCTION.jsonl": true,
+      "exact26_WEIGHTED_DVM_CALLS.jsonl": true,
+      "exact26_PACKED_SEMANTICS_CALLS.jsonl": true,
+      "exact26_NORM219_CALLS.jsonl": true,
+      "49_frozen_sources": true,
+      "observer_source": true,
+      "selection_exact": true,
+      "all10_boundaries": true,
+      "crossrun_dx_exact": true
+    },
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_exact_except_path": true,
+      "observer_source": true,
+      "selection_exact": true,
+      "all26_observations": true,
+      "all10_boundaries": true,
+      "crossrun_dx_exact": true
+    }
+  },
+  "mapping_from_actual_input": {
+    "model.mtp.output_layer": 1,
+    "model.output_layer": 2
+  },
+  "selection": {
+    "complete": true,
+    "step": 226,
+    "coordinates": [
+      [
+        4080,
+        1671
+      ],
+      [
+        4095,
+        2270
+      ],
+      [
+        4095,
+        3137
+      ],
+      [
+        4095,
+        3484
+      ],
+      [
+        4095,
+        4315
+      ],
+      [
+        4095,
+        4455
+      ],
+      [
+        4095,
+        4536
+      ],
+      [
+        4095,
+        4551
+      ],
+      [
+        4095,
+        4766
+      ]
+    ],
+    "token_rows": [
+      0,
+      1,
+      4080,
+      4095
+    ],
+    "affected_token_rows": [
+      4080,
+      4095
+    ],
+    "control_token_rows": [
+      0,
+      1
+    ],
+    "hidden_columns": [
+      1671,
+      2270,
+      3137,
+      3484,
+      4315,
+      4455,
+      4536,
+      4551,
+      4766
+    ],
+    "scope": "Every observed main-head dinput mismatch; all vocabulary entries in affected token rows; observation only."
+  },
+  "observations": [
+    {
+      "mf_module": "model.mtp.output_layer",
+      "hp_call": 1,
+      "mf_kind": "x",
+      "hp_kind": "x",
+      "numerically_different": 0,
+      "elements": 20480,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_module": "model.mtp.output_layer",
+      "hp_call": 1,
+      "mf_kind": "logits",
+      "hp_kind": "logits",
+      "numerically_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_module": "model.mtp.output_layer",
+      "hp_call": 1,
+      "mf_kind": "dy_output",
+      "hp_kind": "dy",
+      "numerically_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 2,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_module": "model.mtp.output_layer",
+      "hp_call": 1,
+      "mf_kind": "dy_matmul",
+      "hp_kind": "dy",
+      "numerically_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 2,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_module": "model.mtp.output_layer",
+      "hp_call": 1,
+      "mf_kind": "dx",
+      "hp_kind": "dx",
+      "numerically_different": 0,
+      "elements": 20480,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_module": "model.output_layer",
+      "hp_call": 2,
+      "mf_kind": "x",
+      "hp_kind": "x",
+      "numerically_different": 0,
+      "elements": 20480,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_module": "model.output_layer",
+      "hp_call": 2,
+      "mf_kind": "logits",
+      "hp_kind": "logits",
+      "numerically_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "mf_module": "model.output_layer",
+      "hp_call": 2,
+      "mf_kind": "dy_output",
+      "hp_kind": "dy",
+      "numerically_different": 3316,
+      "elements": 608256,
+      "fp32_bitwise_different": 3318,
+      "bf16_different": 3318,
+      "max_abs": 2.3283064365386963e-10,
+      "mean_abs": 5.2848671940721575e-15,
+      "l2_error_squared": 7.047420846841844e-19,
+      "relative_l2": 1.077490404050223e-06
+    },
+    {
+      "mf_module": "model.output_layer",
+      "hp_call": 2,
+      "mf_kind": "dy_matmul",
+      "hp_kind": "dy",
+      "numerically_different": 3316,
+      "elements": 608256,
+      "fp32_bitwise_different": 3318,
+      "bf16_different": 3318,
+      "max_abs": 2.3283064365386963e-10,
+      "mean_abs": 5.2848671940721575e-15,
+      "l2_error_squared": 7.047420846841844e-19,
+      "relative_l2": 1.077490404050223e-06
+    },
+    {
+      "mf_module": "model.output_layer",
+      "hp_call": 2,
+      "mf_kind": "dx",
+      "hp_kind": "dx",
+      "numerically_different": 9,
+      "elements": 20480,
+      "fp32_bitwise_different": 9,
+      "bf16_different": 9,
+      "max_abs": 2.9802322387695312e-08,
+      "mean_abs": 1.964828300060617e-12,
+      "l2_error_squared": 9.202863814709918e-16,
+      "relative_l2": 2.7168501739756277e-05
+    }
+  ],
+  "selected_dx_fp64": [],
+  "source_sha256": "cafbaed765e1f5734ac9552a42f4e477f1e338ca0c6817a921ec75521648d103",
+  "scope": "Four complete token rows, all vocabulary entries and all nine full-observation dx differences; not a full-logits comparison.",
+  "weight_basis": "Actual HP consumed BF16 weight columns; previous full-model audit confirms both baseline step225 entire weights exact; current probes preserve both26step trajectories."
+}

@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-10-16T05:59:59.120861+08:00",
+  "excluded_runs": [
+    {
+      "run": "hp-jtf637-qsqrt222-head226",
+      "exit": 1,
+      "completed_metrics": 1,
+      "reason": "Observer incorrectly assumes exactly2forward calls despite checkpoint recomputation; not a numerical ablation."
+    },
+    {
+      "run": "hp-jtf637-qsqrt222-head226-r2",
+      "exit": 1,
+      "completed_metrics": 0,
+      "reason": "Observer and original backward both unpack ctx.saved_tensors, rejected by non-reentrant checkpoint; not a numerical ablation."
+    }
+  ],
+  "r3_change": "Unpack once, reuse the same tensors in original backward and count actual backward calls; all numerical fidelity guards remain."
+}
