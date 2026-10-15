@@ -1,0 +1,91 @@
+Looking in links: /work/tmp/issue211-test-wheels
+Processing ./tmp/issue211-test-wheels/pytest-9.1.1-py3-none-any.whl
+Processing ./tmp/issue211-test-wheels/iniconfig-2.3.1-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: packaging>=22 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (26.3)
+Processing ./tmp/issue211-test-wheels/pluggy-1.6.0-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: pygments>=2.7.2 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (2.21.0)
+Installing collected packages: pluggy, iniconfig, pytest
+Successfully installed iniconfig-2.3.1 pluggy-1.6.0 pytest-9.1.1
+Obtaining file:///work/fixes/global-resource-metrics-cpu
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: hyper_parallel
+  Building editable for hyper_parallel (pyproject.toml): started
+  Building editable for hyper_parallel (pyproject.toml): finished with status 'done'
+  Created wheel for hyper_parallel: filename=hyper_parallel-0.1.0-0.editable-cp312-cp312-linux_aarch64.whl size=13316 sha256=a72acb71b58bb7c83d349081d6069d417ab34a72e4f0ab61e043c78a0866f026
+  Stored in directory: /tmp/pip-ephem-wheel-cache-idt2jv2w/wheels/2d/b3/90/91a2390029a6e2604646f6fb4bb203c25476739ae13882175d
+Successfully built hyper_parallel
+Installing collected packages: hyper_parallel
+  Attempting uninstall: hyper_parallel
+    Found existing installation: hyper_parallel 0.1.0
+    Not uninstalling hyper-parallel at /workspace/venv/lib/python3.12/site-packages, outside environment /work/venvs/resource-metric-tests
+    Can't uninstall 'hyper_parallel'. No files were found to uninstall.
+Successfully installed hyper_parallel-0.1.0
+EDITABLE_IMPORT /work/fixes/global-resource-metrics-cpu/hyper_parallel/__init__.py
+        state = TrainerState(global_step=1, epoch=0)
+        device = SimpleNamespace(max_memory_allocated=lambda: gibibyte, max_memory_reserved=lambda: 2 * gibibyte)
+        with (
+            patch.object(environ_meter_module, "get_world_size_safe", return_value=8),
+            patch.object(environ_meter_module, "get_device_type", return_value="npu"),
+            patch.object(environ_meter_module, "get_torch_device", return_value=device),
+            patch.object(environ_meter_module, "all_reduce", side_effect=simulate_collective),
+            patch.object(environ_meter_module.time, "perf_counter", side_effect=(10.0, 12.0)),
+        ):
+            callback.on_step_begin(state)
+            callback.on_micro_step_begin(state, {"input_ids": torch.ones(2, 4), "token_count": torch.tensor(6)})
+            callback.on_step_end(state, loss=1.0, loss_dict={"foundation_loss/lm": 1.0}, grad_norm=0.5)
+    
+        expected = {
+            "performance/step_time": 9.0,
+            "performance/tokens_per_second": 24.0 / 9.0,
+            "memory/device_max_allocated_gb": 13.0,
+            "memory/device_max_reserved_gb": 17.0,
+            "data/step_tokens": 24.0,
+            "data/step_samples": 4.0,
+            "training/foundation_loss/lm": 1.0,
+        }
+        for name, value in expected.items():
+            with self.subTest(metric=name):
+>               self.assertEqual(trainer.step_env_metrics[name], value, f"wrong reduction domain for {name}")
+E               AssertionError: 7.0 != 17.0 : wrong reduction domain for memory/device_max_reserved_gb
+
+tests/ut/trainer/test_environ_meter_callback.py:254: AssertionError
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+tests/common/mark_utils.py:38
+  /work/fixes/global-resource-metrics-cpu/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:38
+  /work/fixes/global-resource-metrics-cpu/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/global-resource-metrics-cpu/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/global-resource-metrics-cpu/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/global-resource-metrics-cpu/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SUBFAILED(metric='performance/step_time') tests/ut/trainer/test_environ_meter_callback.py::TestEnvironMeterCallback::test_tensor_parallel_resource_extrema_cover_all_ranks
+SUBFAILED(metric='performance/tokens_per_second') tests/ut/trainer/test_environ_meter_callback.py::TestEnvironMeterCallback::test_tensor_parallel_resource_extrema_cover_all_ranks
+SUBFAILED(metric='memory/device_max_allocated_gb') tests/ut/trainer/test_environ_meter_callback.py::TestEnvironMeterCallback::test_tensor_parallel_resource_extrema_cover_all_ranks
+SUBFAILED(metric='memory/device_max_reserved_gb') tests/ut/trainer/test_environ_meter_callback.py::TestEnvironMeterCallback::test_tensor_parallel_resource_extrema_cover_all_ranks
+4 failed, 5 passed, 21 warnings, 3 subtests passed in 29.87s

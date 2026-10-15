@@ -6,7 +6,7 @@
 
 **当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前待完成TP/CP/EP及合法组合、完整/选择重算的同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
 
-当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部11个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
+当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部12个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
 
 ## 按影响排序的问题、子问题与独立 PR
 
@@ -14,7 +14,7 @@
 
 | 排序 | 问题与影响 | 小问题单 | 独立单提交 PR | 已有证据及剩余边界 |
 |---|---|---|---|---|
-| Top1 | 当前配方 TP/CP/EP 矩阵尚未完成200步精度验收 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 旧配方全rank误差超阈值，见历史数据；当前TP2前两轮均在训练前让卡。短跑或修改参考配方不能替代验收 |
+| Top1 | 当前配方 TP/CP/EP 矩阵尚未完成200步精度验收 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 旧配方全rank误差超阈值，见历史数据；当前TP2第三轮保留69步后让卡，加权MTP最大差0.006696已超阈值；125重试在训练前让卡。未完成200步，不能替代验收 |
 | Top2 | 梯度累积按微批有效 token 归一化，改变整步目标 | [#203](https://github.com/hf1s/hyper-parallel/issues/203) | [#194](https://github.com/hf1s/hyper-parallel/pull/194) | 实际 Trainer 的不等长监督样例，正确梯度 14、旧行为 10；TP2×EP2 LM 误差显著下降但仍未过 0.005 |
 | Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
 | Top4 | 测试调度器覆盖上层NPU可见列表，使设备分配越界 | [#223](https://github.com/hf1s/hyper-parallel/issues/223) | [#224](https://github.com/hf1s/hyper-parallel/pull/224) | 单提交2文件；无设备回归10测试/18子测试通过、两轴检视通过；不等同实际多卡训练验证 |
@@ -26,10 +26,33 @@
 | Top10 | Muon NS 精度无法显式配置并从 checkpoint 恢复 | [#210](https://github.com/hf1s/hyper-parallel/issues/210) | [#201](https://github.com/hf1s/hyper-parallel/pull/201) | 保留 BF16 默认；CPU、8 卡和 2 卡 ST 通过；可选 FP32 成本须匹配配方评估 |
 | Top11 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
 | Top12 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
+| Top13 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；真实69步前缀确认耗时及reserved漏报，修复后NPU/PP通信仍待回归 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+
+## 最新补充：资源统计独立修复与TP2的69步阶段证据（2026-10-15）
+
+新增小问题[#225](https://github.com/hf1s/hyper-parallel/issues/225)与单提交草稿PR[#226](https://github.com/hf1s/hyper-parallel/pull/226)，提交`b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7`。原回调仅在DP+CP组内取资源MAX，TP/PP其他rank不被覆盖；现在只将步耗时、allocated、reserved三次MAX改为全world，数据计数及loss保留DP+CP，避免重复统计。规范和需求两轴检视通过；5个CPU测试和7个子测试通过，同一测试在未修复基点有4项资源相关子测试失败。尚未验证修复后的真实NPU/PP通信和通信成本；当前head没有check run、combined status为pending，不宣称CI通过。
+
+[修复前原始日志](reports/global-resource-metrics/global-resource-metrics-red.log) · [修复后原始日志](reports/global-resource-metrics/global-resource-metrics-green.log) · [两轴检视与最终源码指纹](reports/global-resource-metrics/global-resource-metrics-two-axis-review.json) · [全rank资源观测](reports/global-resource-metrics/global-resource-metrics-real-observation.json) · [原始证据大小与SHA](reports/global-resource-metrics/global-resource-metrics-test-evidence.json)。CPU结果不能换算成实际显存收益。
+
+固定源`18602c4`、同镜像同配方TP2第三轮`r129-f637-fp32-tp2-200-r3`完成69步×8rank后，4号卡出现其他容器任务。守卫刷新归属后只停止本任务容器，退出137、270.47秒后释放，无本任务设备PID残留。68份原始文件逐一核验；公开67份，进程归属原文件本地保存，公开仅给出命名空间/控制组不同的判定，避免展开其他任务信息。
+
+| 同参考的69步前缀，全8rank最大绝对差 | LM | 日志MTP（×0.3） | 还原MTP | 日志aux（×0.0001） | 还原aux |
+|---|---:|---:|---:|---:|---:|
+| TP2，未完成200步 | 0.0045027733 | 0.0066955090 | 0.0223183632 | 0.0000016616 | 0.0166159589 |
+
+输入哈希和初态无不一致。未加权量由日志按实际系数还原；MTP在第45步、aux在第19步首次超过0.005。该前缀已观察到超阈值，但完整200步验收仍未完成；资源指标修复不解释或修复训练数值偏差。
+
+![TP2仅69步阶段证据，未完成200步；MTP与aux由日志按配置系数还原](figures/f637-tp2-r3-prefix69-zh.png)
+
+[全部loss逐步误差](reports/f637-tp2-r3-interrupted/f637-tp2-r3-prefix69-analysis.json) · [68份采集清单](reports/f637-tp2-r3-interrupted/f637-tp2-r3-interrupted-evidence-manifest.json) · [公开原始8rank指标](reports/f637-tp2-r3-interrupted/raw/runs/r129-f637-fp32-tp2-200-r3) · [释放凭据](reports/f637-tp2-r3-interrupted/raw/scheduling/r129-f637-fp32-tp2-200-r3.receipt.json) · [进程归属判定](reports/f637-tp2-r3-interrupted/f637-tp2-r3-interrupted-ownership-summary.json)。
+
+资源统计缺陷的实际证据：26/69步rank0耗时低于全rank最大值，最大少报0.004096秒；3/69步rank0累计reserved低于全rank最大值，最大少报0.0390625 GiB。allocated的TP lane间有差异，但此轮rank0恰好处在较大一侧，因此不能说本轮rank0 allocated也少报。后续跨拓扑性能比较必须逐步覆盖全部rank；此处不以69步中断样本给出最终并行收益。
+
+满足全局20分钟间隔后，125重试`r125-f637-fp32-tp2-200-r1`又在初始化阶段遇到0号卡其他容器进程；训练0步，退出137，67.74秒后只释放本任务，31文件核验通过，两端重复归档已清理。该尝试未到达训练，不能据此判定125完整训练环境已恢复。[采集与清理凭据](reports/f637-r125-tp2-r1-interrupted/f637-r125-tp2-r1-interrupted-local-verification.json) · [归属判定](reports/f637-r125-tp2-r1-interrupted/f637-r125-tp2-r1-interrupted-ownership-summary.json)。下一轮在释放后重新计满20分钟，仅使用125/129空闲资源；优先补齐尚无当前配方结果的EP2，TP2完整200步继续列为待完成。
 
 ## 最新补充：#214 的 Ascend 两卡／四卡回归通过（2026-10-15）
 
@@ -39,7 +62,7 @@
 
 [验证分析](reports/pr214-uneven-npu-st-r2/pr214-uneven-npu-st-r2-analysis.json) · [24份采集清单](reports/pr214-uneven-npu-st-r2/pr214-uneven-npu-st-r2-evidence-manifest.json) · [两端清理与SHA核验](reports/pr214-uneven-npu-st-r2/pr214-uneven-npu-st-r2-local-verification.json) · [原始两卡／四卡日志](reports/pr214-uneven-npu-st-r2/raw/runs/r129-pr214-uneven-st4-r2) · [释放凭据](reports/pr214-uneven-npu-st-r2/raw/scheduling/r129-pr214-uneven-st4-r2.receipt.json)。此前收集失败及入口修复证据保留在上一轮记录中。
 
-下一次实验最早在2026-10-15 23:12:35（UTC+8）重新检查空闲卡，继续同固定配方TP2第三轮200步。125的只读namespace快照中，先前普通ns0的全部8卡映射已经消失，TP2请求的12份固定文件也已逐一核对；尚未以新容器验证设备发现，不能提前判定已完全恢复。若后续在125运行，跨主机的性能差异必须单列，不能当作并行收益。
+当时计划于2026-10-15 23:12:35（UTC+8）后继续TP2第三轮；其后续69步中断结果见最新补充。125的只读namespace快照中，先前普通ns0的全部8卡映射已经消失，TP2请求的12份固定文件也已逐一核对；尚未以新容器验证设备发现，不能提前判定已完全恢复。若后续在125运行，跨主机的性能差异必须单列，不能当作并行收益。
 
 ## 本轮补充：四卡短步回归、独立选卡修复与资源让出（2026-10-15）
 
@@ -166,7 +189,7 @@ TP2首轮随后在满足20分钟间隔、连续两次空卡检查后启动，初
 
 ## 待完成清单与资源约束
 
-- [x] 已确认11个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
+- [x] 已确认12个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
 - [x] 旧六项修复配方 FSDP0–200、200→400 与连续参考全 rank 零误差；关闭/完整/选择重算200步已完成。
 - [x] 129 固定旧基点 `521d3a8` 的 FP32 配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续；未完成独立连续400参考。
 - [x] 最新 `f637ef7` 集成源的 FSDP0–200 运行完成，8rank数据完整，checkpoint200文件清单齐全。

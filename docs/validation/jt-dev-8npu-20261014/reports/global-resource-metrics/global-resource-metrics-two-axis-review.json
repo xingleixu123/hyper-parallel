@@ -1,0 +1,31 @@
+{
+  "head": "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7",
+  "base": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a",
+  "issue": 225,
+  "pr": 226,
+  "commits": 1,
+  "files": 2,
+  "standards": "PASS：无新增Pylint发现，补充全rank同序调用说明；断言消息改为f-string。",
+  "spec": "PASS：Mesh覆盖world，三个Trainer入口全部rank调用；只扩大三项资源MAX，数据及loss保留DP+CP。",
+  "cpu_red": "4 failed, 5 passed, 3 subtests passed",
+  "cpu_green": "5 passed, 7 subtests passed",
+  "post_test_edits": "仅补充docstring/注释及断言失败消息；生产文件保持基点CRLF，测试文件保持LF。功能逻辑未改。",
+  "additional_review_simulation": "需求轴另执行八线程CPU collective边界模拟，未保存独立脚本/结果；不纳入可下载回归证据。",
+  "not_verified": [
+    "修复后的实际NPU/PP多进程通信",
+    "world MAX额外通信开销",
+    "200步精度或最终资源收益"
+  ],
+  "source_files": [
+    {
+      "path": "hyper_parallel/trainer/callbacks/environ_meter_callback.py",
+      "sha256": "9db09efaac8bfc1a05d3a257e5fc31d83d19ae012081cfe495ecace0fba5503a",
+      "bytes": 14194
+    },
+    {
+      "path": "tests/ut/trainer/test_environ_meter_callback.py",
+      "sha256": "03b14eeadd20cab8e98870e3215b5729545aa05864b98b3c54d7921366ce2e2f",
+      "bytes": 12623
+    }
+  ]
+}
