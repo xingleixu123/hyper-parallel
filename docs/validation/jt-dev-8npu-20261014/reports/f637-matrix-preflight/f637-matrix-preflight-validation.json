@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "cases": 14,
+  "all_parsed_numeric_recipes_match_baseline": true,
+  "initial_scalar_type_mismatches": [
+    "optimizer.muon_config.ns_epsilon",
+    "optimizer.adamw_config.adamw_eps",
+    "model.config.rms_norm_eps"
+  ],
+  "correction": "科学计数浮点增加小数点，避免PyYAML将无小数点指数读成字符串；所有JSON数值不变，重新经过真实解析器",
+  "scope": "配置预检，无模型构建或NPU执行",
+  "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+  "parser_result_sha256": "bfc635104dfcc6f52b631085d1eaabe8b9e6a11117466ee5ca3bad310cb5190c"
+}

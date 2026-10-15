@@ -182,6 +182,35 @@ def main() -> None:
         _write(candidate / 'config.resolved.json', changed)
         check('declared_parallel_recompute_window_axes_allowed',
               audit(reference, candidate, 1, 200)['status'] == 'PASS')
+        changed = copy.deepcopy(config)
+        changed['accelerator']['cp_size'] = 2
+        cp_rule = {
+            'match': '*.self_attn', 'when': 'cp', 'inner_target': 'self',
+            'inner_wrapper': {
+                '_target_': ('hyper_parallel.models.jt_deepseek_v3.adapter.distributed.'
+                            'context_parallel.mla_cp_wrapper'),
+                'strategy': 'expanded_ulysses',
+            },
+        }
+        changed['plan_overrides'].append(cp_rule)
+        _write(candidate / 'config.resolved.json', changed)
+        check('explicit_default_jt_cp_communication_wrapper_allowed',
+              audit(reference, candidate, 1, 200)['status'] == 'PASS')
+        cp_rule['inner_wrapper']['overlap'] = False
+        _write(candidate / 'config.resolved.json', changed)
+        check('resolved_default_cp_overlap_false_allowed',
+              audit(reference, candidate, 1, 200)['status'] == 'PASS')
+        for key, value in (('when', None), ('match', '*.mlp'), ('inner_target', 'other')):
+            invalid = copy.deepcopy(changed)
+            invalid['plan_overrides'][-1][key] = value
+            _write(candidate / 'config.resolved.json', invalid)
+            check(f'cp_wrapper_changed_{key}_fails', audit(reference, candidate, 1, 200)['status'] == 'FAIL')
+        for key, value in (('_target_', 'different.wrapper'), ('loss_scale', 0.5),
+                           ('strategy', 'unknown'), ('overlap', True)):
+            invalid = copy.deepcopy(changed)
+            invalid['plan_overrides'][-1]['inner_wrapper'][key] = value
+            _write(candidate / 'config.resolved.json', invalid)
+            check(f'cp_wrapper_changed_option_{key}_fails', audit(reference, candidate, 1, 200)['status'] == 'FAIL')
         changed['model']['config']['mtp_loss_factor'] = 0.5
         _write(candidate / 'config.resolved.json', changed)
         rejects('loss_coefficient_change_rejected', lambda: audit(reference, candidate, 1, 200))

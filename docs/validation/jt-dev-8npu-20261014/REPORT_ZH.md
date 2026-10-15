@@ -1,8 +1,20 @@
+## 最新续训尝试与完整关联核验（2026-10-15）
+
+最新基点的FSDP0–200已经完成，仍保留下一节的完整基线证据。随后满足全局20分钟间隔、129八卡连续两次确认空闲后启动200–400续训；在模型初始化阶段，3号卡出现PID命名空间与控制组均不同的外部进程，刷新进程清单后仍在。本任务仅释放自己的容器，约78.98秒后退出137，8rank均尚无训练步，无本任务设备PID残留。**这不是续训精度失败，也不能算恢复成功；最新基点的200–400数值验收仍未完成。** 原checkpoint200的25个文件大小、修改时间和已记录小文件哈希均保持不变，保留用于下一次恢复。下一次最早于2026-10-15 19:39:27（UTC+8）之后重新检查空卡。
+
+[中断及归属差异摘要](reports/f637-fsdp8-resume-interrupted/f637-fsdp8-resume-interrupted-analysis.json) · [释放凭据](reports/f637-fsdp8-resume-interrupted/r129-f637-fp32-fsdp8-200-400.receipt.json) · [checkpoint保留核对](reports/f637-fsdp8-resume-interrupted/f637-checkpoint-retained-after-resume-interruption.json)。31份运行证据逐文件校验通过，重复压缩包两端删除；原始进程身份留在本地。
+
+总单、10个小问题及10个独立PR共21项已重新回读，10个GitHub原生父子关系、问题与PR双向链接、每PR单提交均核对通过；问题保持开启、PR保持草稿。[完整关联核验](reports/f637-matrix-preflight/github-chinese-full-link-audit.json) · [发布回读凭据](reports/f637-matrix-preflight/github-chinese-publication-receipt.json)。核验记录绑定更新前一版总单正文摘要；本次只追加续训与预检证据，不改变问题对应关系或代码提交。
+
+等待期间已准备14组TP/CP/EP及重算配置，全部经过真实配置解析器并核对数值配方与基线一致。首次预检发现指数浮点被YAML解析为字符串，已修正序列化并重新检查；没有使用错误配置启动NPU。离线比较器仅精确允许CP必需的默认通信包装规则（含解析器补入的`overlap:false`），未知目标、策略、额外数值选项及`overlap:true`仍拒绝。29项合成CPU检查及规范/验收两轴复审通过；其他200步、8rank、证据完整性及原始分量门槛未变。**这些属于配置与工具预检，不是14组训练已通过。**
+
+[待运行矩阵与优先顺序](reports/f637-matrix-preflight/f637-matrix-plan.json) · [真实配置解析核验](reports/f637-matrix-preflight/f637-matrix-preflight-validation.json) · [29项检查](reports/f637-matrix-preflight/strict-loss-gate-validation.json) · [两轴复审与函数一致性](reports/f637-matrix-preflight/strict-loss-gate-cp-review.json)。
+
 ## 最新完整基线与问题关联（2026-10-15）
 
 129第四轮已完整完成FSDP0–200：8个rank各200条记录，退出码0，376.65秒后正常释放全部设备，无本任务残留PID。输入全局哈希跨rank一致，逐步及累计计数核对通过，全部数值有限；step200累计1600样本、3713791个监督token。峰值allocated/reserved为22.032196/27.25 GiB，排除前20步后中位步时1.155003秒，包含固定观测开销；单轮测量不证明性能收益。
 
-checkpoint200包含完整25个文件、27973262840字节，文件均在本轮时间窗口写入；小文件哈希已记录，未对大张量文件宣称全量哈希校验。76份运行证据逐文件验证通过，重复压缩包两端已清理。**本轮只是基线运行完整；checkpoint实际可恢复性、200–400续训精度以及独立连续400参考仍待验证。** 下一轮最早在2026-10-15 19:17:55（UTC+8）之后重新检查空卡，不提前占用。
+checkpoint200包含完整25个文件、27973262840字节，文件均在本轮时间窗口写入；小文件哈希已记录，未对大张量文件宣称全量哈希校验。76份运行证据逐文件验证通过，重复压缩包两端已清理。**本轮只是基线运行完整；checkpoint实际可恢复性、200–400续训精度以及独立连续400参考仍待验证。** 该基线释放后满足20分钟间隔再启动的首轮续训结果见本文最前面的更新。
 
 [200步全rank核验](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-complete-analysis.json) · [checkpoint清单](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-checkpoint-inventory.json) · [释放凭据](reports/f637-fsdp8-r4-complete/r129-f637-fp32-fsdp8-0-200-r4.receipt.json) · [采集校验](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-complete-local-verification.json)。
 

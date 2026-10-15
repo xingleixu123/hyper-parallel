@@ -26,6 +26,19 @@ from compare_runs import audit as audit_weighted
 from compare_runs import read_rows
 
 
+JT_CP_RULE = {
+    'match': '*.self_attn', 'when': 'cp', 'inner_target': 'self',
+    'inner_wrapper': {
+        '_target_': 'hyper_parallel.models.jt_deepseek_v3.adapter.distributed.context_parallel.mla_cp_wrapper',
+        'strategy': 'expanded_ulysses',
+    },
+}
+JT_CP_RULE_WITH_DEFAULTS = {
+    **JT_CP_RULE,
+    'inner_wrapper': {**JT_CP_RULE['inner_wrapper'], 'overlap': False},
+}
+
+
 def _recipe(config: dict) -> dict:
     """Remove only the explicitly allowed parallel, recompute and run-window axes."""
     required = ('model', 'optimizer', 'lr_scheduler', 'loss_fn', 'training', 'dataset',
@@ -47,6 +60,9 @@ def _recipe(config: dict) -> dict:
         retained = {key: value for key, value in rule.items() if key not in placement_fields and value is not None}
         if not retained.get('module_type') and retained.get('exact_type') is False:
             retained.pop('exact_type')
+        # JT requires this explicit communication wrapper only for CP; unknown rules remain part of the recipe.
+        if retained in (JT_CP_RULE, JT_CP_RULE_WITH_DEFAULTS):
+            continue
         if set(retained) - {'match', 'when'}:
             overrides.append(retained)
     if 'plan_overrides' in result:
