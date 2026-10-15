@@ -1,0 +1,61 @@
+[INFO] Start profiling....
+[W1015 15:38:45.471437240 NPUCachingAllocator.cpp:201] Warning: The current CANN and Soc versions require processing for 32 padding size, with memory allocation. (function operator())
+Traceback (most recent call last):
+  File "/alignment/phase12/tools-f637/replay_head207_aclop_v2_nz.py", line 117, in <module>
+    main()
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/alignment/phase12/tools-f637/replay_head207_aclop_v2_nz.py", line 77, in main
+    smoke = matmul(left, right).float().cpu().numpy()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/alignment/phase12/tools-f637/replay_head207_aclop_v2_nz.py", line 41, in matmul
+    output, metadata = nz_matmul(gradient, inputs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/alignment/phase12/tools-f637/head_gemm_aclop_nz.py", line 48, in matmul
+    storage = list(torch_npu.get_storage_size(tensor))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'int' object is not iterable
+[ERROR] 2026-10-15-15:38:56 (PID:1592158, Device:0, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+[WARNING] An exception has occurred in process App, return code: Operation not permitted.
+[INFO] Start export data in PROF_000001_20261015153844569_01592158FMPOBPQI.
+Thu 15 Oct 2026 15:38:59 [WARNING] [MSVP] [1592702] msprof_entrance.py: Msprof analysis is parsing data as root, which may cause potential system security risks.
+Thu 15 Oct 2026 15:38:59 [INFO] [MSVP] [1592704] msprof_common.py: Start analyzing data in "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/host" ...
+Thu 15 Oct 2026 15:38:59 [INFO] [MSVP] [1592704] msprof_common.py: It may take few minutes, please be patient ...
+Thu 15 Oct 2026 15:38:59 [INFO] [MSVP] [1592704] msprof_common.py: Analysis data in "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/host" finished.
+Thu 15 Oct 2026 15:38:59 [INFO] [MSVP] [1592704] msprof_common.py: Start analyzing data in "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/device_0" ...
+Thu 15 Oct 2026 15:38:59 [INFO] [MSVP] [1592704] msprof_common.py: It may take few minutes, please be patient ...
+Thu 15 Oct 2026 15:38:59 [INFO] [MSVP] [1592704] msprof_common.py: Analysis data in "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/device_0" finished.
+Thu 15 Oct 2026 15:38:59 [INFO] [MSVP] [1592704] msprof_export.py: All collected data will be exported, path is: /state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/device_0.
+2026-10-15 15:38:59 [INFO] [1592894] export_manager.cpp: Start to load data!
+2026-10-15 15:38:59 [INFO] [1592894] export_manager.cpp: The report parameter is not used.
+2026-10-15 15:38:59 [INFO] [1592894] db_assembler.cpp: Start exporting the db!
+2026-10-15 15:38:59 [INFO] [1592894] timeline_manager.cpp: Start exporting the timeline!
+2026-10-15 15:38:59 [INFO] [1592894] timeline_manager.cpp: End exporting timeline output_file. The file is stored in the PROF file.
+2026-10-15 15:38:59 [INFO] [1592894] db_assembler.cpp: End exporting db output_file. The file is stored in the PROF file.
+Thu 15 Oct 2026 15:39:00 [WARNING] [MSVP] [1592928] msprof_entrance.py: Msprof analysis is parsing data as root, which may cause potential system security risks.
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_export.py: The data in "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/host" has been analyzed. Parsing phase will be skipped.
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_export.py: The data in "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/device_0" has been analyzed. Parsing phase will be skipped.
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_export.py: All collected data will be exported, path is: /state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/device_0.
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_export.py: There is no summary data to export for "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/host"
+2026-10-15 15:39:00 [INFO] [1592943] export_manager.cpp: Start to load data!
+2026-10-15 15:39:00 [INFO] [1592943] summary_manager.cpp: Start exporting the summary!
+2026-10-15 15:39:00 [INFO] [1592943] db_assembler.cpp: Start exporting the db!
+2026-10-15 15:39:00 [INFO] [1592943] db_assembler.cpp: Find completed msprof db. End exporting db output_file.
+2026-10-15 15:39:00 [INFO] [1592943] summary_manager.cpp: End exporting summary output_file. The file is stored in the PROF file.
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_export.py: All collected data will be exported, path is: /state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/device_0.
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_export.py: There is no summary data to export for "/state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/device_0"
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_common.py: Start exporting summary output_file.
+Thu 15 Oct 2026 15:39:00 [INFO] [MSVP] [1592930] msprof_common.py: End exporting summary output_file.The file is stored in the /state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI/mindstudio_profiler_output path.
+[INFO] Export all data in PROF_000001_20261015153844569_01592158FMPOBPQI done.
+[INFO] Start query data in PROF_000001_20261015153844569_01592158FMPOBPQI.
+Thu 15 Oct 2026 15:39:01 [WARNING] [MSVP] [1592969] msprof_entrance.py: Msprof analysis is parsing data as root, which may cause potential system security risks.
+Job Info	Device ID	Dir Name	Collection Time           	Model ID	Iteration Number	Top Time Iteration	Rank ID	
+
+NA      	         	host    	2026-10-15 15:38:44.599251	N/A     	N/A             	N/A               	-1     	
+
+NA      	0        	device_0	2026-10-15 15:38:44.603283	N/A     	N/A             	N/A               	-1     	
+
+[INFO] Query all data in PROF_000001_20261015153844569_01592158FMPOBPQI done.
+[INFO] Profiling finished.
+[INFO] Process profiling data complete. Data is saved in /state/jt-recipe-20261014/head207-gemm-aclop-v2-nz-replay/profiler/PROF_000001_20261015153844569_01592158FMPOBPQI

@@ -1,0 +1,111 @@
+{
+  "complete": true,
+  "kernel": 2,
+  "input_hashes": {
+    "x": "7e3de7e3e6430d9371c3e6794dbc71fbefa33a09934b81e3fc471b3545591831",
+    "dy": "25faecb2ed4f5d5495dfc40ab5a4093eaf00a579c5dc37e3967bcc3c3afa5eb3"
+  },
+  "records": [
+    {
+      "mode": "nd_transpose_view",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          1,
+          152064
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "87b51d442d2fc275716af602e7bce52e6657a07768d60aaa0c9982279bb78f07",
+      "matches_prior_screen": true,
+      "start_wall_ns": 1792077764052171760,
+      "end_wall_ns": 1792077764534386020
+    },
+    {
+      "mode": "single_batch_bmm",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          1,
+          152064,
+          4096
+        ],
+        "left_stride": [
+          152064,
+          1,
+          152064
+        ],
+        "right_shape": [
+          1,
+          4096,
+          5120
+        ],
+        "right_stride": [
+          20971520,
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "c1f2f1a95ab2ca3a83d454c0e83ea789135c66b645fc4792a226a0285786eb4b",
+      "matches_prior_screen": true,
+      "start_wall_ns": 1792077765848751940,
+      "end_wall_ns": 1792077766144339050
+    },
+    {
+      "mode": "native_bmmv2",
+      "formats": {
+        "left": 2,
+        "right": 2,
+        "output": 2,
+        "left_shape": [
+          152064,
+          4096
+        ],
+        "left_stride": [
+          1,
+          152064
+        ],
+        "right_shape": [
+          4096,
+          5120
+        ],
+        "right_stride": [
+          5120,
+          1
+        ],
+        "operand_dtype": "torch.bfloat16"
+      },
+      "bf16_sha256": "87b51d442d2fc275716af602e7bce52e6657a07768d60aaa0c9982279bb78f07",
+      "matches_prior_screen": true,
+      "start_wall_ns": 1792077767448971390,
+      "end_wall_ns": 1792077772065556030
+    }
+  ],
+  "torch": "2.12.0+cpu",
+  "torch_npu": "2.12.0",
+  "loaded_libraries": [
+    "/workspace/Ascend/cann-9.2.0-beta.2/aarch64-linux/lib64/libascendcl.so",
+    "/workspace/Ascend/cann-9.2.0-beta.2/aarch64-linux/lib64/libnnopbase.so",
+    "/workspace/Ascend/cann-9.2.0-beta.2/aarch64-linux/lib64/libopapi.so"
+  ],
+  "source_sha256": "bcf42738d547f75d002a057b8ce7ce9b3a406c630353131c2124d5a02810befb",
+  "helper_sha256": "d23d1f0121fe7cf9452f954d1690316bb56b9616d08bbbbf421c603001c4a05f",
+  "scope": "Profiler observation only; no new training result or throughput claim."
+}

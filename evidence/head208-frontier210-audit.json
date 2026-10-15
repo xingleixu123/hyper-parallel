@@ -1,0 +1,406 @@
+{
+  "complete": true,
+  "independent": true,
+  "acceptance_complete": false,
+  "window_steps": 10,
+  "fidelity": {
+    "legacy_nz": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exact10_steps": true,
+      "exit_zero": true,
+      "source_revision": true,
+      "mode": true,
+      "independent": true,
+      "all_steps_factor": true,
+      "no_teacher_marker": true,
+      "route_source": true,
+      "helper_sources": true,
+      "actual_storage_every_step": true,
+      "20_actual_backward_calls": true,
+      "router_no_teacher": true,
+      "router_source": true,
+      "router_helper_source": true,
+      "20_router_calls": true,
+      "49_base_sources": true,
+      "model_hash_observer": true,
+      "model_hash_helper": true,
+      "end_step210": true,
+      "recipe_otherwise_unchanged": true,
+      "hash_steps": true
+    }
+  },
+  "runs": {
+    "legacy_nz": "hp-jtf637-headrouter-frontier210"
+  },
+  "first_bad": {
+    "legacy_nz": null
+  },
+  "summary": {
+    "legacy_nz": {
+      "total_loss": {
+        "first": 9.5367431640625e-07,
+        "max": 0.0014362335205078125,
+        "mean": 0.00017805099487304686,
+        "bad_steps": []
+      },
+      "lm_loss": {
+        "first": 9.5367431640625e-07,
+        "max": 0.00016927719116210938,
+        "mean": 2.3436546325683593e-05,
+        "bad_steps": []
+      },
+      "mtp_weighted": {
+        "first": 2.384185791015625e-07,
+        "max": 0.0013729333877563477,
+        "mean": 0.00015478134155273439,
+        "bad_steps": []
+      },
+      "mtp_raw": {
+        "first": 7.947285975973273e-07,
+        "max": 0.004576444625854492,
+        "mean": 0.0005159378051757812,
+        "bad_steps": []
+      },
+      "aux_weighted": {
+        "first": 5.867332227710298e-12,
+        "max": 9.767948649821827e-08,
+        "mean": 1.594603527338618e-08,
+        "bad_steps": []
+      },
+      "aux_raw": {
+        "first": 5.8673322200775146e-08,
+        "max": 0.0009767948649823666,
+        "mean": 0.00015946035273373127,
+        "bad_steps": []
+      }
+    }
+  },
+  "models": [
+    {
+      "mode": "legacy_nz",
+      "step": 208,
+      "different_vs_mf": {
+        "fp32_sha256": [
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.1.mlp.gate.weight"
+        ],
+        "bf16_as_fp32_sha256": [
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.1.mlp.gate.weight"
+        ]
+      }
+    },
+    {
+      "mode": "legacy_nz",
+      "step": 209,
+      "different_vs_mf": {
+        "fp32_sha256": [
+          "lm_head.weight",
+          "model.embed_tokens.weight",
+          "model.layers.0.input_layernorm.weight",
+          "model.layers.0.mlp.down_proj.weight",
+          "model.layers.0.mlp.gate_proj.weight",
+          "model.layers.0.mlp.up_proj.weight",
+          "model.layers.0.post_attention_layernorm.weight",
+          "model.layers.0.self_attn.kv_a_layernorm.weight",
+          "model.layers.0.self_attn.kv_b_proj.weight",
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.0.self_attn.o_proj.weight",
+          "model.layers.0.self_attn.q_a_layernorm.weight",
+          "model.layers.0.self_attn.q_b_proj.weight",
+          "model.layers.1.input_layernorm.weight",
+          "model.layers.1.mlp.experts.down_proj",
+          "model.layers.1.mlp.experts.gate_up_proj",
+          "model.layers.1.mlp.gate.weight",
+          "model.layers.1.mlp.shared_experts.down_proj.weight",
+          "model.layers.1.mlp.shared_experts.gate_proj.weight",
+          "model.layers.1.mlp.shared_experts.up_proj.weight",
+          "model.layers.1.post_attention_layernorm.weight",
+          "model.layers.1.self_attn.kv_a_layernorm.weight",
+          "model.layers.1.self_attn.kv_b_proj.weight",
+          "model.layers.1.self_attn.linear_qkv.weight",
+          "model.layers.1.self_attn.o_proj.weight",
+          "model.layers.1.self_attn.q_a_layernorm.weight",
+          "model.layers.1.self_attn.q_b_proj.weight",
+          "model.norm.weight",
+          "mtp.layers.0.eh_proj.weight",
+          "mtp.layers.0.enorm.weight",
+          "mtp.layers.0.final_layernorm.weight",
+          "mtp.layers.0.hnorm.weight",
+          "mtp.layers.0.transformer_layer.input_layernorm.weight",
+          "mtp.layers.0.transformer_layer.mlp.experts.down_proj",
+          "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj",
+          "mtp.layers.0.transformer_layer.mlp.gate.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight",
+          "mtp.layers.0.transformer_layer.post_attention_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+          "mtp.layers.0.transformer_layer.self_attn.o_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight"
+        ],
+        "bf16_as_fp32_sha256": [
+          "lm_head.weight",
+          "model.embed_tokens.weight",
+          "model.layers.0.mlp.down_proj.weight",
+          "model.layers.0.mlp.gate_proj.weight",
+          "model.layers.0.mlp.up_proj.weight",
+          "model.layers.0.self_attn.kv_b_proj.weight",
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.0.self_attn.o_proj.weight",
+          "model.layers.0.self_attn.q_b_proj.weight",
+          "model.layers.1.mlp.experts.down_proj",
+          "model.layers.1.mlp.experts.gate_up_proj",
+          "model.layers.1.mlp.gate.weight",
+          "model.layers.1.mlp.shared_experts.down_proj.weight",
+          "model.layers.1.mlp.shared_experts.gate_proj.weight",
+          "model.layers.1.mlp.shared_experts.up_proj.weight",
+          "model.layers.1.self_attn.kv_b_proj.weight",
+          "model.layers.1.self_attn.linear_qkv.weight",
+          "model.layers.1.self_attn.o_proj.weight",
+          "model.layers.1.self_attn.q_b_proj.weight",
+          "model.norm.weight",
+          "mtp.layers.0.eh_proj.weight",
+          "mtp.layers.0.transformer_layer.input_layernorm.weight",
+          "mtp.layers.0.transformer_layer.mlp.experts.down_proj",
+          "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj",
+          "mtp.layers.0.transformer_layer.mlp.gate.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+          "mtp.layers.0.transformer_layer.self_attn.o_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight"
+        ]
+      }
+    },
+    {
+      "mode": "legacy_nz",
+      "step": 210,
+      "different_vs_mf": {
+        "fp32_sha256": [
+          "lm_head.weight",
+          "model.embed_tokens.weight",
+          "model.layers.0.input_layernorm.weight",
+          "model.layers.0.mlp.down_proj.weight",
+          "model.layers.0.mlp.gate_proj.weight",
+          "model.layers.0.mlp.up_proj.weight",
+          "model.layers.0.post_attention_layernorm.weight",
+          "model.layers.0.self_attn.kv_a_layernorm.weight",
+          "model.layers.0.self_attn.kv_b_proj.weight",
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.0.self_attn.o_proj.weight",
+          "model.layers.0.self_attn.q_a_layernorm.weight",
+          "model.layers.0.self_attn.q_b_proj.weight",
+          "model.layers.1.input_layernorm.weight",
+          "model.layers.1.mlp.experts.down_proj",
+          "model.layers.1.mlp.experts.gate_up_proj",
+          "model.layers.1.mlp.gate.weight",
+          "model.layers.1.mlp.shared_experts.down_proj.weight",
+          "model.layers.1.mlp.shared_experts.gate_proj.weight",
+          "model.layers.1.mlp.shared_experts.up_proj.weight",
+          "model.layers.1.post_attention_layernorm.weight",
+          "model.layers.1.self_attn.kv_a_layernorm.weight",
+          "model.layers.1.self_attn.kv_b_proj.weight",
+          "model.layers.1.self_attn.linear_qkv.weight",
+          "model.layers.1.self_attn.o_proj.weight",
+          "model.layers.1.self_attn.q_a_layernorm.weight",
+          "model.layers.1.self_attn.q_b_proj.weight",
+          "model.norm.weight",
+          "mtp.layers.0.eh_proj.weight",
+          "mtp.layers.0.enorm.weight",
+          "mtp.layers.0.final_layernorm.weight",
+          "mtp.layers.0.hnorm.weight",
+          "mtp.layers.0.transformer_layer.input_layernorm.weight",
+          "mtp.layers.0.transformer_layer.mlp.experts.down_proj",
+          "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj",
+          "mtp.layers.0.transformer_layer.mlp.gate.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight",
+          "mtp.layers.0.transformer_layer.post_attention_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+          "mtp.layers.0.transformer_layer.self_attn.o_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight"
+        ],
+        "bf16_as_fp32_sha256": [
+          "lm_head.weight",
+          "model.embed_tokens.weight",
+          "model.layers.0.mlp.down_proj.weight",
+          "model.layers.0.mlp.gate_proj.weight",
+          "model.layers.0.mlp.up_proj.weight",
+          "model.layers.0.self_attn.kv_b_proj.weight",
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.0.self_attn.o_proj.weight",
+          "model.layers.0.self_attn.q_b_proj.weight",
+          "model.layers.1.mlp.experts.down_proj",
+          "model.layers.1.mlp.experts.gate_up_proj",
+          "model.layers.1.mlp.gate.weight",
+          "model.layers.1.mlp.shared_experts.down_proj.weight",
+          "model.layers.1.mlp.shared_experts.gate_proj.weight",
+          "model.layers.1.mlp.shared_experts.up_proj.weight",
+          "model.layers.1.self_attn.kv_b_proj.weight",
+          "model.layers.1.self_attn.linear_qkv.weight",
+          "model.layers.1.self_attn.o_proj.weight",
+          "model.layers.1.self_attn.q_b_proj.weight",
+          "mtp.layers.0.eh_proj.weight",
+          "mtp.layers.0.enorm.weight",
+          "mtp.layers.0.final_layernorm.weight",
+          "mtp.layers.0.transformer_layer.mlp.experts.down_proj",
+          "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj",
+          "mtp.layers.0.transformer_layer.mlp.gate.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight",
+          "mtp.layers.0.transformer_layer.post_attention_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+          "mtp.layers.0.transformer_layer.self_attn.o_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight"
+        ]
+      }
+    }
+  ],
+  "rows": [
+    {
+      "step": 201,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 9.5367431640625e-07,
+          "lm_loss": 9.5367431640625e-07,
+          "mtp_weighted": 2.384185791015625e-07,
+          "mtp_raw": 7.947285975973273e-07,
+          "aux_weighted": 5.867332227710298e-12,
+          "aux_raw": 5.8673322200775146e-08
+        }
+      }
+    },
+    {
+      "step": 202,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0,
+          "lm_loss": 0.0,
+          "mtp_weighted": 0.0,
+          "mtp_raw": 0.0,
+          "aux_weighted": 4.982575777748993e-11,
+          "aux_raw": 4.98257577419281e-07
+        }
+      }
+    },
+    {
+      "step": 203,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0,
+          "lm_loss": 0.0,
+          "mtp_weighted": 1.1920928955078125e-07,
+          "mtp_raw": 3.973642979104852e-07,
+          "aux_weighted": 5.5506825481430044e-11,
+          "aux_raw": 5.550682544708252e-07
+        }
+      }
+    },
+    {
+      "step": 204,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0,
+          "lm_loss": 0.0,
+          "mtp_weighted": 0.0,
+          "mtp_raw": 0.0,
+          "aux_weighted": 2.0489096638938442e-11,
+          "aux_raw": 2.0489096641540527e-07
+        }
+      }
+    },
+    {
+      "step": 205,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0,
+          "lm_loss": 0.0,
+          "mtp_weighted": 0.0,
+          "mtp_raw": 0.0,
+          "aux_weighted": 4.5262277107750715e-11,
+          "aux_raw": 4.5262277126312256e-07
+        }
+      }
+    },
+    {
+      "step": 206,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0,
+          "lm_loss": 0.0,
+          "mtp_weighted": 2.384185791015625e-07,
+          "mtp_raw": 7.947285967091489e-07,
+          "aux_weighted": 5.932524800187841e-11,
+          "aux_raw": 5.932524800300598e-07
+        }
+      }
+    },
+    {
+      "step": 207,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0,
+          "lm_loss": 4.76837158203125e-07,
+          "mtp_weighted": 0.0,
+          "mtp_raw": 0.0,
+          "aux_weighted": 5.820766091346741e-11,
+          "aux_raw": 5.820766091346741e-07
+        }
+      }
+    },
+    {
+      "step": 208,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0,
+          "lm_loss": 2.384185791015625e-07,
+          "mtp_weighted": 0.0,
+          "mtp_raw": 0.0,
+          "aux_weighted": 1.9371509604737547e-11,
+          "aux_raw": 1.9371509552001953e-07
+        }
+      }
+    },
+    {
+      "step": 209,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.0014362335205078125,
+          "lm_loss": 6.341934204101562e-05,
+          "mtp_weighted": 0.0013729333877563477,
+          "mtp_raw": 0.004576444625854492,
+          "aux_weighted": 9.767948649821827e-08,
+          "aux_raw": 0.0009767948649823666
+        }
+      }
+    },
+    {
+      "step": 210,
+      "absolute_error": {
+        "legacy_nz": {
+          "total_loss": 0.00034332275390625,
+          "lm_loss": 0.00016927719116210938,
+          "mtp_weighted": 0.0001742839813232422,
+          "mtp_raw": 0.0005809466044111034,
+          "aux_weighted": 6.146701052789014e-08,
+          "aux_raw": 0.000614670105278492
+        }
+      }
+    }
+  ],
+  "scope": "Read-only model hashes208-210; ten-step loss and gradient norms must remain exactly identical to the independent combination26 trajectory."
+}
