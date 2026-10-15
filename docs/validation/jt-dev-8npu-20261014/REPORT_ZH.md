@@ -1,10 +1,10 @@
 ## 上游更新与资源进展（2026-10-15）
 
-上游随后合入 #186，JT_dev 推进到 `f637ef7ee4d4b416800716f1ebaaae7709b8a06a`，包含 CP 分块损失支持、MLA 布局调整和 `enable_chunk_loss`/`chunk_loss_size` 配置。此前 `521d3a8` 的基线与续训证据属于固定旧轮次，不能改写为新基点结论。该轮连续400参考在 step168 出现外部设备进程，本任务已释放容器，保留中断日志，不计为完整参考，也没有停止他人任务。接下来先集成新基点，再按0–200→checkpoint200–400→独立连续400的顺序重建匹配参考。
+上游随后合入 #186，JT_dev 推进到 `f637ef7ee4d4b416800716f1ebaaae7709b8a06a`，包含 CP 分块损失支持、MLA 布局调整和 `enable_chunk_loss`/`chunk_loss_size` 配置。此前 `521d3a8` 的基线与续训证据属于固定旧轮次，不能改写为新基点结论。该轮连续400参考在 step168 出现外部设备进程，本任务已释放容器，保留中断日志，不计为完整参考，也没有停止他人任务。新基点已集成完成；接下来按0–200→checkpoint200–400→独立连续400的顺序重建匹配参考。
 
 原 #199 与 #186 的生产功能重叠，现已保留上游实现并收敛为 #205 的独立回归测试：两个文件、单提交 `e9fc94d376ca7380c13a5e09c0020b34a75dc1d2`。新基点 CPU 20项测试、25项子测试通过，两轴检视通过；新基点四卡 ST 尚待运行，不沿用旧 NPU 通过结论。所有资源操作继续遵守空闲检查和全局20分钟间隔。
 
-当前公开证据：[详细中文总报告](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/REPORT_ZH.md)、[本次 CPU 原始日志](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-ut.log)、[隔离容器凭据](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-receipt.json)、[源码与单提交重写记录](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-rewrite.json)。以上链接固定到证据提交，不随分支后续更新漂移。
+上一轮公开证据：[详细中文总报告](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/REPORT_ZH.md)、[本次 CPU 原始日志](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-ut.log)、[隔离容器凭据](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-receipt.json)、[源码与单提交重写记录](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-rewrite.json)。以上链接固定到证据提交，不随分支后续更新漂移。
 
 ## 最新基点组合回归与 CPU 测试隔离补充（2026-10-15）
 
@@ -16,13 +16,25 @@
 
 [回归汇总与限定条件](reports/cpu-fixtures/cpu-fixture-validation.json)、[组合回归原始日志](reports/cpu-fixtures/latest-f637-cpu-fixtures-ut.log)、[修正前失败日志](reports/cpu-fixtures/latest-f637-cpu-ut.log)、[最小复现记录](reports/cpu-fixtures/checkpoint-device-minimal-npu-import.container.log)。
 
+## 两台服务器的匹配环境与中文图（2026-10-15）
+
+125 的独立 Docker 环境中已核对到与 129 相同的镜像 ID `5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d`。两台训练源码均为 `18602c4524dc664b81b2bad9a7b624455ce1494f`，树 `825a2bbc68e5d72f2ebaa4af85ae0066d61cce97`；125 以新建隔离 venv 完成 editable 安装、真实配置解析与 4710 行数据读取，未挂载 NPU。两台 Arrow 文件 SHA256 同为 `cb7e146388ff5de09cafe50bb57c060265038ecabd2f343fa9114c05f3b678f1`。旧源码保存在各自备份分支，未删除共享镜像或数据。
+
+总单与 PR 使用的图新增中文版本，并保留英文原件与原始数值。每张图标明历史来源、完整/未加权分量及实际比较对象；中文化不改变验收结论。14张图的生成输入、输出哈希和脚本见 [绘图记录](reports/chinese-figure-rendering.json)。MF 官方入口与镜像已核对到 `5089da308ebcc146d0cbe32180c209c4f1d39d77`，Megatron 到 `0101df91e5f86acb26a03bd8ad2361f3113476a6`；重计算相关实现变化已逐文件核对，详见 [能力对照](reports/recompute-reference-comparison.md)。
+
+## #199 四卡短回归的中断证据（2026-10-15）
+
+独立源码 `e9fc94d376ca7380c13a5e09c0020b34a75dc1d2` 在129的空闲0–3卡运行。约67.78秒后，资源守卫报告四个 PID 不属于当时容器进程清单，随后只释放本任务容器，退出137。事后相关 PID 已退出，现有记录不足以确证其外部归属或排除检测时序问题；下一轮需补齐事件时的进程归属证据。没有停止其他任务。
+
+rank0 已输出8种配置各2步的16条损失记录，其中包含新增的 `chunk_size=48`、TP1×CP4 和 TP2×CP2×SP。观测到的 LM/MTP/aux 日志最大绝对差分别为0.000682831、0.000119448、9.10368e-8，最大梯度相对L2为0.0140618。**这些仅是中断前的局部观察：没有全部4rank的pytest完成摘要、退出0或完整结束标记，因此不能记作ST通过，更不能代替200步验收。** 参考 [局部分析](reports/latest-f637-preparation/pr199-f637-st4-partial-analysis.json)、[资源释放记录](reports/latest-f637-preparation/r129-pr199-f637-st4.receipt.json) 和 [逐文件哈希](reports/latest-f637-preparation/pr199-f637-st4-interrupted-evidence-manifest.json)。重复采集压缩包已校验后删除。
+
 ## 总体目标与当前结论
 
 本单是 JT DeepSeek V3 八卡验证的**总问题单**，统一关联所有已拆分的小问题及独立 PR，维护优先级、复现证据、精度曲线、显存/性能、重计算与续训验收状态。每个已确认的独立缺陷或接口需求各用一个小问题单和一个单提交 PR，两个方向均能回到本单；不把多个缺陷混入同一个修复提交。
 
 **当前总体尚未验收通过。** 最高优先级仍是 TP/CP/EP 相对 FSDP 的 200 步误差超过 0.005。六项修复集成的旧配方已做到 FSDP 续训及 full/selective 重算全 rank 零误差；新生产 FP32 专家梯度＋FP32 NS 配方必须使用自己匹配的参考，不能继承旧配方结论。
 
-截至 2026-10-15，129 已完成新环境 FSDP 0–200，再从该 checkpoint 续训 201–400；每段 8 rank 的全部 200 步、退出/完成标记、有限值记录完整，step201 累计样本恢复为 1608，累计监督 token 为 3720095，200→201 边界检查通过。**该固定轮次的独立连续400参考在step168因资源冲突被释放，未完成。当前只确认基线/续训运行完整性与计数连续性，不声明新配方续训loss对齐通过。** 续训收尾检测到外部 PID，该轮时间暂不用于性能对比。
+在固定旧基点 `521d3a8` 轮次中，129 已完成 FP32 配方 FSDP 0–200，再从该 checkpoint 续训 201–400；每段 8 rank 的全部 200 步、退出/完成标记、有限值记录完整，step201 累计样本恢复为 1608，累计监督 token 为 3720095，200→201 边界检查通过。**该固定轮次的独立连续400参考在step168因资源冲突被释放，未完成。当前只确认基线/续训运行完整性与计数连续性，不声明新配方续训loss对齐通过。** 续训收尾检测到外部 PID，该轮时间暂不用于性能对比。
 
 ## 按影响排序的问题、子问题与独立 PR
 
@@ -72,13 +84,13 @@
 
 例如 CP4 未加权 MTP/aux 最大差为 0.021587213/0.156689202，TP2 为约 0.02070109/0.17280778。未加权 aux 也未达标。新生产 FP32 配方的 3 步集成通过仅证明短跑路径；早期诊断包装器的 200 步仍失败且梯度布局不同，不能当作生产补丁验收。
 
-![FSDP 基线逐步对齐](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-fsdp8-baseline.png)
+![FSDP 基线逐步对齐](figures/reviewed-fsdp8-baseline-zh.png)
 
-![FSDP 续训逐步对齐](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-fsdp8-resume.png)
+![FSDP 续训逐步对齐](figures/reviewed-fsdp8-resume-zh.png)
 
-![CP4 未加权 200 步误差](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-cp4-off-200-raw.png)
+![CP4 未加权 200 步误差](figures/reviewed-cp4-off-200-raw-zh.png)
 
-![TP2 未加权 200 步误差](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/reviewed-tp2-replicated-experts-build-200-raw.png)
+![TP2 未加权 200 步误差](figures/reviewed-tp2-replicated-experts-build-200-raw-zh.png)
 
 ## 数值定位进展与未确认事项
 
@@ -86,7 +98,7 @@
 - TP 首步 Q/KV 投影和输出投影完整输入共 4608 个哈希块相同，首次已定位的输出偏离在第一层输出投影。局部投影使用 FP32 后，采样最大差从 0.015625 降至 0.0009765625，后续 MLP 仍放大残差；该消融改变数值配方，不能直接与旧 BF16 基线混比。
 - EP/CP 的四个 NS 参数从单矩阵变为矩阵批次2。逐矩阵 NS 和 CPU FP64 范数的三步消融仍有非零差异；首步 28 个被观测参数哈希相同不代表全部专家参数相同。
 - CP 首步仅有采样边界证据，不能称已定位完整根因。固定 512 位置 loss 分块使部分反向边界一致，但 embedding 梯度相对 L2 仍约 0.00532；只跑一步，不能替代 200 步验收。
-- 重算灵活性仍是待完成需求：当前 JT YAML 尚未提供 MF 式任意模块路径/层范围、排除及通信重算配置。已有模块消融使用实验包装器；不能将 `selective` 名称视作相同接口。
+- 重算灵活性评估结论：当前 JT YAML 尚未提供 MF 式任意模块路径/层范围、排除及通信重算配置。已有模块消融使用实验包装器；不能将 `selective` 名称视作相同接口。
 
 ## 显存、吞吐与重计算性价比
 
@@ -106,15 +118,15 @@
 
 重算独立40步消融：full 节省约3.095 GiB、步时增加9.13%；selective 节省2.407 GiB、增加8.50%；单独 MLP 节省0.853 GiB、增加1.91%；只重算 MTP 未降低整步峰值、时间增加约2.99%。MLP＋norm 另有200步全 rank 零误差，节省约1.165 GiB、步时增加约2%。模块事件时间为含子调用的时间，不能嵌套相加；进入/退出 allocated 差也不能当作保存激活大小。
 
-![源参数释放的显存收益](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/source-parameter-lifetime.png)
+![源参数释放的显存收益](figures/source-parameter-lifetime-zh.png)
 
-![模块重算成本比较](https://raw.githubusercontent.com/xingleixu123/hyper-parallel/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/figures/recompute-module-cost.png)
+![模块重算成本比较](figures/recompute-module-cost-zh.png)
 
-[同口径时间与显存原始记录](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/matching-build-topology-costs.md)；[重算成本与口径](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/recompute-cost-analysis.md)；[MF/Megatron 固定源码对照](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/recompute-reference-comparison.md)。
+[同口径时间与显存原始记录](https://github.com/xingleixu123/hyper-parallel/blob/2f5ba55838338dcb5c37c9cd44a958586da2e89a/docs/validation/jt-dev-8npu-20261014/reports/matching-build-topology-costs.md)；[重算成本与口径](reports/recompute-cost-analysis.md)；[MF/Megatron 固定源码对照](reports/recompute-reference-comparison.md)。
 
 ## 固定环境、复现入口与证据
 
-此前已测固定基点 `JT_dev@521d3a8a9aa62353327093ab1258ca2c22006e8b` 已合入 #180（head `5de3cceab094bbed18915d1a9c9231ca220629ca`）。旧八卡测量从 `ad1c553`＋#180 开始，四项修复集成源 `6e762be`、六项源 `ec2e16b`；129 当前整合源 `a3450812a3bb737e74b8433928acc6fc18374433`，再应用 #200/#201 生产补丁，补丁 SHA256 `803107108b505cd7ab7eafb7c625eb125ae0679e97cb1482f0914f3b3213f784`。
+此前已测固定基点 `JT_dev@521d3a8a9aa62353327093ab1258ca2c22006e8b` 已合入 #180（head `5de3cceab094bbed18915d1a9c9231ca220629ca`）。旧八卡测量从 `ad1c553`＋#180 开始，四项修复集成源 `6e762be`、六项源 `ec2e16b`；129 该历史轮次整合源 `a3450812a3bb737e74b8433928acc6fc18374433`，再应用 #200/#201 生产补丁，补丁 SHA256 `803107108b505cd7ab7eafb7c625eb125ae0679e97cb1482f0914f3b3213f784`。
 
 硬件：8×Ascend 910B3 64 GiB。CANN 9.2.0-beta.2 / V100R001C12B086，Python 3.12.14，Torch 2.12.0+cpu，TorchNPU 2.12.0，transformers 5.13.1。129 镜像 `jt-clean:hp-910b-20261009`，ID `sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d`，从 `/home/jt_image/four-images-clean-20261009/HP-910B/hp-910b-arrow.tar.gz` 校验后载入。镜像内原代码较旧，实际导入的是挂载并验证过的 editable checkout。
 
@@ -128,11 +140,12 @@
 
 - [x] 已确认9个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
 - [x] 旧六项修复配方 FSDP0–200、200→400 与连续参考全 rank 零误差；关闭/完整/选择重算200步已完成。
-- [x] 129 最新环境新配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续。
-- [ ] 新配方独立连续400步完成；基线/续训逐 rank 加权和未加权 loss 全部≤0.005。
+- [x] 129 固定旧基点 `521d3a8` 的 FP32 配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续；未完成独立连续400参考。
+- [ ] 最新 `f637ef7` 基点的 FSDP0–200、checkpoint200→400及独立连续400步完成；逐 rank 加权和未加权 loss 全部≤0.005。
 - [ ] 新配方 TP/CP/EP 及合法组合200步全部达到相同门槛，剩余根因分别修复并建单。
 - [ ] #214 的 Ascend/HCCL 补丁回归。
-- [ ] 按最终配方复核重算选择及资源收益，落实经验证的灵活配置方案。
+- [x] 完成 MF / Megatron 重算配置能力对照，明确当前 JT 与 MF 式模块/层范围、排除及通信配置的差距。
+- [ ] 按最终配方复核关闭/完整/选择重算200步及资源收益；模块选择消融按其实际步数报告。
 - [ ] 外部维护者评审、当前提交对应的完整 CI、最终回归与合入确认。
 
 仅在125/129获准的空闲设备上运行，优先保证其他实验；任何两轮 NPU 实验之间全局至少间隔20分钟，等待期间不占卡，冲突只释放本任务容器，不停止他人进程。八卡训练每轮有900秒上限，不常驻排队占卡。清理仅限本任务已核验无用的临时数据和重复压缩包，checkpoint200 保留到续训与连续参考比对完毕；原始镜像、共享数据和其他任务文件不删除。

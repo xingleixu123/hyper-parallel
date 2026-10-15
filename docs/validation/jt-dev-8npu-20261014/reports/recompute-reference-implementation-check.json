@@ -1,0 +1,146 @@
+[
+  {
+    "repository": "mindformers",
+    "path": "mindformers/pynative/distributed/activation_checkpoint.py",
+    "old": "302c939f1f6c3335c533f8c83cdce67db671f607",
+    "new": "5089da308ebcc146d0cbe32180c209c4f1d39d77",
+    "blobs": {
+      "old": "413d01d30b3da6d681cb6ba4c1a34a3d61661f5b",
+      "new": "413d01d30b3da6d681cb6ba4c1a34a3d61661f5b"
+    },
+    "identical_file": true,
+    "line_anchors": [
+      {
+        "line": 791,
+        "text": "def apply_recompute("
+      }
+    ]
+  },
+  {
+    "repository": "mindformers",
+    "path": "mindformers/pynative/optimizer/muon.py",
+    "old": "302c939f1f6c3335c533f8c83cdce67db671f607",
+    "new": "5089da308ebcc146d0cbe32180c209c4f1d39d77",
+    "blobs": {
+      "old": "f6fe0b850a38018c8a08bdfe1347bdaa907826a9",
+      "new": "f6fe0b850a38018c8a08bdfe1347bdaa907826a9"
+    },
+    "identical_file": true,
+    "line_anchors": []
+  },
+  {
+    "repository": "megatron",
+    "path": "megatron/core/transformer/transformer_config.py",
+    "old": "07046cc6b8b7479ba05e6b47ed25f3f8e6634573",
+    "new": "0101df91e5f86acb26a03bd8ad2361f3113476a6",
+    "blobs": {
+      "old": "5071e8869858d1bb14f0ce311b660982d8474dc9",
+      "new": "4c749ea1f970be62d2a829922af7eb9713528868"
+    },
+    "identical_file": false,
+    "line_anchors": [
+      {
+        "line": 630,
+        "text": "recompute_granularity: Optional[Literal['full', 'selective']] = None"
+      },
+      {
+        "line": 641,
+        "text": "recompute_method: Optional[Literal['uniform', 'block']] = None"
+      },
+      {
+        "line": 649,
+        "text": "recompute_num_layers: Optional[int] = None"
+      },
+      {
+        "line": 658,
+        "text": "recompute_modules: Optional[List[str]] = None"
+      },
+      {
+        "line": 1356,
+        "text": "residual_stream_recompute_num_layers: Optional[int] = None"
+      },
+      {
+        "line": 2443,
+        "text": "f'recompute_method: {self.recompute_method} must be \"block\" or \"uniform\".'"
+      },
+      {
+        "line": 2447,
+        "text": "f\"Using recompute_granularity: {self.recompute_granularity} so \""
+      },
+      {
+        "line": 2453,
+        "text": "f\"When using recompute_granularity: {self.recompute_granularity} \""
+      },
+      {
+        "line": 2462,
+        "text": "f\"When using recompute_granularity: {self.recompute_granularity} \""
+      },
+      {
+        "line": 2494,
+        "text": "f\"Invalid choices for recompute_modules: {invalid_modules}. \""
+      },
+      {
+        "line": 2517,
+        "text": "if \"core_attn\" in self.recompute_modules:"
+      },
+      {
+        "line": 2525,
+        "text": "if \"shared_experts\" in self.recompute_modules:"
+      },
+      {
+        "line": 2564,
+        "text": "if \"moe\" not in self.recompute_modules:"
+      },
+      {
+        "line": 2568,
+        "text": "if self.recompute_granularity == \"selective\" and \"mhc\" in self.recompute_modules:"
+      },
+      {
+        "line": 2571,
+        "text": "if \"mlp\" in self.recompute_modules:"
+      },
+      {
+        "line": 2746,
+        "text": "if self.recompute_granularity == \"selective\" and \"moe\" in self.recompute_modules:"
+      },
+      {
+        "line": 3516,
+        "text": "if self.recompute_granularity:"
+      }
+    ],
+    "diff": "diff --git a/megatron/core/transformer/transformer_config.py b/megatron/core/transformer/transformer_config.py\nindex 5071e88..4c749ea 100644\n--- a/megatron/core/transformer/transformer_config.py\n+++ b/megatron/core/transformer/transformer_config.py\n@@ -360,7 +360,10 @@ class TransformerConfig(ModelParallelConfig):\n     \"\"\"Layer offset for DSA cross-layer top-k sharing.\"\"\"\n \n     dsa_indexer_loss_coeff: Optional[float] = None\n-    \"\"\"Coefficient for the DSA indexer KL divergence loss. Set to 0 to disable indexer loss.\"\"\"\n+    \"\"\"Coefficient for the DSA indexer KL divergence loss.\n+    Set to 0 to disable indexer loss; in that mode the non-differentiable indexer projections are\n+    frozen and excluded from gradient/optimizer bookkeeping.\n+    \"\"\"\n \n     dsa_indexer_use_sparse_loss: bool = False\n     \"\"\"Whether to use sparse DSA indexer loss. If True, the indexer loss will be computed using the\n@@ -381,6 +384,12 @@ class TransformerConfig(ModelParallelConfig):\n     dsa_indexer_scoring_relu: bool = True\n     \"\"\"Whether DSA indexer should apply ReLU to q@k^T scores before weighting.\"\"\"\n \n+    dsa_indexer_qk_proj_use_quantization: bool = True\n+    \"\"\"Whether indexer query/key projections use the enclosing FP8/FP4 context.\n+    When disabled, these projections use the configured unquantized dtype (e.g. BF16).\n+    This does not control ``linear_weights_proj`` or index-score quantization.\n+    \"\"\"\n+\n     dsa_indexer_k_norm_epsilon: Optional[float] = None\n     \"\"\"Optional epsilon override for the DSA indexer key LayerNorm.\"\"\"\n \n@@ -397,6 +406,23 @@ class TransformerConfig(ModelParallelConfig):\n     path. FP32 uses a true FP32-output projection and is not compatible with the cuDNN DSA\n     backend. The final index scores remain FP32 independently of this option.\"\"\"\n \n+    dsa_indexer_kpool: int = 1\n+    \"\"\"Number of keys per softmax-weighted indexer pool; 1 keeps per-token selection.\n+    When greater than one, ``dsa_indexer_topk`` must be divisible by this value.\n+    \"\"\"\n+\n+    dsa_indexer_kpool_use_quantization: bool = False\n+    \"\"\"Quantize KPool scoring inputs to E4M3 with power-of-two scales after Hadamard\n+    rotation. This does not change projection parameter or GEMM precision.\n+    \"\"\"\n+\n+    dsa_indexer_kpool_always_select_tail: bool = True\n+    \"\"\"Append each query's incomplete causal pool after selected history pools.\n+    This widens the output to ``dsa_indexer_topk + dsa_indexer_kpool - 1``; unused slots are -1.\n+    Set to False for fixed-width pool-only selection. Only applies when\n+    ``dsa_indexer_kpool > 1``.\n+    \"\"\"\n+\n     ####################\n     # Compressed sparse attention\n     ####################\n@@ -1796,11 +1822,13 @@ class TransformerConfig(ModelParallelConfig):\n         if (\n             self.dsa_indexer_weights_proj_output_dtype == \"fp32\"\n             and self.dsa_kernel_backend == \"cudnn\"\n+            and self.dsa_indexer_kpool <= 1\n         ):\n             raise ValueError(\n                 \"dsa_indexer_weights_proj_output_dtype='fp32' is not supported by \"\n-                \"dsa_kernel_backend='cudnn', which requires a BF16 indexer weights tensor. \"\n-                \"Use dsa_kernel_backend='tilelang' or 'none'.\"\n+                \"dsa_kernel_backend='cudnn' for per-token DSA, which requires a BF16 indexer \"\n+                \"weights tensor. KPool selection bypasses the cuDNN top-k path; use KPool or \"\n+                \"dsa_kernel_backend='tilelang'/'none'.\"\n             )\n \n         if is_gated_delta_net_variant(self.experimental_attention_variant):\n@@ -1865,6 +1893,31 @@ class TransformerConfig(ModelParallelConfig):\n                     \"dsa_indexer_skip_topk_offset must be non-negative, got \"\n                     f\"{self.dsa_indexer_skip_topk_offset}.\"\n                 )\n+            if self.dsa_indexer_kpool < 1:\n+                raise ValueError(\n+                    f\"dsa_indexer_kpool must be positive, got {self.dsa_indexer_kpool}.\"\n+                )\n+            if self.dsa_indexer_kpool > 1:\n+                if self.dsa_indexer_topk is None:\n+                    raise ValueError(\n+                        \"dsa_indexer_topk must be set when dsa_indexer_kpool is greater than 1.\"\n+                    )\n+                if self.dsa_indexer_topk < 1:\n+                    raise ValueError(\n+                        \"dsa_indexer_topk must be positive\"\n+                        \" when dsa_indexer_kpool is greater than 1.\"\n+                    )\n+                if self.dsa_indexer_topk % self.dsa_indexer_kpool != 0:\n+                    raise ValueError(\n+                        \"dsa_indexer_topk must be divisible\"\n+                        \" by dsa_indexer_kpool for pool selection; \"\n+                        f\"got topk={self.dsa_indexer_topk}, kpool={self.dsa_indexer_kpool}.\"\n+                    )\n+            if self.dsa_indexer_kpool > 1 and (self.dsa_indexer_loss_coeff or 0.0) > 0:\n+                raise ValueError(\n+                    \"DSA indexer loss is not supported with kpool selection; set \"\n+                    \"dsa_indexer_loss_coeff=0 or dsa_indexer_kpool=1.\"\n+                )\n         elif self.experimental_attention_variant == \"dsv4_hybrid\":\n             assert self.multi_latent_attention, \"DSv4 Hybrid requires multi_latent_attention.\"\n             assert self.csa_compress_ratios is not None, \"csa_compress_ratios must be set\"\n@@ -3992,6 +4045,12 @@ class MLATransformerConfig(TransformerConfig):\n     multi_latent_attention: bool = True\n     \"\"\"Whether to use Multi-Latent Attention.\"\"\"\n \n+    mla_proj_use_quantization: bool = True\n+    \"\"\"Whether absorbed-MLA projections use the enclosing FP8/FP4 context.\n+    When disabled, they use the configured unquantized dtype (e.g. BF16). Core-attention\n+    precision is unchanged.\n+    \"\"\"\n+\n     use_fused_mla_q_uproj: bool = False\n     \"\"\"Use the cuDNN fused MLA Q up-proj + per-head RoPE + MXFP8-quant kernel (SM100 only).\n     Requires apply_rope_fusion=True, q_lora_rank set, TP=1, SBHD, MXFP8 DPA, and zero\n"
+  },
+  {
+    "repository": "megatron",
+    "path": "megatron/core/transformer/transformer_block.py",
+    "old": "07046cc6b8b7479ba05e6b47ed25f3f8e6634573",
+    "new": "0101df91e5f86acb26a03bd8ad2361f3113476a6",
+    "blobs": {
+      "old": "fd205162162371aa36ac95fec653d7a2ef2bbe33",
+      "new": "fd205162162371aa36ac95fec653d7a2ef2bbe33"
+    },
+    "identical_file": true,
+    "line_anchors": []
+  },
+  {
+    "repository": "megatron",
+    "path": "megatron/core/transformer/transformer_layer.py",
+    "old": "07046cc6b8b7479ba05e6b47ed25f3f8e6634573",
+    "new": "0101df91e5f86acb26a03bd8ad2361f3113476a6",
+    "blobs": {
+      "old": "932f70a83e838d318846a4757c4a3caeead1651d",
+      "new": "932f70a83e838d318846a4757c4a3caeead1651d"
+    },
+    "identical_file": true,
+    "line_anchors": [
+      {
+        "line": 514,
+        "text": "if \"layernorm\" in self.config.recompute_modules:"
+      },
+      {
+        "line": 576,
+        "text": "if \"mlp\" in self.config.recompute_modules:"
+      }
+    ]
+  }
+]

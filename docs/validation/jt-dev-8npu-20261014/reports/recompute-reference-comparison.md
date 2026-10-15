@@ -24,12 +24,16 @@ JT 的 `selective` 是算子选择策略，不能据名称认定为 MindFormers 
 
 - [MindFormers master 配置说明](https://www.mindspore.cn/mindformers/docs/en/master/feature/configuration.html)，2026-10-14 检索；文档为可变 master；实现已另行固定为下列源码提交。
 - [MindFormers master 内存优化](https://www.mindspore.cn/mindformers/docs/en/master/feature/memory_optimization.html)，包含 select_module、exclude_op 和 recompute_comm 的接口。
-- [Megatron TransformerConfig](https://github.com/NVIDIA/Megatron-LM/blob/07046cc6b8b7479ba05e6b47ed25f3f8e6634573/megatron/core/transformer/transformer_config.py#L604)，核对时 main 的提交为 `07046cc6b8b7479ba05e6b47ed25f3f8e6634573`（2026-10-15 北京时间）。
+- [Megatron TransformerConfig](https://github.com/NVIDIA/Megatron-LM/blob/0101df91e5f86acb26a03bd8ad2361f3113476a6/megatron/core/transformer/transformer_config.py#L630)，核对时 main 的提交为 `0101df91e5f86acb26a03bd8ad2361f3113476a6`（2026-10-15 北京时间）。
 - [Megatron Bridge 重计算说明](https://docs.nvidia.com/nemo/megatron-bridge/latest/training/activation-recomputation.html)，用于交叉核对模块类别及配置含义。
-- 本任务代码基点 `ad1c553`：`hyper_parallel/distributed/activation_checkpoint.py`、`hyper_parallel/trainer/config/parallelism.py`、JT adapter registry。
+- 本任务核对代码为最新上游 `f637ef7` 上的集成源 `18602c4524dc664b81b2bad9a7b624455ce1494f`：`hyper_parallel/distributed/activation_checkpoint.py`、`hyper_parallel/trainer/config/parallelism.py`、JT adapter registry。
 
 ## 最新 PyNative 实现细节
 
-MindFormers 官方 GitHub 镜像与 AtomGit master 均核对到 `302c939f1f6c3335c533f8c83cdce67db671f607`。[`apply_recompute`](https://github.com/mindspore-ai/mindformers/blob/302c939f1f6c3335c533f8c83cdce67db671f607/mindformers/pynative/distributed/activation_checkpoint.py#L791) 先安装 exclude wrapper，再应用 full、select、comm；按父模块覆盖关系去重。它会把 MTP 作为 trunk 后面的层号，并将完整层的 early_stop 设为false，以使通信及自定义反向边界重放完整。选择子模块仍可早停。这些实现契约比只支持一个模块名列表更完整，移植时需要逐个拓扑验证。
+2026-10-15 16:50（北京时间），用户指定的 MindFormers 官方 GitCode 入口与官方 GitHub 镜像 master 均核对到 `5089da308ebcc146d0cbe32180c209c4f1d39d77`。[`apply_recompute`](https://github.com/mindspore-ai/mindformers/blob/5089da308ebcc146d0cbe32180c209c4f1d39d77/mindformers/pynative/distributed/activation_checkpoint.py#L791) 先安装 exclude wrapper，再应用 full、select、comm；按父模块覆盖关系去重。它会把 MTP 作为 trunk 后面的层号，并将完整层的 early_stop 设为false，以使通信及自定义反向边界重放完整。选择子模块仍可早停。这些实现契约比只支持一个模块名列表更完整，移植时需要逐个拓扑验证。
 
-同一源码的 [`Muon`](https://github.com/mindspore-ai/mindformers/blob/302c939f1f6c3335c533f8c83cdce67db671f607/mindformers/pynative/optimizer/muon.py#L1195) 在FP32中做范数归一化，再进入BF16 NS；Addmm/Baddbmm通过cube_math_type=4保留FP32加法。JT当前使用独立matmul与BF16乘加，数值路径不同。本任务已核对安装的torch_npu存在该精度接口，将以独立算子实验检查可用性与实际误差，不能直接把MF的实现收益当作JT实测。
+同一源码的 [`Muon`](https://github.com/mindspore-ai/mindformers/blob/5089da308ebcc146d0cbe32180c209c4f1d39d77/mindformers/pynative/optimizer/muon.py#L1195) 在FP32中做范数归一化，再进入BF16 NS；Addmm/Baddbmm通过cube_math_type=4保留FP32加法。JT当前使用独立matmul与BF16乘加，数值路径不同。本任务已核对安装的 torch_npu 存在该精度接口；这里是实现语义比较，不能直接把 MF 的实现收益当作 JT 的精度或性能实测。
+
+## 最新提交的差异核验
+
+MF 的重计算实现与 Muon 实现文件在上述新提交和前次 `302c939f` 之间 blob 完全相同。Megatron 的 `transformer_block.py`、`transformer_layer.py` 也未变化；配置文件本次差异位于 DSA indexer / MLA 量化能力，重计算字段与校验段保持原语义。因此上表的能力判断仍成立。新引用固定到当前已核对提交，后续上游变化不自动成为本任务证据。机器记录见 [引用核对](recompute-reference-head-check.json) 和 [实现文件比较](recompute-reference-implementation-check.json)。

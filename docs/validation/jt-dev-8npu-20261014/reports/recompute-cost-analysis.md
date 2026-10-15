@@ -2,6 +2,8 @@
 
 固定源 `ec2e16bce26e497519c573f0a8d87a538a329197`，含用户指定 PR180 与六项修复。8×910B3、CANN 9.2.0-beta.2，FSDP8、GBS8、seq4096、两层主干加一层 MTP。以下模块策略是明确记录目标的实验 wrapper，不是当前 YAML 已有的模块选择接口。
 
+以下均为历史轮次；最新 `f637ef7` 基点仍需重新完成匹配配方的 200 步验证，不能沿用本节结论。中文图仅翻译标签，原始数值不变。
+
 ## 整体峰值与步耗时
 
 各策略独立运行 40 步，全部 8 rank 的 LM/MTP/aux/total loss、梯度范数均与 FSDP off 参考精确相同；初值、逐步输入和 LR 一致。步耗时取第21–40步的中位数，峰值取全部8rank的最大 allocated。每个策略只运行一次，图中的P10–P90是步间分布，不是重复实验置信区间。
@@ -16,7 +18,7 @@
 | 只重算 norm | 22.3212 | 0.3126 | 0.94206 | +0.14% |
 | 只重算 MTP decoder | 22.6338 | 0 | 0.96884 | +2.99% |
 
-![整步重计算成本](../figures/recompute-module-cost.png)
+![整步重计算成本](../figures/recompute-module-cost-zh.png)
 
 当前显存有余量时，关闭重算的吞吐最高。只重算 MLP 的单位额外时间收益优于 attention；norm 的增量时间接近噪声，不能据此报告无限高收益比。只重算 MTP block 没有降低整步峰值，在这个模型/batch下不划算。
 
@@ -28,7 +30,7 @@ MLP+norm 组合已另外完成200步，全部8rank的 LM/MTP/aux/total loss 和�
 
 另起关闭/完整/selective三组12步诊断，在第6–10步采集NPU events。全部8rank、全部12步loss也与参考精确相同。每个主要 attention/MLP 条目包含40次调用（8rank×5steps）。
 
-![模块调用成本](../figures/recompute-module-events.png)
+![模块调用成本](../figures/recompute-module-events-zh.png)
 
 在关闭重算时，attention的单次inclusive中位时间约17.42–19.40ms，MLP约6.48–7.60ms。当前selective保留了部分计算结果，但attention重放仍约16.43–17.94ms，解释了其整步耗时相对full只减少少量的实测现象。该解释来自本配置的观察，不能外推到所有模型或batch。
 
