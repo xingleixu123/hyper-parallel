@@ -1,0 +1,25 @@
+{
+  "complete": true,
+  "mf_pynative": {
+    "retrieved": true,
+    "commit": "d3f5dc943f6bf50cfa238db9c320ba4ff75ac52e",
+    "url": "https://gitcode.com/mindspore/mindformers/blob/d3f5dc943f6bf50cfa238db9c320ba4ff75ac52e/mindformers/pynative/optimizer/muon.py",
+    "sha256": "9e9e5867a4225181a7014ca7809bae67d16e9bfa103a7316fb71aaa20a7fee7c",
+    "scope": "Pinned PyNative source, not the unchanged graph archive runtime."
+  },
+  "megatron": {
+    "commit": "915b1d2d427e526dabc4a0b460562c257376025c",
+    "url": "https://github.com/NVIDIA/Megatron-LM/blob/915b1d2d427e526dabc4a0b460562c257376025c/megatron/core/optimizer/muon.py",
+    "finding": "兼容入口指向 Emerging Optimizers"
+  },
+  "nvidia_reference": {
+    "url": "https://docs.nvidia.com/nemo/emerging-optimizers/0.4.0/_modules/emerging_optimizers/orthogonalized_optimizers/muon_utils.html",
+    "retrieved": "2026-10-15",
+    "finding": "本地使用 functional.normalize，可选 FP64 norm；分布式平方和归约后 sqrt；不提供旧 MF 图归约顺序的逐位保证"
+  },
+  "correctness": "206 实际唯一不同的 BF16 归一化点，MF 更接近同输入 FP64 参考；不能泛化为整体正确性。独立替代公式在205引入新差异，26步指标恶化，不建议默认修改。",
+  "publication": {
+    "omitted": "逐坐标数值与源码摘录；保留汇总、链接和哈希",
+    "original_report_sha256": "34cd247c889d4fd35e883051ccd146732b5564f11cc7fe3836fe4f2447a4de24"
+  }
+}

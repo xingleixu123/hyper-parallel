@@ -1,0 +1,68 @@
+{
+  "complete": true,
+  "fidelity": {
+    "all_metrics_grad_norm_exact": true,
+    "all_inputs_exact": true,
+    "restore_exact": true,
+    "exit_zero": true,
+    "stored_hp_normalized_exact": true,
+    "native_normalized_replays_all_mf_weights": true
+  },
+  "native_kernel": 19,
+  "native_files": {
+    "square_sum": {
+      "file": "mf-native-router-norm206-kernels/rank_0/NativeNS/1/5/GraphKernel_Sqrt_Add_Div_Cast_split.Default_GraphKernel_Sqrt_Add_Div_Cast_split-op19.0.0.1792065739162989.input.0.DefaultFormat.float32.npy",
+      "shape": [],
+      "dtype": "float32",
+      "sha256": "7ecd16e55341cc1568e304c1f6251f4698d3edec84d6f0b40cab8826c396cf22"
+    },
+    "input": {
+      "file": "mf-native-router-norm206-kernels/rank_0/NativeNS/1/5/GraphKernel_Sqrt_Add_Div_Cast_split.Default_GraphKernel_Sqrt_Add_Div_Cast_split-op19.0.0.1792065739163237.input.1.DefaultFormat.float32.npy",
+      "shape": [
+        8,
+        5120
+      ],
+      "dtype": "float32",
+      "sha256": "b30ea6e4f87cb4253fb8247934afd3a264ac58df281f0fc5c32320bcf4bab249"
+    },
+    "normalized": {
+      "file": "mf-native-router-norm206-kernels/rank_0/NativeNS/1/5/GraphKernel_Sqrt_Add_Div_Cast_split.Default_GraphKernel_Sqrt_Add_Div_Cast_split-op19.0.0.1792065739163408.output.0.DefaultFormat.bfloat16.npy",
+      "shape": [
+        8,
+        5120
+      ],
+      "dtype": "float32",
+      "sha256": "300ffc136d21b00542a49730f13c81e984182eb17feb415cf6edd9c53f3112c6"
+    }
+  },
+  "native_square_sum": 0.03457723930478096,
+  "hp_square_sum": 0.03457723557949066,
+  "hp_tensor_norm": 0.18594953417778015,
+  "fp64_reference_square_sum": 0.0345772330136788,
+  "fp64_reference_norm": 0.1859495442685429,
+  "normalized": {
+    "hp_tensor_norm": {
+      "different": 1,
+      "max_abs": 3.0517578125e-05,
+      "relative_l2": 3.0517490625090816e-05
+    },
+    "hp_square_sum_sqrt": {
+      "different": 0,
+      "max_abs": 0.0,
+      "relative_l2": 0.0
+    },
+    "native_sum_hp_sqrt": {
+      "different": 0,
+      "max_abs": 0.0,
+      "relative_l2": 0.0
+    }
+  },
+  "correctness_at_boundary": {
+    "different_normalized_points": 1,
+    "mf_closer": 1,
+    "hp_closer": 0,
+    "tie": 0,
+    "scope": "Only differing actual206 normalized coordinates versus FP64 ideal of the same FP32 input; no general optimizer or full-trajectory accuracy claim."
+  },
+  "scope": "Actual unmodified full-model MF206 normalization dump; one normalized BF16 coordinate explains12 updated router weights under same-input replay. Independent training square-sum formula was already rejected due earlier205 side effects."
+}
