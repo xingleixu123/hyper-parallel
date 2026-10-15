@@ -37,7 +37,9 @@
 - 新问题#223与单提交PR#224：父环境指定`4,5,6,7`，旧`parallel_run`却分配`0,1`、`2,3`。独立修复继承上层设备并在启动前校验预算；无设备容器中修复前24失败/4通过（含子测试），修复后10测试/18子测试通过，规范和需求两轴均通过。[复现](reports/parallel-case-visible-devices/parallel-case-visible-devices-reproduction.json) · [修复前](reports/parallel-case-visible-devices/parallel-case-visible-devices-before.log) · [修复后](reports/parallel-case-visible-devices/parallel-case-visible-devices-after.log) · [两轴检视与提交指纹](reports/parallel-case-visible-devices/parallel-case-visible-devices-review.json)。此修复不改训练公式，也不将CPU结果算作NPU训练通过。
 - TP2第二轮在两次空卡检查后启动，但初始化35.33秒时4号卡出现另一容器的进程；命名空间及控制组不同，刷新后仍在。只停止本任务容器，外部任务继续运行；0训练步、退出137、设备已释放。该轮没有精度或性能结论。[中断分析](reports/f637-tp2-r2-interrupted/f637-tp2-r2-interrupted-analysis.json) · [31份证据核验](reports/f637-tp2-r2-interrupted/f637-tp2-r2-interrupted-local-verification.json)。
 
-当前设备空窗从#199释放重新计满20分钟，最早2026-10-15 22:25:40（UTC+8）再次检查资源；计划先完成#214四卡补丁回归，再继续当前固定配方的200步矩阵。没有预占卡。上述收集产生的重复压缩包均已在两端清理，当前step200 checkpoint保留供跨拓扑参数/优化器定位。
+#214首轮按间隔启动四卡后，测试收集报`ModuleNotFoundError: No module named tests`，两卡阶段0用例、四卡阶段未启动；容器退出1，30.88秒后已释放。根因为回归脚本从日志目录运行，操作脚本已改为从源码目录启动且禁用pytest缓存，独立绝对日志路径及资源约束保持不变。无NPU容器复核两个入口共3个测试节点收集成功；规范/需求两轴复审通过。这是入口修复，不是#214 NPU算法通过证据。[首轮分析](reports/pr214-uneven-npu-st/pr214-uneven-npu-st-analysis.json) · [14份原始采集清单](reports/pr214-uneven-npu-st/pr214-uneven-npu-st-evidence-manifest.json) · [无设备收集预检](reports/pr214-uneven-npu-st/pr214-fixed-runner-cpu-collection-r2.log) · [脚本复审](reports/pr214-uneven-npu-st/pr214-fixed-runner-two-axis-review.json)。首次CPU预检还有Windows传输换行问题，原记录保留，按bytes传输修正后才得到成功结果。
+
+当前全局设备空窗从#214释放重新计满20分钟，最早2026-10-15 22:46:34（UTC+8）重新检查空闲卡；没有预占卡。下一轮#214重新回归后继续当前固定配方200步矩阵。重复压缩包两端已清理，另清理已用完的源码导入bundle和35.23MB远端CPU复现checkout；当前step200 checkpoint保留供跨拓扑参数/优化器定位。
 
 ## 最新验收：FSDP基线与续训两个200步窗口均通过（2026-10-15）
 
@@ -71,7 +73,7 @@ TP2首轮随后在满足20分钟间隔、连续两次空卡检查后启动，初
 
 第二轮TP2沿用同源同镜像、逐字节相同配置，使用独立运行目录和端口；最早2026-10-15北京时间21:43:13再检查资源，不提前占卡。本轮再次读取上游JT_dev，仍为`f637ef7ee4d4b416800716f1ebaaae7709b8a06a`。checkpoint200继续保留供后续跨拓扑step200参数/优化器差异定位；待不再需要时核实归属和使用情况后清理。
 
-总单、10个小问题及10个单提交PR共21项，10组原生父子关系和双向正文链接均已回读核对。新增集成验收结果已同步到续训问题#208及PR#197，保持草稿及单提交，不把多修复集成的通过全部归因于某一个PR。[本次更新前关联核验](reports/f637-tp2-interrupted/github-chinese-full-link-audit.json) · [发布回读凭据](reports/f637-tp2-interrupted/github-chinese-publication-receipt.json)。
+截至2026-10-15 22:26（UTC+8），总单、11个小问题及11个单提交PR共23项，11组原生父子关系和双向正文链接均已回读核对。新增集成验收结果已同步到续训问题#208及PR#197，保持草稿及单提交，不把多修复集成的通过全部归因于某一个PR。[本次关联核验](reports/pr214-uneven-npu-st/github-chinese-full-link-audit.json) · [发布回读凭据](reports/pr214-uneven-npu-st/github-chinese-publication-receipt.json)。
 
 ## 统一验收标准与执行顺序
 
@@ -154,7 +156,7 @@ TP2首轮随后在满足20分钟间隔、连续两次空卡检查后启动，初
 
 ## 待完成清单与资源约束
 
-- [x] 已确认10个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
+- [x] 已确认11个独立问题，各有中文小问题单与独立单提交 PR，正文相互关联。
 - [x] 旧六项修复配方 FSDP0–200、200→400 与连续参考全 rank 零误差；关闭/完整/选择重算200步已完成。
 - [x] 129 固定旧基点 `521d3a8` 的 FP32 配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续；未完成独立连续400参考。
 - [x] 最新 `f637ef7` 集成源的 FSDP0–200 运行完成，8rank数据完整，checkpoint200文件清单齐全。
