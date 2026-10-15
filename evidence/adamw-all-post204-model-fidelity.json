@@ -1,0 +1,31 @@
+{
+  "complete": true,
+  "run": "hp-jtf637-adamw-all-post204-audit206",
+  "checks": {
+    "all_metrics_grad_norm_exact": true,
+    "all_inputs_exact": true,
+    "restore_exact": true,
+    "exit_zero": true,
+    "all48_model_tensors": true,
+    "selected_optimizer_trace_exact": true
+  },
+  "model_exact": 47,
+  "nonexact": [
+    {
+      "name": "lm_head.weight",
+      "shape": [
+        152064,
+        5120
+      ],
+      "elements": 778567680,
+      "unequal": 32242,
+      "bf16_unequal": 65,
+      "max": 6.011687219142914e-07,
+      "weight_relative_l2": 1.908070451056422e-08,
+      "update_relative_l2": 1.2159523646936798e-05,
+      "actual_sha256": "023b571a5f538919364a878146f0a20c697c1404e9c6a6199b983f18c9237679"
+    }
+  ],
+  "teacher_values_used": false,
+  "saved_model_arrays": false
+}

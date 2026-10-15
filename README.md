@@ -23,3 +23,5 @@
 205步所选裁剪前head梯度541/541精确，裁剪后540处差异由范数2个FP32 ULP完全解释，最大仅2.91e-11。进一步核验完整4096×5120输入/返回梯度：两分支输入全等、MTP返回梯度全等，主返回梯度仅1处差7.28e-12。继续定位更早层的205反向边界，不能将局部精确当作200步验收。
 
 新增报告为`head-*-comparison.json`、`head-full-input-gradient-boundaries.json`和`head-gemm-industry-correctness-assessment.json`。首个多层继承观察器编译停滞，终止后改为直接继承，保真重跑成功；失败记录与数值结论分开。完整数组、梯度坐标值不发布；125仅保留必要定位步。
+
+随后只读审计全部204步模型：48张量中47张量逐元素精确，仅lm_head.weight有32,242个FP32/65个BF16差异；六步观察器保真通过，未保存额外模型。证据`adamw-all-post204-model-fidelity.json`及对应完整逐张量表。下一步检查205最终RMSNorm实际操作数。
