@@ -1,0 +1,27 @@
+{
+  "sources": [
+    {
+      "url": "https://github.com/NVIDIA/Megatron-LM/blob/de003e9932ce777e5bdcf41ed178c04c8839ec7f/megatron/core/tensor_parallel/layers.py",
+      "sha256": "ffb251015a294bd309ad9581d26145605eccb1f3204d34e18538c4b49d3c12d4",
+      "lines": [
+        784,
+        821,
+        822,
+        894
+      ],
+      "finding": "dinput=grad_output@weight；普通wgrad=grad_output.T@input；融合路径可直接累加FP32 main_grad，未要求复制旧MF的BF16分支舍入顺序。"
+    },
+    {
+      "url": "https://gitcode.com/mindspore/mindformers/blob/d3f5dc943f6bf50cfa238db9c320ba4ff75ac52e/mindformers/pynative/layers/linear.py",
+      "sha256": "0c7a0214e4f032d3beff61542b53426a6516461b953481ad9ca0ae1c8b1ca799",
+      "lines": [
+        105,
+        134,
+        135
+      ],
+      "finding": "现代PyNative Linear使用本地matmul；共享梯度的数学求和与底层归约浮点次序需分开判断。"
+    }
+  ],
+  "accuracy_scope": "仅在两侧实际操作数完全相同的分支比较FP64点积误差；203主分支及205/206不据HP单侧参考判断MF准确性。",
+  "conclusion": "首步主/MTP合计1082个分支坐标，HP更接近FP64的18个，MF更近的22个，其余1042个相同。没有一方普遍正确另一方普遍错误的证据；保留归档兼容诊断，不据此改变产品默认。"
+}
