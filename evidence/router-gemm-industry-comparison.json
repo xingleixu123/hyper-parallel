@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-10-15T06:32:37.134873+00:00",
+  "sources": [
+    {
+      "name": "Megatron",
+      "path": "industry/megatron/megatron/core/transformer/moe/moe_utils.py",
+      "url": "https://github.com/NVIDIA/Megatron-LM/blob/de003e9932ce777e5bdcf41ed178c04c8839ec7f/megatron/core/transformer/moe/moe_utils.py#L1477-L1488",
+      "sha256": "d1aff14179353c469d891aa367ca7dc8ff756add1999eb9b5e897a19ca234295"
+    },
+    {
+      "name": "MF PyNative",
+      "path": "industry/mf/mindformers/pynative/transformers/moe/router.py",
+      "url": "https://gitcode.com/mindspore/mindformers/blob/d3f5dc943f6bf50cfa238db9c320ba4ff75ac52e/mindformers/pynative/transformers/moe/router.py",
+      "sha256": "6e41ea5c05afd2bb638ae227e7ad70301ffc1d0867e7e6cb368d50f39eea879c"
+    }
+  ],
+  "conclusion": "Megatron explicit router autograd uses TE GEMM NT for dweight or torch.mm(dy.T,x), no mandated contiguous transpose. Modern MF PyNative uses functional.linear. Our contiguous transpose is archive compatibility, not universally more accurate or an industry-required correction. Local pinned MF source verified; fresh GitCode page open failed."
+}
