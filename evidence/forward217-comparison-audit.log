@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/alignment/phase12/tools/compare_forward217.py", line 116, in <module>
+    main()
+  File "/alignment/phase12/tools/compare_forward217.py", line 80, in main
+    checks['mf']['observer_source'] = mf_manifest['source_sha256'] == source_sha('mf_forward217_tap.py')
+                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/alignment/phase12/tools/compare_head206_interventions.py", line 37, in source_sha
+    return hashlib.sha256((ROOT / 'tools-f637' / name).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python3.12.14/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python3.12.14/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/alignment/phase12/tools-f637/mf_forward217_tap.py'

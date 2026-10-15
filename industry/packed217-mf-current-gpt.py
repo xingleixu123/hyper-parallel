@@ -1,0 +1,910 @@
+# Copyright (c) 2024, NVIDIA CORPORATION. All rights reserved.
+# Copyright 2026 Huawei Technologies Co., Ltd
+#
+# Modification points:
+# 1. Replace all interfaces with MindSpore TransFormers'.
+# 2. Add some input parameters for MindSpore TransFormers.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""mindformers GPT model"""
+# MindSpore ``Cell.construct`` intentionally exposes model-specific signatures.
+# pylint: disable=arguments-differ
+__all__ = ['GPTModel']
+
+from typing import Literal, Optional, Union
+
+import numpy as np
+
+from hyper_parallel.core.dtensor.dtensor import DTensor
+from hyper_parallel.core.dtensor.placement_types import Replicate
+
+from mindspore import Tensor, dtype, nn, mint, ops
+from mindspore.mint.distributed import all_reduce, get_world_size
+from mindspore.graph.api import _no_grad
+
+from mindformers.tools.logger import logger
+from mindformers.pynative.loss.loss import CrossEntropyLoss, ChunkCrossEntropyLoss
+from mindformers.pynative.distributed.utils import vocab_parallel_shard_dim
+from mindformers.parallel_core.utils.spec_utils import ModuleSpec
+from mindformers.pynative.layers.mask_generate import CausalMaskGenerate
+from mindformers.parallel_core.transformer_config import TransformerConfig
+from mindformers.pynative.base_models.common.embeddings.language_model_embedding import LanguageModelEmbedding
+from mindformers.pynative.base_models.common.embeddings.rotary_pos_embedding import RotaryEmbedding
+from mindformers.pynative.base_models.common.embeddings.yarn_rotary_pos_embedding import YarnRotaryEmbedding
+from mindformers.pynative.base_models.common.embeddings.rope_utils import compute_rotary_cos_sin
+from mindformers.pynative.base_models.gpt.gpt_layer_specs import get_gpt_mtp_block_spec
+from mindformers.pynative.transformers.transformer_block import TransformerBlock, TransformerBlockSubmodules
+from mindformers.pynative.transformers.multi_token_prediction import (
+    MultiTokenPredictionBlock,
+    MTPLossAutoScaler,
+    process_mtp_loss,
+    track_mtp_metrics,
+)
+from mindformers.pynative.layers.linear import Linear
+from mindformers.pynative.optimizer.muon_utils import make_muon_fns
+from mindformers.pynative.transformers.moe.moe_utils import track_moe_metrics
+from mindformers.pynative.transformers.experimental_attention_variant.utils import (
+    track_indexer_metrics,
+)
+
+
+class GPTModel(nn.Cell):
+    """GPT Transformer language model.
+
+    Args:
+        config (TransformerConfig):
+            Transformer config.
+        transformer_layer_spec (ModuleSpec):
+            Specifies module to use for transformer layers.
+        vocab_size (int):
+            Vocabulary size.
+        max_sequence_length (int):
+            maximum size of sequence. This is used for positional embedding.
+        pre_process (bool, optional):
+            Include embedding layer (used with pipeline parallelism). Defaults to True.
+        post_process (bool, optional):
+            Include an output layer (used with pipeline parallelism). Defaults to True.
+        share_embeddings_and_output_weights (bool, optional):
+            When True, input embeddings and output logit weights are shared. Defaults to False.
+        position_embedding_type (Literal[learned_absolute,rope], optional):
+            Position embedding type. Defaults to 'learned_absolute'.
+        rotary_percent (float, optional):
+            Percent of rotary dimension to use for rotary position embeddings.
+            Ignored unless position_embedding_type is 'rope'. Defaults to 1.0.
+        rotary_base (int, optional):
+            Base period for rotary position embeddings. Ignored unless
+            position_embedding_type is 'rope'.
+            Defaults to 10000.
+        rope_scaling (bool, optional): Toggle RoPE scaling. Defaults to False.
+        rope_scaling_factor (float): RoPE scaling factor. Defaults to 8.
+        seq_len_interpolation_factor (Optional[float], optional):
+            scale of linearly interpolating RoPE for longer sequences.
+            The value must be a float larger than 1.0. Defaults to None.
+    """
+
+    def __init__(
+            self,
+            config: TransformerConfig,
+            transformer_layer_spec: Union[TransformerBlockSubmodules, ModuleSpec],
+            vocab_size: int,
+            max_sequence_length: int,
+            pre_process: bool = True,
+            post_process: bool = True,
+            share_embeddings_and_output_weights: bool = False,
+            position_embedding_type: Literal['learned_absolute', 'rope', 'yarn', 'none'] = 'learned_absolute',
+            rotary_percent: float = 1.0,
+            rotary_base: int = 10000,
+            rope_scaling: bool = False,
+            rope_scaling_factor: float = 8.0,
+            seq_len_interpolation_factor: Optional[float] = None,
+            layer_start: int = 0,
+            layer_end: int = None,
+            vp_size: int = 1,
+            stage_idx: int = 0,
+    ):
+        super().__init__()
+
+        self.config = config
+        self.dsa_indexer_use_sparse_loss = config.dsa_indexer_use_sparse_loss
+        self.transformer_layer_spec = transformer_layer_spec
+        self.vocab_size = vocab_size
+        self.max_sequence_length = max_sequence_length
+        self.layer_start = layer_start
+        self.layer_end = layer_end if layer_end is not None else config.num_layers - 1
+        self.pre_process = pre_process and (self.layer_start == 0)
+        self.post_process = post_process and (self.layer_end == config.num_layers - 1)
+        self.share_embeddings_and_output_weights = share_embeddings_and_output_weights
+        self.use_attn_mask_compression = config.use_attn_mask_compression or config.use_eod_attn_mask_compression
+        self.return_logits = False
+
+        if hasattr(self.config, 'position_embedding_type'):
+            # By default, use the position_embedding_type configuration in TransformerConfig.
+            self.position_embedding_type = self.config.position_embedding_type
+        else:
+            self.position_embedding_type = position_embedding_type
+
+        self.rotary_percent = rotary_percent
+
+        if hasattr(self.config, 'rotary_base'):
+            # By default, use the rotary_base configuration in TransformerConfig.
+            self.rotary_base = self.config.rotary_base
+        else:
+            self.rotary_base = rotary_base
+
+        self.rotary_scaling = rope_scaling
+        self.rope_scaling_factor = rope_scaling_factor
+        if seq_len_interpolation_factor is not None:
+            self.rotary_seq_len_interpolation_factor = seq_len_interpolation_factor
+        else:
+            self.rotary_seq_len_interpolation_factor = config.rotary_seq_len_interpolation_factor
+        self.seq_length = config.seq_length
+        mtp_block_spec = None
+        if config.mtp_num_layers:
+            mtp_block_spec = get_gpt_mtp_block_spec(config, transformer_layer_spec)
+        self.mtp_process = mtp_block_spec is not None and self.post_process
+        self.stage_idx = stage_idx
+        self.vp_size = vp_size
+
+        # get value from config
+        self.use_eod_attn_mask_compression = config.use_eod_attn_mask_compression
+        self.init_method = config.init_method
+        self.compute_dtype = config.compute_dtype
+        self.hidden_size = config.hidden_size
+        self.hidden_dropout = config.hidden_dropout
+        self.pad_token_id = config.pad_token_id
+        self.ignore_token_id = config.ignore_token_id
+        self.calculate_per_token_loss = config.calculate_per_token_loss
+        self.chunk_loss_num = config.chunk_loss_num
+        logger.info(
+            "GPTModel chunk loss config: chunk_loss_num=%s, calculate_per_token_loss=%s",
+            self.chunk_loss_num,
+            self.calculate_per_token_loss
+        )
+
+        # Internally generates AttentionMask.
+        self.casual_mask = CausalMaskGenerate(
+            seq_length=config.seq_length,
+            compute_type=config.compute_dtype,
+            is_dynamic=config.is_dynamic,
+            pad_token_id=config.pad_token_id,
+            use_attn_mask_compression=self.use_attn_mask_compression,
+        )
+
+        # Embeddings
+        if self.pre_process or self.mtp_process:
+            self.embedding = LanguageModelEmbedding(
+                config=self.config,
+                vocab_size=self.vocab_size,
+                max_sequence_length=self.max_sequence_length,
+                position_embedding_type=self.position_embedding_type,
+            )
+
+        # rope
+        # The MTP implementation pre-computes RotaryEmbedding
+        # (unlike Megatron v0.12.0's real-time generation) to minimize dynamic memory usage.
+        self.use_rotary_position_embeddings = self.position_embedding_type in ['rope', 'yarn']
+        self.use_rotary_position_ids = bool(config.use_rotary_position_ids)
+        if self.position_embedding_type == 'rope':
+            if config.multi_latent_attention:
+                self.rotary_pos_emb = RotaryEmbedding(
+                    kv_channels=config.qk_pos_emb_head_dim,
+                    rotary_percent=config.rotary_percent,
+                    rotary_interleaved=self.config.rotary_interleaved,
+                    seq_len_interpolation_factor=seq_len_interpolation_factor,
+                    rotary_base=config.rotary_base,
+                    rope_scaling=rope_scaling,
+                    rope_scaling_factor=rope_scaling_factor,
+                    use_rotary_position_ids=self.use_rotary_position_ids
+                )
+            else:
+                self.rotary_pos_emb = RotaryEmbedding(
+                    kv_channels=self.config.kv_channels,
+                    rotary_percent=rotary_percent,
+                    rotary_interleaved=self.config.rotary_interleaved,
+                    seq_len_interpolation_factor=seq_len_interpolation_factor,
+                    rotary_base=rotary_base,
+                    rope_scaling=rope_scaling,
+                    rope_scaling_factor=rope_scaling_factor,
+                    use_rotary_position_ids=self.use_rotary_position_ids
+                )
+        elif self.position_embedding_type == 'yarn':
+            self.rotary_pos_emb = YarnRotaryEmbedding(
+                kv_channels=config.qk_pos_emb_head_dim,
+                rotary_percent=config.rotary_percent,
+                rotary_interleaved=self.config.rotary_interleaved,
+                seq_len_interpolation_factor=seq_len_interpolation_factor,
+                rotary_base=config.rotary_base,
+                scaling_factor=config.rotary_scaling_factor,
+                original_max_position_embeddings=config.max_position_embeddings,
+                beta_fast=config.beta_fast,
+                beta_slow=config.beta_slow,
+                mscale=config.mscale,
+                mscale_all_dim=config.mscale_all_dim,
+                use_rotary_position_ids=self.use_rotary_position_ids
+            )
+        elif self.position_embedding_type == 'mrope':
+            raise NotImplementedError("position_embedding_type = mrope is not supported now.")
+
+        # Transformer.
+        self.decoder = TransformerBlock(
+            config=self.config,
+            spec=transformer_layer_spec,
+            # The corresponding Megatron v0.12.0 module's forward pass has this logic disabled by default,
+            # so it won't cause significant impact.
+            pre_process=self.pre_process,
+            post_process=self.post_process,
+            layer_start=self.layer_start,
+            layer_end=self.layer_end,
+        )
+
+        # Output
+        if self.post_process or self.mtp_process:
+            skip_weight_param_allocation = self.pre_process and self.share_embeddings_and_output_weights
+            self.output_layer = Linear(input_size=self.hidden_size,
+                                       output_size=self.vocab_size,
+                                       init_method=self.init_method,
+                                       bias=False,
+                                       skip_weight_param_allocation=skip_weight_param_allocation,
+                                       compute_dtype=self.config.compute_dtype)
+            config.model_parallel = config.tensor_model_parallel_size
+            loss_cls = ChunkCrossEntropyLoss if self.chunk_loss_num > 1 else CrossEntropyLoss
+            self.loss = loss_cls(
+                calculate_per_token_loss=self.calculate_per_token_loss,
+                chunk_loss_num=self.chunk_loss_num,
+                config=config
+            )
+
+        self.mtp = None
+        if self.mtp_process:
+            self.mtp = MultiTokenPredictionBlock(config=self.config, spec=mtp_block_spec)
+            self.mtp_loss_auto_scaler = MTPLossAutoScaler()
+
+        # operations
+        self.cast = ops.cast
+        self.concat_prefix = mint.concat
+        self.zeros = mint.zeros
+        self.not_equal = mint.not_equal
+        self.reshape = mint.reshape
+        self.mul = mint.mul
+        self.add = mint.add
+        self.sub = mint.sub
+        self.sign = mint.sign
+        self.transpose = mint.permute
+        self.assign = mint.clone
+
+        if (config.experimental_attention_variant == "dsa"
+                and not config.dsa_indexer_use_sparse_loss):
+            logger.warning(
+                "`dsa_indexer_use_sparse_loss` is False: enable DSA indexer warm-up "
+                "and freeze every parameter outside the indexer."
+            )
+            self.freeze_for_dsa_indexer_warmup()
+
+    def set_use_rotary_position_ids(self, enabled: bool):
+        """Set whether all model-level rotary embeddings consume explicit position ids."""
+        self.use_rotary_position_ids = bool(enabled)
+        self.config.use_rotary_position_ids = self.use_rotary_position_ids
+        rotary_pos_emb = getattr(self, "rotary_pos_emb", None)
+        if rotary_pos_emb is not None and hasattr(rotary_pos_emb, "use_rotary_position_ids"):
+            rotary_pos_emb.use_rotary_position_ids = self.use_rotary_position_ids
+
+    def freeze_for_dsa_indexer_warmup(self):
+        """Freeze every non-indexer parameter during the dense DSA warm-up stage."""
+        for param in self.trainable_params():
+            if "indexer" not in param.name:
+                param.requires_grad = False
+
+    def _should_use_chunked_loss(self):
+        """Whether current runtime state should use chunked loss."""
+        return self.training and self.chunk_loss_num > 1 and not self.return_logits
+
+    def construct(
+            self,
+            input_ids: Tensor,
+            position_ids: Tensor = None,
+            attention_mask: Tensor = None,
+            decoder_input: Tensor = None,
+            labels: Tensor = None,
+            loss_mask=None,
+            actual_seq_len=None,
+    ):
+        """GPTModel construct.
+
+        Args:
+            input_ids (Tensor): The input tensor of token IDs.
+            position_ids (Tensor, optional): Position ID tensor, used to specify the position
+            of each token. Default is None.
+            attention_mask (Tensor, optional): Attention mask tensor, used to mask padding
+            tokens. Default is None.
+            decoder_input (Tensor, optional): Decoder input tensor. Default is None.
+            labels (Tensor, optional): The label tensor, used for calculating the loss.
+            Default is None.
+            loss_mask (Tensor, optional): Loss mask tensor, used to specify which positions
+            are included in the loss calculation. Default is None.
+            actual_seq_len (Tensor, optional): Actual sequence length tensor. Default is None.
+        """
+        if self.use_rotary_position_ids and position_ids is None:
+            raise ValueError("position_ids must be provided when use_rotary_position_ids is enabled.")
+        if (self.use_rotary_position_ids and self.config.apply_rope_fusion
+                and position_ids.shape[0] > 1):
+            raise ValueError(
+                "Pynative fused RoPE does not support per-batch position_ids when batch size is greater than 1. "
+                "Set apply_rope_fusion=False or use a flattened TND input."
+            )
+        if actual_seq_len is not None:
+            # ``actual_seq_len`` arrives as host data (see the trainer's
+            # ``_keep_actual_seq_len_on_host``): flatten it in numpy and build the
+            # Tensor here, once. A device reshape would return an unfilled buffer
+            # under MS_SIMULATION_LEVEL, where no kernel is launched, and the
+            # all-zero cu_seqlens would be rejected by FlashAttentionScore.
+            if isinstance(actual_seq_len, np.ndarray):
+                actual_seq_len = Tensor(actual_seq_len.reshape(-1))
+            else:
+                actual_seq_len = self.reshape(actual_seq_len, (-1,))
+
+        # Mindspore support TND layout by using actual_seq_len,
+        # which indicates the partial seq_lens of eod sequences for compression mask.
+        # Check mindformers.dataset.blended_datasets.gpt_dataset._get_eod_attention_mask() for implement details.
+
+        labels, attention_mask, loss_mask = self._preprocess_input_labels_and_masks(
+            input_ids, labels, attention_mask, loss_mask, actual_seq_len)
+
+        hidden_states, rotary_pos_emb, mscale = self.language_model(
+            input_ids,
+            position_ids,
+            attention_mask,
+            decoder_input=decoder_input,
+            actual_seq_len=actual_seq_len
+        )
+
+        # logits and loss
+        output_weight = None
+        if self.share_embeddings_and_output_weights:
+            output_weight = self.shared_embedding_or_output_weight()
+            output_weight = self.cast(output_weight, self.config.compute_dtype)
+
+        if self.mtp_process:
+            hidden_states = self.mtp(
+                input_ids=input_ids,
+                position_ids=position_ids,
+                hidden_states=hidden_states,
+                attention_mask=attention_mask,
+                rotary_pos_emb=rotary_pos_emb,
+                embedding=self.embedding,
+                actual_seq_len=actual_seq_len,
+                mscale=mscale
+            )
+
+        if not self.post_process:
+            return hidden_states
+
+        if self.mtp_process:
+            hidden_states = process_mtp_loss(
+                hidden_states_list=hidden_states,
+                labels=labels,
+                loss_mask=loss_mask,
+                output_layer=self.output_layer,
+                output_weight=output_weight,
+                compute_language_model_loss=self.compute_language_model_loss,
+                config=self.config,
+                mtp_loss_auto_scaler=self.mtp_loss_auto_scaler,
+            )
+
+        # logits origin shape is [s b h], transform it to [b*s h].
+        logits = self.output_layer(hidden_states, output_weight)
+        need_chunked_loss = self._should_use_chunked_loss()
+        if logits.ndim > 2 and not need_chunked_loss:
+            logits = self.transpose(logits, (1, 0, 2))
+            logits = self.reshape(logits, (-1, logits.shape[-1]))
+
+        if not self.training or self.return_logits:
+            # With enable_loss_parallel the logits stay vocab-sharded (Shard(-1)); when we
+            # return them instead of computing the loss, gather to full vocab so callers
+            # (generation, metrics) see the same replicated logits as without loss parallel.
+            if vocab_parallel_shard_dim(logits) is not None:
+                logits = logits.redistribute(
+                    logits.device_mesh, (Replicate(),) * len(logits.placements))
+            return self.cast(logits, dtype.float32).contiguous()
+
+        # labels origin shape is [b s], Transpose is not required.
+        if need_chunked_loss:
+            if logits.ndim != 3:
+                raise ValueError(f"Chunked loss expects 3D logits, but got shape {logits.shape}.")
+            logits = self.transpose(logits, (1, 0, 2))
+            loss = self.compute_language_model_loss(labels, logits, loss_mask)
+        else:
+            loss = self.compute_language_model_loss(labels, logits, loss_mask)
+        if self.calculate_per_token_loss:
+            numerator0, denominator0 = loss
+            return numerator0, denominator0
+        # Only the loss is consumed downstream (compute_loss / compute_pp_loss take
+        # output[0]); logits and hidden_states were detached and never read. Keep the
+        # tuple shape so the [0]-indexing consumers stay unchanged.
+        return (loss,)
+
+    def language_model(
+            self,
+            input_ids,
+            position_ids,
+            attn_mask,
+            decoder_input,
+            tokentype_ids=None,
+            prefix_keys_values=None,
+            actual_seq_len=None
+    ):
+        """decoder output.
+
+        Args:
+            input_ids (Tensor): The input tensor of token IDs.
+            position_ids (Tensor, optional): Position ID tensor, used to specify the position
+            of each token. Default is None.
+            attn_mask (Tensor, optional): Attention mask tensor, used to mask padding
+            tokens. Default is None.
+            decoder_input (Tensor, optional): Decoder input tensor. Default is None.
+            tokentype_ids (Tensor, optional): Token's type ID. Default is None.
+            prefix_keys_values (Tensor, optional): Prefix key-value pairs, used for
+            scenarios such as prefix tuning. The default value is None.
+            actual_seq_len (Tensor, optional): Actual sequence length tensor. Default is None.
+        """
+        bs, seq_len = input_ids.shape
+        # Encoder embedding
+        if decoder_input is not None:
+            pass
+        elif self.pre_process:
+            decoder_input = self.embedding(input_ids, position_ids, tokentype_ids=tokentype_ids)
+        else:
+            decoder_input = None
+
+        # rope
+        rotary_pos_emb = None
+        mscale = 1.0
+        rotary_cos_sin = None
+        if self.use_rotary_position_embeddings:
+            rotary_pos_emb, mscale = self.rotary_pos_emb(seq_len, position_ids=position_ids)
+            rotary_cos_sin = compute_rotary_cos_sin(
+                rotary_pos_emb,
+                mscale,
+                self.config.rotary_dtype,
+                apply_rope_fusion=self.config.apply_rope_fusion,
+                rotary_interleaved=self.config.rotary_interleaved,
+                multi_latent_attention=self.config.multi_latent_attention,
+            )
+
+        if prefix_keys_values is not None:
+            if attn_mask is None:
+                raise ValueError("attn_mask should not be None when prefix_keys_values is not None!")
+            if self.config.use_attn_mask_compression or attn_mask.ndim != 4:
+                raise ValueError("use_attn_mask_compression should be False when prefix_keys_values is not None! "
+                                 f"And attn_mask.ndim should be 4, but got {attn_mask.ndim}")
+
+            # prefix_key_values shape num_layers*(2, B, prefix_len, kv_num*kv_channel)
+            bs, seq_len = input_ids.shape
+            prefix_length = prefix_keys_values[0].shape[2]
+            prefix_mask = self.zeros((bs, 1, seq_len, prefix_length), dtype=attn_mask.dtype)
+            # (B, 1, S, S) -> (B, 1, S, S+prefix_len)
+            attn_mask = self.concat_prefix((prefix_mask, attn_mask))
+
+        # Run decoder.
+        # input_ids is forwarded so hash-based MoE layers can look up tid2eid;
+        # default None keeps non-hash models bit-for-bit unchanged.
+        hidden_states = self.decoder(
+            decoder_input,
+            attn_mask,
+            rotary_pos_emb,
+            prefix_keys_values,
+            actual_seq_len,
+            input_ids=input_ids,
+            mscale=mscale,
+            rotary_cos_sin=rotary_cos_sin
+        )
+
+        return hidden_states, rotary_pos_emb, mscale
+
+    def shared_embedding_or_output_weight(self):
+        """Gets the embedding weight or output logit weights when share embedding and output weights set to True.
+
+        Returns:
+            Tensor: During pre-processing it returns the input embeddings weight while during post-processing
+            it returns the final output layers weight
+        """
+        if self.pre_process:
+            return self.embedding.word_embeddings.weight
+        if self.post_process:
+            return self.output_layer.weight
+        return None
+
+    def compute_language_model_loss(self,
+                                    labels: Tensor,
+                                    logits: Tensor,
+                                    loss_mask: Tensor=None
+                                    ):
+        """Post-processing of language model output.
+
+        Args:
+            labels (Tensor): Labels.
+            logits (Tensor): Logit.
+            loss_mask (Tensor): Loss mask.
+
+        Returns:
+            output (Tensor): Output loss.
+        """
+        return self.loss(logits, labels, loss_mask)
+
+    def _iter_self_attentions(self):
+        """Yield (layer_idx, param_name_prefix, self_attention_module) for every transformer / MTP layer."""
+        for i in range(self.layer_start, self.layer_end + 1):
+            self_attn = self.decoder.layers[i].self_attention
+            yield i, f"decoder.layers.{i}.self_attention", self_attn
+
+        mtp_num_layers = getattr(self.config, "mtp_num_layers", 0) or 0
+        if mtp_num_layers and getattr(self, "mtp", None) is not None:
+            for i in range(mtp_num_layers):
+                self_attn = self.mtp.layers[i].transformer_layer.self_attention
+                yield -i - 1, f"mtp.layers.{i}.transformer_layer.self_attention", self_attn
+
+    def _iter_core_attentions(self):
+        """Yield (param_name_prefix, core_attention_module) for every transformer / MTP layer."""
+        for _, prefix, self_attn in self._iter_self_attentions():
+            yield f"{prefix}.core_attention", self_attn.core_attention
+
+    def set_qk_clip_reduce_group(self, group, group_size):
+        """Register the comm group for the qk_clip max-logit all-reduce.
+
+        ``max_logits_val`` is a per-(layer, head) running max that only needs to be
+        max-reduced over the domain where the SAME weight sees DIFFERENT data — the
+        data + context-parallel domain (``dp x cp``, i.e. the ``loss_mesh`` group).
+        tp / pp ranks hold different heads / layers (each rank clips its own head
+        partition, and each stage owns only its layers' params), so they must NOT be
+        folded into this reduce. Set by ``parallelize_gptmodel``; an explicitly
+        configured size-one group skips the collective entirely.
+        """
+        self._qk_clip_reduce_group = group
+        self._qk_clip_reduce_group_size = int(group_size)
+        self._qk_clip_reduce_group_configured = True
+
+    def _all_reduce_max_logits(self, tensor):
+        """AllReduce-Max ``tensor`` over the configured dp x cp loss group."""
+        if getattr(self, "_qk_clip_reduce_group_configured", False):
+            group_size = self._qk_clip_reduce_group_size
+            if group_size <= 1:
+                return tensor
+            group = self._qk_clip_reduce_group
+            if group is None:
+                raise RuntimeError(
+                    "QK-clip reduce group is missing for a loss mesh with "
+                    f"size {group_size}."
+                )
+            result = all_reduce(tensor, op=ops.ReduceOp.MAX, group=group)
+            return result if result is not None else tensor
+
+        # Models that were not configured through ``set_qk_clip_reduce_group``
+        # retain the world-group fallback for single-card and legacy paths.
+        if get_world_size() > 1:
+            result = all_reduce(tensor, op=ops.ReduceOp.MAX)
+            return result if result is not None else tensor
+        return tensor
+
+    def get_max_attention_logit(self):
+        """Return {full_param_name: Tensor} for every tracked layer, unfiltered so no rank skips a gather."""
+        return {
+            f"{prefix}.max_logits_val": core_attn.max_logits_val
+            for prefix, core_attn in self._iter_core_attentions()
+            if hasattr(core_attn, "max_logits_val")
+        }
+
+    def reset_max_attention_logit(self):
+        """Reset every per-layer max_logits_val to zeros."""
+        for _, core_attn in self._iter_core_attentions():
+            if hasattr(core_attn, "max_logits_val"):
+                core_attn.reset_parameter()
+
+    def _preprocess_input_labels_and_masks(self,
+                                           input_ids: Tensor,
+                                           labels: Tensor = None,
+                                           attention_mask: Tensor = None,
+                                           loss_mask: Tensor = None,
+                                           actual_seq_len: Tensor = None):
+        """Preprocess input_ids and generate labels and masks if they are None.
+        """
+        if loss_mask is None:
+            loss_mask = self.cast(self.not_equal(input_ids, self.pad_token_id), dtype.float32)
+        if labels is not None:
+            label_mask = self.cast(self.not_equal(labels, self.ignore_token_id), dtype.float32)
+            loss_mask = self.mul(loss_mask, label_mask)
+        if (self.use_eod_attn_mask_compression and actual_seq_len is not None and attention_mask is None
+                and getattr(self.config, "input_layout", None) == "TND") and self.dsa_indexer_use_sparse_loss:
+            return labels, attention_mask, loss_mask
+        if self.use_attn_mask_compression:
+            attention_mask = self.casual_mask()
+        elif attention_mask is None:
+            attention_mask = self.casual_mask(input_ids)
+        return labels, attention_mask, loss_mask
+
+    def _get_expert_bias_modules(self):
+        """Return (and lazily cache) the MoE layers in this model that own an
+        auxiliary-loss-free ``expert_bias`` buffer.
+
+        The cache is an instance attribute, so each model object (e.g. each
+        virtual pipeline chunk under ``pipeline_parallel_interleave_num > 1``)
+        keeps its own module list. This makes the per-instance caching correct
+        under interleaving: one model instance per chunk.
+        """
+        cache = getattr(self, "_expert_bias_modules_cache", None)
+        if cache is None:
+            cache = [
+                module for _, module in self.cells_and_names()
+                if getattr(module, "enable_expert_bias", False)
+            ]
+            self._expert_bias_modules_cache = cache
+        return cache
+
+    def _get_global_aux_loss_modules(self):
+        """Return (and lazily cache) the modules in this model that own a
+        global-aux-loss tracker to reset each step.
+
+        Cached as an instance attribute for the same per-chunk reason as
+        :meth:`_get_expert_bias_modules`.
+        """
+        cache = getattr(self, "_global_aux_loss_modules_cache", None)
+        if cache is None:
+            cache = [
+                module for _, module in self.cells_and_names()
+                if hasattr(module, "reset_global_aux_loss_tracker")
+            ]
+            self._global_aux_loss_modules_cache = cache
+        return cache
+
+    def _update_expert_bias(self, metric_group, metric_group_size):
+        """Update auxiliary-loss-free ``expert_bias`` and reset per-step token counters.
+
+        Must be called on every step (regardless of log interval or loss
+        availability) and on every PP stage / VPP chunk, so the routers stay
+        in sync across the pipeline.
+
+        Args:
+            metric_group: Process group spanning the dp x cp domain
+                (``loss_mesh``). Each rank in this group sees a different sample
+                shard of the global batch, so its local ``tokens_per_expert``
+                histogram is only a partial count. We all-reduce SUM over this
+                group to recover the global-batch histogram, otherwise the bias
+                delta diverges from the single-card baseline. Local TP sequence
+                parallelism additionally shards the router token view across TP,
+                so the TP group stored on the router is reduced as well. ``None``
+                (or a single-rank group) skips the corresponding all-reduce.
+            metric_group_size: Size of ``metric_group`` (skip all-reduce when
+                ``<= 1``).
+        """
+        cache = self._get_expert_bias_modules()
+        if not cache:
+            return
+
+        # NOTE: Currently this sync is blocking (thus exposed) and happens on the
+        # default compute stream. Need to assess if this is OK performance-wise.
+        tokens_per_expert_list = [module.tokens_per_expert for module in cache]
+        tokens_per_expert_by_layer = ops.vstack(tokens_per_expert_list)
+
+        # All-reduce the per-rank token counts over the dp x cp domain so the
+        # bias delta is computed from global-batch statistics, matching the
+        # single-card path (which has no group to reduce over).
+        if metric_group is not None and (
+                metric_group_size is None or metric_group_size > 1):
+            if DTensor is not None and isinstance(tokens_per_expert_by_layer, DTensor):
+                tokens_per_expert_by_layer = tokens_per_expert_by_layer.to_local()
+            all_reduce(tokens_per_expert_by_layer, group=metric_group)
+
+        router = getattr(cache[0], "router", None)
+        tp_group = getattr(router, "_tp_group", None)
+        tp_size = getattr(router, "_tp_size", 1)
+        if tp_group is not None and tp_size > 1:
+            if DTensor is not None and isinstance(tokens_per_expert_by_layer, DTensor):
+                tokens_per_expert_by_layer = tokens_per_expert_by_layer.to_local()
+            all_reduce(tokens_per_expert_by_layer, group=tp_group)
+
+        with _no_grad():
+            for moe_layer_idx, module in enumerate(cache):
+                tokens_per_expert = tokens_per_expert_by_layer[moe_layer_idx].float()
+
+                # update the expert bias
+                # this is not exactly the same as https://arxiv.org/pdf/2408.15664 proposed
+                expert_bias_delta = module.load_balance_coeff * mint.sign(
+                    tokens_per_expert.mean() - tokens_per_expert
+                )
+
+                # NOTE: Megatron-LM does not apply zero-mean correction to the expert bias delta;
+                # Torchtitan applies zero-mean correction here
+                module.expert_bias.add_(expert_bias_delta)
+                module.tokens_per_expert = mint.zeros_like(module.tokens_per_expert)
+
+    def get_load_balancing_loss(self, metric_group, metric_group_size,
+                                pp_metric_group, pp_metric_group_size, **kwargs):
+        """Combine and reduce the MoE load-balancing (aux) loss for logging.
+
+        ``track_moe_metrics`` combines the per-layer tracker across PP stages
+        (a PP-group collective) before reducing it to a scalar, so it must run
+        on every stage every step to stay deadlock-free. Non-last stages get
+        ``None`` back (they only contribute to the combine).
+
+        Returns the raw tracked aux loss (NOT divided by the number of
+        gradient-accumulation steps); the caller applies that scaling.
+        """
+        has_last = kwargs.get("has_last", True)
+        return track_moe_metrics(
+            loss_scale=self.config.moe_aux_loss_coeff,
+            num_layers=self.config.num_layers,
+            moe_layer_freq=self.config.moe_layer_freq,
+            mtp_num_layers=self.config.mtp_num_layers,
+            group=metric_group,
+            group_size=metric_group_size,
+            pp_group=pp_metric_group,
+            pp_group_size=pp_metric_group_size,
+            has_last=has_last,
+        )
+
+    def reset_model_temporary_tensors(self):
+        """Reset per-step temporary tensors (global-aux-loss trackers).
+
+        No-op unless ``moe_router_load_balancing_type == "global_aux_loss"``.
+        """
+        if self.config.moe_router_load_balancing_type != "global_aux_loss":
+            return
+        for module in self._get_global_aux_loss_modules():
+            module.reset_global_aux_loss_tracker()
+
+    def get_mtp_loss(self, metric_group, metric_group_size):
+        """Return the reduced multi-token-prediction (MTP) loss for logging.
+
+        Returns the raw per-layer tracked MTP loss tensor (NOT divided by the
+        number of gradient-accumulation steps); the caller applies that
+        scaling and formatting. ``None`` when there is no MTP loss to report.
+        """
+        return track_mtp_metrics(group=metric_group, group_size=metric_group_size)
+
+    def get_index_loss(self, metric_group=None, metric_group_size=None,
+                       pp_metric_group=None, pp_metric_group_size=None,
+                       has_last=True):
+        """Return the reduced sparse-attention indexer loss for logging.
+
+        Returns the raw tracked indexer loss (NOT divided by the number of
+        gradient-accumulation steps); the caller applies that scaling.
+        ``None`` when there is no indexer loss to report.
+        """
+        return track_indexer_metrics(
+            group=metric_group,
+            group_size=metric_group_size,
+            pp_group=pp_metric_group,
+            pp_group_size=pp_metric_group_size,
+            has_last=has_last,
+        )
+
+    def get_gpt_transformer_config(self):
+        """Get the transformer config for GPT model.
+
+        Returns:
+            TransformerConfig: The transformer configuration.
+        """
+        return self.config
+
+    def make_model_muon_fns(self):
+        """Read values from TransformersConfig and generate schema."""
+        num_moe_experts = self.config.num_moe_experts
+        hidden_size = self.config.hidden_size
+        moe_ffn_hidden_size = self.config.moe_ffn_hidden_size
+        qk_head_dim = self.config.qk_head_dim
+        qk_pos_emb_head_dim = self.config.qk_pos_emb_head_dim
+        num_attention_heads = self.config.num_attention_heads
+        kv_lora_rank = self.config.kv_lora_rank
+        value_head_dim = self.config.v_head_dim
+
+        q_lora_rank = self.config.q_lora_rank
+
+        # linear_qkv (concat MLA) is [q_rank | kv_lora_rank | qk_pos_emb_head_dim] along dim=0.
+        # With LoRA    : q_rank = q_lora_rank → 3 plain slabs.
+        # Without LoRA : q_rank = n_heads * (qk_head_dim + qk_pos_emb_head_dim) → 1 periodic + 2 slabs.
+        if q_lora_rank is not None:
+            qkv_blocks = (q_lora_rank, kv_lora_rank, qk_pos_emb_head_dim)
+        else:
+            qkv_blocks = (
+                (qk_head_dim, qk_pos_emb_head_dim, num_attention_heads),
+                kv_lora_rank,
+                qk_pos_emb_head_dim,
+            )
+
+        schema = [
+            # experts.weight1: reshape → split into two [num_moe_experts, hidden_size, moe_ffn_hidden_size]
+            {
+                "patterns": ["*mlp.experts.weight1*"],
+                "kind": "reshape_concat",
+                "reshape": (num_moe_experts, hidden_size, 2 * moe_ffn_hidden_size),
+            },
+            # experts.weight2: reshape → [num_moe_experts, moe_ffn_hidden_size, hidden_size]
+            {
+                "patterns": ["*mlp.experts.weight2*"],
+                "kind": "reshape_only",
+                "reshape": (num_moe_experts, moe_ffn_hidden_size, hidden_size),
+            },
+            # linear_qb (concat MLA = q_up_proj): periodic split across heads
+            {
+                "patterns": ["*self_attention.linear_qb.weight*"],
+                "kind": "periodic",
+                "parts": (qk_head_dim, qk_pos_emb_head_dim, num_attention_heads),
+            },
+            # linear_kvb (concat MLA = kv_up_proj): periodic split across heads
+            {
+                "patterns": ["*self_attention.linear_kvb.weight*"],
+                "kind": "periodic",
+                "parts": (qk_head_dim, value_head_dim, num_attention_heads),
+            },
+            # linear_qkv (concat MLA): hybrid slabs along dim=0.
+            # LoRA case    : 3 plain slabs  → [q_down, kv_lora, k_pe]
+            # no-LoRA case : 1 periodic + 2 slabs → [q_nope, q_pe, kv_lora, k_pe]
+            {
+                "patterns": ["*self_attention.linear_qkv.weight*"],
+                "kind": "block_split",
+                "blocks": qkv_blocks,
+            },
+            # fc1 and shared_fc1: alternating 1,1 split along rows
+            {
+                "patterns": [
+                    "*mlp.shared_experts.linear_fc1.weight*",
+                    "*mlp.linear_fc1.weight*",
+                ],
+                "kind": "periodic",
+                "parts": (1, 1),
+            },
+        ]
+
+        return make_muon_fns(schema)
+
+    def get_param_layer_indices(self, params):
+        """Return layer indices for each parameter (used for QK-clip).
+
+        Args:
+            params: List of parameters from the optimizer.
+
+        Returns:
+            Tuple of layer indices for each parameter, where:
+                - layer_idx >= 0 stands for the layer_idx-th decoder layer
+                - layer_idx < 0 stands for the -(layer_idx+1)-th MTP layer
+        """
+        param_layer = []
+        for param in params:
+            name = param.name
+            try:
+                layer_idx = int(name.split(".")[2])
+            except (ValueError, IndexError):
+                layer_idx = 0
+            if name.startswith('mtp'):
+                layer_idx = -layer_idx - 1
+            param_layer.append(layer_idx)
+        return tuple(param_layer)
+
+    def apply_qk_clip_scaling(self, logit_threshold, fp32_param_map):
+        """Max-reduce the tracked attention logits and apply QK-clip to every MLA layer's weights.
+
+        One list drives both the reduce and the apply, so row ``i`` of ``scales``
+        always belongs to ``layers[i]``; selecting the layers twice would let the
+        two sides drift apart and scale a layer by another layer's factors.
+        """
+        if not self.config.multi_latent_attention:
+            return
+        layers = [self_attn for _, _, self_attn in self._iter_self_attentions()
+                  if hasattr(self_attn.core_attention, "max_logits_val")]
+        if not layers:
+            return
+
+        stacked = mint.stack([sa.core_attention.max_logits_val for sa in layers], dim=0)
+        scales = logit_threshold / mint.clamp(self._all_reduce_max_logits(stacked),
+                                              min=logit_threshold)
+        for row, self_attention in enumerate(layers):
+            self_attention.apply_qk_clip(scales[row], fp32_param_map)

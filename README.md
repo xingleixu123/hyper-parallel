@@ -101,3 +101,10 @@ router206实际梯度、动量均相同，12个更新权重差异被定位到原
 ## 第80／81组：专家权重梯度归约完整200步复验
 
 两组均完成且通过输入、完整恢复、源码与前26步保真审计；主MoE和主MoE＋MTP的200步指标及范数逐值相同。total最大误差下降，但均值和首次超限反而恶化；仍未通过全部六项标准，累计81组独立完整实验。详见[中文阶段记录](阶段记录-212Router反向首差与消融.md)、[完整审计](evidence/weighted212-independent200-audit.json)、[六项曲线](evidence/weighted212-independent200-loss-errors.png)。
+
+
+## 第217步分段语义：完整200步消融与首差推进
+
+[详细中文阶段记录](阶段记录-217分段批次前向首差.md)。三组独立200步已完成，累计84组仍无全部六项通过；新的三组为归档兼容语义消融。位置与MTP同时统一后，217全部46裁剪前梯度精确、模型精确至218，219仅两项权重首差。五组完整同输入重放排除本例CANN注意力前向差异。组合均值改善但最大误差恶化，正负结果、当前MF/Megatron来源和无损清理回执全部保留。
+
+[200步逐项审计](evidence/packed217-independent200-audit.json) · [模型哈希与梯度证据](evidence/packed217-model-frontier-audit.json) · [注意力同输入重放](evidence/attention217-same-input-replay.json)
