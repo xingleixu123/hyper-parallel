@@ -1,6 +1,27 @@
-## 最新续训尝试与完整关联核验（2026-10-15）
+## 最新进展：完整完成 FSDP 0–200 与 200–400 续训（2026-10-15）
 
-最新基点的FSDP0–200已经完成，仍保留下一节的完整基线证据。随后满足全局20分钟间隔、129八卡连续两次确认空闲后启动200–400续训；在模型初始化阶段，3号卡出现PID命名空间与控制组均不同的外部进程，刷新进程清单后仍在。本任务仅释放自己的容器，约78.98秒后退出137，8rank均尚无训练步，无本任务设备PID残留。**这不是续训精度失败，也不能算恢复成功；最新基点的200–400数值验收仍未完成。** 原checkpoint200的25个文件大小、修改时间和已记录小文件哈希均保持不变，保留用于下一次恢复。下一次最早于2026-10-15 19:39:27（UTC+8）之后重新检查空卡。
+北京时间19:37再次核对，JT_dev仍为`f637ef7ee4d4b416800716f1ebaaae7709b8a06a`；本轮沿用含#180和已检视修复的固定集成源码`18602c4524dc664b81b2bad9a7b624455ce1494f`、同一镜像及CANN 9.2.0-beta.2。满足全局20分钟间隔且129八卡两次空闲检查通过后，第二次恢复完整完成step201–400：**8个rank各200条记录、退出码0、376.91秒内正常释放全部设备，无本任务残留PID。** 没有改动本轮数值配方或占用别人正在使用的卡。
+
+checkpoint实际加载日志记录`global_step=200, start_epoch=0, start_step=200`。step201累计1608样本/3720095监督token，step400累计3200样本/7467738监督token；8rank逐步计数衔接、输入全局摘要、有限值和完成标记检查通过。本轮LM、MTP、aux及梯度范数的跨rank日志差均为0，**这只是本轮rank记录一致，不能代替与独立连续400步参考的逐步精度比较**。
+
+| 完整运行 | 每rank步区间 | 峰值 allocated / reserved | 排除本轮前20步的中位步时 | 当前验收边界 |
+|---|---|---|---|---|
+| FSDP基线第四轮 | 1–200 | 22.032196 / 27.25 GiB | 1.155003秒 | 已完整运行，独立对照待完成 |
+| 从checkpoint200恢复第二轮 | 201–400 | 22.032196 / 25.316406 GiB | 1.160107秒 | 已完整恢复并训练，独立对照待完成 |
+
+表内步时包含相同的指标及输入身份观测开销；两行数据步区间不同，不能据此宣称吞吐提升或下降。图中仅展示rank0轨迹，MTP/aux按配置系数0.3/0.0001还原；它不是误差对齐图。**当前精度状态仍为UNVERIFIED，尚未声称LM、MTP、aux连续200步误差≤0.005。** 下一项是同源独立0–400参考，分别核验基线1–200和续训201–400的全部8rank、加权日志及还原未加权分量；下一次最早于2026-10-15 20:05:59（UTC+8）后检查空卡。
+
+![FSDP基线与续训完整轨迹；独立精度验收仍待完成](figures/f637-fsdp8-resume-chain-zh.png)
+
+[全rank完整性及恢复边界摘要](reports/f637-fsdp8-resume-r2-complete/f637-fsdp8-resume-r2-complete-analysis.json) · [恢复原始日志](reports/f637-fsdp8-resume-r2-complete/rank0-stdout.log) · [逐步指标示例](reports/f637-fsdp8-resume-r2-complete/metrics-rank0.jsonl) · [独立执行及释放凭据](reports/f637-fsdp8-resume-r2-complete/r129-f637-fp32-fsdp8-200-400-r2.receipt.json) · [76份采集文件校验](reports/f637-fsdp8-resume-r2-complete/f637-fsdp8-resume-r2-complete-local-verification.json)。完整8rank指标、起始/结束标记和配置均保留在同目录；重复采集压缩包已在本机及129两端删除。
+
+恢复前另做只读CPU元数据检查，未加载27.97GB模型张量正文：8rank的训练步200、数据游标1600样本、累计token3713791和两个调度器步数均与保存位置一致；CPU、NPU及Python三类RNG状态均已保存；46个优化器标量步数为200，28项Muon NS dtype均记录float32。该检查与实际恢复结果分开记录，不能把元数据存在当作数值恢复证明。[CPU检查摘要](reports/f637-checkpoint-metadata/f637-checkpoint-metadata-cpu-summary.json) · [完整小元数据摘要](reports/f637-checkpoint-metadata/f637-checkpoint-metadata-cpu.json)。
+
+总单仍关联10个独立小问题和10个单提交草稿PR；新增训练证据不改变PR代码提交，也不将多修复集成结果全部归因于其中一个PR。完整跨拓扑及重计算矩阵继续按原门槛验证。
+
+## 前次续训让卡与完整关联核验（2026-10-15）
+
+最新基点的FSDP0–200已经完成，仍保留下一节的完整基线证据。随后满足全局20分钟间隔、129八卡连续两次确认空闲后启动200–400续训；在模型初始化阶段，3号卡出现PID命名空间与控制组均不同的外部进程，刷新进程清单后仍在。本任务仅释放自己的容器，约78.98秒后退出137，8rank均尚无训练步，无本任务设备PID残留。**这不是续训精度失败，也不能算恢复成功；最新基点的200–400数值验收仍未完成。** 原checkpoint200的25个文件大小、修改时间和已记录小文件哈希均保持不变，保留用于下一次恢复。当时规定下一次最早于2026-10-15 19:39:27（UTC+8）之后重新检查空卡；后续完整恢复结果见本文首节。
 
 [中断及归属差异摘要](reports/f637-fsdp8-resume-interrupted/f637-fsdp8-resume-interrupted-analysis.json) · [释放凭据](reports/f637-fsdp8-resume-interrupted/r129-f637-fp32-fsdp8-200-400.receipt.json) · [checkpoint保留核对](reports/f637-fsdp8-resume-interrupted/f637-checkpoint-retained-after-resume-interruption.json)。31份运行证据逐文件校验通过，重复压缩包两端删除；原始进程身份留在本地。
 
@@ -14,7 +35,7 @@
 
 129第四轮已完整完成FSDP0–200：8个rank各200条记录，退出码0，376.65秒后正常释放全部设备，无本任务残留PID。输入全局哈希跨rank一致，逐步及累计计数核对通过，全部数值有限；step200累计1600样本、3713791个监督token。峰值allocated/reserved为22.032196/27.25 GiB，排除前20步后中位步时1.155003秒，包含固定观测开销；单轮测量不证明性能收益。
 
-checkpoint200包含完整25个文件、27973262840字节，文件均在本轮时间窗口写入；小文件哈希已记录，未对大张量文件宣称全量哈希校验。76份运行证据逐文件验证通过，重复压缩包两端已清理。**本轮只是基线运行完整；checkpoint实际可恢复性、200–400续训精度以及独立连续400参考仍待验证。** 该基线释放后满足20分钟间隔再启动的首轮续训结果见本文最前面的更新。
+checkpoint200包含完整25个文件、27973262840字节，文件均在本轮时间窗口写入；小文件哈希已记录，未对大张量文件宣称全量哈希校验。76份运行证据逐文件验证通过，重复压缩包两端已清理。**该基线完成时尚未做恢复；现已完成200–400实际续训，结果见首节。独立连续400参考和续训精度验收仍待完成。** 该基线释放后满足20分钟间隔再启动的首轮续训结果见本文最前面的更新。
 
 [200步全rank核验](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-complete-analysis.json) · [checkpoint清单](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-checkpoint-inventory.json) · [释放凭据](reports/f637-fsdp8-r4-complete/r129-f637-fp32-fsdp8-0-200-r4.receipt.json) · [采集校验](reports/f637-fsdp8-r4-complete/f637-fsdp8-r4-complete-local-verification.json)。
 
