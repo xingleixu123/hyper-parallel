@@ -1,0 +1,334 @@
+{
+  "joins": {
+    "shared_forward": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0,
+      "worst_index": [
+        0,
+        0
+      ],
+      "hp_at_worst": 2.125,
+      "mf_at_worst": 2.125
+    },
+    "hp_joint_dtype": "torch.float32",
+    "hp_sum_vs_actual_hp_joint": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0,
+      "worst_index": [
+        0,
+        0
+      ],
+      "hp_at_worst": 4.6806763975837384e-07,
+      "mf_at_worst": 4.6806763975837384e-07
+    },
+    "hp_joint_after_bf16_vs_actual_mf_joint": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0,
+      "worst_index": [
+        0,
+        0
+      ],
+      "hp_at_worst": 4.675239324569702e-07,
+      "mf_at_worst": 4.675239324569702e-07
+    },
+    "mf_early_branch_sum_vs_actual_mf_joint": {
+      "exact": false,
+      "size": 20971520,
+      "different": 553062,
+      "max_abs": 2.384185791015625e-07,
+      "rel_l2": 0.002822125472474774,
+      "worst_index": [
+        35,
+        2050
+      ],
+      "hp_at_worst": 3.314018249511719e-05,
+      "mf_at_worst": 3.337860107421875e-05
+    },
+    "hp_late_sum_vs_actual_mf_joint": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0,
+      "worst_index": [
+        0,
+        0
+      ],
+      "hp_at_worst": 4.675239324569702e-07,
+      "mf_at_worst": 4.675239324569702e-07
+    }
+  },
+  "complete": true,
+  "step": 205,
+  "fidelity": {
+    "mf_exit_zero": true,
+    "mf_all_metrics_grad_norm_exact": true,
+    "mf_all_inputs_exact": true,
+    "mf_restore_exact": true,
+    "hp_exit_zero": true,
+    "hp_all_metrics_grad_norm_exact": true,
+    "hp_all_inputs_exact": true,
+    "hp_restore_exact": true,
+    "hp_selected_optimizer_trace_exact": true,
+    "mf_source_hash": true,
+    "hp_source_hash": true
+  },
+  "records": [
+    {
+      "name": "model.norm",
+      "mf_name": "model.decoder.final_layernorm",
+      "kind": "x",
+      "comparison": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 2.125,
+        "mf_at_worst": 2.125
+      }
+    },
+    {
+      "name": "model.norm",
+      "mf_name": "model.decoder.final_layernorm",
+      "kind": "weight",
+      "comparison": {
+        "exact": true,
+        "size": 5120,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 0.9938971996307373,
+        "mf_at_worst": 0.9938971996307373
+      }
+    },
+    {
+      "name": "model.norm",
+      "mf_name": "model.decoder.final_layernorm",
+      "kind": "inverse_rms",
+      "comparison": {
+        "exact": true,
+        "size": 4096,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 0.3172056972980499,
+        "mf_at_worst": 0.3172056972980499
+      }
+    },
+    {
+      "name": "model.norm",
+      "mf_name": "model.decoder.final_layernorm",
+      "kind": "y_fp32",
+      "comparison": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 0.6699484586715698,
+        "mf_at_worst": 0.6699484586715698
+      }
+    },
+    {
+      "name": "model.norm",
+      "mf_name": "model.decoder.final_layernorm",
+      "kind": "dy",
+      "comparison": {
+        "exact": false,
+        "size": 20971520,
+        "different": 1,
+        "max_abs": 7.275957614183426e-12,
+        "rel_l2": 9.989775072782227e-11,
+        "worst_index": [
+          249,
+          3745
+        ],
+        "hp_at_worst": -9.604264050722122e-10,
+        "mf_at_worst": -9.677023626863956e-10
+      }
+    },
+    {
+      "name": "model.norm",
+      "mf_name": "model.decoder.final_layernorm",
+      "kind": "dx",
+      "comparison": {
+        "exact": false,
+        "size": 20971520,
+        "different": 1756132,
+        "max_abs": 1.8755963537842035e-07,
+        "rel_l2": 0.0016600157944245688,
+        "worst_index": [
+          3741,
+          3173
+        ],
+        "hp_at_worst": 6.313006451819092e-05,
+        "mf_at_worst": 6.29425048828125e-05,
+        "after_bf16_cast": {
+          "exact": true,
+          "size": 20971520,
+          "different": 0,
+          "max_abs": 0.0,
+          "rel_l2": 0.0,
+          "worst_index": [
+            0,
+            0
+          ],
+          "hp_at_worst": 0.0,
+          "mf_at_worst": 0.0
+        }
+      }
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "kind": "x",
+      "comparison": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 2.125,
+        "mf_at_worst": 2.125
+      }
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "kind": "weight",
+      "comparison": {
+        "exact": true,
+        "size": 5120,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 0.9998045563697815,
+        "mf_at_worst": 0.9998045563697815
+      }
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "kind": "inverse_rms",
+      "comparison": {
+        "exact": true,
+        "size": 4096,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 0.3172056972980499,
+        "mf_at_worst": 0.3172056972980499
+      }
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "kind": "y_fp32",
+      "comparison": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 0.6739304065704346,
+        "mf_at_worst": 0.6739304065704346
+      }
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "kind": "dy",
+      "comparison": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 1.4901161193847656e-06,
+        "mf_at_worst": 1.4901161193847656e-06
+      }
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "mf_name": "model.mtp.layers.0.hnorm",
+      "kind": "dx",
+      "comparison": {
+        "exact": false,
+        "size": 20971520,
+        "different": 20971222,
+        "max_abs": 2.9786860977765173e-08,
+        "rel_l2": 0.0016603684549892387,
+        "worst_index": [
+          211,
+          3656
+        ],
+        "hp_at_worst": 7.718816959823016e-06,
+        "mf_at_worst": 7.748603820800781e-06,
+        "after_bf16_cast": {
+          "exact": true,
+          "size": 20971520,
+          "different": 0,
+          "max_abs": 0.0,
+          "rel_l2": 0.0,
+          "worst_index": [
+            0,
+            0
+          ],
+          "hp_at_worst": 4.675239324569702e-07,
+          "mf_at_worst": 4.675239324569702e-07
+        }
+      }
+    }
+  ],
+  "scope": "Complete actual finalRMSNorm operatorinputs/outputs andbranchderivatives; no reference injection.",
+  "publication": {
+    "omitted": "Raw coordinate example values",
+    "original_report_sha256": "28a8498443cb96a263f3bd596eb7dc685684bfe2cc9548265f118df91726e2ac"
+  }
+}

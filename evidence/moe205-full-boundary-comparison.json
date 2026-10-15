@@ -1,0 +1,114 @@
+{
+  "complete": true,
+  "fidelity": {
+    "mf_exit_zero": true,
+    "mf_all_metrics_grad_norm_exact": true,
+    "mf_all_inputs_exact": true,
+    "mf_restore_exact": true,
+    "hp_exit_zero": true,
+    "hp_all_metrics_grad_norm_exact": true,
+    "hp_all_inputs_exact": true,
+    "hp_restore_exact": true,
+    "hp_selected_optimizer_trace_exact": true,
+    "mf_source_exact": true,
+    "hp_source_exact": true
+  },
+  "step": 205,
+  "records": [
+    {
+      "kind": "x",
+      "hp_actual_dtype": "torch.bfloat16",
+      "comparison": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 1.5078125,
+        "mf_at_worst": 1.5078125
+      }
+    },
+    {
+      "kind": "y",
+      "hp_actual_dtype": "torch.float32",
+      "comparison": {
+        "exact": false,
+        "size": 20971520,
+        "different": 17170138,
+        "max_abs": 0.125,
+        "rel_l2": 0.001670537570418818,
+        "worst_index": [
+          87,
+          4508
+        ],
+        "hp_at_worst": 36.625,
+        "mf_at_worst": 36.5
+      },
+      "after_bf16_cast": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": -0.4140625,
+        "mf_at_worst": -0.4140625
+      }
+    },
+    {
+      "kind": "dy",
+      "hp_actual_dtype": "torch.float32",
+      "comparison": {
+        "exact": true,
+        "size": 20971520,
+        "different": 0,
+        "max_abs": 0.0,
+        "rel_l2": 0.0,
+        "worst_index": [
+          0,
+          0
+        ],
+        "hp_at_worst": 4.675239324569702e-07,
+        "mf_at_worst": 4.675239324569702e-07
+      }
+    },
+    {
+      "kind": "dx",
+      "hp_actual_dtype": "torch.bfloat16",
+      "comparison": {
+        "exact": false,
+        "size": 20971520,
+        "different": 49,
+        "max_abs": 1.1641532182693481e-10,
+        "rel_l2": 3.4480305263630728e-09,
+        "worst_index": [
+          1605,
+          660
+        ],
+        "hp_at_worst": 1.6996636986732483e-08,
+        "mf_at_worst": 1.7113052308559418e-08
+      },
+      "after_bf16_cast": {
+        "exact": false,
+        "size": 20971520,
+        "different": 49,
+        "max_abs": 1.1641532182693481e-10,
+        "rel_l2": 3.4480305263630728e-09,
+        "worst_index": [
+          1605,
+          660
+        ],
+        "hp_at_worst": 1.6996636986732483e-08,
+        "mf_at_worst": 1.7113052308559418e-08
+      }
+    }
+  ],
+  "scope": "Entire main layer1 MoE x/y/dy/dx,4096x5120 each; original native computations, no teacher injection."
+}
