@@ -1,6 +1,22 @@
+## 独立连续参考第二轮让卡（2026-10-15）
+
+129在满足全局20分钟间隔、八卡连续两次空闲检查后启动第二轮独立0–400参考。初始化阶段0号卡出现宿主机其他用户的Python进程，其UID、PID命名空间及控制组均与本任务不同，刷新后仍在。本任务约35.45秒后只停止并删除自己的容器，退出137，无本任务设备PID残留。结束采样时该外部进程已不在设备PID列表；没有向它发送终止信号。
+
+**本轮8rank均无训练指标，也无start/complete标记，不能作为400步参考，不能判为loss精度失败，更不能纳入性能收益。** 之前完整的基线1–200和续训201–400证据及checkpoint200保持保留，独立精度仍待验证。下一次最早2026-10-15 20:50:42（UTC+8）再检查资源，使用同源同镜像同配置的第三轮请求；没有提前启动或保留设备排队。
+
+[第二轮中断及归属摘要](reports/f637-fsdp8-continuous400-r2-interrupted/f637-fsdp8-continuous400-r2-interrupted-analysis.json) · [释放凭据](reports/f637-fsdp8-continuous400-r2-interrupted/r129-f637-fp32-fsdp8-continuous400-r2.receipt.json) · [31份采集文件校验](reports/f637-fsdp8-continuous400-r2-interrupted/f637-fsdp8-continuous400-r2-interrupted-local-verification.json) · [初始化日志](reports/f637-fsdp8-continuous400-r2-interrupted/rank0-stderr.log)。两端重复压缩包均已删除，原始进程身份保留本地排障。
+
+## 125 设备命名空间占用核实（2026-10-15）
+
+125只读复查得到新的环境侧证据：`/proc/uda/namespace_node`中`ns_id=0`映射全部8卡，`root_tgid`与另一个仍运行的普通容器init PID一致，该容器不属于本任务；其mount namespace与宿主机PID1不同。采样时卡6、7另有外部设备进程。这个事实与[昇腾官方针对训练服务器的-8020占用故障诊断](https://www.hiascend.com/document/caselibrary/detail/topic_0000002238354198)相符，解释了为什么宿主机的低利用率或某一时刻无训练PID，仍不足以证明新容器可取得设备。
+
+没有停止持有设备映射的容器、进入其环境运行实验、更改驱动或全局共享配置。因此尚未验证释放后的因果反转，也没有宣称125恢复可用；继续优先使用129满足空闲条件的窗口。该环境观察与CPU接口缺陷#218/#219分开，不新增没有代码修复的重复PR。公开记录仅包含设备范围、匹配关系和原始证据SHA，其他任务的容器身份细节保留在本地。[只读环境核对摘要](reports/f637-environment-followup/r125-namespace-occupancy-summary.json)。
+
+北京时间20:27再次读取上游，JT_dev仍是`f637ef7ee4d4b416800716f1ebaaae7709b8a06a`；10个独立PR的head及单提交约束均未改变。当前head的check-runs和status上下文均为空，组合状态pending，不能当作完整CI通过。[当前提交及CI读取结果](reports/f637-environment-followup/github-current-head-checks-20261015-1228.json)。
+
 ## 独立参考等待资源、证据复审与清理（2026-10-15）
 
-FSDP基线1–200和checkpoint200续训201–400均已完整完成，详见下一节。独立连续0–400参考在满足全局20分钟间隔后首次检查发现3号卡占用，没有启动；随后再次确认八卡空闲才启动，初始化阶段再次发现3号卡外部进程，整轮约41.64秒后因让卡结束。其PID命名空间及控制组与本任务不同，刷新进程清单后仍存在；守卫只释放本任务容器，退出137，无本任务设备PID残留。**8rank均为0训练步，既不能作为独立参考，也不属于loss精度失败。** 下次最早于2026-10-15 20:29:37（UTC+8）后检查空卡，仍使用相同源码、镜像和配置。
+FSDP基线1–200和checkpoint200续训201–400均已完整完成，详见下一节。独立连续0–400参考在满足全局20分钟间隔后首次检查发现3号卡占用，没有启动；随后再次确认八卡空闲才启动，初始化阶段再次发现3号卡外部进程，整轮约41.64秒后因让卡结束。其PID命名空间及控制组与本任务不同，刷新进程清单后仍存在；守卫只释放本任务容器，退出137，无本任务设备PID残留。**8rank均为0训练步，既不能作为独立参考，也不属于loss精度失败。** 当时规定下次最早于2026-10-15 20:29:37（UTC+8）后检查空卡；随后第二轮记录和当前窗口见本文首节，源码、镜像和配置未变。
 
 [参考中断及归属摘要](reports/f637-fsdp8-continuous400-interrupted/f637-fsdp8-continuous400-interrupted-analysis.json) · [释放凭据](reports/f637-fsdp8-continuous400-interrupted/r129-f637-fp32-fsdp8-continuous400.receipt.json) · [31份文件采集校验](reports/f637-fsdp8-continuous400-interrupted/f637-fsdp8-continuous400-interrupted-local-verification.json)。重复压缩包两端已删除，原始进程身份仅保留本地。
 
@@ -75,7 +91,7 @@ checkpoint200包含完整25个文件、27973262840字节，文件均在本轮时
 
 这涉及两个不同边界。第一，已单独提交 [小问题 #218](https://github.com/hf1s/hyper-parallel/issues/218) 与 [PR #219](https://github.com/hf1s/hyper-parallel/pull/219)，单提交 `86930dd`。CPU后端的`torch.cpu.current_device()`返回`"cpu"`，`get_device_id()`直接转交给`torch.device(type,index)`，使JT的CPU构建失败；不挂NPU的最小复现已确认。修复使CPU返回无索引`None`，CUDA/NPU仍保留当前整数索引；JT测试不再把该API固定mock为0，改走真实CPU分支。修复前5失败/17通过/5子测试通过，修复后**20项测试和7项子测试通过，19.06秒**；最小复现也通过，规范/验收条件两轴检视通过，静态检查基点和补丁均6条既有告警、无新增。第一次测试容器缺pytest、未收集测试，单独保存失败记录；安装隔离测试依赖后才取得以上结果。[修复与检视](reports/cpu-device-index/cpu-device-index-review.json)、[红回归](reports/cpu-device-index/r125-cpu-device-index-red-r2.log)、[绿回归](reports/cpu-device-index/r125-cpu-device-index-green.log)。
 
-第二，125同挂载方式的只读npu-smi查询返回`device is used / -8020`，129相同查询正常；驱动主库解析均指向各自主机的挂载库。现有证据只说明125的新容器不可用，尚不能把具体容器或驱动版本认定为根因。没有停止其他容器、修改全机共享开关或升级驱动。**CPU修复不代表NPU发现问题已解决，也不产生八卡训练或性能结论。**
+第二，125同挂载方式的只读npu-smi查询返回`device is used / -8020`，129相同查询正常；驱动主库解析均指向各自主机的挂载库。当时证据只能说明125的新容器不可用；后续只读namespace核对发现其他普通容器登记全部8卡，见本文环境核实节，仍未进行释放后的因果反转验证，也未认定驱动版本为根因。没有停止其他容器、修改全机共享开关或升级驱动。**CPU修复不代表NPU发现问题已解决，也不产生八卡训练或性能结论。**
 
 ## 上游更新与资源进展（2026-10-15）
 
@@ -222,7 +238,8 @@ rank0 已输出8种配置各2步的16条损失记录，其中包含新增的 `ch
 - [x] 旧六项修复配方 FSDP0–200、200→400 与连续参考全 rank 零误差；关闭/完整/选择重算200步已完成。
 - [x] 129 固定旧基点 `521d3a8` 的 FP32 配方 FSDP0–200 及200→400按顺序运行完成，数据完整、计数连续；未完成独立连续400参考。
 - [x] 最新 `f637ef7` 集成源的 FSDP0–200 运行完成，8rank数据完整，checkpoint200文件清单齐全。
-- [ ] 从本轮checkpoint200续训至400，并完成独立连续400参考；逐rank加权和未加权loss全部≤0.005。
+- [x] 从本轮checkpoint200完整续训至400，8rank各200步、退出0、输入与累计计数连续。
+- [ ] 完成本轮独立连续400参考；分别核验基线及续训各200步，逐rank加权和未加权loss全部≤0.005。
 - [ ] 新配方 TP/CP/EP 及合法组合200步全部达到相同门槛，剩余根因分别修复并建单。
 - [ ] #214 的 Ascend/HCCL 补丁回归。
 - [x] 完成 MF / Megatron 重算配置能力对照，明确当前 JT 与 MF 式模块/层范围、排除及通信配置的差距。
