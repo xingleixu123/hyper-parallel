@@ -1,0 +1,1866 @@
+{
+  "aliases": {
+    "buffers": [],
+    "parameters": []
+  },
+  "buffers": [
+    {
+      "aliases": [
+        "model.layers.1.mlp.gate.e_score_correction_bias"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.mlp.gate.e_score_correction_bias",
+      "is_meta": false,
+      "layout": null,
+      "persistent": true,
+      "shape": [
+        8
+      ]
+    },
+    {
+      "aliases": [
+        "model.rotary_emb.inv_freq"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.rotary_emb.inv_freq",
+      "is_meta": false,
+      "layout": null,
+      "persistent": false,
+      "shape": [
+        32
+      ]
+    },
+    {
+      "aliases": [
+        "model.rotary_emb.original_inv_freq"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.rotary_emb.original_inv_freq",
+      "is_meta": false,
+      "layout": null,
+      "persistent": false,
+      "shape": [
+        32
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.mlp.gate.e_score_correction_bias"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.gate.e_score_correction_bias",
+      "is_meta": false,
+      "layout": null,
+      "persistent": true,
+      "shape": [
+        8
+      ]
+    }
+  ],
+  "checkpoint": {},
+  "config": {
+    "_name_or_path": "",
+    "architectures": [
+      "JTDeepseekV3ForCausalLM"
+    ],
+    "attention_bias": false,
+    "attention_dropout": 0.0,
+    "bos_token_id": 0,
+    "chunk_loss_size": 4096,
+    "chunk_size_feed_forward": 0,
+    "dtype": null,
+    "enable_chunk_loss": true,
+    "eos_token_id": 1,
+    "expert_fp32_weight_gradients": true,
+    "first_k_dense_replace": 1,
+    "head_dim": 64,
+    "hidden_act": "silu",
+    "hidden_size": 5120,
+    "id2label": {
+      "0": "LABEL_0",
+      "1": "LABEL_1"
+    },
+    "index_head_dim": 128,
+    "index_n_heads": 64,
+    "index_topk": 2048,
+    "initializer_range": 0.02,
+    "intermediate_size": 12288,
+    "is_encoder_decoder": false,
+    "kv_lora_rank": 512,
+    "label2id": {
+      "LABEL_0": 0,
+      "LABEL_1": 1
+    },
+    "layer_types": [
+      "full_attention",
+      "full_attention"
+    ],
+    "max_position_embeddings": 262400,
+    "mlp_bias": false,
+    "mlp_layer_types": [
+      "dense",
+      "sparse"
+    ],
+    "model_type": "jt_deepseek_v3",
+    "moe_aux_loss_coeff": 0.0001,
+    "moe_intermediate_size": 1536,
+    "moe_router_bias_update_rate": 0.001,
+    "moe_router_enable_expert_bias": true,
+    "mtp_loss_factor": 0.3,
+    "n_group": 1,
+    "n_routed_experts": 8,
+    "n_shared_experts": 2,
+    "norm_topk_prob": true,
+    "num_attention_heads": 128,
+    "num_experts_per_tok": 2,
+    "num_hidden_layers": 2,
+    "num_key_value_heads": 128,
+    "num_nextn_predict_layers": 1,
+    "output_attentions": false,
+    "output_hidden_states": false,
+    "pad_token_id": null,
+    "problem_type": null,
+    "q_lora_rank": 1536,
+    "qk_head_dim": 192,
+    "qk_nope_head_dim": 128,
+    "qk_rope_head_dim": 64,
+    "return_dict": true,
+    "rms_norm_eps": 1e-06,
+    "rope_interleave": true,
+    "rope_parameters": {
+      "rope_theta": 5000000,
+      "rope_type": "default"
+    },
+    "routed_scaling_factor": 2.827,
+    "tie_word_embeddings": false,
+    "topk_group": 1,
+    "transformers_version": "5.13.1",
+    "use_cache": false,
+    "use_pad_tokens": true,
+    "v_head_dim": 128,
+    "vocab_size": 152064
+  },
+  "modules": [
+    {
+      "forward_signature": "(input_ids: 'torch.Tensor', shift_labels: 'torch.Tensor | None' = None, *, labels: 'torch.Tensor | None' = None, position_ids: 'torch.Tensor | None' = None, attention_mask: 'torch.Tensor | None' = None, use_cache: 'bool' = False, actual_seq_len: 'tuple[int, ...] | None' = None, sequence_start: 'int' = 0) -> 'JTDeepseekV3Output'",
+      "fqn": "<root>",
+      "training": true,
+      "type": "hyper_parallel.core.fully_shard.api.HSDPJTDeepseekV3ForCausalLM"
+    },
+    {
+      "forward_signature": "(input_ids: torch.LongTensor | None = None, attention_mask: torch.Tensor | None = None, position_ids: torch.LongTensor | None = None, past_key_values: transformers.cache_utils.Cache | None = None, inputs_embeds: torch.FloatTensor | None = None, use_cache: bool | None = None, **kwargs: Unpack[transformers.utils.generic.TransformersKwargs]) -> transformers.modeling_outputs.BaseModelOutputWithPast",
+      "fqn": "model",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Model"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.embed_tokens",
+      "training": true,
+      "type": "torch.nn.modules.sparse.Embedding"
+    },
+    {
+      "forward_signature": "(*input: Any) -> None",
+      "fqn": "model.layers",
+      "training": true,
+      "type": "torch.nn.modules.container.ModuleList"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor', attention_mask: 'Any' = None, position_ids: 'Any' = None, past_key_values: 'Any' = None, use_cache: 'bool' = False, position_embeddings: 'Any' = None, **kwargs: 'Any') -> 'torch.Tensor'",
+      "fqn": "model.layers.0",
+      "training": true,
+      "type": "hyper_parallel.core.fully_shard.api.HSDPJTDeepseekV3Decoder"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor', position_embeddings: 'Any' = None, attention_mask: 'Any' = None, past_key_values: 'Any' = None, actual_seq_len: 'Any' = None, **kwargs: 'Any') -> 'tuple[torch.Tensor, Any]'",
+      "fqn": "model.layers.0.self_attn",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MLAAttention"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.self_attn.linear_qkv",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.self_attn.q_a_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.self_attn.kv_a_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.self_attn.q_b_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.self_attn.kv_b_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.self_attn.o_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(values: 'torch.Tensor', cos: 'torch.Tensor', sin: 'torch.Tensor', *, unsqueeze_dim: 'int' = 1) -> 'torch.Tensor'",
+      "fqn": "model.layers.0.self_attn.explicit_rotary",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3RotaryEmbedding"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.self_attn.key_rope_gather",
+      "training": true,
+      "type": "torch.nn.modules.linear.Identity"
+    },
+    {
+      "forward_signature": "(x)",
+      "fqn": "model.layers.0.mlp",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32MLP"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.mlp.gate_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.mlp.up_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.mlp.down_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.mlp.act_fn",
+      "training": true,
+      "type": "transformers.activations.SiLUActivation"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.input_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.0.post_attention_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor', attention_mask: 'Any' = None, position_ids: 'Any' = None, past_key_values: 'Any' = None, use_cache: 'bool' = False, position_embeddings: 'Any' = None, **kwargs: 'Any') -> 'torch.Tensor'",
+      "fqn": "model.layers.1",
+      "training": true,
+      "type": "hyper_parallel.core.fully_shard.api.HSDPJTDeepseekV3Decoder"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor', position_embeddings: 'Any' = None, attention_mask: 'Any' = None, past_key_values: 'Any' = None, actual_seq_len: 'Any' = None, **kwargs: 'Any') -> 'tuple[torch.Tensor, Any]'",
+      "fqn": "model.layers.1.self_attn",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MLAAttention"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.self_attn.linear_qkv",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.self_attn.q_a_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.self_attn.kv_a_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.self_attn.q_b_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.self_attn.kv_b_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.self_attn.o_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(values: 'torch.Tensor', cos: 'torch.Tensor', sin: 'torch.Tensor', *, unsqueeze_dim: 'int' = 1) -> 'torch.Tensor'",
+      "fqn": "model.layers.1.self_attn.explicit_rotary",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3RotaryEmbedding"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.self_attn.key_rope_gather",
+      "training": true,
+      "type": "torch.nn.modules.linear.Identity"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor') -> 'torch.Tensor'",
+      "fqn": "model.layers.1.mlp",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MoE"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor, top_k_index: torch.Tensor, top_k_weights: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.mlp.experts",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Experts"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.mlp.experts.act_fn",
+      "training": true,
+      "type": "transformers.activations.SiLUActivation"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor') -> 'torch.Tensor'",
+      "fqn": "model.layers.1.mlp.gate",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Gate"
+    },
+    {
+      "forward_signature": "(x)",
+      "fqn": "model.layers.1.mlp.shared_experts",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32MLP"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.mlp.shared_experts.gate_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.mlp.shared_experts.up_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.mlp.shared_experts.down_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.mlp.shared_experts.act_fn",
+      "training": true,
+      "type": "transformers.activations.SiLUActivation"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.input_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.layers.1.post_attention_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "model.norm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(x, position_ids)",
+      "fqn": "model.rotary_emb",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RotaryEmbedding"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "lm_head",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(hidden: 'torch.Tensor', input_ids: 'torch.Tensor', *, embedding: 'nn.Module', head: 'nn.Module | None', decoder_kwargs: 'Mapping[str, Any] | None' = None, shift_fn: 'Callable[[torch.Tensor], torch.Tensor] | None' = None, sequence_end_mask: 'torch.Tensor | None' = None) -> 'MultiTokenPredictionOutput'",
+      "fqn": "mtp",
+      "training": true,
+      "type": "hyper_parallel.components.modules.mtp.DeepseekV3MTP"
+    },
+    {
+      "forward_signature": "(*input: Any) -> None",
+      "fqn": "mtp.layers",
+      "training": true,
+      "type": "torch.nn.modules.container.ModuleList"
+    },
+    {
+      "forward_signature": "(hidden: 'torch.Tensor', embedding: 'torch.Tensor', **decoder_kwargs: 'Any') -> 'torch.Tensor'",
+      "fqn": "mtp.layers.0",
+      "training": true,
+      "type": "hyper_parallel.components.modules.mtp.MultiTokenPredictionLayer"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.enorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.hnorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.eh_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor', attention_mask: 'Any' = None, position_ids: 'Any' = None, past_key_values: 'Any' = None, use_cache: 'bool' = False, position_embeddings: 'Any' = None, **kwargs: 'Any') -> 'torch.Tensor'",
+      "fqn": "mtp.layers.0.transformer_layer",
+      "training": true,
+      "type": "hyper_parallel.core.fully_shard.api.HSDPJTDeepseekV3Decoder"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor', position_embeddings: 'Any' = None, attention_mask: 'Any' = None, past_key_values: 'Any' = None, actual_seq_len: 'Any' = None, **kwargs: 'Any') -> 'tuple[torch.Tensor, Any]'",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MLAAttention"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.linear_qkv",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.q_b_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.kv_b_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.o_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(values: 'torch.Tensor', cos: 'torch.Tensor', sin: 'torch.Tensor', *, unsqueeze_dim: 'int' = 1) -> 'torch.Tensor'",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.explicit_rotary",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3RotaryEmbedding"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.key_rope_gather",
+      "training": true,
+      "type": "torch.nn.modules.linear.Identity"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor') -> 'torch.Tensor'",
+      "fqn": "mtp.layers.0.transformer_layer.mlp",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MoE"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor, top_k_index: torch.Tensor, top_k_weights: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.experts",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Experts"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.experts.act_fn",
+      "training": true,
+      "type": "transformers.activations.SiLUActivation"
+    },
+    {
+      "forward_signature": "(hidden_states: 'torch.Tensor') -> 'torch.Tensor'",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.gate",
+      "training": true,
+      "type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Gate"
+    },
+    {
+      "forward_signature": "(x)",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32MLP"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj",
+      "training": true,
+      "type": "torch.nn.modules.linear.Linear"
+    },
+    {
+      "forward_signature": "(input: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts.act_fn",
+      "training": true,
+      "type": "transformers.activations.SiLUActivation"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.input_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    },
+    {
+      "forward_signature": "(hidden_states: torch.Tensor) -> torch.Tensor",
+      "fqn": "mtp.layers.0.final_layernorm",
+      "training": true,
+      "type": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm"
+    }
+  ],
+  "parameters": [
+    {
+      "aliases": [
+        "lm_head.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "lm_head.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        152064,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.embed_tokens.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.embed_tokens.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        152064,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.input_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.input_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.mlp.down_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.mlp.down_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120,
+        12288
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.mlp.gate_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.mlp.gate_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        12288,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.mlp.up_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.mlp.up_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        12288,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.post_attention_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.post_attention_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.self_attn.kv_a_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.self_attn.kv_a_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        512
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.self_attn.kv_b_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.self_attn.kv_b_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=0)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        32768,
+        512
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.self_attn.linear_qkv.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.self_attn.linear_qkv.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        2112,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.self_attn.o_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.self_attn.o_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=1)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120,
+        16384
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.self_attn.q_a_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.self_attn.q_a_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        1536
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.0.self_attn.q_b_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.0.self_attn.q_b_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=0)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        24576,
+        1536
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.input_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.input_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.mlp.experts.down_proj"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.mlp.experts.down_proj",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        8,
+        5120,
+        1536
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.mlp.experts.gate_up_proj"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.mlp.experts.gate_up_proj",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        8,
+        3072,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.mlp.gate.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.mlp.gate.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        8,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.mlp.shared_experts.down_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.mlp.shared_experts.down_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120,
+        3072
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.mlp.shared_experts.gate_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.mlp.shared_experts.gate_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        3072,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.mlp.shared_experts.up_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.mlp.shared_experts.up_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        3072,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.post_attention_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.post_attention_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.self_attn.kv_a_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.self_attn.kv_a_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        512
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.self_attn.kv_b_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.self_attn.kv_b_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=0)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        32768,
+        512
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.self_attn.linear_qkv.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.self_attn.linear_qkv.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        2112,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.self_attn.o_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.self_attn.o_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=1)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120,
+        16384
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.self_attn.q_a_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.self_attn.q_a_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        1536
+      ]
+    },
+    {
+      "aliases": [
+        "model.layers.1.self_attn.q_b_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.layers.1.self_attn.q_b_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=0)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        24576,
+        1536
+      ]
+    },
+    {
+      "aliases": [
+        "model.norm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "model.norm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.eh_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.eh_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120,
+        10240
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.enorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.enorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.final_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.final_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.hnorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.hnorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.input_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.input_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.mlp.experts.down_proj"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.experts.down_proj",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        8,
+        5120,
+        1536
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        8,
+        3072,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.mlp.gate.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.gate.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        8,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120,
+        3072
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        3072,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        3072,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.post_attention_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.post_attention_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        512
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=0)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        32768,
+        512
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        2112,
+        5120
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.self_attn.o_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.o_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=1)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        5120,
+        16384
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Replicate()"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        1536
+      ]
+    },
+    {
+      "aliases": [
+        "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight"
+      ],
+      "device": "npu:0",
+      "dtype": "torch.float32",
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight",
+      "is_meta": false,
+      "layout": {
+        "mesh_dim_names": [
+          "fsdp_shard",
+          "tp"
+        ],
+        "mesh_shape": [
+          8,
+          1
+        ],
+        "placements": [
+          "Shard(dim=0)",
+          "Shard(dim=0)"
+        ]
+      },
+      "requires_grad": true,
+      "shape": [
+        24576,
+        1536
+      ]
+    }
+  ],
+  "source": {}
+}

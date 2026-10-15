@@ -1,0 +1,31 @@
+{
+  "checked_at": "2026-10-15T16:41:16.587701+00:00",
+  "reviewer": "independent-spec-review-agent",
+  "audit_status": "PASS",
+  "training_precision_status": "FAIL",
+  "findings": [],
+  "summary_zh": "独立核对两份清单各76文件的字节数/SHA；两次运行完整200步×8rank，输入全局哈希、计数、LR及48项记录初态一致。源码、镜像一致，容器独立，均退出0并释放。逐步误差与严格比较报告完全吻合，三项还原误差均超过0.005。",
+  "independent_max_abs": {
+    "lm": {
+      "value": 0.011061668395996094,
+      "step": 148
+    },
+    "mtp_derived_unweighted": {
+      "value": 0.022786458333333336,
+      "step": 98
+    },
+    "aux_derived_unweighted": {
+      "value": 0.204604584723711,
+      "step": 172
+    }
+  },
+  "resource_audit_zh": "每步先全8rank MAX再排除前20步统计时间，token不重复相加，内存保留全部200步累计峰值。CP2中位步时1.5963217020秒，比FSDP增加38.20935%；allocated峰值20.7066459656GiB，减少1.3255500793GiB。仅本次运行观测，不能推导等精度收益。",
+  "inputs_sha256": {
+    "f637-cp2-200-strict-comparison.json": "8d865ab04168f6e0c688eaaa0c2574896184dd37eb9a2fadf20eab7ad9eb9f86",
+    "f637-cp2-200-complete-analysis.json": "fe7fea3e5a1221b23d6cda58580d063d5defd5b6ad552deb551e47db645d0fd7",
+    "f637-cp2-200-complete-evidence-manifest.json": "37fe7d5d2bd1165c44f3a17bbb0e9c89751ae7033f832c8125c1ceba519c04b3",
+    "f637-fsdp8-r4-complete-evidence-manifest.json": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11",
+    "f637-cp2-200-all-rank-resources.json": "188cbd4028dc5a12e06102fbda4daa6de03cabc952dc1c0b71ae45c4326dc0bc",
+    "f637-fsdp8-r4-all-rank-resources.json": "4a93261f7d53ed185dc43b89d39a4a0e90d8072b8b99ec9640d4c7ca7da28383"
+  }
+}
