@@ -1,12 +1,20 @@
 # JT DeepSeek-V3：当前结果与问题排序
 
-**已按用户要求暂停实验，训练队列和容器均已停止，不自动续跑。** FSDP 的 0→200、checkpoint200→400 已通过；跨拓扑精度仍有失败，不能宣布整体完成。所有后续正式运行均纳入用户指定的 [PR #180](https://github.com/hf1s/hyper-parallel/pull/180)。
+**2026-10-15 已获授权在 125/129 空闲时恢复；每轮释放设备后至少间隔 20 分钟，不停止其他人的实验。** 以下已完成结果来自此前 125 的固定环境：FSDP 的 0→200、checkpoint200→400 已通过，跨拓扑精度仍有失败，不能宣布整体完成。最新 JT_dev 为 `521d3a8`，已合入用户指定的 [PR #180](https://github.com/hf1s/hyper-parallel/pull/180)。129 已使用 `/home/jt_image` 中经校验的 `jt-clean:hp-910b-20261009`（CANN 9.2.0-beta.2）完成新的 FSDP 0–200：8 rank 全步数、初始状态和输入记录完整，退出成功；尚待 200–400 续训及独立连续 400 步参考，不能把完整性通过当作跨运行精度通过。
+
+[PR/Issue 双向索引](https://github.com/hf1s/hyper-parallel/issues/202)。公开总问题单：[#202](https://github.com/hf1s/hyper-parallel/issues/202)。
+
+## 129 新镜像基线进展
+
+源代码为最新 JT_dev `521d3a8`（含 #180）集成既有六项修复及 #200/#201，固定源 `a345081`、补丁 SHA256 `80310710…`。镜像 ID `5f9e677f…`；未使用镜像内旧 checkout。`r129-jtclean-fp32-fsdp8-build-0-200` 于 2026-10-15 完成，实验耗时 383.54 秒，去掉前 20 步后中位步时 1.17048 秒，峰值 allocated 22.28220 GiB / reserved 27.50391 GiB。保留 checkpoint200 共 27.973 GB 供续训，当前仅做了文件与 safetensors 头部完整性校验，恢复加载尚未验证。
+
+八卡已释放且实验容器已删除；全局冷却结束时间不早于 2026-10-15T14:44:05（Asia/Shanghai），随后仍须重新确认八卡空闲。81 个日志及配置证据已下载并逐文件校验 SHA256；详见 [基线完整性](reports/jtclean-fsdp8-baseline-integrity.json)、[checkpoint 清单](reports/jtclean-checkpoint200-inventory.json)、[镜像与依赖预检](reports/jtclean-cpu-preflight.json)。129 与 125 驱动/固件不同，精度和性能对比使用各自同机参考。
 
 ## 按影响排序的问题
 
 | Top | 问题与影响 | 当前证据与处理 |
 |---|---|---|
-| 1 | 跨 FSDP/TP/CP/EP 的 200 步精度仍超出 0.005 | 专家 BF16 权重梯度分区舍入和 Muon 更新敏感性已有独立算子及首步证据；TP 还有上游差异。FP32 专家梯度加完整 FP32 NS 的 EP2、CP2、TP2×EP2 长跑仍失败。生产补丁仅完成新的FSDP基线200步，完整矩阵未验收；定位已暂停。 |
+| 1 | 跨 FSDP/TP/CP/EP 的 200 步精度仍超出 0.005 | 专家 BF16 权重梯度分区舍入和 Muon 更新敏感性已有独立算子及首步证据；TP 还有上游差异。FP32 专家梯度加完整 FP32 NS 的 EP2、CP2、TP2×EP2 长跑仍失败。生产补丁在125仅完成新的FSDP基线200步，完整矩阵未验收；现按新的资源间隔恢复定位。 |
 | 2 | 梯度累积时使用错误的有效 token 分母 | [PR #194](https://github.com/hf1s/hyper-parallel/pull/194)。改为整步有效 token 数。TP2+EP2 的 LM 最大偏差由 0.92238 降至 0.01248，仍需处理 Top1。CPU 重现与真实 200 步对照均已保留。 |
 | 3 | FSDP 初始化后保留完整源参数，浪费大量显存 | [PR #198](https://github.com/hf1s/hyper-parallel/pull/198)。释放已经消费的初始化容器引用。EP2 节省 9.422 GiB，CP2 节省 10.125 GiB；各 200 步、8 rank 同拓扑 loss/梯度误差均为 0。约 0.1% 的步时变化视为噪声。 |
 | 4 | CP 拒绝分块输出 loss，阻断低显存训练 | [PR #199](https://github.com/hf1s/hyper-parallel/pull/199)。实现全 CP 有效 token 分母，重放不重复 collective。4 卡 ST 通过；demo 的 CP2 已能完成 200 步，跨拓扑数值问题仍单独跟踪。 |
@@ -15,8 +23,9 @@
 | 7 | 续训后累计 token/sample 监控从零开始 | [PR #197](https://github.com/hf1s/hyper-parallel/pull/197)。保存并恢复 meter 累计量，兼容旧 checkpoint。真实续训 200 步、8 rank 的 loss/梯度/累计计数与连续参考均一致。 |
 | 8 | 专家局部权重梯度先舍入到BF16，FP32归约不能恢复 | [PR #200](https://github.com/hf1s/hyper-parallel/pull/200)。提供默认关闭的FP32累加选项，显式参数归属及FSDP消费。CPU与真实2卡累积/共享权重/重算ST通过；尚不代表跨拓扑200步达标。 |
 | 9 | Muon NS输入、计算及更新传输的精度无法配置和恢复 | [PR #201](https://github.com/hf1s/hyper-parallel/pull/201)。保留BF16默认，新增可持久化的FP32选项和旧checkpoint兼容。CPU及真实8卡/2卡ST通过；原成本归因已撤回，保留BF16默认；两项精度选项合用在相同观测设置下步时增加24.25%，不能单独归因于NS。 |
+| 10 | 普通 Shard 非整除重建错误，可能导致 rank 间通信不一致 | [Issue #211](https://github.com/hf1s/hyper-parallel/issues/211)。独立双进程 Gloo 已重现；补丁在 redistribution 与直接 reduce_partial 入口一致拒绝不支持的普通分片。DTensor UT 457 passed、41 subtests，双/四进程 ST 2 passed；Ascend 补丁回归待空闲设备，独立 PR 正在提交。 |
 
-八个 PR 均为独立单提交，并经过 Standards / Spec 两轴检视及相应测试。当前仍为 draft，GitHub 没有已验证的完整 CI 成功结果；详细状态见 `reports/pr-verification.json`。目前修复中，#194 的正确性优先级最高，#198 的实测显存收益最明确。
+八个 PR 均为独立单提交，并经过 Standards / Spec 两轴检视及相应测试。当前仍为 draft，GitHub 没有已验证的完整 CI 成功结果；详细状态见 `evidence/pr-*-receipt.json`。目前修复中，#194 的正确性优先级最高，#198 的实测显存收益最明确。
 
 ![源参数生命周期修复的显存收益](figures/source-parameter-lifetime.png)
 
@@ -83,7 +92,7 @@ MLP+norm组合另有200步验证，全部8rank的loss/梯度差为0，节省1.16
 
 ## 环境与数据保留
 
-125的隔离目录为 `<isolated experiment directory>`，8×Ascend910B3 64GiB。CANN为9.2.0-beta.2 / V100R001C12B086，torch/torch_npu 2.12.0，Python3.12.14。最新核对JT_dev为`ad1c553`，#180 head为`5de3cce`。本任务模型为示例的两层trunk、一层MTP、8个路由专家，不能外推为完整DeepSeek模型的性能结论。
+125的隔离目录为 `/home/xxl/jt-dev-8npu-20261014`，8×Ascend910B3 64GiB。CANN为9.2.0-beta.2 / V100R001C12B086，torch/torch_npu 2.12.0，Python3.12.14。最新核对JT_dev为`ad1c553`，#180 head为`5de3cce`。本任务模型为示例的两层trunk、一层MTP、8个路由专家，不能外推为完整DeepSeek模型的性能结论。
 
 所有比较保留配置、源码提交/patch、editable导入路径、全rank标量、初始化及输入哈希、清单和可编辑SVG。完成续训对照后，按清单清理四份大型checkpoint，累计约104GiB；仅处理本任务文件。现已停止全部四条本任务队列及容器，未影响其他任务；保留生产FP32配方的step200 checkpoint约26GiB供后续明确恢复时使用。
 

@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "scope": "CPU imports, full configuration resolution, real Arrow data access",
+  "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+  "import_path": "/workspace/hyper-parallel/hyper_parallel/__init__.py",
+  "datasets_import": "/workspace/venv/lib/python3.12/site-packages/datasets/__init__.py",
+  "versions": {
+    "torch": "2.12.0+cpu",
+    "torch-npu": "2.12.0",
+    "datasets": "4.8.5",
+    "pyarrow": "21.0.0",
+    "transformers": "5.13.1",
+    "fsspec": "2026.2.0",
+    "dill": "0.4.1",
+    "multiprocess": "0.70.19"
+  },
+  "configurations": [
+    {
+      "case": "r129-jtclean-fp32-fsdp8-build-0-200",
+      "train_iters": 200
+    },
+    {
+      "case": "r129-jtclean-fp32-fsdp8-build-200-400",
+      "train_iters": 400
+    },
+    {
+      "case": "r129-jtclean-fp32-fsdp8-build-continuous400",
+      "train_iters": 400
+    },
+    {
+      "case": "r129-jtclean-fp32-ep2-build-200",
+      "train_iters": 200
+    },
+    {
+      "case": "r129-jtclean-fp32-cp2-build-200",
+      "train_iters": 200
+    },
+    {
+      "case": "r129-jtclean-fp32-tp2ep2-build-200",
+      "train_iters": 200
+    }
+  ],
+  "dataset_rows": 4710,
+  "dataset_columns": [
+    "input_ids",
+    "labels",
+    "cu_seqlens",
+    "cu_seqlens_padded",
+    "real_len"
+  ],
+  "sample_shapes": [
+    {
+      "index": 0,
+      "column_lengths": {
+        "input_ids": 4096,
+        "labels": 4096,
+        "cu_seqlens": 2,
+        "cu_seqlens_padded": null,
+        "real_len": null
+      }
+    },
+    {
+      "index": 4709,
+      "column_lengths": {
+        "input_ids": 4096,
+        "labels": 4096,
+        "cu_seqlens": 2,
+        "cu_seqlens_padded": null,
+        "real_len": null
+      }
+    }
+  ]
+}

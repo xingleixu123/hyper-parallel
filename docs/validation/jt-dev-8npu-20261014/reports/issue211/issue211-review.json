@@ -1,0 +1,24 @@
+{
+  "base": "521d3a8a9aa62353327093ab1258ca2c22006e8b",
+  "standards": "PASS after final incremental review",
+  "spec": "PASS after closing direct reduce_partial bypass",
+  "resolved_finding": "Direct reduce_partial discarded uneven global shape before a later full_tensor call. Guard now checks source and target before any collective. Four-rank regression failed without this guard and passes with it.",
+  "verification": {
+    "dtensor_ut_passed": 457,
+    "subtests_passed": 41,
+    "inherited_skipped": 96,
+    "skip_reason": "Existing module-level skip in test_device_mesh_pytest.py",
+    "cpu_distributed_launchers_passed": 2,
+    "cpu_worker_world_sizes": [
+      2,
+      4
+    ],
+    "npu_fix_regression": "pending; no NPU devices used for these CPU tests"
+  },
+  "source_hashes": {
+    "hyper_parallel/core/dtensor/tensor_redistribution.py": "0f4e917d03b9417a2709e2462e590fdb4009ac1ae517b49c0f7b654f2c45a38f",
+    "tests/torch/shard/redistribute.py": "d7d0d1022b0dfe58e719ea183def5b23aad8c71998f829352ab8870ab99860f8",
+    "tests/torch/shard/test_redistribute.py": "4792ecf34c8f2acdfecc1e7434c95b69e430f160fcfa3f9c21cf2495fbbb3194",
+    "tests/ut/core/dtensor/test_tensor_redistribution.py": "1929479620b945877b94cfaaae40f130b71ca8a86e0f4f87926f79988aab7900"
+  }
+}

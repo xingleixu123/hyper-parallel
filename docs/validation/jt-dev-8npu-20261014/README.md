@@ -1,12 +1,22 @@
 # JT DeepSeek V3: eight-910B validation evidence
 
-Experiments are paused at the user’s request; all owned queues and the container are stopped, with no automatic restart. This immutable snapshot documents completed runs and known failures. It does not claim the complete parallel matrix is accepted.
+Experiments resumed with explicit authorization on 2026-10-15, using idle devices on hosts 125 or 129, a global minimum 20-minute interval after each release, and bounded per-run containers. Other jobs are never stopped. This snapshot records completed measurements and known failures; the complete parallel matrix remains unaccepted.
 
 - Base: hf1s/hyper-parallel JT_dev at ad1c55379767d63ece7e084b0623340b37b83d93.
 - Included PR #180 head: 5de3cceab094bbed18915d1a9c9231ca220629ca (integration 81f141d).
 - Four-fix integration: 6e762bec039ced4e2fc5cdcfbf6326a179810e03 (whole-step token normalization, CP chunked projection loss, complete recompute coverage, replay-safe routing counts). Each fix is tracked separately; these multi-fix integration measurements are not isolated per-PR tests.
 - CANN 9.2.0-beta.2 V100R001C12B086, PyTorch 2.12.0, torch_npu 2.12.0, Python 3.12.14, transformers 5.13.1; eight Ascend910B3 64GiB.
 - Sequence length4096, global batch8, micro batch1, seed42, constant LR0.0001, unchanged Muon/AdamW recipe and initialization. Every compared step verifies canonical input hashes; complete native initial-state hashes match before partitioning.
+
+## 129 jt_image baseline and issue #211 follow-up (2026-10-15)
+
+The final offline image `jt-clean:hp-910b-20261009` (ID `5f9e677f…`) was found in the existing `/home/jt_image/four-images-clean-20261009/HP-910B/hp-910b-arrow.tar.gz` package and verified before loading. It provides CANN 9.2.0-beta.2, Torch/TorchNPU 2.12.0 and working Arrow datasets. The experiment imports the mounted editable current source, not the image's older checkout: latest JT_dev `521d3a8` includes #180; integrated source `a345081` plus the recorded #200/#201 patch is pinned.
+
+The new FSDP steps 1–200 completed on all eight ranks in 383.54 seconds, then released all devices and removed the owned container. Median measured step time after 20 warmup steps is 1.170481 s; peak allocated/reserved memory is 22.282196/27.503906 GiB. Checkpoint200 is retained for restore. These are **run-integrity and file-header checks only**, not resumed-loss acceptance. The next run is checkpoint200 to 400, followed by an independent continuous400 reference. At the next resource check, 129 had eight foreign workers and 125 had one occupied device; no training was launched. Host-specific references are required because driver/firmware revisions differ.
+
+See [baseline integrity](reports/jtclean-fsdp8-baseline-integrity.json), [all-rank scalar data](scalars/jtclean-fsdp8-baseline-200.csv), [checkpoint inventory](reports/jtclean-checkpoint200-inventory.json), [CPU dependency/data preflight](reports/jtclean-cpu-preflight.json) and [source provenance](reports/resume-129-source-provenance.json).
+
+[Issue #211](https://github.com/hf1s/hyper-parallel/issues/211) now has an optimizer-independent two-rank CPU/Gloo reproduction: ordinary Shard rows1/3 fail reconstruction, while rows2 is an exact control. The proposed guard rejects unsupported source/target geometry before redistribution or explicit partial-reduction collectives. Final CPU checks: 457 DTensor unit tests and 41 subtests passed; 96 pre-existing DeviceMesh tests remain skipped. Two distributed launchers passed (two-rank FP32/BF16 reconstruction and four-rank explicit Partial reduction). The four-rank case also fails without the direct reduction guard, proving the review-discovered bypass is covered. No Ascend regression or performance improvement is claimed for this fix yet. [Review and exact source hashes](reports/issue211/issue211-review.json), [UT output](reports/issue211/issue211-cpu-v3-ut.log), [distributed output](reports/issue211/issue211-cpu-v3-st.log), [standalone reproduction](reports/issue211/probe_uneven_full_tensor_cpu.py).
 
 ## Evidence semantics
 
@@ -27,7 +37,7 @@ Step time is the median after excluding the first20 steps of that measured run. 
 | EP2 original |0.014165878|0.003723621|0.000012476|1.019160|30.605194|FAIL|
 | CP2 after chunk support |0.022237778|0.005699873|0.000021477|1.283979|31.183506|FAIL|
 
-Remaining TP/CP/EP drift is unresolved; investigation is paused. The six-fix follow-up is documented below; EP/CP same-topology memory regressions have passed and are documented below. Module cost ablations and the MLP+norm 200-step check are documented below; additional hybrids remain pending.
+Remaining TP/CP/EP drift is unresolved; investigation continues under the resource-sharing policy. The six-fix follow-up is documented below; EP/CP same-topology memory regressions have passed and are documented below. Module cost ablations and the MLP+norm 200-step check are documented below; additional hybrids remain pending.
 
 Figures are available as PNG and editable SVG; JSON contains all-rank step errors and provenance names. CSV contains scalar measurements and input hashes only, with no training text, weights, checkpoints, or credentials.
 
