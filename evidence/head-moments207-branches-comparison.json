@@ -1,0 +1,302 @@
+{
+  "complete": true,
+  "fidelity": {
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "moment207_hash_exact": true,
+      "two_unique_branch_matches": true
+    },
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "moment207_hash_exact": true,
+      "models206207_exact": true,
+      "postclip_gradient_hash_exact": true,
+      "observer_source": true,
+      "original_source": true,
+      "49_sources": true,
+      "two_complete_backward_branches": true
+    }
+  },
+  "mf_run": "mf-head207-nativebranches",
+  "hp_run": "hp-jtf637-headroutermoments-branches207-r2",
+  "comparisons": [
+    {
+      "native_kernel": 3,
+      "hp_forward_call": 2,
+      "comparison": {
+        "x": {
+          "size": 20971520,
+          "different": 0,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "dy": {
+          "size": 622854144,
+          "different": 0,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "dw": {
+          "size": 778567680,
+          "different": 26368,
+          "max_abs": 7.62939453125e-06,
+          "relative_l2": 1.6786299852246655e-05,
+          "coordinate_file": "/state/jt-recipe-20261014/head-branches207-differences-r2/op3-coordinates.npy",
+          "coordinate_sha256": "9c3211306dc3199bbdebe10df96ac4f584781d1aa5245f475a4d2ec896b429fd"
+        }
+      }
+    },
+    {
+      "native_kernel": 2,
+      "hp_forward_call": 1,
+      "comparison": {
+        "x": {
+          "size": 20971520,
+          "different": 0,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "dy": {
+          "size": 622854144,
+          "different": 0,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "dw": {
+          "size": 778567680,
+          "different": 24071,
+          "max_abs": 3.0517578125e-05,
+          "relative_l2": 1.3803465970349376e-05,
+          "coordinate_file": "/state/jt-recipe-20261014/head-branches207-differences-r2/op2-coordinates.npy",
+          "coordinate_sha256": "04870a17a2c7b9444199778da1e6af96a853e58d3b532c6a5b0811286d00fc22"
+        }
+      }
+    }
+  ],
+  "postclip_reconstruction": {
+    "mf": {
+      "grad_norm": 14.30665111541748,
+      "coefficient": 0.06989755481481552,
+      "reconstructed_sha256": "96bd57941a4444154e789a2683c64f202b1afc3030614d9ecef9e5645fc0a109",
+      "actual_sha256": "96bd57941a4444154e789a2683c64f202b1afc3030614d9ecef9e5645fc0a109",
+      "all_postclip_elements_exact": true
+    },
+    "hp": {
+      "grad_norm": 14.30665111541748,
+      "coefficient": 0.06989755481481552,
+      "reconstructed_sha256": "549ef29e30b3e2431a546663da5aeb64947c533fcf3a644638192c60da3c46a6",
+      "actual_sha256": "549ef29e30b3e2431a546663da5aeb64947c533fcf3a644638192c60da3c46a6",
+      "all_postclip_elements_exact": true
+    }
+  },
+  "native": {
+    "3": {
+      "dy": {
+        "path": "/state/jt-recipe-20261014/mf-head207-nativebranches-kernels/rank_0/HeadBranches207/1/6/1421125496.npy",
+        "original_name": "MatMul.Gradients_Default_network-MFTrainOneStepCell_network-_VirtualDatasetCell__backbone-DataOrderWrapperCell_network-ObservedInputModel_model-GPTModel_mtp-MultiTokenPredictionBlock_output_layer-ColumnParallelLinear_Grad_MatMul_MatMul-op3.0.0.1792073097490928.input.0.DefaultFormat.bfloat16.npy",
+        "bf16_sha256": "50f47c4adb3f9f16d5364f076e65e58b9a35662461fab5e8a7ce9a0378198042",
+        "shape": [
+          4096,
+          152064
+        ],
+        "storage_dtype": "float32"
+      },
+      "x": {
+        "path": "/state/jt-recipe-20261014/mf-head207-nativebranches-kernels/rank_0/HeadBranches207/1/6/1222844361.npy",
+        "original_name": "MatMul.Gradients_Default_network-MFTrainOneStepCell_network-_VirtualDatasetCell__backbone-DataOrderWrapperCell_network-ObservedInputModel_model-GPTModel_mtp-MultiTokenPredictionBlock_output_layer-ColumnParallelLinear_Grad_MatMul_MatMul-op3.0.0.1792073106061850.input.1.DefaultFormat.bfloat16.npy",
+        "bf16_sha256": "52912dc3cf58f0c8e1ae159d32e30f6f8f28f0942ef9ee6b060160bc62d13029",
+        "shape": [
+          4096,
+          5120
+        ],
+        "storage_dtype": "float32"
+      },
+      "dw": {
+        "path": "/state/jt-recipe-20261014/mf-head207-nativebranches-kernels/rank_0/HeadBranches207/1/6/252264425.npy",
+        "original_name": "MatMul.Gradients_Default_network-MFTrainOneStepCell_network-_VirtualDatasetCell__backbone-DataOrderWrapperCell_network-ObservedInputModel_model-GPTModel_mtp-MultiTokenPredictionBlock_output_layer-ColumnParallelLinear_Grad_MatMul_MatMul-op3.0.0.1792073106346060.output.0.DefaultFormat.bfloat16.npy",
+        "bf16_sha256": "e6d4837a5f5bd0d570949d6fb5d39ae135469a6da811b9cfadc138d96d0d029a",
+        "shape": [
+          152064,
+          5120
+        ],
+        "storage_dtype": "float32"
+      }
+    },
+    "2": {
+      "dy": {
+        "path": "/state/jt-recipe-20261014/mf-head207-nativebranches-kernels/rank_0/HeadBranches207/1/6/1680306536.npy",
+        "original_name": "MatMul.Gradients_Default_network-MFTrainOneStepCell_network-_VirtualDatasetCell__backbone-DataOrderWrapperCell_network-ObservedInputModel_model-GPTModel_mtp-MultiTokenPredictionBlock_output_layer-ColumnParallelLinear_Grad_MatMul_MatMul-op2.0.0.1792073118926452.input.0.DefaultFormat.bfloat16.npy",
+        "bf16_sha256": "25faecb2ed4f5d5495dfc40ab5a4093eaf00a579c5dc37e3967bcc3c3afa5eb3",
+        "shape": [
+          4096,
+          152064
+        ],
+        "storage_dtype": "float32"
+      },
+      "x": {
+        "path": "/state/jt-recipe-20261014/mf-head207-nativebranches-kernels/rank_0/HeadBranches207/1/6/1244596951.npy",
+        "original_name": "MatMul.Gradients_Default_network-MFTrainOneStepCell_network-_VirtualDatasetCell__backbone-DataOrderWrapperCell_network-ObservedInputModel_model-GPTModel_mtp-MultiTokenPredictionBlock_output_layer-ColumnParallelLinear_Grad_MatMul_MatMul-op2.0.0.1792073128633858.input.1.DefaultFormat.bfloat16.npy",
+        "bf16_sha256": "7e3de7e3e6430d9371c3e6794dbc71fbefa33a09934b81e3fc471b3545591831",
+        "shape": [
+          4096,
+          5120
+        ],
+        "storage_dtype": "float32"
+      },
+      "dw": {
+        "path": "/state/jt-recipe-20261014/mf-head207-nativebranches-kernels/rank_0/HeadBranches207/1/6/964996192.npy",
+        "original_name": "MatMul.Gradients_Default_network-MFTrainOneStepCell_network-_VirtualDatasetCell__backbone-DataOrderWrapperCell_network-ObservedInputModel_model-GPTModel_mtp-MultiTokenPredictionBlock_output_layer-ColumnParallelLinear_Grad_MatMul_MatMul-op2.0.0.1792073128918973.output.0.DefaultFormat.bfloat16.npy",
+        "bf16_sha256": "c2170b6355d98047b874b77cd4c871249673a4c061eb2fc94ef2d39ea0dbca17",
+        "shape": [
+          152064,
+          5120
+        ],
+        "storage_dtype": "float32"
+      }
+    }
+  },
+  "hp": {
+    "1": {
+      "x": {
+        "step": 207,
+        "call": 1,
+        "kind": "x",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call1-x.npy",
+        "shape": [
+          4096,
+          5120
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 41943168,
+        "sha256": "7e3de7e3e6430d9371c3e6794dbc71fbefa33a09934b81e3fc471b3545591831",
+        "bf16_sha256": "7e3de7e3e6430d9371c3e6794dbc71fbefa33a09934b81e3fc471b3545591831"
+      },
+      "dy": {
+        "step": 207,
+        "call": 1,
+        "kind": "dy",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call1-dy.npy",
+        "shape": [
+          4096,
+          152064
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 1245708416,
+        "sha256": "448ccac635674ff06a2588945efd84094772906fc6d4bb6e41ff96540a9f22a0",
+        "bf16_sha256": "448ccac635674ff06a2588945efd84094772906fc6d4bb6e41ff96540a9f22a0"
+      },
+      "dw": {
+        "step": 207,
+        "call": 1,
+        "kind": "dw",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call1-dw.npy",
+        "shape": [
+          152064,
+          5120
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 1557135488,
+        "sha256": "87b51d442d2fc275716af602e7bce52e6657a07768d60aaa0c9982279bb78f07",
+        "bf16_sha256": "87b51d442d2fc275716af602e7bce52e6657a07768d60aaa0c9982279bb78f07"
+      }
+    },
+    "2": {
+      "x": {
+        "step": 207,
+        "call": 2,
+        "kind": "x",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call2-x.npy",
+        "shape": [
+          4096,
+          5120
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 41943168,
+        "sha256": "52912dc3cf58f0c8e1ae159d32e30f6f8f28f0942ef9ee6b060160bc62d13029",
+        "bf16_sha256": "52912dc3cf58f0c8e1ae159d32e30f6f8f28f0942ef9ee6b060160bc62d13029"
+      },
+      "dy": {
+        "step": 207,
+        "call": 2,
+        "kind": "dy",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call2-dy.npy",
+        "shape": [
+          4096,
+          152064
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 1245708416,
+        "sha256": "cbd8426ec6e47675b635679fcaf7ea013c47d22b4e486df696e9856d3ff5a588",
+        "bf16_sha256": "cbd8426ec6e47675b635679fcaf7ea013c47d22b4e486df696e9856d3ff5a588"
+      },
+      "dw": {
+        "step": 207,
+        "call": 2,
+        "kind": "dw",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call2-dw.npy",
+        "shape": [
+          152064,
+          5120
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 1557135488,
+        "sha256": "c860d499a9310f9ad474b4125756c9654fa4940101dc2c9a6535ca8cd1ab2367",
+        "bf16_sha256": "c860d499a9310f9ad474b4125756c9654fa4940101dc2c9a6535ca8cd1ab2367"
+      }
+    },
+    "3": {
+      "x": {
+        "step": 207,
+        "call": 3,
+        "kind": "x",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call3-x.npy",
+        "shape": [
+          4096,
+          5120
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 41943168,
+        "sha256": "52912dc3cf58f0c8e1ae159d32e30f6f8f28f0942ef9ee6b060160bc62d13029"
+      }
+    },
+    "4": {
+      "x": {
+        "step": 207,
+        "call": 4,
+        "kind": "x",
+        "path": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-branches207-r2/branches207/call4-x.npy",
+        "shape": [
+          4096,
+          5120
+        ],
+        "logical_dtype": "bfloat16",
+        "storage_dtype": "uint16",
+        "bytes": 41943168,
+        "sha256": "7e3de7e3e6430d9371c3e6794dbc71fbefa33a09934b81e3fc471b3545591831"
+      }
+    }
+  },
+  "hp_recomputation": {
+    "forward_calls": 4,
+    "saved_counts": {
+      "x": 4,
+      "dy": 2,
+      "dw": 2
+    }
+  },
+  "source_sha256": "4e88015a8aab1243ee690c3f08dbdb8fc77ec8b7af2f73c655d846640baa112c",
+  "scope": "Full actual BF16 operands and outputs, branches mapped by complete x identity. Numerical differences do not alone prove mathematical incorrectness."
+}

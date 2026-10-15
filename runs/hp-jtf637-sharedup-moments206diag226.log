@@ -1,0 +1,761 @@
+<frozen runpy>:128: RuntimeWarning: 'torch.distributed.run' found in sys.modules after import of package 'torch.distributed', but prior to execution of 'torch.distributed.run'; this may result in unpredictable behaviour
+[W1015 13:25:51.203690320 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[P12-BROADCAST-FP32] {"scope": "single-card diagnostic only", "teacher_values_used": false, "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa", "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca", "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"}
+[P12-NS-EAGER] active target=muon_jit_probe.graph_jit_ns scope=all
+[P12-THREE-NATIVE-ADJACENT-NPU-SQRT] actual live values; no recorded norm used
+[P12-Q-NATIVE-TILE] live tiled normalization; no recorded values used
+[P12-DENSE-NATIVE-TILE] actual live values; no recorded norm used
+[P12-EXPERT-BMM-EAGER] 3D explicit bmm Gram with RHS view; square/product unchanged
+[P12-DENSE-ADJACENT-TILE] actual live values; no recorded norm used
+2026-10-15 13:26:02,969 [INFO] torch_npu.env: get env LOCAL_RANK = 0
+2026-10-15 13:26:03,888 [INFO] torch_npu.env: get env RANK = 0
+2026-10-15 13:26:03,888 [INFO] torch_npu.env: get env WORLD_SIZE = 1
+2026-10-15 13:26:03,888 [INFO] torch_npu.env: get env MASTER_ADDR = 127.0.0.1
+2026-10-15 13:26:03,888 [INFO] torch_npu.env: get env MASTER_PORT = 31536
+2026-10-15 13:26:03,888 [INFO] torch_npu.env: get env TORCHELASTIC_USE_AGENT_STORE = True
+[W1015 13:26:03.307596110 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+2026-10-15 13:26:03,893 [INFO] hyper_parallel.trainer.base: Trainer config:
+{
+  "model": {
+    "_target_": "vocabulary_both_builder.build_jt_model",
+    "config": {
+      "architectures": [
+        "JTDeepseekV3ForCausalLM"
+      ],
+      "vocab_size": 152064,
+      "hidden_size": 5120,
+      "intermediate_size": 12288,
+      "moe_intermediate_size": 1536,
+      "num_hidden_layers": 2,
+      "num_attention_heads": 128,
+      "num_key_value_heads": 128,
+      "n_shared_experts": 2,
+      "n_routed_experts": 8,
+      "routed_scaling_factor": 2.827,
+      "kv_lora_rank": 512,
+      "q_lora_rank": 1536,
+      "qk_rope_head_dim": 64,
+      "v_head_dim": 128,
+      "qk_nope_head_dim": 128,
+      "n_group": 1,
+      "topk_group": 1,
+      "num_experts_per_tok": 2,
+      "norm_topk_prob": true,
+      "hidden_act": "silu",
+      "max_position_embeddings": 262400,
+      "initializer_range": 0.02,
+      "rms_norm_eps": 1e-06,
+      "first_k_dense_replace": 1,
+      "mlp_layer_types": [
+        "dense",
+        "sparse"
+      ],
+      "layer_types": [
+        "full_attention",
+        "full_attention"
+      ],
+      "attention_dropout": 0.0,
+      "rope_parameters": {
+        "rope_type": "default",
+        "rope_theta": 5000000
+      },
+      "rope_interleave": true,
+      "tie_word_embeddings": false,
+      "use_cache": false,
+      "attention_bias": false,
+      "mlp_bias": false,
+      "num_nextn_predict_layers": 1,
+      "mtp_loss_factor": 0.3,
+      "use_pad_tokens": true,
+      "moe_aux_loss_coeff": 0.0001,
+      "moe_router_enable_expert_bias": true,
+      "moe_router_bias_update_rate": 0.001,
+      "enable_chunk_loss": true,
+      "chunk_loss_size": 4096
+    },
+    "reference_weights": "/state/jt-recipe-20261014/hp-offline-step200",
+    "factor": "norm-swiglu-both-router",
+    "moe_backward_factor": "archive-measured-join-backward"
+  },
+  "optimizer": {
+    "_target_": "muon_all_casts_probe.build_optimizer",
+    "muon_config": {
+      "lr": 0.0001,
+      "weight_decay": 0.1,
+      "momentum": 0.95,
+      "nesterov": true,
+      "ns_steps": 5,
+      "ns_variant": "legacy",
+      "ns_epsilon": 1e-07,
+      "matched_adamw_rms": 0.2,
+      "apply_lr_in_update": true
+    },
+    "adamw_config": {
+      "adamw_lr": 0.0001,
+      "adamw_weight_decay": 0.1,
+      "adamw_betas": [
+        0.9,
+        0.95
+      ],
+      "adamw_eps": 1e-08
+    },
+    "qk_clip_threshold": 100.0,
+    "fp32_main_params": true
+  },
+  "lr_scheduler": {
+    "_target_": "hyper_parallel.components.optim.lr_scheduler.MultiLRScheduler",
+    "lr_decay_style": "constant",
+    "lr_config": {
+      "lr": 0.0001,
+      "min_lr": 0.0001,
+      "lr_warmup_steps": 0,
+      "lr_decay_ratio": 1.0
+    }
+  },
+  "loss_fn": {
+    "_target_": "hyper_parallel.components.losses.ModelOutputLoss"
+  },
+  "model_init_dtype": "float32",
+  "training": {
+    "train_iters": 226,
+    "train_samples": null,
+    "lr_scheduler_iters": 1000,
+    "eval_iters": 0,
+    "global_batch_size": 1,
+    "micro_batch_size": 1,
+    "backend": "hccl",
+    "max_grad_norm": 1.0,
+    "init_device": "meta",
+    "loss_aggregation": "token_weighted",
+    "seed": 42,
+    "enable_full_determinism": true,
+    "close_matmul_k_shift": false,
+    "gc_steps": 0,
+    "empty_cache_steps": 0,
+    "empty_cache_before_backward": false,
+    "eval_steps": 0,
+    "eval_epochs": 0,
+    "logging_steps": 1,
+    "low_precision": {
+      "enabled": false,
+      "format": "mxfp8_e4m3",
+      "scaling": "mx_block"
+    }
+  },
+  "accelerator": {
+    "tp_size": 1,
+    "cp_size": 1,
+    "ep_size": 1,
+    "pp_size": 1,
+    "sequence_parallel": false,
+    "loss_parallel": false
+  },
+  "fsdp_config": {
+    "dp_shard_size": 1,
+    "edp_shard_size": 1,
+    "replicate_params": [],
+    "mix_precision": {
+      "param_dtype": "bfloat16",
+      "reduce_dtype": "float32",
+      "output_dtype": null,
+      "cast_forward_inputs": false
+    },
+    "enable_offload": false,
+    "reshard_after_forward": true,
+    "reshard_after_backward": true,
+    "requires_grad_sync": true,
+    "backward_prefetch_depth": 1,
+    "forward_prefetch_depth": 1,
+    "comm_fusion": false,
+    "comm_fusion_zero_copy": null
+  },
+  "plan_overrides": [
+    {
+      "match": [
+        "model.layers.*.self_attn",
+        "mtp.layers.*.transformer_layer.self_attn"
+      ],
+      "when": null,
+      "module_type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Attention",
+      "exact_type": true,
+      "replace_module": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MLAAttention",
+        "module_fqn": "",
+        "context": null
+      },
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": {
+        "linear_qkv.weight": {
+          "tp": "replicate"
+        },
+        "q_b_proj.weight": {
+          "tp": "shard(0)"
+        },
+        "kv_b_proj.weight": {
+          "tp": "shard(0)"
+        },
+        "o_proj.weight": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn.*_layernorm",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "replicate"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn.key_rope_gather",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "replicate"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.mlp.shared_experts",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": {
+        "gate_proj.weight": {
+          "tp": "replicate"
+        },
+        "up_proj.weight": {
+          "tp": "replicate"
+        },
+        "down_proj.weight": {
+          "tp": "replicate"
+        }
+      },
+      "in_src": {
+        "x": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "x": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "mtp.layers.*.eh_proj",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": {
+        "weight": {
+          "tp": "replicate"
+        }
+      },
+      "in_src": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "model.layers.[123456789]*.mlp",
+      "when": "ep",
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn"
+      },
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "mtp.layers.*.transformer_layer.mlp",
+      "when": "ep",
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn"
+      },
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    }
+  ],
+  "mixed_precision": {
+    "enabled": false
+  },
+  "activation_checkpoint": {
+    "mode": "off",
+    "swap_inputs": false,
+    "selection": {
+      "source": "default",
+      "layer_count": null,
+      "layer_indices": null
+    }
+  },
+  "activation_swap": "none",
+  "compile": {
+    "enabled": false,
+    "mode": "default",
+    "fullgraph": false,
+    "dynamic": false,
+    "backend": null,
+    "options": null,
+    "dynamo_cache_size_limit": 256
+  },
+  "dataset": {
+    "_target_": "hyper_parallel.data.online.mapping.MappingTransformDataset",
+    "source_dataset": {
+      "_target_": "datasets.load_from_disk",
+      "dataset_path": "/aligned-data/sft_data_4k_from_256k",
+      "keep_in_memory": null,
+      "storage_options": null
+    },
+    "model_assets": {
+      "chat_template": null,
+      "tokenizer": null
+    },
+    "data_transform": {
+      "_target_": "hyper_parallel.data.text.text_transform.PreTokenizedSFTTransform",
+      "input_ids_key": "input_ids",
+      "labels_key": "labels",
+      "boundaries_key": "cu_seqlens",
+      "loss_mask_key": "loss_mask"
+    }
+  },
+  "dataloader": {
+    "_target_": "hyper_parallel.data.batching.FixedBatchDataLoader",
+    "drop_last": true,
+    "num_workers": 0,
+    "batch_sampler": null,
+    "collate_fn": {
+      "_target_": "hyper_parallel.data.batching.build_online_text_collate_fn",
+      "mesh_context": null
+    },
+    "batch_size": null,
+    "sampler_type": "single",
+    "seed": 1234,
+    "pin_memory": false,
+    "prefetch_factor": null,
+    "get_batch": {
+      "_target_": "hyper_parallel.data.batching.TextParallelBatch",
+      "source_type": "online",
+      "attention_mode": "compressed",
+      "reset_position_ids": true,
+      "runtime_input_adapter": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.data.runtime.JTSequenceRuntime"
+      },
+      "causal": true,
+      "sliding_window": null,
+      "reset_attention_mask": false,
+      "eod_mask_loss": false
+    },
+    "data_rearrange_map": null,
+    "data_sharding": false,
+    "use_background_prefetcher": false
+  },
+  "packed_sequence": null,
+  "checkpoint": {
+    "save_ckpt": false,
+    "checkpoint_dir": "/state/jt-recipe-20261014/hp-norm-fp32-checkpoints",
+    "save_steps": 0,
+    "save_epochs": 1,
+    "is_async": false,
+    "is_peft": false,
+    "save_optimizer": true,
+    "save_train_state": true,
+    "save_extra_state_per_rank": true,
+    "restore_from": "/state/jt-recipe-20261014/hp-native-step200/global_step_200",
+    "restore_optimizer": true,
+    "restore_train_state": true,
+    "restore_dataloader_state": true,
+    "model_save_format": "safetensors",
+    "save_consolidated": "final",
+    "staging_dir": null,
+    "best_metric_key": "default"
+  },
+  "debug": {
+    "check_dataset": null,
+    "check_nan_inf": false,
+    "check_fsdp_runtime": false
+  },
+  "model_integration": {
+    "mode": "off"
+  },
+  "memory": {
+    "enable": false,
+    "start_step": 1,
+    "end_step": 2,
+    "save_path": "./memory_snapshot",
+    "dump_ranks": [
+      0
+    ],
+    "stacks": "all",
+    "max_entries": null,
+    "mem_info": false
+  },
+  "wandb": {
+    "enabled": false,
+    "project": "",
+    "entity": null
+  },
+  "profiler": {
+    "enabled": false,
+    "start_step": 1,
+    "stop_step": 10,
+    "start_on_init": false,
+    "memory": true,
+    "rank_ids": null,
+    "pipeline_stage_leaders": false,
+    "output_path": null,
+    "level": 1,
+    "with_stack": false,
+    "data_simplification": false,
+    "mstx": false,
+    "trace_handler": {
+      "analyse_flag": true,
+      "async_mode": false
+    }
+  },
+  "magi": null,
+  "peft": null
+}
+2026-10-15 13:26:03,893 [INFO] hyper_parallel.trainer.base: Process rank: 0, world size: 1
+2026-10-15 13:26:03,905 [INFO] hyper_parallel.distributed.mesh: Built device mesh (1, 1, 1), dense FSDP mesh (1, 1, 1) and expert FSDP mesh None
+2026-10-15 13:26:03,906 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='model.layers.[123456789]*.mlp' skipped because condition 'ep' is inactive
+2026-10-15 13:26:03,906 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='mtp.layers.*.transformer_layer.mlp' skipped because condition 'ep' is inactive
+2026-10-15 13:26:03,915 [INFO] hyper_parallel.models._transformers.model_builder: FSDP2Manager instantiated with FSDP2Config
+[INFO|configuration_utils.py:1104] 2026-10-15 13:26:03,916 >> Generate config GenerationConfig {
+  "bos_token_id": 0,
+  "eos_token_id": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "use_cache": false
+}
+
+[P12-FACTOR] norm-fp32 changed_modules 16
+[P12-ACTIVATION-FACTOR] norm-swiglu ['model.layers.0.mlp', 'model.layers.1.mlp.shared_experts', 'mtp.layers.0.transformer_layer.mlp.shared_experts']
+[P12-FACTOR] router-fp32 changed_modules 2
+[P12-MOE-PRECISION] norm-swiglu-both-router ['model.layers.1.mlp', 'mtp.layers.0.transformer_layer.mlp']
+[P12-NORM-RESIDUAL-JOIN] ['model.layers.0', 'model.layers.1', 'mtp.layers.0.transformer_layer']
+[P12-VOCABULARY-BOTH] FP32 embedding and shared-head gradients
+[P12-COMBINED-NORM-JOIN] Added shared LM/MTP join to residual-join control
+[P12-FORWARD-FACTOR] qkv-forward ['model.layers.0.self_attn.linear_qkv', 'model.layers.1.self_attn.linear_qkv', 'mtp.layers.0.transformer_layer.self_attn.linear_qkv']
+[P12-MOE-BACKWARD-FACTOR] archive-measured-join-backward ['model.layers.0.mlp', 'model.layers.1.mlp', 'model.layers.1.mlp.shared_experts', 'mtp.layers.0.transformer_layer.mlp', 'mtp.layers.0.transformer_layer.mlp.shared_experts']
+[P12-MAPPED-REFERENCE] model.npz 48 arrays SHA256 verified
+/alignment/phase12/tools-f637/moe_precision_builder.py:68: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:213.)
+  if torch.from_numpy(value).dtype != expected[name].dtype:
+[rank0]:[W1015 13:26:26.613523360 NPUCachingAllocator.cpp:201] Warning: The current CANN and Soc versions require processing for 32 padding size, with memory allocation. (function operator())
+2026-10-15 13:26:27,027 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Adapter-declared FSDP child units: ['mtp.layers.0.transformer_layer']
+/workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+  if self.device.type != 'cpu':
+2026-10-15 13:26:27,647 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Applied FSDP2 to 23 child units and the root module
+2026-10-15 13:26:27,647 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: FSDP2 wrap applied
+2026-10-15 13:26:27,674 [INFO] hyper_parallel.models._transformers.model_builder: Model moved to npu:0
+2026-10-15 13:26:27,709 [INFO] hyper_parallel.trainer.base: Model config:
+{
+  "transformers_version": "5.13.1",
+  "architectures": [
+    "JTDeepseekV3ForCausalLM"
+  ],
+  "output_hidden_states": false,
+  "return_dict": true,
+  "dtype": null,
+  "chunk_size_feed_forward": 0,
+  "is_encoder_decoder": false,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1"
+  },
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1
+  },
+  "problem_type": null,
+  "vocab_size": 152064,
+  "hidden_size": 5120,
+  "intermediate_size": 12288,
+  "moe_intermediate_size": 1536,
+  "num_hidden_layers": 2,
+  "num_attention_heads": 128,
+  "num_key_value_heads": 128,
+  "n_shared_experts": 2,
+  "n_routed_experts": 8,
+  "routed_scaling_factor": 2.827,
+  "kv_lora_rank": 512,
+  "q_lora_rank": 1536,
+  "qk_rope_head_dim": 64,
+  "v_head_dim": 128,
+  "qk_nope_head_dim": 128,
+  "n_group": 1,
+  "topk_group": 1,
+  "num_experts_per_tok": 2,
+  "norm_topk_prob": true,
+  "hidden_act": "silu",
+  "max_position_embeddings": 262400,
+  "initializer_range": 0.02,
+  "rms_norm_eps": 1e-06,
+  "use_cache": false,
+  "pad_token_id": null,
+  "bos_token_id": 0,
+  "eos_token_id": 1,
+  "tie_word_embeddings": false,
+  "rope_parameters": {
+    "rope_type": "default",
+    "rope_theta": 5000000
+  },
+  "mlp_layer_types": [
+    "dense",
+    "sparse"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "index_topk": 2048,
+  "index_head_dim": 128,
+  "index_n_heads": 64,
+  "mlp_bias": false,
+  "head_dim": 64,
+  "first_k_dense_replace": 1,
+  "layer_types": [
+    "full_attention",
+    "full_attention"
+  ],
+  "qk_head_dim": 192,
+  "_name_or_path": "",
+  "rope_interleave": true,
+  "num_nextn_predict_layers": 1,
+  "mtp_loss_factor": 0.3,
+  "use_pad_tokens": true,
+  "moe_aux_loss_coeff": 0.0001,
+  "moe_router_enable_expert_bias": true,
+  "moe_router_bias_update_rate": 0.001,
+  "enable_chunk_loss": true,
+  "chunk_loss_size": 4096,
+  "model_type": "jt_deepseek_v3",
+  "output_attentions": false
+}
+/workspace/venv/lib/python3.12/site-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[P12-MUON-LAYOUT-COMPOSITION] qkv q-up kv-up expert-gate-up
+2026-10-15 13:26:27,822 [INFO] hyper_parallel.components.optim.parameter_groups: Parameters without weight decay: ['model.layers.0.self_attn.q_a_layernorm.weight', 'model.layers.0.self_attn.kv_a_layernorm.weight', 'model.layers.0.input_layernorm.weight', 'model.layers.0.post_attention_layernorm.weight', 'model.layers.1.self_attn.q_a_layernorm.weight', 'model.layers.1.self_attn.kv_a_layernorm.weight', 'model.layers.1.input_layernorm.weight', 'model.layers.1.post_attention_layernorm.weight', 'model.norm.weight', 'mtp.layers.0.enorm.weight', 'mtp.layers.0.hnorm.weight', 'mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight', 'mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight', 'mtp.layers.0.transformer_layer.input_layernorm.weight', 'mtp.layers.0.transformer_layer.post_attention_layernorm.weight', 'mtp.layers.0.final_layernorm.weight']
+2026-10-15 13:26:27,822 [INFO] hyper_parallel.components.optim.builders: Muon optimizer split: 28 Muon parameters, 18 AdamW parameters
+2026-10-15 13:26:27,822 [INFO] hyper_parallel.components.optim.builders: Muon parameters (first 5): ['model.layers.0.self_attn.linear_qkv.weight', 'model.layers.0.self_attn.q_b_proj.weight', 'model.layers.0.self_attn.kv_b_proj.weight', 'model.layers.0.self_attn.o_proj.weight', 'model.layers.0.mlp.gate_proj.weight']
+2026-10-15 13:26:27,822 [INFO] hyper_parallel.components.optim.builders: AdamW parameters (first 5): ['model.embed_tokens.weight', 'model.layers.0.self_attn.q_a_layernorm.weight', 'model.layers.0.self_attn.kv_a_layernorm.weight', 'model.layers.0.input_layernorm.weight', 'model.layers.0.post_attention_layernorm.weight']
+2026-10-15 13:26:27,822 [INFO] hyper_parallel.core.optimizer.dtensor_compat: Detected DTensor backend: 'hyper'.
+2026-10-15 13:26:27,823 [INFO] hyper_parallel.core.optimizer: Effective adamw config: {'lr': 0.0001, 'betas': [0.9, 0.95], 'eps': 1e-08, 'weight_decay': 0.1, 'amsgrad': False, 'maximize': False}
+2026-10-15 13:26:27,827 [INFO] hyper_parallel.core.optimizer.optimizer: [HSDP Batch] group_key=0, num_hsdp_groups=2, num_batch_groups=2, total_sub_batches=3, group_numels=[783302656, 377487360], max_batch_numel=536870912
+2026-10-15 13:26:27,828 [INFO] hyper_parallel.core.optimizer: Effective muon config: {'lr': 0.0001, 'weight_decay': 0.1, 'matched_adamw_rms': 0.2, 'momentum': (0.95, 0.95), 'nesterov': True, 'ns_steps': 5, 'ns_variant': 'legacy', 'hsdp_replica_count': None, 'ns_epsilon': 1e-07, 'apply_lr_in_update': True, 'ns_transform_fn': <function build_optimizer.<locals>.transform at 0xffff13e177e0>, 'ns_coefficients': None, 'zero_rms_scale_mode': 'zero'}
+[P12-MUON-COMPOSITION] layouts plus graph arithmetic; modern per-piece scale
+[P12-LEGACY-COMPOSITION] last-piece scale; graph_arithmetic= True
+[P12-ALL-CASTS] split/transpose casts plus expert BF16 norm
+2026-10-15 13:26:27,833 [INFO] hyper_parallel.core.optimizer.optimizer: [HSDP Batch] group_key=0, num_hsdp_groups=2, num_batch_groups=2, total_sub_batches=3, group_numels=[783302656, 377487360], max_batch_numel=536870912
+2026-10-15 13:26:27,835 [INFO] torch_npu.env: get env CLOSE_MATMUL_K_SHIFT = 0
+[INFO|/alignment/phase12/hp-jt-f637-pr192/hyper_parallel/trainer/callbacks/checkpoint_callback.py:123] 10/15/2026 13:26:27 >> Checkpoint configuration: checkpoint_dir=/state/jt-recipe-20261014/hp-norm-fp32-checkpoints, save_ckpt=False, save_steps=0, save_epochs=0, is_async=False, is_peft=False, save_extra_state_per_rank=True, restore_from=/state/jt-recipe-20261014/hp-native-step200/global_step_200
+[INFO|/alignment/phase12/hp-jt-f637-pr192/hyper_parallel/trainer/callbacks/checkpoint_callback.py:326] 10/15/2026 13:26:27 >> Loading checkpoint from /state/jt-recipe-20261014/hp-native-step200/global_step_200
+2026-10-15 13:26:32,482 [INFO] hyper_parallel.components.checkpoint.dcp_checkpointer: Reading extra_state from /state/jt-recipe-20261014/hp-native-step200/global_step_200/extra_state/extra_state_rank_0.pt
+/workspace/venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[INFO|/alignment/phase12/hp-jt-f637-pr192/hyper_parallel/trainer/callbacks/checkpoint_callback.py:395] 10/15/2026 13:26:33 >> Checkpoint loaded successfully: path=/state/jt-recipe-20261014/hp-native-step200/global_step_200, global_step=200, start_epoch=0, start_step=200
+[P12-MAPPED-REFERENCE] optimizer.npz 138 arrays SHA256 verified
+[P12-RESTORE] {"step": 200, "model": 48, "optimizer": 64, "all_exact": true}
+[P12-LR-FOLDING] {"single_factor": "Existing apply_lr_in_update=True; preserve original scalar precision", "teacher_values_used": false, "groups": [{"group": 0, "restored_apply_lr_in_update": false, "effective_apply_lr_in_update": true, "lr": 0.0001}], "source_sha256": "8f25308314fe0c348948a0e32ceeac0ff5cc083341e1d8c7e4a3468aca540012"}
+[P12-MUON-SCALAR-FP32] {"single_factor": "Scalar sqrt(dimension), RMS product and LR product each evaluated in FP32", "teacher_values_used": false, "learning_rate_folding_unchanged": true, "source_sha256": "e28c479215d0c7527c5e4344e14107110b62b9aea08fea5744a19327b28828d4"}
+[P12-CE-SUM-TREE] independent measured FP32 addition tree
+[P12-SILU-GATE] independent arithmetic factor all ['model.layers.0.mlp', 'model.layers.1.mlp.shared_experts', 'mtp.layers.0.transformer_layer.mlp.shared_experts']
+[P12-DENSE-UP] FP32 SiLU then upstream product model.layers.0.mlp
+[P12-EXPERT-ORDER] {"modules": ["model.layers.1.mlp", "mtp.layers.0.transformer_layer.mlp"], "reference_values_used": false, "factor": "K-major FP32 sorting twice, mapped back to N-major ordinal", "classification": "Archive token order compatibility; not a mathematical correctness claim"}
+[P12-SHARED-UP-FP32] {"module": "model.layers.1.mlp.shared_experts", "formula": "BF16(dy.float()*silu(gate.float()))", "teacher_values_used": false, "changed_steps": "all resumed steps, no step or coordinate special case", "forward_and_gate_formula_unchanged": true, "mtp_unchanged": true, "source_sha256": "aa17475ca1a873b7e845f83152e7022a3e372ae4cf3ae248a3e8e9cf3bdb0011", "classification": "Independent single-factor archive-compatibility ablation; no universal correctness claim"}
+[INFO|/alignment/phase12/hp-jt-f637-pr192/hyper_parallel/trainer/text_trainer.py:312] 10/15/2026 13:27:16 >> Rank0 Start training. Global step: 200. Train iters: 226. Start epoch: 0. Train epochs: 1.
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/function.py:596: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:423.)
+  return super().apply(*args, **kwargs)  # type: ignore[misc]
+2026-10-15 13:27:25,882 [INFO] torch_npu.env: get env LD_LIBRARY_PATH = /usr/local/Ascend/cann-9.2.0-beta.2/lib64:/usr/local/Ascend/cann-9.2.0-beta.2/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.2.0-beta.2/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.2.0-beta.2/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/python3.12.14/lib:/usr/local/python3.12.14/lib
+2026-10-15 13:27:25,882 [INFO] torch_npu.env: get env PATH = /workspace/venv/bin:/usr/local/python3.12.14/bin:/usr/local/sbin:/usr/local/Ascend/cann-9.2.0-beta.2/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/profiler/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/ascend_system_advisor/asys:/usr/local/Ascend/cann-9.2.0-beta.2/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.2.0-beta.2/tools/msobjdump:/workspace/venv/bin:/usr/local/python3.12.14/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-10-15 13:27:26,587 [INFO] torch_npu.env: get env ASCEND_OPP_PATH = /usr/local/Ascend/cann-9.2.0-beta.2/opp
+2026-10-15 13:27:27,454 [INFO] torch_npu.env: get env HOME = /root
+2026-10-15 13:27:27,548 [INFO] torch_npu.env: get env TE_AUTO_RESTART_COUNTER = 0
+2026-10-15 13:27:31,117 [INFO] torch_npu.env: get env PYTHONPATH = /alignment/phase12/tools-f637:/workspace:/workspace:/usr/local/Ascend/cann-9.2.0-beta.2/python/site-packages:/usr/local/Ascend/cann-9.2.0-beta.2/opp/built-in/op_impl/ai_core/tbe:
+.Training:  89%|████████▉ | 201/226 [01:16<00:09,  2.62step/s, loss=8.81245, grad_norm=17.9907, lr=1.000e-04, foundation_loss/aux=0.000494624, foundation_loss/lm=6.80484, foundation_loss/mtp=2.00711, tokens/s=11.388, step_time=28.276s] | step=201 epoch=0 data/consumed_samples=1 data/consumed_tokens=322 data/step_samples=1 data/step_tokens=322 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=28.2764 performance/tokens_per_second=11.3876 training/foundation_loss/aux=0.000494624 training/foundation_loss/lm=6.80484 training/foundation_loss/mtp=2.00711 training/grad_norm=17.9907 training/lr=0.0001 training/total_loss=8.81245
+[P12-HP] {"step": 201, "loss": 8.812447547912598, "components": {"foundation_loss/lm": 6.804838180541992, "foundation_loss/mtp": 2.007114887237549, "foundation_loss/aux": 0.0004946244298480451}, "grad_norm": 17.990650177001953}
+Training:  89%|████████▉ | 202/226 [01:20<00:09,  2.51step/s, loss=7.76483, grad_norm=17.6372, lr=1.000e-04, foundation_loss/aux=0.000490978, foundation_loss/lm=5.97626, foundation_loss/mtp=1.78808, tokens/s=81.147, step_time=3.685s] | step=202 epoch=0 data/consumed_samples=2 data/consumed_tokens=621 data/step_samples=1 data/step_tokens=299 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.68466 performance/tokens_per_second=81.1473 training/foundation_loss/aux=0.000490978 training/foundation_loss/lm=5.97626 training/foundation_loss/mtp=1.78808 training/grad_norm=17.6372 training/lr=0.0001 training/total_loss=7.76483
+[P12-HP] {"step": 202, "loss": 7.764829158782959, "components": {"foundation_loss/lm": 5.976261138916016, "foundation_loss/mtp": 1.7880767583847046, "foundation_loss/aux": 0.00049097795272246}, "grad_norm": 17.63715171813965}
+Training:  90%|████████▉ | 203/226 [01:24<00:09,  2.42step/s, loss=6.05982, grad_norm=24.0495, lr=1.000e-04, foundation_loss/aux=0.000492758, foundation_loss/lm=4.6129, foundation_loss/mtp=1.44643, tokens/s=14.238, step_time=3.652s] | step=203 epoch=0 data/consumed_samples=3 data/consumed_tokens=673 data/step_samples=1 data/step_tokens=52 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.6523 performance/tokens_per_second=14.2376 training/foundation_loss/aux=0.000492758 training/foundation_loss/lm=4.6129 training/foundation_loss/mtp=1.44643 training/grad_norm=24.0495 training/lr=0.0001 training/total_loss=6.05982
+[P12-HP] {"step": 203, "loss": 6.0598249435424805, "components": {"foundation_loss/lm": 4.6129021644592285, "foundation_loss/mtp": 1.4464300870895386, "foundation_loss/aux": 0.000492757884785533}, "grad_norm": 24.04949378967285}
+Training:  90%|█████████ | 204/226 [01:27<00:09,  2.33step/s, loss=5.89634, grad_norm=24.4357, lr=1.000e-04, foundation_loss/aux=0.000497898, foundation_loss/lm=4.53319, foundation_loss/mtp=1.36265, tokens/s=15.984, step_time=3.691s] | step=204 epoch=0 data/consumed_samples=4 data/consumed_tokens=732 data/step_samples=1 data/step_tokens=59 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.69119 performance/tokens_per_second=15.984 training/foundation_loss/aux=0.000497898 training/foundation_loss/lm=4.53319 training/foundation_loss/mtp=1.36265 training/grad_norm=24.4357 training/lr=0.0001 training/total_loss=5.89634
+[P12-HP] {"step": 204, "loss": 5.896337509155273, "components": {"foundation_loss/lm": 4.533186435699463, "foundation_loss/mtp": 1.3626532554626465, "foundation_loss/aux": 0.0004978983197361231}, "grad_norm": 24.435726165771484}
+Training:  91%|█████████ | 205/226 [01:31<00:09,  2.24step/s, loss=8.76388, grad_norm=15.7466, lr=1.000e-04, foundation_loss/aux=0.000489097, foundation_loss/lm=6.67326, foundation_loss/mtp=2.09014, tokens/s=94.185, step_time=3.642s] | step=205 epoch=0 data/consumed_samples=5 data/consumed_tokens=1075 data/step_samples=1 data/step_tokens=343 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.64177 performance/tokens_per_second=94.1848 training/foundation_loss/aux=0.000489097 training/foundation_loss/lm=6.67326 training/foundation_loss/mtp=2.09014 training/grad_norm=15.7466 training/lr=0.0001 training/total_loss=8.76388
+[P12-HP] {"step": 205, "loss": 8.763884544372559, "components": {"foundation_loss/lm": 6.673255920410156, "foundation_loss/mtp": 2.090139150619507, "foundation_loss/aux": 0.0004890967393293977}, "grad_norm": 15.746615409851074}
+Training:  91%|█████████ | 206/226 [01:35<00:09,  2.17step/s, loss=9.13299, grad_norm=40.6688, lr=1.000e-04, foundation_loss/aux=0.000480813, foundation_loss/lm=7.10203, foundation_loss/mtp=2.03048, tokens/s=9.052, step_time=3.646s] | step=206 epoch=0 data/consumed_samples=6 data/consumed_tokens=1108 data/step_samples=1 data/step_tokens=33 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.64551 performance/tokens_per_second=9.05224 training/foundation_loss/aux=0.000480813 training/foundation_loss/lm=7.10203 training/foundation_loss/mtp=2.03048 training/grad_norm=40.6688 training/lr=0.0001 training/total_loss=9.13299
+[P12-HP] {"step": 206, "loss": 9.132991790771484, "components": {"foundation_loss/lm": 7.102030277252197, "foundation_loss/mtp": 2.0304808616638184, "foundation_loss/aux": 0.00048081279965117574}, "grad_norm": 40.668846130371094}
+[P12-MODEL-HASH] 206 48
+Training:  92%|█████████▏| 207/226 [02:12<00:12,  1.56step/s, loss=10.2706, grad_norm=14.3075, lr=1.000e-04, foundation_loss/aux=0.000473134, foundation_loss/lm=7.88302, foundation_loss/mtp=2.38713, tokens/s=336.676, step_time=3.636s] | step=207 epoch=0 data/consumed_samples=7 data/consumed_tokens=2332 data/step_samples=1 data/step_tokens=1224 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.63554 performance/tokens_per_second=336.676 training/foundation_loss/aux=0.000473134 training/foundation_loss/lm=7.88302 training/foundation_loss/mtp=2.38713 training/grad_norm=14.3075 training/lr=0.0001 training/total_loss=10.2706
+[P12-HP] {"step": 207, "loss": 10.270622253417969, "components": {"foundation_loss/lm": 7.883023738861084, "foundation_loss/mtp": 2.3871259689331055, "foundation_loss/aux": 0.00047313430695794523}, "grad_norm": 14.307454109191895}
+[P12-MODEL-HASH] 207 48
+Training:  92%|█████████▏| 208/226 [02:41<00:14,  1.28step/s, loss=4.83011, grad_norm=37.8151, lr=1.000e-04, foundation_loss/aux=0.000507045, foundation_loss/lm=3.98216, foundation_loss/mtp=0.847439, tokens/s=8.548, step_time=3.626s] | step=208 epoch=0 data/consumed_samples=8 data/consumed_tokens=2363 data/step_samples=1 data/step_tokens=31 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.62648 performance/tokens_per_second=8.54824 training/foundation_loss/aux=0.000507045 training/foundation_loss/lm=3.98216 training/foundation_loss/mtp=0.847439 training/grad_norm=37.8151 training/lr=0.0001 training/total_loss=4.83011
+[P12-HP] {"step": 208, "loss": 4.83010721206665, "components": {"foundation_loss/lm": 3.982161521911621, "foundation_loss/mtp": 0.8474390506744385, "foundation_loss/aux": 0.0005070449551567435}, "grad_norm": 37.81513595581055}
+Training:  92%|█████████▏| 209/226 [02:45<00:13,  1.26step/s, loss=6.52211, grad_norm=15.7071, lr=1.000e-04, foundation_loss/aux=0.00047759, foundation_loss/lm=5.0398, foundation_loss/mtp=1.48183, tokens/s=91.831, step_time=3.594s] | step=209 epoch=0 data/consumed_samples=9 data/consumed_tokens=2693 data/step_samples=1 data/step_tokens=330 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.59357 performance/tokens_per_second=91.8306 training/foundation_loss/aux=0.00047759 training/foundation_loss/lm=5.0398 training/foundation_loss/mtp=1.48183 training/grad_norm=15.7071 training/lr=0.0001 training/total_loss=6.52211
+[P12-HP] {"step": 209, "loss": 6.522112846374512, "components": {"foundation_loss/lm": 5.039800643920898, "foundation_loss/mtp": 1.4818344116210938, "foundation_loss/aux": 0.0004775900160893798}, "grad_norm": 15.707127571105957}
+Training:  93%|█████████▎| 210/226 [02:49<00:12,  1.24step/s, loss=8.69139, grad_norm=11.882, lr=1.000e-04, foundation_loss/aux=0.000493544, foundation_loss/lm=6.62368, foundation_loss/mtp=2.06722, tokens/s=429.406, step_time=3.628s] | step=210 epoch=0 data/consumed_samples=10 data/consumed_tokens=4251 data/step_samples=1 data/step_tokens=1558 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.62827 performance/tokens_per_second=429.406 training/foundation_loss/aux=0.000493544 training/foundation_loss/lm=6.62368 training/foundation_loss/mtp=2.06722 training/grad_norm=11.882 training/lr=0.0001 training/total_loss=8.69139
+[P12-HP] {"step": 210, "loss": 8.691389083862305, "components": {"foundation_loss/lm": 6.623676776885986, "foundation_loss/mtp": 2.067218542098999, "foundation_loss/aux": 0.0004935439792461693}, "grad_norm": 11.881989479064941}
+Training:  93%|█████████▎| 211/226 [02:52<00:12,  1.22step/s, loss=9.24782, grad_norm=8.67045, lr=1.000e-04, foundation_loss/aux=0.000484155, foundation_loss/lm=7.02906, foundation_loss/mtp=2.21827, tokens/s=829.942, step_time=3.635s] | step=211 epoch=0 data/consumed_samples=11 data/consumed_tokens=7268 data/step_samples=1 data/step_tokens=3017 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.63519 performance/tokens_per_second=829.942 training/foundation_loss/aux=0.000484155 training/foundation_loss/lm=7.02906 training/foundation_loss/mtp=2.21827 training/grad_norm=8.67045 training/lr=0.0001 training/total_loss=9.24782
+[P12-HP] {"step": 211, "loss": 9.247819900512695, "components": {"foundation_loss/lm": 7.0290632247924805, "foundation_loss/mtp": 2.2182717323303223, "foundation_loss/aux": 0.00048415467608720064}, "grad_norm": 8.670453071594238}
+Training:  94%|█████████▍| 212/226 [02:56<00:11,  1.20step/s, loss=9.95706, grad_norm=10.8339, lr=1.000e-04, foundation_loss/aux=0.00047988, foundation_loss/lm=7.59102, foundation_loss/mtp=2.36556, tokens/s=528.057, step_time=3.638s] | step=212 epoch=0 data/consumed_samples=12 data/consumed_tokens=9189 data/step_samples=1 data/step_tokens=1921 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.63787 performance/tokens_per_second=528.057 training/foundation_loss/aux=0.00047988 training/foundation_loss/lm=7.59102 training/foundation_loss/mtp=2.36556 training/grad_norm=10.8339 training/lr=0.0001 training/total_loss=9.95706
+[P12-HP] {"step": 212, "loss": 9.95705509185791, "components": {"foundation_loss/lm": 7.59101676940918, "foundation_loss/mtp": 2.36555814743042, "foundation_loss/aux": 0.00047988048754632473}, "grad_norm": 10.833932876586914}
+Training:  94%|█████████▍| 213/226 [03:00<00:10,  1.18step/s, loss=9.60763, grad_norm=11.7682, lr=1.000e-04, foundation_loss/aux=0.00048366, foundation_loss/lm=7.28908, foundation_loss/mtp=2.31807, tokens/s=524.843, step_time=3.635s] | step=213 epoch=0 data/consumed_samples=13 data/consumed_tokens=11097 data/step_samples=1 data/step_tokens=1908 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.63538 performance/tokens_per_second=524.843 training/foundation_loss/aux=0.00048366 training/foundation_loss/lm=7.28908 training/foundation_loss/mtp=2.31807 training/grad_norm=11.7682 training/lr=0.0001 training/total_loss=9.60763
+[P12-HP] {"step": 213, "loss": 9.607627868652344, "components": {"foundation_loss/lm": 7.2890753746032715, "foundation_loss/mtp": 2.318068742752075, "foundation_loss/aux": 0.00048366020200774074}, "grad_norm": 11.768228530883789}
+Training:  95%|█████████▍| 214/226 [03:03<00:10,  1.17step/s, loss=8.87487, grad_norm=8.11934, lr=1.000e-04, foundation_loss/aux=0.000491949, foundation_loss/lm=6.72084, foundation_loss/mtp=2.15355, tokens/s=572.557, step_time=3.586s] | step=214 epoch=0 data/consumed_samples=14 data/consumed_tokens=13150 data/step_samples=1 data/step_tokens=2053 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.58567 performance/tokens_per_second=572.557 training/foundation_loss/aux=0.000491949 training/foundation_loss/lm=6.72084 training/foundation_loss/mtp=2.15355 training/grad_norm=8.11934 training/lr=0.0001 training/total_loss=8.87487
+[P12-HP] {"step": 214, "loss": 8.874874114990234, "components": {"foundation_loss/lm": 6.720836162567139, "foundation_loss/mtp": 2.153545379638672, "foundation_loss/aux": 0.000491948623675853}, "grad_norm": 8.119338035583496}
+Training:  95%|█████████▌| 215/226 [03:07<00:09,  1.15step/s, loss=9.09105, grad_norm=9.62273, lr=1.000e-04, foundation_loss/aux=0.000478295, foundation_loss/lm=6.84742, foundation_loss/mtp=2.24316, tokens/s=623.644, step_time=3.627s] | step=215 epoch=0 data/consumed_samples=15 data/consumed_tokens=15412 data/step_samples=1 data/step_tokens=2262 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.62707 performance/tokens_per_second=623.644 training/foundation_loss/aux=0.000478295 training/foundation_loss/lm=6.84742 training/foundation_loss/mtp=2.24316 training/grad_norm=9.62273 training/lr=0.0001 training/total_loss=9.09105
+[P12-HP] {"step": 215, "loss": 9.091054916381836, "components": {"foundation_loss/lm": 6.847417831420898, "foundation_loss/mtp": 2.2431581020355225, "foundation_loss/aux": 0.0004782952892128378}, "grad_norm": 9.622726440429688}
+Training:  96%|█████████▌| 216/226 [03:10<00:08,  1.13step/s, loss=8.0465, grad_norm=9.11792, lr=1.000e-04, foundation_loss/aux=0.000482871, foundation_loss/lm=6.02408, foundation_loss/mtp=2.02194, tokens/s=534.662, step_time=3.617s] | step=216 epoch=0 data/consumed_samples=16 data/consumed_tokens=17346 data/step_samples=1 data/step_tokens=1934 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9004 performance/step_time=3.61724 performance/tokens_per_second=534.662 training/foundation_loss/aux=0.000482871 training/foundation_loss/lm=6.02408 training/foundation_loss/mtp=2.02194 training/grad_norm=9.11792 training/lr=0.0001 training/total_loss=8.0465
+[P12-HP] {"step": 216, "loss": 8.046504974365234, "components": {"foundation_loss/lm": 6.024083137512207, "foundation_loss/mtp": 2.021939516067505, "foundation_loss/aux": 0.00048287102254107594}, "grad_norm": 9.117918014526367}
+Training:  96%|█████████▌| 217/226 [03:14<00:08,  1.12step/s, loss=9.78589, grad_norm=29.8407, lr=1.000e-04, foundation_loss/aux=0.000472531, foundation_loss/lm=7.61368, foundation_loss/mtp=2.17174, tokens/s=1056.067, step_time=3.599s] | step=217 epoch=0 data/consumed_samples=17 data/consumed_tokens=21147 data/step_samples=1 data/step_tokens=3801 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.5992 performance/tokens_per_second=1056.07 training/foundation_loss/aux=0.000472531 training/foundation_loss/lm=7.61368 training/foundation_loss/mtp=2.17174 training/grad_norm=29.8407 training/lr=0.0001 training/total_loss=9.78589
+[P12-HP] {"step": 217, "loss": 9.785893440246582, "components": {"foundation_loss/lm": 7.613678932189941, "foundation_loss/mtp": 2.1717429161071777, "foundation_loss/aux": 0.0004725310136564076}, "grad_norm": 29.84067726135254}
+Training:  96%|█████████▋| 218/226 [03:18<00:07,  1.10step/s, loss=10.382, grad_norm=12.8796, lr=1.000e-04, foundation_loss/aux=0.000472507, foundation_loss/lm=8.00568, foundation_loss/mtp=2.37587, tokens/s=461.425, step_time=3.524s] | step=218 epoch=0 data/consumed_samples=18 data/consumed_tokens=22773 data/step_samples=1 data/step_tokens=1626 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.52387 performance/tokens_per_second=461.425 training/foundation_loss/aux=0.000472507 training/foundation_loss/lm=8.00568 training/foundation_loss/mtp=2.37587 training/grad_norm=12.8796 training/lr=0.0001 training/total_loss=10.382
+[P12-HP] {"step": 218, "loss": 10.382014274597168, "components": {"foundation_loss/lm": 8.00567626953125, "foundation_loss/mtp": 2.3758656978607178, "foundation_loss/aux": 0.00047250697389245033}, "grad_norm": 12.879621505737305}
+Training:  97%|█████████▋| 219/226 [03:21<00:06,  1.09step/s, loss=7.17803, grad_norm=18.4936, lr=1.000e-04, foundation_loss/aux=0.00053746, foundation_loss/lm=5.54178, foundation_loss/mtp=1.63571, tokens/s=1134.686, step_time=3.610s] | step=219 epoch=0 data/consumed_samples=19 data/consumed_tokens=26869 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.60981 performance/tokens_per_second=1134.69 training/foundation_loss/aux=0.00053746 training/foundation_loss/lm=5.54178 training/foundation_loss/mtp=1.63571 training/grad_norm=18.4936 training/lr=0.0001 training/total_loss=7.17803
+[P12-HP] {"step": 219, "loss": 7.178029537200928, "components": {"foundation_loss/lm": 5.541777610778809, "foundation_loss/mtp": 1.6357146501541138, "foundation_loss/aux": 0.0005374602624215186}, "grad_norm": 18.493568420410156}
+Training:  97%|█████████▋| 220/226 [03:25<00:05,  1.07step/s, loss=8.71163, grad_norm=11.8064, lr=1.000e-04, foundation_loss/aux=0.000465696, foundation_loss/lm=6.73821, foundation_loss/mtp=1.97295, tokens/s=653.334, step_time=3.543s] | step=220 epoch=0 data/consumed_samples=20 data/consumed_tokens=29184 data/step_samples=1 data/step_tokens=2315 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.54337 performance/tokens_per_second=653.334 training/foundation_loss/aux=0.000465696 training/foundation_loss/lm=6.73821 training/foundation_loss/mtp=1.97295 training/grad_norm=11.8064 training/lr=0.0001 training/total_loss=8.71163
+[P12-HP] {"step": 220, "loss": 8.711629867553711, "components": {"foundation_loss/lm": 6.738211154937744, "foundation_loss/mtp": 1.97295343875885, "foundation_loss/aux": 0.00046569580445066094}, "grad_norm": 11.806412696838379}
+Training:  98%|█████████▊| 221/226 [03:28<00:04,  1.06step/s, loss=10.1559, grad_norm=10.7569, lr=1.000e-04, foundation_loss/aux=0.00046439, foundation_loss/lm=7.83771, foundation_loss/mtp=2.31776, tokens/s=878.509, step_time=3.566s] | step=221 epoch=0 data/consumed_samples=21 data/consumed_tokens=32317 data/step_samples=1 data/step_tokens=3133 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.56627 performance/tokens_per_second=878.509 training/foundation_loss/aux=0.00046439 training/foundation_loss/lm=7.83771 training/foundation_loss/mtp=2.31776 training/grad_norm=10.7569 training/lr=0.0001 training/total_loss=10.1559
+[P12-HP] {"step": 221, "loss": 10.155938148498535, "components": {"foundation_loss/lm": 7.837714672088623, "foundation_loss/mtp": 2.317758560180664, "foundation_loss/aux": 0.0004643897991627455}, "grad_norm": 10.756861686706543}
+Training:  98%|█████████▊| 222/226 [03:32<00:03,  1.05step/s, loss=7.09887, grad_norm=15.5709, lr=1.000e-04, foundation_loss/aux=0.000464365, foundation_loss/lm=5.48568, foundation_loss/mtp=1.61273, tokens/s=636.178, step_time=3.552s] | step=222 epoch=0 data/consumed_samples=22 data/consumed_tokens=34577 data/step_samples=1 data/step_tokens=2260 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.55246 performance/tokens_per_second=636.178 training/foundation_loss/aux=0.000464365 training/foundation_loss/lm=5.48568 training/foundation_loss/mtp=1.61273 training/grad_norm=15.5709 training/lr=0.0001 training/total_loss=7.09887
+[P12-HP] {"step": 222, "loss": 7.098868370056152, "components": {"foundation_loss/lm": 5.485678195953369, "foundation_loss/mtp": 1.6127259731292725, "foundation_loss/aux": 0.00046436532284133136}, "grad_norm": 15.570947647094727}
+Training:  99%|█████████▊| 223/226 [03:35<00:02,  1.03step/s, loss=5.4678, grad_norm=17.1734, lr=1.000e-04, foundation_loss/aux=0.000517738, foundation_loss/lm=4.17308, foundation_loss/mtp=1.2942, tokens/s=1130.024, step_time=3.625s] | step=223 epoch=0 data/consumed_samples=23 data/consumed_tokens=38673 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.6247 performance/tokens_per_second=1130.02 training/foundation_loss/aux=0.000517738 training/foundation_loss/lm=4.17308 training/foundation_loss/mtp=1.2942 training/grad_norm=17.1734 training/lr=0.0001 training/total_loss=5.4678
+[P12-HP] {"step": 223, "loss": 5.467803478240967, "components": {"foundation_loss/lm": 4.173081874847412, "foundation_loss/mtp": 1.2942036390304565, "foundation_loss/aux": 0.0005177379352971911}, "grad_norm": 17.17335319519043}
+Training:  99%|█████████▉| 224/226 [03:39<00:01,  1.02step/s, loss=7.05628, grad_norm=14.3422, lr=1.000e-04, foundation_loss/aux=0.000458702, foundation_loss/lm=5.3764, foundation_loss/mtp=1.67943, tokens/s=988.720, step_time=3.563s] | step=224 epoch=0 data/consumed_samples=24 data/consumed_tokens=42196 data/step_samples=1 data/step_tokens=3523 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.56319 performance/tokens_per_second=988.72 training/foundation_loss/aux=0.000458702 training/foundation_loss/lm=5.3764 training/foundation_loss/mtp=1.67943 training/grad_norm=14.3422 training/lr=0.0001 training/total_loss=7.05628
+[P12-HP] {"step": 224, "loss": 7.056282043457031, "components": {"foundation_loss/lm": 5.376397609710693, "foundation_loss/mtp": 1.6794259548187256, "foundation_loss/aux": 0.00045870174653828144}, "grad_norm": 14.342168807983398}
+Training: 100%|█████████▉| 225/226 [03:43<00:00,  1.01step/s, loss=11.6978, grad_norm=11.4328, lr=1.000e-04, foundation_loss/aux=0.00045252, foundation_loss/lm=9.00649, foundation_loss/mtp=2.69085, tokens/s=666.537, step_time=3.532s] | step=225 epoch=0 data/consumed_samples=25 data/consumed_tokens=44550 data/step_samples=1 data/step_tokens=2354 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.53169 performance/tokens_per_second=666.537 training/foundation_loss/aux=0.00045252 training/foundation_loss/lm=9.00649 training/foundation_loss/mtp=2.69085 training/grad_norm=11.4328 training/lr=0.0001 training/total_loss=11.6978
+[P12-HP] {"step": 225, "loss": 11.697794914245605, "components": {"foundation_loss/lm": 9.006490707397461, "foundation_loss/mtp": 2.6908507347106934, "foundation_loss/aux": 0.0004525196854956448}, "grad_norm": 11.432799339294434}
+Training: 100%|██████████| 226/226 [03:46<00:00,  1.00s/step, loss=10.3295, grad_norm=9.552, lr=1.000e-04, foundation_loss/aux=0.000453359, foundation_loss/lm=7.94512, foundation_loss/mtp=2.38393, tokens/s=506.724, step_time=3.540s] | step=226 epoch=0 data/consumed_samples=26 data/consumed_tokens=46344 data/step_samples=1 data/step_tokens=1794 memory/device_max_allocated_gb=50.3606 memory/device_max_reserved_gb=59.9023 performance/step_time=3.54039 performance/tokens_per_second=506.724 training/foundation_loss/aux=0.000453359 training/foundation_loss/lm=7.94512 training/foundation_loss/mtp=2.38393 training/grad_norm=9.552 training/lr=0.0001 training/total_loss=10.3295
+[P12-HP] {"step": 226, "loss": 10.329499244689941, "components": {"foundation_loss/lm": 7.945119857788086, "foundation_loss/mtp": 2.3839263916015625, "foundation_loss/aux": 0.0004533593892119825}, "grad_norm": 9.551995277404785}
+2026-10-15 13:30:14,398 [INFO] hyper_parallel.trainer.runtime.logging: VRAM usage after epoch 1: cur 26.06GB, max 50.36GB.
+/workspace/venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)

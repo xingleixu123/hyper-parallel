@@ -1,0 +1,114 @@
+{
+  "complete": true,
+  "eligible_for_acceptance": false,
+  "fidelity": {
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "moments207_exact_reference": true,
+      "native_dump_exact_four_arrays": true,
+      "native_dump_slots": true,
+      "kernel_output_exact_native207_moment": true,
+      "unique_head_kernel": true,
+      "first_input_native_clip_x": true,
+      "head_parameter_moment": true
+    },
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "moments207_exact_reference": true,
+      "models206207_exact_reference": true,
+      "DIAGNOSTIC_ONLY.json_exact_reference": true,
+      "HEAD_MOMENTS206_INTERVENTION.json_exact_reference": true,
+      "MODEL206_INTERVENTION.json_exact_reference": true,
+      "49_sources": true,
+      "observer_source": true,
+      "observer_helper": true,
+      "boundary": true,
+      "full_gradient_hash": true
+    }
+  },
+  "mf_run": "mf-head207-nativegradient",
+  "hp_run": "hp-jtf637-headroutermoments-gradient207",
+  "hp_reference": "hp-jtf637-sharedup-headroutermoments206diag226",
+  "native_kernels": {
+    "input.0": {
+      "path": "/state/jt-recipe-20261014/mf-head207-nativegradient-kernels/rank_0/Head207/1/6/GraphKernel_Mul_Add_Assign_fusion.Default_GraphKernel_Mul_Add_Assign_fusion-op1.0.0.1792072306883969.input.0.DefaultFormat.float32.npy",
+      "sha256": "96bd57941a4444154e789a2683c64f202b1afc3030614d9ecef9e5645fc0a109",
+      "shape": [
+        152064,
+        5120
+      ],
+      "dtype": "float32",
+      "bytes": 3114270848
+    },
+    "input.1": {
+      "path": "/state/jt-recipe-20261014/mf-head207-nativegradient-kernels/rank_0/Head207/1/6/GraphKernel_Mul_Add_Assign_fusion.Default_GraphKernel_Mul_Add_Assign_fusion-op1.0.0.1792072308278936.input.1.DefaultFormat.float32.npy",
+      "sha256": "6cea5ca446f9dcc7a0e904065db3a0dd2d493bb07cb71db7e2ca8a3f08c9cbf9",
+      "shape": [
+        152064,
+        5120
+      ],
+      "dtype": "float32",
+      "bytes": 3114270848
+    },
+    "input.2": {
+      "path": "/state/jt-recipe-20261014/mf-head207-nativegradient-kernels/rank_0/Head207/1/6/GraphKernel_Mul_Add_Assign_fusion.Default_GraphKernel_Mul_Add_Assign_fusion-op1.0.0.1792072309435389.input.2.DefaultFormat.float32.npy",
+      "sha256": "6496f08a40f1fd29689829eaef87e2c4305501ac4cf7cf7d55dc765bb83bc0ef",
+      "shape": [
+        152064,
+        5120
+      ],
+      "dtype": "float32",
+      "bytes": 3114270848
+    },
+    "output.0": {
+      "path": "/state/jt-recipe-20261014/mf-head207-nativegradient-kernels/rank_0/Head207/1/6/GraphKernel_Mul_Add_Assign_fusion.Default_GraphKernel_Mul_Add_Assign_fusion-op1.0.0.1792072310812019.output.0.DefaultFormat.float32.npy",
+      "sha256": "6496f08a40f1fd29689829eaef87e2c4305501ac4cf7cf7d55dc765bb83bc0ef",
+      "shape": [
+        152064,
+        5120
+      ],
+      "dtype": "float32",
+      "bytes": 3114270848
+    }
+  },
+  "hp_gradient": {
+    "step": 207,
+    "name": "lm_head.weight",
+    "boundary": "postclip_before_optimizer",
+    "sha256": "549ef29e30b3e2431a546663da5aeb64947c533fcf3a644638192c60da3c46a6",
+    "file": "/state/jt-recipe-20261014/hp-jtf637-headroutermoments-gradient207/head-postclip207.npy",
+    "shape": [
+      152064,
+      5120
+    ],
+    "dtype": "float32",
+    "bytes": 3114270848,
+    "read_only_observation": true,
+    "source_sha256": "0c41c71bd57d7165cbcaca209716731745355abb95894e148f1dfaac0d9e293e",
+    "helper_sha256": "cb7011c957fae5e7180c2fcd295fcab95ebda7fd4216a7e1b7e00e73c2ba84ee"
+  },
+  "gradient_comparison": {
+    "size": 778567680,
+    "different": 47701,
+    "max_abs": 2.1331070456653833e-06,
+    "relative_l2": 1.3898399959241399e-05,
+    "patch_ready": true,
+    "patch_file": "/state/jt-recipe-20261014/head-gradient207-difference-patch/gradient.npz",
+    "patch_bytes": 763956,
+    "patch_sha256": "e9de5693aac55dd781415dbf84107ea890a1b4e5f5703dd2f999488b927baadc"
+  },
+  "graph": {
+    "path": "/state/jt-recipe-20261014/mf-head207-nativegradient-kernels/rank_0/graphs/ms_output_trace_code_graph_3.ir",
+    "sha256": "81236563269989d4ce9c041787cbabf2e1b387d650528e51dc1f0acb2d6d14b1",
+    "snippet": "  %2315(CNode_6049) = GraphKernel_Mul_Add_Assign_fusion(%para93_clip_x, %2311, %2314) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (0, 2), side_effect_mem: Bool(1), graph_kernel: \"Mul_Add_Assign_fusion\", visited: Bool(1), IsFeatureMapOutput: Bool(1), func_graph: seg_trans__anonymous__3627} cnode_attrs: {is_dynamic_len: Bool(0)}\n      : (<Tensor[Float32], (152064, 5120)>, <Tensor[Float32], (152064, 5120)>, <Ref[Tensor[Float32]], (152064, 5120), ref_key=adam_m.output_layer.weight, is_parameter, is_inplace>) -> (<Ref[Tensor[Float32]], (152064, 5120), ref_key=adam_m.output_layer.weight, is_parameter, is_inplace>)\n      : (<Float32xDefaultFormat[const vector]{152064, 5120}>, <Float32xDefaultFormat[const vector]{152064, 5120}>, <Float32xDefaultFormat[const vector]{152064, 5120}>) -> (<Float32xDefaultFormat[const vector]{152064, 5120}>)\n      : (Tensor, Tensor, Tensor) -> (Tensor)\n      # Fullname with scope: (Default/GraphKernel_Mul_Add_Assign_fusion-op1)",
+    "line": 19387
+  },
+  "source_sha256": "e5df5328702b914fbe1279fe04208064bb6957a2fc6dc629555af912df3eba80",
+  "scope": "Actual207 postclip gradient after206 model/head-moment synchronization. Separates newly generated gradients from inherited head moment differences; does not yet establish optimizer arithmetic correctness."
+}
