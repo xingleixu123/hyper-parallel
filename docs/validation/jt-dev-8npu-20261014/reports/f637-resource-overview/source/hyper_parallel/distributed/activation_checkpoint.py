@@ -1,0 +1,1165 @@
+# Copyright 2026 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""Activation checkpointing helpers for distributed model components."""
+# pylint: disable=forbidden-backend-import
+
+import fnmatch
+import logging
+import weakref
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any, Optional
+
+import torch
+from torch import nn
+
+from hyper_parallel.core.activation_memory.api import (
+    CheckpointPolicy,
+    checkpoint_wrapper,
+    create_selective_checkpoint_contexts,
+    ignore_sac_ops as _ignore_sac_ops,
+)
+from hyper_parallel.core.activation_memory.swap import (
+    SwapManager,
+    _teardown_wired_swap_layers,
+)
+from hyper_parallel.models.adapter_spec import RecomputePolicy
+from hyper_parallel.models.registry import get_model_adapter
+
+logger = logging.getLogger(__name__)
+
+
+def _resolve_torch_op(dotted_path: str):
+    """Resolve a torch operator to its default overload when available."""
+    if dotted_path.startswith("ops."):
+        dotted_path = dotted_path[4:]
+    if dotted_path.count(".") == 1:
+        dotted_path = f"{dotted_path}.default"
+    obj = torch.ops
+    try:
+        for part in dotted_path.split("."):
+            obj = getattr(obj, part)
+    except AttributeError:
+        return None
+    return obj
+
+
+def _resolve_op_attr(root: object, dotted_path: str):
+    """Resolve an optional operator outside the regular ``torch.ops`` tree."""
+    obj = root
+    try:
+        for part in dotted_path.split("."):
+            obj = getattr(obj, part)
+    except AttributeError:
+        return None
+    return obj
+
+
+def _existing_ops(*ops):
+    """Return the available operators, omitting optional torch operators."""
+    return frozenset(op for op in ops if op is not None)
+
+
+# Matmul operators alternate between saving and recomputing their outputs. The
+# counter is scoped to one checkpoint region by ``make_selective_checkpoint_context_fn``.
+_SELECTIVE_AC_MATMUL_OPS = _existing_ops(
+    _resolve_torch_op("aten.matmul"),
+    _resolve_torch_op("aten.mm"),
+    _resolve_torch_op("aten.linear"),
+    _resolve_torch_op("aten._grouped_mm"),
+    _resolve_torch_op("aten._scaled_grouped_mm"),
+)
+
+# Some model implementations mutate these operator outputs in-place. Keeping
+# the output by reference would either trip SAC's version check or replay the
+# mutation on an already-mutated tensor during recomputation.
+_SELECTIVE_AC_FORCE_RECOMPUTE_OPS = _existing_ops(
+    _resolve_torch_op("aten.topk"),
+)
+
+
+def _default_compute_intensive_ops() -> tuple:
+    """Get PyTorch's compute-intensive operator list when the private API exists."""
+    try:
+        # This private PyTorch API is unavailable on some supported versions.
+        from torch._functorch.partitioners import get_default_op_list  # pylint: disable=import-outside-toplevel
+
+        return tuple(op.default for op in get_default_op_list().compute_intensive_ops)
+    except (ImportError, AttributeError, RuntimeError):
+        return ()
+
+
+def _ffpa_forward_ops() -> tuple:
+    """Resolve optional FFPA forward operators after their extension registers."""
+    try:
+        # The optional extension registers its operators only when imported.
+        import ffpa_attn.cute  # pylint: disable=C0415, W0611
+    except (ImportError, OSError, RuntimeError):
+        return ()
+    return (
+        _resolve_op_attr(torch.ops, "ffpa_attn._fwd_cute.default"),
+        _resolve_op_attr(torch.ops, "ffpa_attn._varlen_fwd_cute.default"),
+    )
+
+
+_SELECTIVE_AC_COMPUTE_OP_NAMES = (
+    "aten.mm",
+    "aten.addmm",
+    "aten.bmm",
+    "aten.linear",
+    "aten._scaled_mm",
+    "aten._scaled_dot_product_cudnn_attention",
+    "aten._scaled_dot_product_efficient_attention",
+    "aten._scaled_dot_product_flash_attention",
+    "aten._scaled_dot_product_flash_attention_for_cpu",
+    "aten._scaled_dot_product_fused_attention_overrideable",
+    "aten.scaled_dot_product_attention",
+    "npu.npu_fusion_attention_v3",
+    "aten._flex_attention",
+    "aten.topk",
+    "aten.max",
+)
+
+_SELECTIVE_AC_COMM_OP_NAMES = (
+    "aten.all_to_all_single",
+    "aten.reduce_scatter_tensor",
+    "_c10d_functional.all_to_all_single",
+    "_c10d_functional.reduce_scatter_tensor",
+    "c10d.allreduce_",
+)
+
+
+def _build_selective_ac_must_save_ops():
+    """Build the expensive/communication operator set for selective AC."""
+    save_ops = set(_default_compute_intensive_ops())
+    compute_ops = _existing_ops(
+        *(_resolve_torch_op(name) for name in _SELECTIVE_AC_COMPUTE_OP_NAMES),
+        _resolve_op_attr(torch, "_higher_order_ops.flex_attention"),
+        _resolve_op_attr(torch, "_higher_order_ops.inductor_compiled_code"),
+        _resolve_op_attr(torch.ops, "torch_attn._varlen_attn.default"),
+        *_ffpa_forward_ops(),
+    )
+    comm_ops = _existing_ops(
+        *(_resolve_torch_op(name) for name in _SELECTIVE_AC_COMM_OP_NAMES),
+        _resolve_op_attr(torch.ops, "deepep.dispatch.default"),
+        _resolve_op_attr(torch.ops, "deepep.combine.default"),
+        _resolve_op_attr(torch.ops, "hybridep.dispatch.default"),
+        _resolve_op_attr(torch.ops, "hybridep.combine.default"),
+    )
+    save_ops.update(compute_ops)
+    save_ops.update(comm_ops)
+    save_ops.difference_update(_SELECTIVE_AC_FORCE_RECOMPUTE_OPS)
+    return frozenset(save_ops)
+
+
+_SELECTIVE_AC_MUST_SAVE_OPS = _build_selective_ac_must_save_ops()
+
+
+@dataclass(frozen=True)
+class _TransformerBlockInfo:
+    """A transformer block discovered below an HF checkpointing owner.
+
+    ``parent`` is the registered repeated-block container (for example, a
+    ``ModuleList``), while ``child_name`` is the actual registered key. Keeping
+    both lets callers replace a block without assuming that the key is a
+    contiguous integer or that the container is a specific PyTorch class.
+    """
+
+    fqn: str
+    module: nn.Module
+    parent: nn.Module
+    child_name: str
+    container_fqn: str
+
+
+@dataclass(frozen=True)
+class _LayerContainerInfo:
+    """One repeated-block container and the blocks selected from it."""
+
+    container: nn.Module
+    path: str
+    blocks: tuple[_TransformerBlockInfo, ...]
+
+
+def _get_checkpoint_wrapped_module(module: nn.Module) -> Optional[nn.Module]:
+    """Return the module directly held by a supported checkpoint wrapper."""
+    for attr_name in ("_wrapped_module", "_checkpoint_wrapped_module"):
+        wrapped_module = getattr(module, attr_name, None)
+        if isinstance(wrapped_module, nn.Module):
+            return wrapped_module
+    return None
+
+
+def _is_hf_checkpointing_layer(module: nn.Module) -> bool:
+    """Recognize HF leaf blocks without requiring a particular container path."""
+    try:
+        # Transformers is optional; older releases may not expose this base class.
+        from transformers.modeling_layers import GradientCheckpointingLayer  # pylint: disable=import-outside-toplevel
+    except ImportError:
+        return False
+    return isinstance(module, GradientCheckpointingLayer)
+
+
+def _find_transformer_block_modules(
+    model: nn.Module,
+) -> tuple[list[_TransformerBlockInfo], set[int]]:
+    """Find transformer blocks below modules with HF checkpointing support.
+
+    HuggingFace model components expose ``gradient_checkpointing`` on modules
+    that own a repeated block container.  The marker is the structural
+    contract; no model class name or conventional ``layers`` path is needed.
+    Each direct child of a marked repeated container is returned with its
+    registered name so callers can safely replace it in-place. An HF
+    ``GradientCheckpointingLayer`` outside such a container is itself a block,
+    rather than an owner whose attention or MLP children should be scanned.
+
+    Args:
+        model: Model whose transformer blocks should be located.
+
+    Returns:
+        A list of block metadata and the IDs of blocks already selected. The
+        ID set is useful to callers that need to add other wrap targets while
+        avoiding duplicate modules.
+    """
+    block_infos = []
+    discovered_block_ids = set()
+    for owner_fqn, owner in model.named_modules():
+        # Match FSDP2's behavior for nested checkpointing owners: once an
+        # owner has itself been selected as a block, do not scan inside it.
+        if id(owner) in discovered_block_ids:
+            continue
+        if any(owner_fqn.startswith(f"{block.fqn}.") for block in block_infos):
+            continue
+        wrapped_owner = _get_checkpoint_wrapped_module(owner)
+        checkpoint_owner = owner if wrapped_owner is None else wrapped_owner
+        if not hasattr(checkpoint_owner, "gradient_checkpointing"):
+            continue
+        if owner_fqn and _is_hf_checkpointing_layer(checkpoint_owner):
+            parent_fqn, _, child_name = owner_fqn.rpartition(".")
+            parent = model.get_submodule(parent_fqn) if parent_fqn else model
+            discovered_block_ids.add(id(owner))
+            discovered_block_ids.add(id(checkpoint_owner))
+            block_infos.append(_TransformerBlockInfo(
+                fqn=owner_fqn, module=owner, parent=parent,
+                child_name=child_name, container_fqn=parent_fqn,
+            ))
+            continue
+
+        for container_name, container in owner.named_children():
+            children = list(container.named_children())
+            container_fqn = (
+                f"{owner_fqn}.{container_name}" if owner_fqn else container_name
+            )
+            for block_name, block in children:
+                if id(block) in discovered_block_ids:
+                    continue
+                discovered_block_ids.add(id(block))
+                wrapped_module = _get_checkpoint_wrapped_module(block)
+                if wrapped_module is not None:
+                    # A checkpoint wrapper may proxy attributes from its inner
+                    # block, including ``gradient_checkpointing``. Treat the
+                    # wrapper and inner module as one logical transformer block
+                    # during the rest of the module-tree traversal.
+                    discovered_block_ids.add(id(wrapped_module))
+                block_fqn = f"{container_fqn}.{block_name}"
+                block_infos.append(
+                    _TransformerBlockInfo(
+                        fqn=block_fqn,
+                        module=block,
+                        parent=container,
+                        child_name=block_name,
+                        container_fqn=container_fqn,
+                    )
+                )
+    return block_infos, discovered_block_ids
+
+
+def ignore_sac_ops(ops: list[object | None]) -> None:
+    """Exclude available runtime operators from selective-AC replay accounting.
+
+    Args:
+        ops: Backend operators to ignore. ``None`` entries represent optional
+            operators that are unavailable in the installed PyTorch version.
+    """
+    _ignore_sac_ops(ops)
+
+
+def ensure_profiler_ops_sac_ignored() -> None:
+    """Keep profiler record-function operators out of selective-AC replay.
+
+    FSDP hooks run under ``record_function`` and may execute a different number
+    of profiler range operators in the original forward and recomputation. The
+    range operators carry no activations, so excluding them only removes them
+    from replay accounting while preserving their execution.
+    """
+    profiler_ops = getattr(torch.ops, "profiler", None)
+    if profiler_ops is None:
+        return
+
+    ops_to_ignore = []
+    for packet_name in (
+        "_record_function_enter",
+        "_record_function_enter_new",
+        "_record_function_exit",
+    ):
+        packet = getattr(profiler_ops, packet_name, None)
+        if packet is None:
+            continue
+        for overload_name in packet.overloads():
+            ops_to_ignore.append(getattr(packet, overload_name))
+    ignore_sac_ops(ops_to_ignore)
+
+
+_FSDP_SAC_IGNORED_OP_NAMES = (
+    "fsdp.all_gather_copy_in",
+    "fsdp.split_with_sizes_copy",
+    "fsdp.chunk_cat",
+    "fsdp.copy_",
+    "c10d._allgather_base_",
+    "aten.empty.memory_format",
+    "aten.empty_like",
+    "aten.view",
+)
+
+_FSDP_SAC_IGNORED_OPS = [_resolve_torch_op(name) for name in _FSDP_SAC_IGNORED_OP_NAMES]
+
+
+def ensure_fsdp_ops_sac_ignored() -> None:
+    """Keep FSDP parameter-lifecycle operators out of selective-AC replay.
+
+    Forward prefetch may unshard parameters before a checkpoint region, while
+    recomputation may need to unshard them inside that region. These allocation,
+    copy and collective operators manage parameters rather than model
+    activations, and therefore must not be matched against the forward replay.
+    """
+    ignore_sac_ops(_FSDP_SAC_IGNORED_OPS)
+
+
+def compile_selective_checkpoint_policy(
+    ctx: Any,
+    func: Any,
+    *args: Any,
+    **kwargs: Any,
+) -> CheckpointPolicy:
+    """Choose a stateless selective-checkpoint policy for compile mode.
+
+    Args:
+        ctx: Checkpoint context supplied by the native selective-checkpoint API.
+        func: The operator being traced.
+        *args: Operator arguments (unused).
+        **kwargs: Operator keyword arguments (unused).
+
+    Returns:
+        The checkpoint policy for ``func``.
+    """
+    del ctx, args, kwargs
+    if func in _SELECTIVE_AC_FORCE_RECOMPUTE_OPS:
+        return CheckpointPolicy.MUST_RECOMPUTE
+    if func in _SELECTIVE_AC_MATMUL_OPS:
+        return CheckpointPolicy.MUST_SAVE
+    if func in _SELECTIVE_AC_MUST_SAVE_OPS:
+        return CheckpointPolicy.MUST_SAVE
+    return CheckpointPolicy.MUST_RECOMPUTE
+
+
+def _make_selective_checkpoint_policy_fn() -> Callable:
+    """Create an isolated eager selective activation checkpointing policy."""
+    matmul_counts = {False: 0, True: 0}
+
+    def selective_checkpointing_policy(
+        ctx: Any,
+        func: Any,
+        *args: Any,
+        **kwargs: Any,
+    ) -> CheckpointPolicy:
+        """Decide whether ``func``'s output is saved or recomputed.
+
+        Follows the selective-activation-checkpointing policy contract: matmuls
+        alternate between save and recompute, expensive/communication ops are
+        always saved, and everything else is recomputed.
+
+        Args:
+            ctx: Checkpoint context carrying the ``is_recompute`` phase flag.
+            func: The operator being traced.
+            *args: Operator arguments (unused).
+            **kwargs: Operator keyword arguments (unused).
+
+        Returns:
+            The checkpoint policy for ``func``.
+        """
+        del args, kwargs
+        if func in _SELECTIVE_AC_FORCE_RECOMPUTE_OPS:
+            return CheckpointPolicy.MUST_RECOMPUTE
+        if func in _SELECTIVE_AC_MATMUL_OPS:
+            matmul_counts[ctx.is_recompute] += 1
+            if matmul_counts[ctx.is_recompute] % 2:
+                return CheckpointPolicy.MUST_SAVE
+            return CheckpointPolicy.MUST_RECOMPUTE
+        if func in _SELECTIVE_AC_MUST_SAVE_OPS:
+            return CheckpointPolicy.MUST_SAVE
+        return CheckpointPolicy.MUST_RECOMPUTE
+
+    return selective_checkpointing_policy
+
+
+def make_selective_checkpoint_context_fn() -> Callable[[], tuple[object, object]]:
+    """Create a per-checkpoint-region selective activation policy context.
+
+    Expensive operations are saved, ordinary operations are recomputed, and
+    matmul operations alternate between the two decisions. A new counter is
+    created every time the returned factory is invoked, matching the
+    ``context_fn`` contract of non-reentrant checkpointing.
+
+    Returns:
+        A no-argument factory that creates the forward and recompute contexts.
+    """
+    ensure_profiler_ops_sac_ignored()
+    ensure_fsdp_ops_sac_ignored()
+
+    def selective_checkpoint_context_fn() -> tuple[object, object]:
+        """Create a fresh pair of forward/recompute selective-AC contexts.
+
+        Returns:
+            The ``(forward_context, recompute_context)`` pair expected by the
+            non-reentrant checkpointing ``context_fn`` contract.
+        """
+        return create_selective_checkpoint_contexts(
+            _make_selective_checkpoint_policy_fn()
+        )
+
+    return selective_checkpoint_context_fn
+
+
+def _find_transformer_layer_container_infos(
+    model: nn.Module,
+) -> list[_LayerContainerInfo]:
+    """Find repeated block containers without model-specific path rules.
+
+    Containers are derived from :func:`_find_transformer_block_modules`, so a
+    model can freely name its towers and layer attributes.  A container is
+    included once even when blocks are shared or the module tree exposes an
+    alias to it.
+
+    Args:
+        model: Model whose transformer layer containers should be located.
+
+    Returns:
+        A list of discovered containers, ordered by the model's registration
+        order. An empty list means no module advertises HF checkpointing
+        support for a repeated block container.
+    """
+    block_infos, _ = _find_transformer_block_modules(model)
+    containers = []
+    blocks_by_container = {}
+    seen_container_ids = set()
+    for block_info in block_infos:
+        container_id = id(block_info.parent)
+        blocks_by_container.setdefault(container_id, []).append(block_info)
+
+    for block_info in block_infos:
+        container_id = id(block_info.parent)
+        if container_id in seen_container_ids:
+            continue
+        seen_container_ids.add(container_id)
+        containers.append(
+            _LayerContainerInfo(
+                container=block_info.parent,
+                path=block_info.container_fqn,
+                blocks=tuple(blocks_by_container[container_id]),
+            )
+        )
+    return containers
+
+
+def _flatten_layer_container_infos(
+    containers: list[_LayerContainerInfo],
+) -> list[nn.Module]:
+    """Expand discovered containers into individual transformer blocks."""
+    return [
+        block_info.module
+        for container in containers
+        for block_info in container.blocks
+    ]
+
+
+def _should_use_hf_native_gradient_checkpointing(
+    model: nn.Module,
+    layers: list[nn.Module],
+    *,
+    enable_compile: bool = False,
+) -> bool:
+    """Return whether full checkpointing can use HuggingFace's native API."""
+    if enable_compile:
+        return False
+
+    if not layers or any(
+        not any(parameter.requires_grad for parameter in layer.parameters())
+        for layer in layers
+    ):
+        return False
+
+    return (
+        all(_is_hf_checkpointing_layer(layer) for layer in layers)
+        and getattr(model, "supports_gradient_checkpointing", False)
+        and hasattr(model, "gradient_checkpointing_enable")
+    )
+
+
+def _wrap_layer_containers(
+    containers: list[_LayerContainerInfo],
+    wrapper: Callable,
+    *,
+    context_fn: Optional[Callable[[], tuple[object, object]]] = None,
+) -> int:
+    """Wrap every layer in the discovered containers and return the count."""
+    wrapped_count = 0
+    for container_info in containers:
+        for block_info in container_info.blocks:
+            checkpoint_kwargs = {} if context_fn is None else {"context_fn": context_fn}
+            current_block = getattr(block_info.parent, block_info.child_name, None)
+            if not isinstance(current_block, nn.Module) or _is_checkpoint_wrapped(current_block):
+                continue
+            setattr(
+                block_info.parent,
+                block_info.child_name,
+                wrapper(current_block, **checkpoint_kwargs),
+            )
+            wrapped_count += 1
+    return wrapped_count
+
+
+def _is_checkpoint_wrapped(module: nn.Module) -> bool:
+    """Return whether a module is already wrapped by a supported checkpoint wrapper."""
+    return hasattr(module, "_wrapped_module") or hasattr(
+        module,
+        "_checkpoint_wrapped_module",
+    )
+
+
+def _warn_if_nothing_wrapped(
+    wrapped_count: int,
+    activation_checkpoint: str,
+    containers: list[_LayerContainerInfo],
+) -> None:
+    """Warn when a checkpointing request wrapped no module at all.
+
+    Every wrapping strategy either probes for known submodule names or skips
+    modules that are already wrapped, so a zero count silently leaves the model
+    running fully eager and memory-unbounded.
+    """
+    if wrapped_count != 0 or not containers:
+        return
+    layer_count = sum(len(container.blocks) for container in containers)
+    logger.warning(
+        "%s activation checkpointing wrapped no module on %d layer(s) in %s; the "
+        "model is running without activation checkpointing. Expected submodule "
+        "names may not match this architecture, or the layers are already wrapped.",
+        activation_checkpoint.capitalize(),
+        layer_count,
+        ", ".join(container.path for container in containers),
+    )
+
+
+def _find_checkpoint_wrappers(module: nn.Module, prefix: str = "") -> dict[str, nn.Module]:
+    """Find outermost checkpoint wrappers by their relative module paths."""
+    if _is_checkpoint_wrapped(module):
+        return {prefix: module}
+
+    wrappers = {}
+    for child_name, child in module.named_children():
+        child_path = f"{prefix}.{child_name}" if prefix else child_name
+        wrappers.update(_find_checkpoint_wrappers(child, child_path))
+    return wrappers
+
+
+def _register_forward_prefetch_layers(containers: list[_LayerContainerInfo]) -> None:
+    """Register swap prefetch chains within each repeated-block container."""
+    swap_manager = SwapManager()
+    for container_info in containers:
+        wrapper_chains = {}
+        for block_info in container_info.blocks:
+            current_block = getattr(block_info.parent, block_info.child_name, None)
+            if not isinstance(current_block, nn.Module):
+                continue
+            for relative_path, wrapper in _find_checkpoint_wrappers(current_block).items():
+                wrapper_chains.setdefault(relative_path, []).append(wrapper)
+
+        wired_modules: list[nn.Module] = []
+        for wrappers in wrapper_chains.values():
+            for current_wrapper, next_wrapper in zip(wrappers, wrappers[1:]):
+                swap_manager.set_forward_prefetch_layer(current_wrapper, next_wrapper)
+                wired_modules.extend((current_wrapper, next_wrapper))
+        wired_modules = list(dict.fromkeys(wired_modules))  # dedupe, keep order
+
+        # swap layers registered above live in the process-wide SwapManager
+        # singleton and are never torn down otherwise, so a long-lived process
+        # that rebuilds or discards models leaks SwapGroup entries and hook
+        # handles.  Tear them down when the container is collected.  The
+        # container must not be a finalizer argument (that would keep it alive);
+        # only the wired child modules are captured, and the callback receives
+        # them directly because the container is unreachable at that point.
+        if wired_modules:
+            weakref.finalize(
+                container_info.container,
+                _teardown_wired_swap_layers,
+                wired_modules,
+            )
+
+
+def _wrap_first_existing_attr(
+    module: nn.Module,
+    attr_names: tuple[str, ...],
+    wrapper: Callable,
+    *,
+    skip: bool = False,
+) -> int:
+    """Checkpoint-wrap the first registered child matching ``attr_names``."""
+    if skip:
+        return 0
+
+    for attr in attr_names:
+        child = getattr(module, attr, None)
+        if not isinstance(child, nn.Module):
+            continue
+        child_name = next(
+            (
+                name
+                for name, registered_child in module.named_children()
+                if registered_child is child
+            ),
+            None,
+        )
+        if child_name is None:
+            continue
+        if _is_checkpoint_wrapped(child):
+            return 0
+        setattr(module, child_name, wrapper(child))
+        return 1
+    return 0
+
+
+def _eager_checkpoint_kwargs(swap_inputs: bool) -> dict[str, Any]:
+    """Build the eager-mode checkpoint keyword arguments.
+
+    Compile mode drops ``swap_inputs`` entirely, but eager checkpointing accepts
+    it in both states: ``False`` keeps ordinary recomputation, while ``True``
+    offloads the checkpoint inputs to host memory.
+    """
+    return {"swap_inputs": swap_inputs}
+
+
+def apply_submodule_checkpointing(
+    layers: list[nn.Module],
+    has_kv_sharing: bool,
+    enable_compile: bool = False,
+    swap_inputs: bool = False,
+) -> int:
+    """Apply full activation checkpointing to transformer-layer submodules.
+
+    Args:
+        layers: Transformer layers whose selected submodules should be wrapped.
+        has_kv_sharing: Whether attention submodules must remain outside the
+            recomputation regions.
+        enable_compile: Whether the wrapped regions will be compiled.
+        swap_inputs: Whether checkpoint inputs should be offloaded in eager
+            execution. This is ignored in compile mode.
+    """
+    checkpoint_kwargs = {} if enable_compile else _eager_checkpoint_kwargs(swap_inputs)
+
+    def submodule_checkpoint_wrapper(module: nn.Module) -> nn.Module:
+        """Wrap one selected layer submodule with checkpointing."""
+        return checkpoint_wrapper(module, **checkpoint_kwargs)
+
+    wrapped_count = 0
+    for layer in layers:
+        wrapped_count += _wrap_first_existing_attr(
+            layer,
+            ("mlp", "feed_forward", "ffn"),
+            submodule_checkpoint_wrapper,
+        )
+        wrapped_count += _wrap_first_existing_attr(
+            layer,
+            ("self_attn", "attention", "attn", "linear_attn"),
+            submodule_checkpoint_wrapper,
+            skip=has_kv_sharing,
+        )
+        wrapped_count += _wrap_first_existing_attr(
+            layer,
+            ("input_layernorm", "attention_norm", "layer_norm1", "norm1"),
+            submodule_checkpoint_wrapper,
+        )
+        wrapped_count += _wrap_first_existing_attr(
+            layer,
+            ("post_attention_layernorm", "ffn_norm", "layer_norm2", "norm2"),
+            submodule_checkpoint_wrapper,
+        )
+        for attr in (
+            "mlp_moe_gen",
+            "input_layernorm_moe_gen",
+            "post_attention_layernorm_moe_gen",
+        ):
+            child = getattr(layer, attr, None)
+            if isinstance(child, nn.Module) and not _is_checkpoint_wrapped(child):
+                setattr(layer, attr, submodule_checkpoint_wrapper(child))
+                wrapped_count += 1
+
+    logger.info(
+        "Applied submodule activation checkpointing to %d layer(s), wrapping %d submodule(s)",
+        len(layers),
+        wrapped_count,
+    )
+    return wrapped_count
+
+
+def _detect_kv_sharing_and_maybe_disable_cache(model: nn.Module) -> bool:
+    """Detect cross-layer KV sharing and disable ordinary model caches."""
+    config = getattr(model, "config", None)
+    text_config = getattr(config, "text_config", None) or config
+    has_kv_sharing = getattr(text_config, "num_kv_shared_layers", 0) > 0
+    if has_kv_sharing or config is None:
+        return has_kv_sharing
+
+    sub_config_names = getattr(type(config), "sub_configs", None) or {
+        "text_config": None,
+    }
+    sub_configs = (getattr(config, name, None) for name in sub_config_names)
+    for sub_config in (config, *sub_configs):
+        if sub_config is None or (
+            sub_config is not config and not hasattr(sub_config, "use_cache")
+        ):
+            continue
+        if getattr(sub_config, "use_cache", None) is not False:
+            _try_disable_use_cache(sub_config)
+    return False
+
+
+def _adapter_recompute_spec(model: nn.Module):
+    """Resolve a model-owned recompute declaration without family branches."""
+    config = getattr(model, "config", None)
+    identities = [getattr(config, "model_type", None)]
+    identities.extend(getattr(config, "architectures", None) or ())
+    adapter_spec = None
+    for identity in identities:
+        if not identity:
+            continue
+        adapter_spec = get_model_adapter(identity)
+        if adapter_spec is not None:
+            break
+    provider = getattr(adapter_spec, "recompute", None)
+    if provider is None or not callable(provider):
+        raise ValueError(
+            "activation_checkpoint.selection.source=model_adapter_safe_regions "
+            "requires ModelAdapterSpec.recompute"
+        )
+    recompute_policy = provider()  # pylint: disable=not-callable
+    if not isinstance(recompute_policy, RecomputePolicy):
+        raise TypeError("ModelAdapterSpec.recompute must return RecomputePolicy")
+    return recompute_policy
+
+
+def _selected_checkpoint_layer_fqns(
+    containers: list[_LayerContainerInfo],
+    selection: Any,
+) -> set[str]:
+    """Select a leading layer count or exact layer indices."""
+    blocks = [block for container in containers for block in container.blocks]
+    layer_count = getattr(selection, "layer_count", None)
+    layer_indices = getattr(selection, "layer_indices", None)
+    if (layer_count is None) == (layer_indices is None):
+        raise ValueError(
+            "model-adapter safe recompute requires exactly one of "
+            "selection.layer_count or selection.layer_indices"
+        )
+    if layer_indices is not None:
+        if not isinstance(layer_indices, (list, tuple)) or not layer_indices:
+            raise ValueError(
+                "model-adapter safe recompute layer_indices must be a non-empty sequence"
+            )
+        if any(
+            isinstance(index, bool) or not isinstance(index, int) or index < 0
+            for index in layer_indices
+        ):
+            raise ValueError(
+                "model-adapter safe recompute layer_indices must contain only "
+                "non-negative integers"
+            )
+        if len(set(layer_indices)) != len(layer_indices):
+            raise ValueError(
+                "model-adapter safe recompute layer_indices must not contain duplicates"
+            )
+        if max(layer_indices) >= len(blocks):
+            raise ValueError(
+                "model-adapter safe recompute layer index "
+                f"{max(layer_indices)} exceeds the maximum index {len(blocks) - 1}"
+            )
+        return {blocks[index].fqn for index in layer_indices}
+
+    if isinstance(layer_count, bool) or not isinstance(layer_count, int) or layer_count < 0:
+        raise ValueError(
+            "model-adapter safe recompute layer_count must be a non-negative integer"
+        )
+    if layer_count > len(blocks):
+        raise ValueError(
+            f"adapter recompute layer_count {layer_count} exceeds discovered layers {len(blocks)}"
+        )
+    if layer_count == 0:
+        return set()
+    return {blocks[index].fqn for index in range(layer_count)}
+
+
+def _apply_model_adapter_safe_checkpointing(
+    model: nn.Module,
+    containers: list[_LayerContainerInfo],
+    ac_layers: list[nn.Module],
+    selection: Any,
+    *,
+    enable_compile: bool,
+    swap_inputs: bool,
+) -> nn.Module:
+    """Wrap only model-adapter-declared safe regions in the selected layers."""
+    recompute_spec = _adapter_recompute_spec(model)
+    selected_layer_fqns = _selected_checkpoint_layer_fqns(containers, selection)
+    if not selected_layer_fqns:
+        logger.info("Model-adapter safe recompute selected zero layers")
+        return model
+    if hasattr(model, "gradient_checkpointing_disable"):
+        model.gradient_checkpointing_disable()
+    checkpoint_kwargs = {"swap_inputs": swap_inputs} if not enable_compile else {}
+    module_by_fqn = dict(model.named_modules())
+    selected_targets = []
+    for module_fqn, module in module_by_fqn.items():
+        if not any(
+            module_fqn.startswith(f"{layer_fqn}.")
+            for layer_fqn in selected_layer_fqns
+        ):
+            continue
+        if not any(
+            fnmatch.fnmatchcase(module_fqn, pattern)
+            for pattern in recompute_spec.safe_module_patterns
+        ):
+            continue
+        if any(
+            fnmatch.fnmatchcase(module_fqn, pattern)
+            for pattern in recompute_spec.no_replay_module_patterns
+        ):
+            raise ValueError(
+                f"[HP-STATE-002] safe recompute target {module_fqn!r} is also a no-replay producer"
+            )
+        selected_targets.append((module_fqn, module))
+    if not selected_targets:
+        raise ValueError(
+            "model adapter safe recompute patterns matched no module in the selected layers"
+        )
+    selected_ids = {id(module) for _, module in selected_targets}
+    for module_fqn, module in selected_targets:
+        if any(
+            child is not module and id(child) in selected_ids
+            for child in module.modules()
+        ):
+            raise ValueError(
+                "model adapter safe recompute patterns selected nested targets: "
+                f"{module_fqn}"
+            )
+    wrapped_count = 0
+    for module_fqn, module in sorted(
+        selected_targets,
+        key=lambda item: item[0].count("."),
+        reverse=True,
+    ):
+        if "." in module_fqn:
+            parent_fqn, child_name = module_fqn.rsplit(".", 1)
+            parent = module_by_fqn[parent_fqn]
+        else:
+            parent, child_name = model, module_fqn
+        if _is_checkpoint_wrapped(module):
+            continue
+        setattr(parent, child_name, checkpoint_wrapper(module, **checkpoint_kwargs))
+        wrapped_count += 1
+    if swap_inputs and not enable_compile:
+        _register_forward_prefetch_layers(containers)
+    logger.info(
+        "Model-adapter safe recompute wrapped %d region(s) across %d/%d layers",
+        wrapped_count,
+        len(selected_layer_fqns),
+        len(ac_layers),
+    )
+    return model
+
+
+def _try_disable_use_cache(sub_config: Any) -> None:
+    """Best-effort disable of ``use_cache`` on one config object."""
+    try:
+        sub_config.use_cache = False
+    except Exception:  # pylint: disable=broad-exception-caught
+        # Configuration objects may reject assignment with custom errors.
+        pass
+
+
+def _validate_activation_checkpoint_config(
+    activation_checkpoint: Optional[str],
+    swap_inputs: bool,
+    enable_compile: bool,
+) -> None:
+    """Validate the activation-checkpoint options and warn about ignored ones.
+
+    Args:
+        activation_checkpoint: Requested recomputation mode.
+        swap_inputs: Whether checkpoint inputs should be offloaded.
+        enable_compile: Whether wrapped regions will be compiled.
+
+    Raises:
+        ValueError: The mode or ``swap_inputs`` has an unsupported value.
+    """
+    if activation_checkpoint not in ("full", "selective"):
+        raise ValueError(
+            "activation_checkpoint.mode must be 'full' or 'selective', but got "
+            f"{activation_checkpoint!r}"
+        )
+    if not isinstance(swap_inputs, bool):
+        raise ValueError(
+            "activation_checkpoint.swap_inputs must be bool, but got "
+            f"{type(swap_inputs).__name__}"
+        )
+
+    if swap_inputs and enable_compile:
+        logger.warning(
+            "activation_checkpoint.swap_inputs is not supported with torch.compile; "
+            "input swapping will be disabled."
+        )
+
+
+def _resolve_activation_checkpoint_containers(
+    model: nn.Module,
+) -> list[_LayerContainerInfo]:
+    """Discover the repeated-block containers that activation checkpointing targets.
+
+    Args:
+        model: Model to inspect.
+
+    Returns:
+        The discovered containers, in registration order.
+
+    Raises:
+        ValueError: No container advertises HuggingFace checkpointing support.
+    """
+    containers = _find_transformer_layer_container_infos(model)
+    if not containers:
+        raise ValueError(
+            f"{type(model).__name__} has no module with a 'gradient_checkpointing' "
+            "attribute and a non-empty repeated block container"
+        )
+    return containers
+
+
+def _apply_selective_checkpointing(
+    containers: list[_LayerContainerInfo],
+    ac_layers: list[nn.Module],
+    has_kv_sharing: bool,
+    *,
+    enable_compile: bool,
+    swap_inputs: bool,
+) -> int:
+    """Wrap every discovered layer for selective recomputation.
+
+    KV-shared models fall back to submodule checkpointing so attention does not
+    write the cache again during backward recomputation.
+
+    Args:
+        containers: The repeated-block containers to wrap.
+        ac_layers: Every block selected from ``containers``.
+        has_kv_sharing: Whether attention submodules must stay outside the
+            recomputation regions.
+        enable_compile: Whether the wrapped regions will be compiled.
+        swap_inputs: Whether checkpoint inputs should be offloaded in eager
+            execution. Ignored in compile mode.
+
+    Returns:
+        The number of layers, or submodules in the KV-shared fallback, wrapped.
+    """
+    if has_kv_sharing:
+        logger.warning(
+            "Selective activation checkpointing is not supported for KV-shared models; "
+            "falling back to submodule activation checkpointing."
+        )
+        return apply_submodule_checkpointing(
+            ac_layers,
+            has_kv_sharing,
+            enable_compile=enable_compile,
+            swap_inputs=swap_inputs,
+        )
+
+    if enable_compile:
+        def compile_checkpoint_wrapper(layer: nn.Module) -> nn.Module:
+            """Wrap one layer with the compile-compatible SAC policy."""
+            return checkpoint_wrapper(
+                layer,
+                policy_fn=compile_selective_checkpoint_policy,
+            )
+
+        return _wrap_layer_containers(containers, compile_checkpoint_wrapper)
+
+    def eager_checkpoint_wrapper(layer: nn.Module, **checkpoint_kwargs: Any) -> nn.Module:
+        """Wrap one layer with eager selective checkpointing."""
+        return checkpoint_wrapper(
+            layer,
+            swap_inputs=swap_inputs,
+            **checkpoint_kwargs,
+        )
+
+    return _wrap_layer_containers(
+        containers,
+        eager_checkpoint_wrapper,
+        context_fn=make_selective_checkpoint_context_fn(),
+    )
+
+
+def _apply_full_checkpointing(
+    model: nn.Module,
+    containers: list[_LayerContainerInfo],
+    ac_layers: list[nn.Module],
+    has_kv_sharing: bool,
+    *,
+    enable_compile: bool,
+    swap_inputs: bool,
+) -> Optional[int]:
+    """Wrap discovered layers for full recomputation.
+
+    Prefers the HuggingFace-native implementation when every eligibility check
+    passes, and otherwise uses Hyper Parallel's wrappers.
+
+    Args:
+        model: Model whose layers should be wrapped.
+        containers: The repeated-block containers to wrap.
+        ac_layers: Every block selected from ``containers``.
+        has_kv_sharing: Whether attention submodules must stay outside the
+            recomputation regions.
+        enable_compile: Whether the wrapped regions will be compiled.
+        swap_inputs: Whether checkpoint inputs should be offloaded in eager
+            execution. Ignored in compile mode.
+
+    Returns:
+        The number of wrapped submodules, or ``None`` when the HuggingFace-native
+        implementation was enabled instead, in which case no per-layer wrapping
+        happened and swap prefetch chains must not be registered.
+    """
+    if not has_kv_sharing and _should_use_hf_native_gradient_checkpointing(
+        model,
+        ac_layers,
+        enable_compile=enable_compile,
+    ):
+        if swap_inputs:
+            logger.warning(
+                "activation_checkpoint.swap_inputs is not supported by Hugging Face native "
+                "gradient checkpointing for now; input swapping will be disabled."
+            )
+        model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": True})
+        logger.info("Using HuggingFace native gradient checkpointing for discovered layers.")
+        return None
+
+    if has_kv_sharing:
+        return apply_submodule_checkpointing(
+            ac_layers,
+            has_kv_sharing,
+            enable_compile=enable_compile,
+            swap_inputs=swap_inputs,
+        )
+
+    def full_checkpoint_wrapper(layer: nn.Module) -> nn.Module:
+        """Wrap one complete transformer layer for full recomputation."""
+        if enable_compile:
+            return checkpoint_wrapper(layer)
+        return checkpoint_wrapper(layer, **_eager_checkpoint_kwargs(swap_inputs))
+
+    return _wrap_layer_containers(containers, full_checkpoint_wrapper)
+
+
+def _apply_activation_checkpointing(
+    model: nn.Module,
+    activation_checkpoint: Optional[str],
+    enable_compile: bool = False,
+    swap_inputs: bool = False,
+    selection: Optional[Any] = None,
+) -> nn.Module:
+    """Apply full or selective recomputation to discovered transformer layers.
+
+    Validates the requested options, discovers the repeated-block containers that
+    advertise HuggingFace checkpointing support, then delegates to the
+    mode-specific wrapper. Swap prefetch chains are registered afterwards for
+    every configuration that wrapped the layers itself.
+    """
+    _validate_activation_checkpoint_config(
+        activation_checkpoint,
+        swap_inputs,
+        enable_compile,
+    )
+    containers = _resolve_activation_checkpoint_containers(model)
+    ac_layers = _flatten_layer_container_infos(containers)
+    has_kv_sharing = _detect_kv_sharing_and_maybe_disable_cache(model)
+
+    if hasattr(model, "gradient_checkpointing_disable"):
+        model.gradient_checkpointing_disable()
+
+    selection_source = getattr(selection, "source", "default")
+    if selection_source == "model_adapter_safe_regions":
+        return _apply_model_adapter_safe_checkpointing(
+            model,
+            containers,
+            ac_layers,
+            selection,
+            enable_compile=enable_compile,
+            swap_inputs=swap_inputs,
+        )
+
+    # Selective recomputation normally wraps whole layers. KV-shared models
+    # instead use submodule checkpointing so attention does not write the cache
+    # again during backward recomputation.
+    if activation_checkpoint == "selective":
+        wrapped_count = _apply_selective_checkpointing(
+            containers,
+            ac_layers,
+            has_kv_sharing,
+            enable_compile=enable_compile,
+            swap_inputs=swap_inputs,
+        )
+        _warn_if_nothing_wrapped(wrapped_count, activation_checkpoint, containers)
+        logger.info(
+            "Selective activation checkpointing applied to %d layer(s) in: %s",
+            wrapped_count,
+            ", ".join(container.path for container in containers),
+        )
+    else:
+        wrapped_count = _apply_full_checkpointing(
+            model,
+            containers,
+            ac_layers,
+            has_kv_sharing,
+            enable_compile=enable_compile,
+            swap_inputs=swap_inputs,
+        )
+        if wrapped_count is None:
+            # The HuggingFace-native path returns early in the original flow and
+            # therefore skips both the warning and the swap prefetch registration.
+            return model
+        _warn_if_nothing_wrapped(wrapped_count, activation_checkpoint, containers)
+        logger.info(
+            "%s activation checkpointing wrapped %d submodule(s) in: %s",
+            activation_checkpoint.capitalize(),
+            wrapped_count,
+            ", ".join(container.path for container in containers),
+        )
+
+    if swap_inputs and not enable_compile:
+        _register_forward_prefetch_layers(containers)
+    return model

@@ -1,0 +1,309 @@
+{
+  "status": "PASS",
+  "review_axis": "Standards / 资源证据与可视化口径",
+  "reviewed_at_utc": "2026-10-15T21:16:42.043384+00:00",
+  "source_commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+  "source_worktree_clean": true,
+  "summary_zh": "六组资源数值、CSV、图中文字和精度状态均吻合绑定证据；未发现本轮实质规范或语义阻断。PASS仅为总览审计结论，EP2/CP2/TP2的严格精度结论仍为FAIL。",
+  "findings": [],
+  "method_zh": "仅用Python标准库从48份原始JSONL的9600条记录独立复算，未导入或执行图工具、all_rank_resources.py、strict_compare_runs.py；审阅最终生成器源码，人工查看PNG，并逐项核对SVG文本。CSV按带BOM的UTF-8读取；旧JSON字节重建保留CRLF。",
+  "checks": {
+    "raw_rank_files": 48,
+    "raw_rows": 9600,
+    "resource_reports": 6,
+    "strict_reports": 6,
+    "bound_input_files": 60,
+    "every_case_complete_8_ranks_by_200_steps": true,
+    "step_time_world_max_before_warmup_exclusion": true,
+    "logical_tokens_samples_counted_once_after_rank_equality": true,
+    "memory_max_all_ranks_all_200_steps": true,
+    "raw_bound_to_collection_manifest_in_strict_report": true,
+    "resource_reports_overview_exactly_equal_recalculation": true,
+    "csv_semantically_equal_overview": true,
+    "svg_labels_numbers_units_match": true,
+    "png_visually_readable": true,
+    "source_commit_empty_patch_agree": true,
+    "baseline_reference_is_independent_continuous400": true,
+    "three_pass_three_fail_preserved": true,
+    "regeneration_json_only_generator_sha_changed": true,
+    "regeneration_csv_png_byte_identical": true
+  },
+  "scope_limits_zh": [
+    "资源为各策略一次匹配运行观测。逐步MAX取自8rank发布的callback指标；计时用21–200步，监督token只计一次。",
+    "显存为进程累计allocated/reserved峰值，取1–200步全部rank，含初始化与warmup；不是稳态激活净额，也不覆盖最后一次指标之后的最终保存。",
+    "保留输入身份采集等共同开销，非无插桩吞吐、非端到端wall time、非性能CI；不同布局DP微批数变化，TP2另有SP/loss parallel。",
+    "精度状态及还原系数后的误差来自绑定的六份严格报告，本轮未重做200步精度比较，也未把同轮rank一致视为独立精度通过。MTP/aux由已记录加权标量按0.3/0.0001还原，不声称捕获原始tensor。",
+    "EP/CP/TP的strict_performance_eligible也均为false；严格比较器在精度失败时主动关闭该资格。因此这里只展示未验收资源观测，不能据此给出交付推荐。",
+    "完全重算比选择重算少0.482707977 GiB，时间差仅约0.2491%的单次观测，不宣称速度赢家。"
+  ],
+  "independent_recalculation": [
+    {
+      "label": "FSDP8 · 关闭重算",
+      "case": "r129-f637-fp32-fsdp8-0-200-r4",
+      "independently_recalculated": {
+        "median_step_seconds": 1.1550026535987854,
+        "summed_step_seconds": 207.7378523349762,
+        "supervised_tokens": 3325552.0,
+        "supervised_tokens_per_second": 16008.406569244611,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      "timed_steps": [
+        21,
+        200
+      ],
+      "memory_steps": [
+        1,
+        200
+      ],
+      "strict_report": "evidence/f637-fsdp8-baseline-independent-comparison.json",
+      "strict_reference": "r129-f637-fp32-fsdp8-continuous400-r3",
+      "precision_status": "PASS",
+      "strict_performance_eligible": true,
+      "unweighted_max_abs": {
+        "lm": 0.0,
+        "mtp": 0.0,
+        "aux": 0.0
+      },
+      "candidate_manifest": "evidence/f637-fsdp8-r4-complete-evidence-manifest.json"
+    },
+    {
+      "label": "FSDP8 · 完全重算",
+      "case": "r129-f637-fp32-fsdp8-full-200-r4",
+      "independently_recalculated": {
+        "median_step_seconds": 1.2351799607276917,
+        "summed_step_seconds": 222.15145444869995,
+        "supervised_tokens": 3325552.0,
+        "supervised_tokens_per_second": 14969.751191829126,
+        "allocated_gib": 19.392932891845703,
+        "reserved_gib": 24.3203125
+      },
+      "timed_steps": [
+        21,
+        200
+      ],
+      "memory_steps": [
+        1,
+        200
+      ],
+      "strict_report": "evidence/f637-fsdp8-full-200-strict-comparison.json",
+      "strict_reference": "r129-f637-fp32-fsdp8-0-200-r4",
+      "precision_status": "PASS",
+      "strict_performance_eligible": true,
+      "unweighted_max_abs": {
+        "lm": 0.0,
+        "mtp": 0.0,
+        "aux": 0.0
+      },
+      "candidate_manifest": "evidence/f637-fsdp8-full-r4-complete-evidence-manifest.json"
+    },
+    {
+      "label": "FSDP8 · 选择重算",
+      "case": "r129-f637-fp32-fsdp8-selective-200-r3",
+      "independently_recalculated": {
+        "median_step_seconds": 1.2321109771728516,
+        "summed_step_seconds": 221.52741825580597,
+        "supervised_tokens": 3325552.0,
+        "supervised_tokens_per_second": 15011.920538702172,
+        "allocated_gib": 19.875640869140625,
+        "reserved_gib": 24.7890625
+      },
+      "timed_steps": [
+        21,
+        200
+      ],
+      "memory_steps": [
+        1,
+        200
+      ],
+      "strict_report": "evidence/f637-fsdp8-selective-r3-strict-comparison.json",
+      "strict_reference": "r129-f637-fp32-fsdp8-0-200-r4",
+      "precision_status": "PASS",
+      "strict_performance_eligible": true,
+      "unweighted_max_abs": {
+        "lm": 0.0,
+        "mtp": 0.0,
+        "aux": 0.0
+      },
+      "candidate_manifest": "evidence/f637-fsdp8-selective-r3-complete-evidence-manifest.json"
+    },
+    {
+      "label": "FSDP + EP2",
+      "case": "r129-f637-fp32-ep2-200",
+      "independently_recalculated": {
+        "median_step_seconds": 1.3174351453781128,
+        "summed_step_seconds": 236.95840060710907,
+        "supervised_tokens": 3325552.0,
+        "supervised_tokens_per_second": 14034.328352485634,
+        "allocated_gib": 20.928653717041016,
+        "reserved_gib": 26.275390625
+      },
+      "timed_steps": [
+        21,
+        200
+      ],
+      "memory_steps": [
+        1,
+        200
+      ],
+      "strict_report": "evidence/f637-ep2-200-strict-comparison.json",
+      "strict_reference": "r129-f637-fp32-fsdp8-0-200-r4",
+      "precision_status": "FAIL",
+      "strict_performance_eligible": false,
+      "unweighted_max_abs": {
+        "lm": 0.007523059844970703,
+        "mtp": 0.01543283462524414,
+        "aux": 0.13898941688239574
+      },
+      "candidate_manifest": "evidence/f637-ep2-200-complete-evidence-manifest.json"
+    },
+    {
+      "label": "FSDP + CP2",
+      "case": "r129-f637-fp32-cp2-200",
+      "independently_recalculated": {
+        "median_step_seconds": 1.596321702003479,
+        "summed_step_seconds": 287.0293798446655,
+        "supervised_tokens": 3325552.0,
+        "supervised_tokens_per_second": 11586.103143168553,
+        "allocated_gib": 20.706645965576172,
+        "reserved_gib": 25.982421875
+      },
+      "timed_steps": [
+        21,
+        200
+      ],
+      "memory_steps": [
+        1,
+        200
+      ],
+      "strict_report": "evidence/f637-cp2-200-strict-comparison.json",
+      "strict_reference": "r129-f637-fp32-fsdp8-0-200-r4",
+      "precision_status": "FAIL",
+      "strict_performance_eligible": false,
+      "unweighted_max_abs": {
+        "lm": 0.011061668395996094,
+        "mtp": 0.022786458333333336,
+        "aux": 0.204604584723711
+      },
+      "candidate_manifest": "evidence/f637-cp2-200-complete-evidence-manifest.json"
+    },
+    {
+      "label": "FSDP + TP2 / SP",
+      "case": "r129-f637-fp32-tp2-200-r4",
+      "independently_recalculated": {
+        "median_step_seconds": 1.857553243637085,
+        "summed_step_seconds": 333.9686608314514,
+        "supervised_tokens": 3325552.0,
+        "supervised_tokens_per_second": 9957.676842254226,
+        "allocated_gib": 17.2946720123291,
+        "reserved_gib": 18.638671875
+      },
+      "timed_steps": [
+        21,
+        200
+      ],
+      "memory_steps": [
+        1,
+        200
+      ],
+      "strict_report": "evidence/f637-tp2-r4-strict-comparison.json",
+      "strict_reference": "r129-f637-fp32-fsdp8-0-200-r4",
+      "precision_status": "FAIL",
+      "strict_performance_eligible": false,
+      "unweighted_max_abs": {
+        "lm": 0.021448135375976562,
+        "mtp": 0.02466996510823568,
+        "aux": 0.15583820641040802
+      },
+      "candidate_manifest": "evidence/f637-tp2-r4-complete-evidence-manifest.json"
+    }
+  ],
+  "reviewed_artifact_sha256": {
+    "tools/plot_f637_resource_overview.py": "7fe5ba2f4755623ab00acdf745da1bd6f29d60f6086ded12e68c4beeabf6f138",
+    "evidence/f637-current-resource-overview.json": "a34e51647d4546fc5ca630e00c0d7d61d7fcb6ebb965548a8204c1c692f8914c",
+    "evidence/f637-current-resource-overview.csv": "7380a72127f45462fb3c86b15185455d86209b533888f505d0ae2aae034d3f46",
+    "figures/f637-current-resource-overview-zh.png": "e7ad176553005e6764dadf030816c79f81d62fbef92dd95740eef6e8920a8a35",
+    "figures/f637-current-resource-overview-zh.svg": "3530d32c87181bfb848fd9065381a775aadf75232d4fa784cd1d000664b5d814",
+    "evidence/resource-overview-style-regeneration.json": "b6704640446678e525be3928db0dbde1b9abc1f123521b1b451dd2eac72187c3"
+  },
+  "verified_collection_manifest_sha256": {
+    "evidence/f637-fsdp8-r4-complete-evidence-manifest.json": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11",
+    "evidence/f637-fsdp8-full-r4-complete-evidence-manifest.json": "0dd0824342de7127b2d4b6a7a2fba05e42ae642b5dae6309a0b1a6f92af0724f",
+    "evidence/f637-fsdp8-selective-r3-complete-evidence-manifest.json": "ea5c11341c93e182ccf4991819fb02c4e2e61011758573bf96d2258ea4c2aec0",
+    "evidence/f637-ep2-200-complete-evidence-manifest.json": "ef929eaf6b81bd89d25d09cd38d5d33f35dc4069a8eb34d7dc2484ae995adaf3",
+    "evidence/f637-cp2-200-complete-evidence-manifest.json": "37fe7d5d2bd1165c44f3a17bbb0e9c89751ae7033f832c8125c1ceba519c04b3",
+    "evidence/f637-tp2-r4-complete-evidence-manifest.json": "e059240bc85b62f8d29efee0f419a4a9fc038a4db3a0c00315b908979a02f836"
+  },
+  "verified_input_sha256": {
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank0.jsonl": "4f35ac8c015ceb0b825d0dff1b9622f2a606f90972c5750f7dd437eabc9e020d",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank1.jsonl": "25605caf8c644034f47bc3a54cc5e90e6f990579320318385e9a18ee690268ec",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank2.jsonl": "0739690e07918e6ff4a248136581376ef323adabd9aef0b780ded900150771a7",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank3.jsonl": "5a7420f75ffd05a3c5add5d145a1748958d5b00c88fc52bbf225642765e896ee",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank4.jsonl": "a982af002a3b8549312fd269adc468014e9b43507563ad00f89dba17e7f183e7",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank5.jsonl": "acdacc90cb0ec46e2f349cbe1ad791b5e1f83d284b3392da2806ab8e6d69cf40",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank6.jsonl": "75e0756cd21aa85b90d3604937d1924a9393d11bf667ce4b21aae73960403e13",
+    "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank7.jsonl": "dac61b2cb5ea0b86214fa5dfa231160acfb7585680bcfcefc3b84ef88887bbf5",
+    "evidence/f637-fsdp8-r4-all-rank-resources.json": "4a93261f7d53ed185dc43b89d39a4a0e90d8072b8b99ec9640d4c7ca7da28383",
+    "evidence/f637-fsdp8-baseline-independent-comparison.json": "9113a00c55ee50833f4ee5b1e02aacdda442bcc1c643509ae68bafeefff60c35",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank0.jsonl": "423b421b5b88b7aea43d2eb0475b2e70bf81d3d899845ef31848f007b463d35d",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank1.jsonl": "002d73dd6fac111b492b0c26b0c8e26e675963776a8f2b8de158623976c7b319",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank2.jsonl": "e9d71fb2c5205cb25b63e4e3d7c55e7b1718708de281c0131db7adaaed4a1715",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank3.jsonl": "704a6537665e99835fd466f8dee512a7ef0d4f3382678e341ee711eb4424417a",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank4.jsonl": "b7d57ec4f95734cc6062e815a740dcc9f5c92afe7cb1857fd243197c44a65f99",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank5.jsonl": "411ca2706e355efb1d667e7d39bc718fb2d7c3b4ad3802a41c7b821f9f1cede7",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank6.jsonl": "65cd46ca5a43f0cb5c295c3e953bcfc3212e561e099b18cf0a97c6988f751f08",
+    "runs/r129-f637-fp32-fsdp8-full-200-r4/metrics-rank7.jsonl": "8e31b95189562636633a5ea28528c518e0ee6951c23767cda39200cd118c5e3b",
+    "evidence/f637-fsdp8-full-200-all-rank-resources.json": "4809ad497ef6eaa73002e391a2610aad2244aba8361d05202f2eede0a1591b16",
+    "evidence/f637-fsdp8-full-200-strict-comparison.json": "142513b5c3301bbebc6004c0aa0c1f1b4cc12ac7c54073eb8db407de66094e9b",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank0.jsonl": "daae4c2d342e1290b4049a0a3918a1ed905671312455699c655d8a5358a60478",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank1.jsonl": "327cc9c5a9e6826231ee4ab4cf60e3d149c9ccae9d6326484f60e02133b530c8",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank2.jsonl": "fca52f547a0a4ef56501f4cb67b427c59e979f1fb6566de70ec3fbe33fe62a64",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank3.jsonl": "ba8c9772f8f237e86992f4a701886b82a2971658f9261cb6a7624ef830ff320c",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank4.jsonl": "3571edf30d0d63d9f18ce7acd8ab43a8ff7315a9c18cabcb0462de44569cfc92",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank5.jsonl": "750829f460a7a1b73bbeb21e6c61a68b33c548f66bd8f5c9eb42634c53d13db4",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank6.jsonl": "653d6a87eafd6113086575b36b3dc5a9203dd46487af5e79ee4f5e5d122715df",
+    "runs/r129-f637-fp32-fsdp8-selective-200-r3/metrics-rank7.jsonl": "41aafb0b29428c1c867b32d24edec903a501f9d651f22d8ddfd0065ee205ad87",
+    "evidence/f637-fsdp8-selective-r3-all-rank-resources.json": "beafe41593ca1891a8e6537a160cf29ef3f263f60c7b7136c04b8e9793c9d9ad",
+    "evidence/f637-fsdp8-selective-r3-strict-comparison.json": "118b0eb341ddbd8e6fbbb1db34a54fa4754e2b6d3ec566f06aa47e3ce0db1891",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank0.jsonl": "e31b27fa187b0c5d0e76014a588c5570593a095d13d065681136920a75689e3e",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank1.jsonl": "7a3b482b3cf89f162fcbb95fa1c622b52296ab9ce82370f74d24e96bbbd4dc4c",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank2.jsonl": "a3bd6fd9d82cb6a93fd7ab90b30a5c1ac0328fc3a5596b92281fcfa085391ed8",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank3.jsonl": "a255f6df08dcdc7d9cfd0c75417871c839427bbcc42d93e20a7e5d6913e85380",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank4.jsonl": "21584b8f654e0e59fd47d59783a4edffe49dc866b103d1e40ab08d11a71f7f04",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank5.jsonl": "a28a427142282301ee84f92721ed169a111c1894a292a8caf8e4ee08c029e995",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank6.jsonl": "6184277b0c663dec48e8f00714ca6e80e9fa50eb8f9de5ad0d265f215953449e",
+    "runs/r129-f637-fp32-ep2-200/metrics-rank7.jsonl": "cc2073615296757d6a69eb6cf13132dc3797767e86a791e32d16e921e53d65f7",
+    "evidence/f637-ep2-200-all-rank-resources.json": "1bc2a873e8aba646d8a6f247cd69915935f612fc543f9e8b33169abe318aac32",
+    "evidence/f637-ep2-200-strict-comparison.json": "83ed5a1c2fd44194fa966029f8a360ac4573eba60be8598f49fc411d0219dd5a",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank0.jsonl": "e6aeb350d749ae38d72fdff18976f6f74a3a8761aff0b0ed32d2be87bb949f40",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank1.jsonl": "44589d4b0f6c60caf40ea8c71ff1edc3a38a8bc391b37100af92f985f736c58e",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank2.jsonl": "ac2631929f34869e2428dd0abc4d0cb636f6e17307bc18ad0276074bfaf20ae2",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank3.jsonl": "1c06b19f44b8cc6d0e73d6d6e0b3e059ef3c7a09bdc235efce0ef5a1d2350896",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank4.jsonl": "e61006dda3db151a03b48993ff22967baa5ae157215204576e608548ca589335",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank5.jsonl": "d02ed48ea1253d452a32a8f957d1269bc75e040dacbf443522b21d2acfb8203a",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank6.jsonl": "34f036f751a93227fc5023fc0fbed08ea4ec1203b0cfa2c7e1c4f2f2fb152588",
+    "runs/r129-f637-fp32-cp2-200/metrics-rank7.jsonl": "3ecd8bbe39184a34c2f6b7236a573ccb75e5a5db7bf9288c356a28fa5f95e133",
+    "evidence/f637-cp2-200-all-rank-resources.json": "188cbd4028dc5a12e06102fbda4daa6de03cabc952dc1c0b71ae45c4326dc0bc",
+    "evidence/f637-cp2-200-strict-comparison.json": "8d865ab04168f6e0c688eaaa0c2574896184dd37eb9a2fadf20eab7ad9eb9f86",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank0.jsonl": "e5158a87f5446b65679208b0c036a0369c57524afd22b7f43ded5b0822785c4d",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank1.jsonl": "79db4e3465708f7d954643e58f44a45fe3e5f151b1635eb33465f4eb6db161bc",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank2.jsonl": "5e5848aebab6f5e98c47519bb703e05efb117aa8b28fafe177f970ece6776c87",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank3.jsonl": "7cd759115aa1d7c5984de4a616b4d9ccdb6983bed54aecf89e96ea1d71aa363e",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank4.jsonl": "63ed6fa334a5b65de0085321ab08e0e51b1289f6209a2ab68d0f79c55a8150c5",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank5.jsonl": "85ce834dd2029aa7a768059a4524a9a90c15ac2bfc2ba89ac539c6bd88f67f99",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank6.jsonl": "2d801692a32e746f01b3f592ba63020b858bb6032bc870a313e38965d08b69c0",
+    "runs/r129-f637-fp32-tp2-200-r4/metrics-rank7.jsonl": "aee9568f70b14e7060f948a9a879a7f415b82d4d9f1bf8931e0c562c02cc1e34",
+    "evidence/f637-tp2-r4-all-rank-resources.json": "953af678a3ed5843a3da0d19919106cadfe25e8d527ec3bb5655d2e04a5ee33a",
+    "evidence/f637-tp2-r4-strict-comparison.json": "de9a9d8df2cf1e42f3d5b45cf6ff27f9656f43dc7375810732dd69001da94d74"
+  },
+  "input_sha256_map_digest": {
+    "serialization": "json.dumps(map,sort_keys=True,separators=(comma,colon)).encode()",
+    "sha256": "a1bf20f2864f02450f5d018c24621e5c09f5316ddfd71dcbe7242cdeeea28d7c"
+  },
+  "standards_reference": {
+    "path": "fixes/latest-jt-validation-f637/.agent/rules/code-style.md",
+    "sha256": "90c0e3f26a7bdaa629b54515b11cc9ecbafb9599e7c58b07d6ad3e15095209de"
+  },
+  "actions_zh": "只读本地源码和证据；仅写本审计及模块成本计划。未启动训练、容器、设备或远端命令，未修改生产源码/原始证据/GitHub。",
+  "module_plan": "evidence/f637-module-cost-current-plan.md"
+}

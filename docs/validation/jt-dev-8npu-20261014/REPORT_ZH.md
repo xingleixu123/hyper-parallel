@@ -34,6 +34,18 @@
 
 已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `b540051`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
 
+## 当前资源总览与重计算接口复核（2026-10-16，UTC+8）
+
+六组完整200步的资源结果已从48份原始rank日志、9600行逐项复算，60项输入SHA及图表数字经独立审计通过。绿色重算配置的精度已通过；红色斜线的EP/CP/TP仍未通过0.005，图中资源下降不能当成已验收的优化推荐。
+
+![当前配方的显存与耗时总览，分别标出精度结论](figures/f637-current-resource-overview-zh.png)
+
+当前FSDP完全/选择重算分别节省约11.98%/9.79% allocated显存，步时增加6.94%/6.68%；两者仅3.069ms的单次中位时间差不能排稳定速度名次。图中每组均为独立完整200步；耗时先逐步取8rank MAX再去前20步，显存含warmup且截至训练采样，不含末次checkpoint保存。保留相同输入采集开销，非无插桩或端到端性能。
+
+JT底层已有checkpoint、exclude及策略接口；当前YAML的off/full/selective可以直接使用。按层安全子区域尚缺JT adapter声明，任意模块路径、排除和通信组合也未完整映射。full覆盖两个主干decoder和一个MTP decoder，off仍保留独立chunked head/CE重算。MF PyNative与Megatron按最新固定官方提交逐项核对；模块成本复测已定义精确FQN与pre-FSDP安装点，尚未执行的新策略不冒称通过。
+
+[中文详细说明、数据、SVG及独立审计](reports/f637-resource-overview/README_ZH.md) · [MF/Megatron能力与接口缺口](reports/f637-resource-overview/f637-recompute-flexibility-gap-review-v2.md) · [当前版本模块复测计划](reports/f637-resource-overview/f637-module-cost-current-plan.md)。
+
 ## 最新完整结果：TP2也完成200步，跨并行精度仍未通过（2026-10-16，UTC+8）
 
 TP2第四轮`r129-f637-fp32-tp2-200-r4`完整完成200步×8rank，退出0，517.637332秒后释放八卡，无本任务残留。与FSDP8基线的输入、初态、计数、源码、镜像及数值配方检查通过；独立数值与资源复算也确认原始证据有效，**训练精度FAIL**。LM/还原MTP/aux最大差分别为**0.0214481354/0.0246699651/0.1558382064**，首次超过0.005分别是111/45/19步。旧中断轮共同1–69步的全部loss和梯度范数与本轮差0，未拼接前缀。
@@ -50,7 +62,7 @@ TP2 allocated/reserved峰值17.294672/18.638672GiB，allocated较FSDP8节省4.73
 
 rank0有51/200步漏报最慢TP lane时间，最大1.213431毫秒；本轮allocated/reserved没有rank0峰值漏报，与旧69步记录分开。离线汇总已校正，进一步补充#225/PR#226的真实修复前证据；该PR原单提交不变，真实NPU修复后通信成本仍待测。
 
-76份原始文件SHA全部核验，传输重复包两端清理，checkpoint200保留。下一次设备实验最早04:26:53.124037+08，仍需空卡复查；接续改为FSDP/CP2×原生/FP32输入梯度的四臂三步诊断，不改变LR、数据或0.005门槛。
+76份原始文件SHA全部核验，传输重复包两端清理，checkpoint200保留。后续设备实验继续遵守释放后至少20分钟及空卡复查；FSDP/CP2×原生/FP32输入梯度的四臂三步诊断保持LR、数据和0.005门槛，不替代200步验收。
 
 [详细配置、复现和资源解释](reports/f637-tp2-r4-complete/README_ZH.md) · [严格全rank比较](reports/f637-tp2-r4-complete/f637-tp2-r4-strict-comparison.json) · [数值独立复算](reports/f637-tp2-r4-complete/f637-tp2-r4-precision-independent-review.json) · [资源与释放独立审计](reports/f637-tp2-r4-complete/f637-tp2-r4-resource-independent-review.json)。
 
