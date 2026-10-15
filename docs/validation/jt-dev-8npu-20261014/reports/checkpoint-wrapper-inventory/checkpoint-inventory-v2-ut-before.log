@@ -1,0 +1,103 @@
+F.F.                                                                   [100%]
+=================================== FAILURES ===================================
+_ TestActivationCheckpointInventory.test_fsdp_composition_preserves_all_regions _
+
+self = <test_integration_validator.TestActivationCheckpointInventory testMethod=test_fsdp_composition_preserves_all_regions>
+
+    def test_fsdp_composition_preserves_all_regions(self) -> None:
+        """Count trunk wrappers extended by FSDP alongside an outer MTP wrapper."""
+        model = nn.Module()
+        model.layers = nn.ModuleList([checkpoint_wrapper(nn.Linear(3, 3)) for _ in range(2)])
+        inner = nn.Linear(3, 3)
+        model.mtp = checkpoint_wrapper(inner)
+        # Use the real class extension, without constructing HSDP state or groups.
+        with mock.patch.dict(fully_shard_api.origin_class_to_extend_class, clear=True):
+            for layer in model.layers:
+                fully_shard_api._extend_module_with_hsdp_interface(layer)
+            fully_shard_api._extend_module_with_hsdp_interface(inner)
+            actual = collect_activation_checkpoint_wrappers(model)
+    
+        expected = {
+            "count": 3,
+            "wrappers": [
+                {"fqn": "layers.0", "wrapped_type": "torch.nn.modules.linear.Linear"},
+                {"fqn": "layers.1", "wrapped_type": "torch.nn.modules.linear.Linear"},
+                {"fqn": "mtp", "wrapped_type": f"{type(inner).__module__}.{type(inner).__qualname__}"},
+            ],
+        }
+>       self.assertEqual(actual, expected)
+E       AssertionError: {'count': 1, 'wrappers': [{'fqn': 'mtp', 'wrapped_t[52 chars]r'}]} != {'count': 3, 'wrappers': [{'fqn': 'layers.0', 'wrap[194 chars]r'}]}
+E       - {'count': 1,
+E       ?           ^
+E       
+E       + {'count': 3,
+E       ?           ^
+E       
+E       -  'wrappers': [{'fqn': 'mtp',
+E       ?                        ^^^
+E       
+E       +  'wrappers': [{'fqn': 'layers.0',
+E       ?                        ^^^^^^^^
+E       
+E       +                'wrapped_type': 'torch.nn.modules.linear.Linear'},
+E       +               {'fqn': 'layers.1',
+E       +                'wrapped_type': 'torch.nn.modules.linear.Linear'},
+E       +               {'fqn': 'mtp',
+E                        'wrapped_type': 'hyper_parallel.core.fully_shard.api.HSDPLinear'}]}
+
+tests/ut/model_integration/test_integration_validator.py:51: AssertionError
+_ TestActivationCheckpointInventory.test_plain_and_same_named_modules_are_not_checkpoint_regions _
+
+self = <test_integration_validator.TestActivationCheckpointInventory testMethod=test_plain_and_same_named_modules_are_not_checkpoint_regions>
+
+    def test_plain_and_same_named_modules_are_not_checkpoint_regions(self) -> None:
+        """A same-named unrelated class is not an HP activation wrapper."""
+        unrelated = type("CheckpointWrapper", (nn.Module,), {"__module__": __name__})()
+        unrelated._wrapped_module = nn.Linear(3, 3)
+        model = nn.Sequential(nn.Linear(3, 3), unrelated)
+>       self.assertEqual(collect_activation_checkpoint_wrappers(model), {"count": 0, "wrappers": []})
+E       AssertionError: {'count': 1, 'wrappers': [{'fqn': '1', 'wrapped_typ[34 chars]r'}]} != {'count': 0, 'wrappers': []}
+E       + {'count': 0, 'wrappers': []}
+E       - {'count': 1,
+E       -  'wrappers': [{'fqn': '1', 'wrapped_type': 'torch.nn.modules.linear.Linear'}]}
+
+tests/ut/model_integration/test_integration_validator.py:72: AssertionError
+_ TestActivationCheckpointInventory.test_root_wrapper_before_and_after_fsdp_class_extension (extend=True) _
+
+self = <test_integration_validator.TestActivationCheckpointInventory testMethod=test_root_wrapper_before_and_after_fsdp_class_extension>
+
+    def test_root_wrapper_before_and_after_fsdp_class_extension(self) -> None:
+        """Retain the root FQN and wrapped type for both supported compositions."""
+        for extend in (False, True):
+            with self.subTest(extend=extend):
+                model = checkpoint_wrapper(nn.Linear(3, 3))
+                with mock.patch.dict(fully_shard_api.origin_class_to_extend_class, clear=True):
+                    if extend:
+                        fully_shard_api._extend_module_with_hsdp_interface(model)
+                    actual = collect_activation_checkpoint_wrappers(model)
+>               self.assertEqual(actual, {
+                    "count": 1,
+                    "wrappers": [{"fqn": "<root>", "wrapped_type": "torch.nn.modules.linear.Linear"}],
+                })
+E               AssertionError: {'count': 0, 'wrappers': []} != {'count': 1, 'wrappers': [{'fqn': '<root>', 'wrappe[39 chars]r'}]}
+E               - {'count': 0, 'wrappers': []}
+E               + {'count': 1,
+E               +  'wrappers': [{'fqn': '<root>',
+E               +                'wrapped_type': 'torch.nn.modules.linear.Linear'}]}
+
+tests/ut/model_integration/test_integration_validator.py:62: AssertionError
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/ut/model_integration/test_integration_validator.py::TestActivationCheckpointInventory::test_fsdp_composition_preserves_all_regions
+FAILED tests/ut/model_integration/test_integration_validator.py::TestActivationCheckpointInventory::test_plain_and_same_named_modules_are_not_checkpoint_regions
+SUBFAILED(extend=True) tests/ut/model_integration/test_integration_validator.py::TestActivationCheckpointInventory::test_root_wrapper_before_and_after_fsdp_class_extension
+3 failed, 2 passed, 15 warnings, 1 subtests passed in 28.40s

@@ -1,0 +1,23 @@
+2026-10-15 17:41:11,768 [INFO] torch_npu.env: get env LOCAL_RANK = 2
+2026-10-15 17:41:12,871 [INFO] torch_npu.env: get env WORLD_SIZE = 8
+2026-10-15 17:41:12,871 [INFO] torch_npu.env: get env MASTER_ADDR = 127.0.0.1
+2026-10-15 17:41:12,871 [INFO] torch_npu.env: get env MASTER_PORT = 30356
+2026-10-15 17:41:12,871 [INFO] torch_npu.env: get env TORCHELASTIC_USE_AGENT_STORE = True
+2026-10-15 17:41:12,947 [INFO] hyper_parallel.trainer.base: Process rank: 2, world size: 8
+2026-10-15 17:41:12,964 [INFO] hyper_parallel.distributed.mesh: Built device mesh (8, 1, 1), dense FSDP mesh (1, 8, 1) and expert FSDP mesh None
+2026-10-15 17:41:12,965 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='model.layers.[123456789]*.mlp' skipped because condition 'ep' is inactive
+2026-10-15 17:41:12,965 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='mtp.layers.*.transformer_layer.mlp' skipped because condition 'ep' is inactive
+2026-10-15 17:41:12,977 [INFO] hyper_parallel.models._transformers.model_builder: FSDP2Manager instantiated with FSDP2Config
+2026-10-15 17:42:14,369 [INFO] hyper_parallel.models._transformers.model_builder: Initialized model state with model-native random initialization
+2026-10-15 17:42:22,278 [INFO] hyper_parallel.distributed.activation_checkpoint: Full activation checkpointing wrapped 3 submodule(s) in: model.layers, mtp.layers.0
+2026-10-15 17:42:22,282 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Adapter-declared FSDP child units: ['mtp.layers.0.transformer_layer']
+2026-10-15 17:42:22,745 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Applied FSDP2 to 3 child units and the root module
+2026-10-15 17:42:22,746 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: FSDP2 wrap applied
+2026-10-15 17:42:22,776 [INFO] hyper_parallel.models._transformers.model_builder: Model moved to npu:2
+2026-10-15 17:42:22,815 [INFO] torch_npu.env: get env HYPER_PARALLEL_MODEL_INTEGRATION_OUTPUT_DIR = /work/runs/r129-f637-fp32-fsdp8-full-200-r3/integration
+/workspace/venv/lib/python3.12/site-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+2026-10-15 17:42:28,981 [INFO] hyper_parallel.trainer.base: Checkpointing is inactive (save_ckpt=false, restore_from=None); no checkpoint callback registered.
+2026-10-15 17:42:28,981 [INFO] torch_npu.env: get env JT_MODULE_PROFILE = 0
+/workspace/hyper-parallel/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py:477: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:423.)
+  pad_ids = pad_ids.reshape(padding, config.num_experts_per_tok) % padding

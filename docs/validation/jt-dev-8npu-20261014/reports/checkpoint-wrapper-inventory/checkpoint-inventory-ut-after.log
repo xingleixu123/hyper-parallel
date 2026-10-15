@@ -1,0 +1,62 @@
+.F............................................................         [100%]
+=================================== FAILURES ===================================
+_ TestActivationCheckpointInventory.test_inventory_import_remains_backend_free _
+
+self = <test_integration_validator.TestActivationCheckpointInventory testMethod=test_inventory_import_remains_backend_free>
+
+    def test_inventory_import_remains_backend_free(self) -> None:
+        """Keep reporting usable without importing Torch in a fresh process."""
+        code = (
+            "import sys; "
+            "from hyper_parallel.tools.model_integration.integration_validator "
+            "import collect_activation_checkpoint_wrappers; "
+            "raise SystemExit(int(any(name in sys.modules for name in ('torch', 'torch_npu'))))"
+        )
+>       result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False, timeout=30)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/ut/model_integration/test_integration_validator.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/python3.12.14/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python3.12.14/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python3.12.14/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: -9 args: ['/work/venvs/checkpoint-inventory-tests/bin/py...>
+endtime = 54462.61323497, orig_timeout = 30
+stdout_seq = [b'DrvMngGetConsoleLogLevel failed. (ret=4)\n']
+stderr_seq = [b'/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can\'t get ascend_hal device count\n  warnings.warn("Can\'t get ascend_hal device count")\n']
+skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/work/venvs/checkpoint-inventory-tests/bin/python', '-c', "import sys; from hyper_parallel.tools.model_integration.integration_validator import collect_activation_checkpoint_wrappers; raise SystemExit(int(any(name in sys.modules for name in ('torch', 'torch_npu'))))"]' timed out after 30 seconds
+
+/usr/local/python3.12.14/lib/python3.12/subprocess.py:1253: TimeoutExpired
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/ut/model_integration/test_integration_validator.py::TestActivationCheckpointInventory::test_inventory_import_remains_backend_free
+1 failed, 61 passed, 16 warnings, 2 subtests passed in 60.53s (0:01:00)

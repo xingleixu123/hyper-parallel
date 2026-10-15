@@ -1,0 +1,92 @@
+{
+  "case": "r129-f637-fp32-fsdp8-full-200-r3",
+  "actual_installed_wrapper_count": 3,
+  "reported_wrapper_count": 1,
+  "inventory_wrappers": [
+    {
+      "forward_signature": "(*args: Any, **kwargs: Any) -> Any",
+      "fqn": "model.layers.0",
+      "training": true,
+      "type": "abc.HSDPCheckpointWrapper"
+    },
+    {
+      "forward_signature": "(*args: Any, **kwargs: Any) -> Any",
+      "fqn": "model.layers.1",
+      "training": true,
+      "type": "abc.HSDPCheckpointWrapper"
+    },
+    {
+      "forward_signature": "(*args: Any, **kwargs: Any) -> Any",
+      "fqn": "mtp.layers.0.transformer_layer",
+      "training": true,
+      "type": "hyper_parallel.core.activation_memory.wrapper.CheckpointWrapper"
+    }
+  ],
+  "all_rank_build_logs": [
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/0/stderr.log",
+      "sha256": "aea4685f27258df72f5f0cc942eff04dbb4975f11110d4c95a4cee7cc178b74b",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/1/stderr.log",
+      "sha256": "089fdfa9d2cbee1fc6b8773efa6d955ccf32669e90fe8c2edff147848f65d5da",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/2/stderr.log",
+      "sha256": "99f800f8dbcaed37dec04deb31c3ab24a91a19a62646f5ce8023dc8eddfce53e",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/3/stderr.log",
+      "sha256": "ff7983404b34a3e16e6876a12a0a817785142a8403a883cafb829a4ec6b61c97",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/4/stderr.log",
+      "sha256": "f45dcbeef49b0e84bbb3edeace52c025f98bbfa8cfe85edc2b29bf76bc56a6a5",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/5/stderr.log",
+      "sha256": "42bce89877596f063c5314a022b6ea749876a680dbc136b8f736dbc62b3e378e",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/6/stderr.log",
+      "sha256": "1dba8597a36e77de82f0753bc347bc0abba788179cc082e47be8c7a60899c1e1",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-full-200-r3/worker-logs/none_bxw61wqt/attempt_0/7/stderr.log",
+      "sha256": "af6e65013c64c52552cdaa759f64cc7b62a47ca45e65dd360d0ce99e6334efaa",
+      "wrapped_count": 3,
+      "containers": "model.layers, mtp.layers.0"
+    }
+  ],
+  "complete_steps_per_rank": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "exit_code": 137,
+  "released": true,
+  "duration_seconds": 115.91190359000029,
+  "foreign_process_has_different_pid_namespace_and_cgroup": true,
+  "only_owned_container_stopped": true,
+  "remaining_owned_pids": 0,
+  "limitations": "报告漏计证据；本轮因卡争用在第一个完整优化器步前中断，不给200步loss/显存/性能结论。"
+}
