@@ -1,0 +1,77 @@
+{
+  "checked_at": "2026-10-15T09:49:53.642573+00:00",
+  "case": "r129-f637-fp32-fsdp8-0-200-r2",
+  "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+  "status": "INCOMPLETE_RESOURCE_CONFLICT",
+  "complete_steps_per_rank": [
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31,
+    31
+  ],
+  "step_window": [
+    1,
+    31
+  ],
+  "all_observed_losses_finite": true,
+  "all_rank_loss_spread_max": {
+    "training/total_loss": 0.0,
+    "training/foundation_loss/lm": 0.0,
+    "training/foundation_loss/mtp": 0.0,
+    "training/foundation_loss/aux": 0.0
+  },
+  "input_hashes_equal_across_ranks": true,
+  "lr": 0.0001,
+  "samples_at_step31": 248.0,
+  "tokens_at_step31": 614332.0,
+  "partial_memory_allocated_gib": 22.032196044921875,
+  "partial_memory_reserved_gib": 27.25,
+  "duration_seconds": 172.13887769999928,
+  "container_exit_code": 137,
+  "container_released": true,
+  "remaining_owned_pids": [],
+  "ownership_observations": [
+    {
+      "pid": 778877,
+      "different_uid": true,
+      "different_pid_namespace": true,
+      "different_cgroup": true,
+      "external_identity_still_present_after_refresh": true
+    },
+    {
+      "pid": 778878,
+      "different_uid": true,
+      "different_pid_namespace": true,
+      "different_cgroup": true,
+      "external_identity_still_present_after_refresh": true
+    },
+    {
+      "pid": 778879,
+      "different_uid": true,
+      "different_pid_namespace": true,
+      "different_cgroup": true,
+      "external_identity_still_present_after_refresh": true
+    },
+    {
+      "pid": 778880,
+      "different_uid": true,
+      "different_pid_namespace": true,
+      "different_cgroup": true,
+      "external_identity_still_present_after_refresh": true
+    }
+  ],
+  "raw_ownership_event_sha256": "a6a741619dffa00f5ca49851739f101268ea50ff7517fe2c18d8f3221097cedc",
+  "next_global_launch_not_before_plus08": "2026-10-15T18:02:07.655109+08:00",
+  "limits": [
+    "仅31步，不能作为200步验收",
+    "各rank聚合loss相同不等于独立连续参考对齐",
+    "未生成checkpoint200，不能启动200–400续训",
+    "本次归属证据不能反推上一轮PR199中断原因",
+    "冲突轮次不纳入性能收益比较"
+  ],
+  "duplicate_archive_cleanup_verified": true
+}

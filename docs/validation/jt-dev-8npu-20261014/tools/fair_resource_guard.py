@@ -32,6 +32,9 @@ ALLOWED_IMAGES = {
     'sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d',
 }
 GAP_SECONDS = 1200
+IDENTITY_FILE_BYTES = 4096
+IDENTITY_PID_LIMIT = 16
+OWNERSHIP_EVENT_BYTES = 8 * 1024 * 1024
 RUNNER_REPOSITORIES = {
     '/work/tools/run_fair_training_case.sh': 'repo',
     '/work/tools/run_fair_pr199_st.sh': 'fixes/pr199-f637-st',
@@ -79,13 +82,16 @@ def card_snapshot():
     return card_observation()['cards']
 
 
-def process_identity(pid):
+def process_identity(pid: int) -> dict:
     """Capture bounded, non-command-line ownership evidence while a process exists."""
     path = Path('/proc') / str(pid)
     result = {'pid': pid, 'observed_wall': time.time()}
     for name in ('status', 'stat', 'cgroup'):
         try:
-            result[name] = (path / name).read_text()[:65536]
+            with (path / name).open('rb') as stream:
+                data = stream.read(IDENTITY_FILE_BYTES + 1)
+            result[name] = data[:IDENTITY_FILE_BYTES].decode('utf-8', errors='backslashreplace')
+            result[name + '_truncated'] = len(data) > IDENTITY_FILE_BYTES
         except OSError as exc:
             result[name + '_error'] = str(exc)
     try:
@@ -104,6 +110,16 @@ def save(path, value):
     temporary = path.with_suffix(path.suffix + '.tmp')
     temporary.write_text(json.dumps(value, indent=2) + '\n')
     temporary.replace(path)
+
+
+def _save_ownership_event(path: Path, value: dict) -> None:
+    """Keep diagnostic evidence below the collector's per-file budget."""
+    payload = (json.dumps(value, indent=2) + '\n').encode('utf-8')
+    if len(payload) > OWNERSHIP_EVENT_BYTES:
+        value = {key: value[key] for key in (
+            'observed_wall', 'container_id', 'devices', 'reported_unknown_pids')}
+        value.update(evidence_truncated=True, original_serialized_bytes=len(payload))
+    save(path, value)
 
 
 def remote_job(request):
@@ -207,7 +223,8 @@ def remote_job(request):
                 foreign = {pid for index in devices for pid in snapshot.get(index, {}).get('pids', [])
                            if pid not in owned and Path('/proc/' + str(pid)).exists()}
                 if foreign:
-                    identities_before = {pid: process_identity(pid) for pid in sorted(foreign)[:128]}
+                    identity_candidates_before = len(foreign)
+                    identities_before = {pid: process_identity(pid) for pid in sorted(foreign)[:IDENTITY_PID_LIMIT]}
                     # A worker may start between docker top and the NPU snapshot.
                     refreshed = subprocess.run(docker + ['top', container, '-eo', 'pid'],
                                                capture_output=True, text=True)
@@ -217,17 +234,27 @@ def remote_job(request):
                     foreign.difference_update(owned)
                 if foreign:
                     event_path = directory / (case + '.ownership-event.json')
-                    save(event_path, {
+                    _save_ownership_event(event_path, {
                         'observed_wall': time.time(), 'container_id': container,
                         'container_init': process_identity(info['State']['Pid']),
-                        'devices': devices, 'npu_smi': observation['raw'],
-                        'top_before': {'stdout': top.stdout, 'stderr': top.stderr, 'returncode': top.returncode},
-                        'top_after': {'stdout': refreshed.stdout, 'stderr': refreshed.stderr,
+                        'devices': devices, 'npu_smi': observation['raw'][:65536],
+                        'npu_smi_truncated': len(observation['raw']) > 65536,
+                        'top_before': {'stdout': top.stdout[:65536], 'stderr': top.stderr[:65536],
+                                       'truncated': len(top.stdout) > 65536 or len(top.stderr) > 65536,
+                                       'returncode': top.returncode},
+                        'top_after': {'stdout': refreshed.stdout[:65536], 'stderr': refreshed.stderr[:65536],
+                                      'truncated': len(refreshed.stdout) > 65536 or len(refreshed.stderr) > 65536,
                                       'returncode': refreshed.returncode},
-                        'owned_pids_seen': sorted(owned), 'reported_unknown_pids': sorted(foreign),
+                        'owned_pids_seen': sorted(owned)[:4096], 'owned_pids_truncated': len(owned) > 4096,
+                        'reported_unknown_pids': sorted(foreign)[:128],
+                        'unknown_pids_truncated': len(foreign) > 128,
+                        'identity_pid_limit': IDENTITY_PID_LIMIT,
+                        'identity_candidates_before_refresh': identity_candidates_before,
+                        'identities_before_truncated': identity_candidates_before > IDENTITY_PID_LIMIT,
+                        'identities_after_truncated': len(foreign) > IDENTITY_PID_LIMIT,
                         'identities_before_refresh': identities_before,
                         'identities_after_refresh': {
-                            pid: process_identity(pid) for pid in sorted(foreign)[:128]},
+                            pid: process_identity(pid) for pid in sorted(foreign)[:IDENTITY_PID_LIMIT]},
                     })
                     receipt.update(reason='foreign-job-appeared-on-selected-devices', foreign_pids=sorted(foreign))
                     receipt['ownership_event'] = str(event_path.relative_to(ROOT))

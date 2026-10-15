@@ -1,8 +1,16 @@
+## 最新八卡基线执行与让卡记录（2026-10-15）
+
+在全局间隔超过20分钟、129八卡连续两次确认空闲后，使用集成源 `18602c4524dc664b81b2bad9a7b624455ce1494f` 启动 `r129-f637-fp32-fsdp8-0-200-r2`。8个rank均记录了step1–31，loss有限、输入身份一致；step31累计248个样本、614332个监督token。随后0–3卡出现外部作业，事件时的UID、PID命名空间及控制组均与本任务容器不同，刷新进程清单后身份差异仍在。本任务只释放自己的容器；退出137、无残留本任务设备PID，整轮172.14秒。**未完成200步，也没有checkpoint200，不能开始本轮200–400续训或声明精度达标；冲突轮次不用于性能收益比较。**
+
+[31步全rank核验与归属摘要](reports/f637-fsdp8-r2-interrupted/f637-fsdp8-r2-interrupted-analysis.json)、[设备释放凭据](reports/f637-fsdp8-r2-interrupted/r129-f637-fp32-fsdp8-0-200-r2.receipt.json)、[逐文件校验记录](reports/f637-fsdp8-r2-interrupted/f637-fsdp8-r2-interrupted-local-verification.json)。采集的68份文件全部校验，重复压缩包两端已删除；原始进程信息本地保留，公开版本仅披露必要身份差异。此轮不能反推此前#199中断的进程归属。
+
+总单、9个小问题及9个独立单提交PR共19项已回读核对，[双向关联与提交数](reports/f637-fsdp8-r2-interrupted/github-chinese-full-link-audit.json)完整。守卫诊断另修正了非UTF8进程信息解码与证据大小边界，10项CPU检查和规范/验收条件两轴复审通过；实际未知PID判断、只停止本任务容器及全局20分钟间隔均未改变。125的基线、续训和连续参考配置均已准备，下一轮重新检查空卡。
+
 ## 上游更新与资源进展（2026-10-15）
 
 上游随后合入 #186，JT_dev 推进到 `f637ef7ee4d4b416800716f1ebaaae7709b8a06a`，包含 CP 分块损失支持、MLA 布局调整和 `enable_chunk_loss`/`chunk_loss_size` 配置。此前 `521d3a8` 的基线与续训证据属于固定旧轮次，不能改写为新基点结论。该轮连续400参考在 step168 出现外部设备进程，本任务已释放容器，保留中断日志，不计为完整参考，也没有停止他人任务。新基点已集成完成；接下来按0–200→checkpoint200–400→独立连续400的顺序重建匹配参考。
 
-原 #199 与 #186 的生产功能重叠，现已保留上游实现并收敛为 #205 的独立回归测试：两个文件、单提交 `e9fc94d376ca7380c13a5e09c0020b34a75dc1d2`。新基点 CPU 20项测试、25项子测试通过，两轴检视通过；新基点四卡 ST 尚待运行，不沿用旧 NPU 通过结论。所有资源操作继续遵守空闲检查和全局20分钟间隔。
+原 #199 与 #186 的生产功能重叠，现已保留上游实现并收敛为 #205 的独立回归测试：两个文件、单提交 `e9fc94d376ca7380c13a5e09c0020b34a75dc1d2`。新基点 CPU 20项测试、25项子测试通过，两轴检视通过；新基点四卡 ST 已尝试但中断，尚待完整回归，不沿用旧 NPU 通过结论。所有资源操作继续遵守空闲检查和全局20分钟间隔。
 
 上一轮公开证据：[详细中文总报告](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/REPORT_ZH.md)、[本次 CPU 原始日志](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-ut.log)、[隔离容器凭据](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-receipt.json)、[源码与单提交重写记录](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-rewrite.json)。以上链接固定到证据提交，不随分支后续更新漂移。
 
@@ -45,7 +53,7 @@ rank0 已输出8种配置各2步的16条损失记录，其中包含新增的 `ch
 | Top1 | 完整 TP/CP/EP 矩阵 200 步精度仍不达标 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 下表保留全 rank 最大误差；短跑、改 loss 权重或改变参考配方均不能替代验收 |
 | Top2 | 梯度累积按微批有效 token 归一化，改变整步目标 | [#203](https://github.com/hf1s/hyper-parallel/issues/203) | [#194](https://github.com/hf1s/hyper-parallel/pull/194) | 实际 Trainer 的不等长监督样例，正确梯度 14、旧行为 10；TP2×EP2 LM 误差显著下降但仍未过 0.005 |
 | Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
-| Top4 | CP 分块输出损失的支持与回归覆盖 | [#205](https://github.com/hf1s/hyper-parallel/issues/205) | [#199](https://github.com/hf1s/hyper-parallel/pull/199) | 功能已由上游 #186 合入；#199 收敛为独立回归，新基点 CPU20项/25子测试通过，NPU待运行 |
+| Top4 | CP 分块输出损失的支持与回归覆盖 | [#205](https://github.com/hf1s/hyper-parallel/issues/205) | [#199](https://github.com/hf1s/hyper-parallel/pull/199) | 功能已由上游 #186 合入；#199 收敛为独立回归，新基点 CPU20项/25子测试通过，NPU尚待完整回归 |
 | Top5 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；集成 full/selective 各 200 步零误差，成本见下文 |
 | Top6 | 重计算重放重复提交专家路由 token 计数 | [#207](https://github.com/hf1s/hyper-parallel/issues/207) | [#196](https://github.com/hf1s/hyper-parallel/pull/196) | 保留必要张量运算，只约束持久副作用；均匀重复计数未必改变 sign 型 bias 更新，不能虚构旧 loss 漂移 |
 | Top7 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 旧配方恢复计数和连续参考完全相同；129 新配方恢复边界正确，完整数值对照待连续参考 |
