@@ -1,0 +1,16 @@
+[W1015 18:34:48.325690030 NPUCachingAllocator.cpp:201] Warning: The current CANN and Soc versions require processing for 32 padding size, with memory allocation. (function operator())
+{"order": "expert_major", "shape": "2d", "route": "eager_bf16", "error": "cannot reshape array of size 8208 into shape (4096,2)"}
+{"order": "expert_major", "shape": "2d", "route": "eager_fp32_sum", "error": "cannot reshape array of size 8208 into shape (4096,2)"}
+/alignment/phase12/tools/replay_weighted212_hp.py:66: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:423.)
+  result = shaped.sum(-1, keepdim=True)
+{"order": "expert_major", "shape": "2d", "route": "jit_bf16", "error": "cannot reshape array of size 8208 into shape (4096,2)"}
+{"order": "expert_major", "shape": "2d", "route": "aclop_bf16", "error": "cannot reshape array of size 8208 into shape (4096,2)"}
+....{"order": "expert_major", "shape": "2d", "route": "aclop_fp32", "error": "cannot reshape array of size 8208 into shape (4096,2)"}
+Traceback (most recent call last):
+  File "/alignment/phase12/tools/replay_weighted212_hp.py", line 89, in <module>
+    main()
+  File "/alignment/phase12/tools/replay_weighted212_hp.py", line 55, in main
+    shaped = values if shape_name == '2d' else values.reshape(1, 4096, 2, 5120)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: shape '[1, 4096, 2, 5120]' is invalid for input of size 42024960
+[ERROR] 2026-10-15-18:35:44 (PID:1703858, Device:0, RankID:-1) ERR99999 UNKNOWN applicaiton exception

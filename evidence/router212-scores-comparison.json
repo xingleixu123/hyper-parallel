@@ -1,0 +1,126 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp_exit_zero": true,
+    "hp_all_metrics_grad_norm_exact": true,
+    "hp_all_inputs_exact": true,
+    "hp_restore_exact": true,
+    "hp_all_main_branches_exact": true,
+    "mf_exit_zero": true,
+    "mf_all_metrics_grad_norm_exact": true,
+    "mf_all_inputs_exact": true,
+    "mf_restore_exact": true,
+    "mf_all_main_branches_exact": true,
+    "unchanged_SOURCE_REVISION.json": true,
+    "unchanged_PROBE_SOURCE_MANIFEST.json": true,
+    "unchanged_HEAD_GEMM_ROUTE.json": true,
+    "unchanged_SHARED_UP_FP32_FACTOR.json": true,
+    "unchanged_ADAMW_ARCHIVE_ARITHMETIC.json": true,
+    "unchanged_Q_NS_ADJACENT_FACTOR.json": true,
+    "unchanged_ROUTER_NS_NPU_SQRT_FACTOR.json": true,
+    "exact12_HEAD_GEMM_ROUTE_CALLS.jsonl": true,
+    "exact12_Q_NS_ADJACENT_CALLS.jsonl": true,
+    "exact12_ROUTER_NS_NPU_SQRT_CALLS.jsonl": true,
+    "exact12_CLIP_REDUCTION.jsonl": true,
+    "49_frozen_sources": true,
+    "hp_46_preclip_exact_211": true,
+    "hp_preclip_source_211": true,
+    "hp_46_preclip_exact_212": true,
+    "hp_preclip_source_212": true,
+    "hp_13_boundaries": true,
+    "mf_8_boundaries": true,
+    "hp_scores_source": true,
+    "mf_scores_source": true,
+    "same_selected_experts": true
+  },
+  "comparisons": {
+    "logits": {
+      "elements": 32768,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "scores": {
+      "elements": 32768,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "scores_dy": {
+      "elements": 32768,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 2,
+      "max_abs": 3.87863110518083e-08,
+      "mean_abs": 1.238537050696209e-12,
+      "l2_error_squared": 1.5076109844200278e-15,
+      "relative_l2": 1.9107498566092142e-06
+    },
+    "auxiliary": {
+      "elements": 32768,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "auxiliary_dy": {
+      "elements": 32768,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "coefficients_expert_aligned": {
+      "elements": 8192,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "coefficients_dy_expert_aligned": {
+      "elements": 8192,
+      "fp32_bitwise_different": 1,
+      "bf16_different": 1,
+      "max_abs": 1.4901161193847656e-08,
+      "mean_abs": 1.8189894035458565e-12,
+      "l2_error_squared": 2.220446049250313e-16,
+      "relative_l2": 1.744848677237314e-06
+    },
+    "normalization_dx_vs_mf_scores_dy": {
+      "elements": 32768,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 2,
+      "max_abs": 3.87863110518083e-08,
+      "mean_abs": 1.238537050696209e-12,
+      "l2_error_squared": 1.5076109844200278e-15,
+      "relative_l2": 1.9107498566092142e-06
+    },
+    "hp_normalization_to_sigmoid_exact": {
+      "elements": 32768,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    }
+  },
+  "indices_original_order_exact": true,
+  "runs": {
+    "hp": "hp-jtf637-norm208-routerscores212",
+    "mf": "mf-routerscores212"
+  },
+  "source_sha256": "2d08ee59636c8b7f12b2f2ce721831ec7b7ffcb7d6dafdfda6502e94f0413a22",
+  "scope": "Readonly12: metrics/norm/input/restore and all main MoE branches exact prior verified runs; HP also verifies46 preclip hashes211/212. MF score observer did not dump46 preclip gradients."
+}

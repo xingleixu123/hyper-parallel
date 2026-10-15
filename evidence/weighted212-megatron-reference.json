@@ -1,0 +1,21 @@
+{
+  "repository": "NVIDIA/Megatron-LM",
+  "commit": "3914483fd325e053797aff3fa431d4a3141139aa",
+  "source_sha256": "d1aff14179353c469d891aa367ca7dc8ff756add1999eb9b5e897a19ca234295",
+  "url": "https://github.com/NVIDIA/Megatron-LM/blob/3914483fd325e053797aff3fa431d4a3141139aa/megatron/core/transformer/moe/moe_utils.py",
+  "locations": [
+    {
+      "line": 519,
+      "text": "def unpermute("
+    },
+    {
+      "line": 620,
+      "text": "permuted_tokens = permuted_tokens * permuted_probs.unsqueeze(-1)"
+    },
+    {
+      "line": 637,
+      "text": "out = output_tokens.to(dtype=input_dtype)"
+    }
+  ],
+  "interpretation_zh": "unpermute保留路由概率dtype参与乘法，可能提升到FP32/FP64；最后返回输入dtype。该实现未规定归档MF图的64路归约树。仅引用相关未融合分支，不扩大到TE融合实现。"
+}

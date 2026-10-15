@@ -1,0 +1,180 @@
+{
+  "complete": true,
+  "fidelity": {
+    "mf_exit_zero": true,
+    "mf_all_metrics_grad_norm_exact": true,
+    "mf_all_inputs_exact": true,
+    "mf_restore_exact": true,
+    "hp_exit_zero": true,
+    "hp_all_metrics_grad_norm_exact": true,
+    "hp_all_inputs_exact": true,
+    "hp_restore_exact": true,
+    "hp_optimizer_trace_exact": true,
+    "hp_46_preclip_exact_211": true,
+    "hp_preclip_source_211": true,
+    "hp_46_preclip_exact_212": true,
+    "hp_preclip_source_212": true,
+    "mf_46_preclip_exact_211": true,
+    "mf_preclip_source_211": true,
+    "mf_46_preclip_exact_212": true,
+    "mf_preclip_source_212": true,
+    "mf_source_exact": true,
+    "hp_source_exact": true
+  },
+  "padding": 8,
+  "comparisons": {
+    "x": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "y": {
+      "exact": false,
+      "size": 20971520,
+      "different": 16992751,
+      "max_abs": 0.125,
+      "rel_l2": 0.0016710079521564144
+    },
+    "dy": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "dx": {
+      "exact": false,
+      "size": 20971520,
+      "different": 6,
+      "max_abs": 3.725290298461914e-09,
+      "rel_l2": 2.9335093754730767e-07
+    },
+    "y_hp_rounded_bf16_vs_mf": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "router_weight": {
+      "exact": true,
+      "size": 40960,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "router_dy": {
+      "exact": false,
+      "size": 32768,
+      "different": 2,
+      "max_abs": 1.7018848552652344e-09,
+      "rel_l2": 7.300144543008505e-07
+    },
+    "router_dx": {
+      "exact": false,
+      "size": 20971520,
+      "different": 5120,
+      "max_abs": 1.305240360238713e-10,
+      "rel_l2": 7.346578032230122e-07
+    },
+    "routed_dx": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "shared_dx": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "hp_router_to_pair": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    }
+  },
+  "joins": {
+    "hp_actual_pair": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "readonly_hp_with_mf_router": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "hp_actual_combined": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "readonly_hp_with_mf_shared": {
+      "exact": false,
+      "size": 20971520,
+      "different": 6,
+      "max_abs": 3.725290298461914e-09,
+      "rel_l2": 2.9335093754730767e-07
+    },
+    "readonly_mf_with_hp_shared": {
+      "exact": false,
+      "size": 20971520,
+      "different": 6,
+      "max_abs": 3.725290298461914e-09,
+      "rel_l2": 2.9335093754359025e-07
+    },
+    "mf_round_expert_router_then_shared": {
+      "exact": true,
+      "size": 20971520,
+      "different": 0,
+      "max_abs": 0.0,
+      "rel_l2": 0.0
+    },
+    "mf_round_router_shared_then_expert": {
+      "exact": false,
+      "size": 20971520,
+      "different": 5654343,
+      "max_abs": 2.384185791015625e-07,
+      "rel_l2": 0.00276418779529038
+    },
+    "mf_fp32_expert_router_then_shared": {
+      "exact": false,
+      "size": 20971520,
+      "different": 6108205,
+      "max_abs": 2.384185791015625e-07,
+      "rel_l2": 0.0027578889214337414
+    },
+    "mf_fp32_expert_shared_then_router": {
+      "exact": false,
+      "size": 20971520,
+      "different": 6108236,
+      "max_abs": 2.384185791015625e-07,
+      "rel_l2": 0.0027578855596952544
+    }
+  },
+  "source_sha256": "2034e23e8279a59119b50d2ed5605ad12f988d812941277b0b01ff2ab1418606",
+  "forward_scope": "Raw HP MoE output is FP32 branch addition; BF16-rounded HP output equals MF. Raw y differences compare different precision boundaries and are not a new forward defect.",
+  "scope": "Actual complete212 branch gradients, 12-step metrics/input/restore and46 preclip hashes at211/212 verified; no intervention or reference injection.",
+  "public_redaction": {
+    "removed_fields": [
+      "hp_at_worst",
+      "mf_at_worst",
+      "worst_index"
+    ],
+    "private_source_file_sha256": "61e53559c7995d480565905cbf15b7df7e8b602c0cc3af2fb7b4cfdaa0e1de04"
+  }
+}

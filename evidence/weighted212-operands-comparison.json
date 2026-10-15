@@ -1,0 +1,123 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp_exit_zero": true,
+    "hp_all_metrics_grad_norm_exact": true,
+    "hp_all_inputs_exact": true,
+    "hp_restore_exact": true,
+    "hp_all_main_branches_exact": true,
+    "hp_all_score_boundaries_exact": true,
+    "mf_exit_zero": true,
+    "mf_all_metrics_grad_norm_exact": true,
+    "mf_all_inputs_exact": true,
+    "mf_restore_exact": true,
+    "mf_all_main_branches_exact": true,
+    "mf_all_score_boundaries_exact": true,
+    "hp_weighted_source": true,
+    "mf_weighted_source": true,
+    "hp_round_weights": true,
+    "mf_no_fused_permute": true,
+    "hp_full_permutation": true
+  },
+  "comparisons": {
+    "expert_values": {
+      "elements": 41943040,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "weighted_output_dy": {
+      "elements": 41943040,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "weights": {
+      "elements": 8192,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "hp_native_weight_dy_to_coefficients": {
+      "elements": 8192,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    "native_weight_dy": {
+      "elements": 8192,
+      "fp32_bitwise_different": 1,
+      "bf16_different": 1,
+      "max_abs": 1.4901161193847656e-08,
+      "mean_abs": 1.8189894035458565e-12,
+      "l2_error_squared": 2.220446049250313e-16,
+      "relative_l2": 1.744848677237314e-06
+    }
+  },
+  "candidates": {
+    "fp64_sum_rounded_bf16": {
+      "hp": {
+        "elements": 8192,
+        "fp32_bitwise_different": 2,
+        "bf16_different": 2,
+        "max_abs": 1.1920928955078125e-07,
+        "mean_abs": 1.4551916963090328e-11,
+        "l2_error_squared": 1.4210854715202206e-14,
+        "relative_l2": 1.395878904500439e-05
+      },
+      "mf": {
+        "elements": 8192,
+        "fp32_bitwise_different": 3,
+        "bf16_different": 3,
+        "max_abs": 1.1920928955078125e-07,
+        "mean_abs": 1.6370906366636184e-11,
+        "l2_error_squared": 1.4432899320127237e-14,
+        "relative_l2": 1.4067419391868943e-05
+      }
+    },
+    "numpy_fp32_sum_rounded_bf16": {
+      "hp": {
+        "elements": 8192,
+        "fp32_bitwise_different": 0,
+        "bf16_different": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "l2_error_squared": 0.0,
+        "relative_l2": 0.0
+      },
+      "mf": {
+        "elements": 8192,
+        "fp32_bitwise_different": 1,
+        "bf16_different": 1,
+        "max_abs": 1.4901161193847656e-08,
+        "mean_abs": 1.8189894035458565e-12,
+        "l2_error_squared": 2.220446049250313e-16,
+        "relative_l2": 1.744848676352835e-06
+      }
+    }
+  },
+  "correctness": {
+    "scope": "FP64 sum of actual rounded BF16 products; does not remove required intermediate rounding.",
+    "different_coordinates": 1,
+    "hp_closer_at_differences": 1,
+    "mf_closer_at_differences": 0,
+    "ties_at_differences": 0,
+    "hp_max_abs_error": 3.246415417379467e-06,
+    "mf_max_abs_error": 3.246415417379467e-06
+  },
+  "same_inputs": true,
+  "source_sha256": "2b8daf55a25986ea2fbea4d2cee50114b6ea538706722aa329f82958a1f8e5a0",
+  "scope": "Complete8192 expert choices, each5120 hidden elements, native12-step observer fidelity."
+}

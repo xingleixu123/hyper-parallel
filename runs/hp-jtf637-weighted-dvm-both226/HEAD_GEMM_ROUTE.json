@@ -1,0 +1,17 @@
+{
+  "mode": "legacy_nz",
+  "teacher_values_used": false,
+  "all_resumed_steps": true,
+  "coordinate_or_step_special_case": false,
+  "forward": "unchanged F.linear",
+  "dinput": "dy @ weight",
+  "dweight": "explicit MatMulV2(NZ(dy),NZ(x))->NZ, transpose_x1=True, output->ND",
+  "scope": "Independent head dweight arithmetic-route ablation; not a universal correctness fix",
+  "source_sha256": "050ff8cf445ff26468ddbe85565af5389320ec16d495a4849f99853a7138b6ed",
+  "helper_sha256": {
+    "head_gemm_aclop_nz_v3.py": "14a3d179aded7b001650c40df5c78f0fb12311f443b6e0b0db58e279a183d6b9",
+    "head_gemm_aclop_v2.py": "1e10162e773ca555b85b67491cdb78328fe519548674c26730f5cc2afc404463"
+  },
+  "validation": "head207-gemm-aclop-v2-nz-replay-r3: both entire outputs exact MF",
+  "jit_and_internal_format_scope": "Enabled only around dweight and restored False in finally"
+}
