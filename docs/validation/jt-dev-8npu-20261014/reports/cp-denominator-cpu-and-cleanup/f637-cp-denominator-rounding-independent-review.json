@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "review_axis": "CPU归一化舍入诊断的狭义结论与证据边界",
+  "reviewed_at": "2026-10-16T02:55:31.604657+08:00",
+  "conclusion_zh": "现有脚本和80例结果足以支持狭义观察：CPU上局部均值再按token份额缩放，与相同投影块的直接全局分母路径，可能产生微小FP32舍入差异。本样例BF16返回梯度未见差异；日志含MKLDNN BF16不可用后的BLAS回退，不能外推原生BF16内核、NPU或CP200步漂移根因。",
+  "npu_root_cause_established": false,
+  "npu_training_acceptance": "NOT_TESTED",
+  "performance_claimed": false,
+  "cpu_execution": {
+    "exit_code": 0,
+    "devices": [],
+    "removed": true,
+    "npu_initialized_at_script_end": false,
+    "torch_version": "2.12.0+cpu",
+    "source_commit": "18602c4524dc664b81b2bad9a7b624455ce1494f"
+  },
+  "call_and_shape_analysis": {
+    "script_lines": {
+      "imports": [
+        24,
+        29
+      ],
+      "evaluate": [
+        32,
+        65
+      ],
+      "case_grid": [
+        87,
+        102
+      ]
+    },
+    "production_projected_ce_lines": [
+      227,
+      298
+    ],
+    "production_cp_scaling_lines": [
+      301,
+      318
+    ],
+    "reference_zh": "hidden[1,32,32]、weight[61,32]、targets[1,32]；projected_cross_entropy按16位置切为两个[1,16,32]输入，由同一F.linear得到两个[1,16,61]投影块。完整32位置有效标签数G作为每个块CE的num_items_in_batch。",
+    "partitioned_zh": "两段均为[1,16,32]和[1,16]，使用同一头权重对象；每段只含一个16位置投影块。CP局部模式先按本段有效标签数ni求均值，再乘float32的ni/G；直接全局模式只在loss回调覆盖num_items_in_batch=G。",
+    "mathematical_equivalence_zh": "精确算术下，sum_i((sum_CE_i/ni)*(ni/G))等于sum_i(sum_CE_i/G)。零标签段使用生产clamp_min(1)，忽略标签CE为可微零；覆盖(0,13)而未覆盖全部标签都忽略。",
+    "controlled_boundary_zh": "三种模式复用同一输入数值和标签、相同投影块形状、相同生产projected CE与ForCausalLMLoss回调。状态和权重先detach/clone，避免跨模式梯度累积。参考与分区的区别限定为局部归一化/额外缩放及相应求和图结构；没有修改生产函数或换成手写CE。",
+    "not_real_cp_zh": "分区是单进程串行切片，贡献相加仅模拟损失代数；没有CP通信、分布式autograd、Trainer权重、HCCL归约、真实NPU算子或200步优化。"
+  },
+  "case_matrix": {
+    "total": 80,
+    "cases_per_dtype": 40,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "valid_counts": [
+      [
+        1,
+        15
+      ],
+      [
+        5,
+        13
+      ],
+      [
+        0,
+        13
+      ],
+      [
+        15,
+        1
+      ],
+      [
+        3,
+        7
+      ]
+    ],
+    "dtypes": [
+      "torch.float32",
+      "torch.bfloat16"
+    ],
+    "comparisons_per_case": 2
+  },
+  "independently_recomputed_summary": {
+    "cp_local_mean_then_scale": {
+      "torch.float32": {
+        "loss": {
+          "cases_with_difference": 6,
+          "max_abs": 4.76837158203125e-07
+        },
+        "hidden_gradient": {
+          "cases_with_difference": 8,
+          "max_abs": 1.862645149230957e-09
+        },
+        "weight_gradient": {
+          "cases_with_difference": 8,
+          "max_abs": 1.4901161193847656e-08
+        }
+      },
+      "torch.bfloat16": {
+        "loss": {
+          "cases_with_difference": 6,
+          "max_abs": 4.76837158203125e-07
+        },
+        "hidden_gradient": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        },
+        "weight_gradient": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        }
+      }
+    },
+    "cp_global_denominator": {
+      "torch.float32": {
+        "loss": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        },
+        "hidden_gradient": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        },
+        "weight_gradient": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        }
+      },
+      "torch.bfloat16": {
+        "loss": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        },
+        "hidden_gradient": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        },
+        "weight_gradient": {
+          "cases_with_difference": 0,
+          "max_abs": 0.0
+        }
+      }
+    }
+  },
+  "narrow_observations_zh": [
+    "FP32局部均值再缩放：loss差异6/40例，最大4.76837158203125e-7；hidden梯度和weight梯度差异各8/40例，最大分别1.862645149230957e-9和1.4901161193847656e-8。",
+    "BF16输入/权重：loss差异6/40例，最大4.76837158203125e-7；返回hidden/weight梯度40/40例均逐元素相同。",
+    "直接全局分母对参考在两种dtype的loss、hidden梯度、weight梯度均无差异。"
+  ],
+  "fallback": {
+    "warning_observed": true,
+    "warning_location": "tools/check_cp_denominator_rounding.py:38",
+    "warning_excerpt": "mkldnn_matmul failed, switching to BLAS gemm; bf16 path needs a cpu with bf16 support",
+    "interpretation_zh": "这是CPU F.linear投影的回退警告，容器最终exit0且结果完整。它不否定这台CPU实际执行路径的观测；但不能将BF16梯度相同解释为原生MKLDNN BF16或NPU BF16结论。"
+  },
+  "limitations_zh": [
+    "参考是相同生产chunked投影与CPU浮点CE计算，不是独立FP64数学oracle；只能比较重排后的数值，不证明哪条路径更接近真实数学值。",
+    "BF16差异检测在autograd返回的BF16梯度上进行，再转double计算差值。它不能恢复BF16舍入前的潜在差异，不能声称反向内部FP32量相同。",
+    "MKLDNN回退日志至少证明BF16路径触发了BLAS fallback；没有逐调用内核轨迹，不能声称所有算子的内部累加精度或具体kernel一致。",
+    "生产projected CE文件SHA与固定提交一致；结果未记录Transformers版本、导入路径/源码SHA，也未在执行回执中固定诊断脚本SHA。本次为给定脚本与既有结果的静态/统计核验，不声称完整历史依赖溯源。",
+    "80例是固定形状、2种dtype、8个seed和5种标签分布的有限样本；没有NPU、优化器、多MTP深度、连续训练或实际CP collective验证。"
+  ],
+  "publication_guidance_zh": "公开摘要应同时写明CPU FP32微小舍入、BF16样例返回梯度未差及MKLDNN到BLAS回退；不得写成NPU CP200步根因已确认、BF16普遍无影响或200步验收通过。",
+  "checks": [
+    {
+      "name": "projected_cross_entropy本地源码与固定提交一致",
+      "status": "PASS"
+    },
+    {
+      "name": "production_cp_adapter本地源码与固定提交一致",
+      "status": "PASS"
+    },
+    {
+      "name": "jt_model_caller本地源码与固定提交一致",
+      "status": "PASS"
+    },
+    {
+      "name": "实际projected_cross_entropy源码SHA一致",
+      "status": "PASS"
+    },
+    {
+      "name": "直接导入生产projected CE与Transformers CE",
+      "status": "PASS"
+    },
+    {
+      "name": "三种模式均走生产投影CE及实际CE回调",
+      "status": "PASS"
+    },
+    {
+      "name": "CPU容器正常结束且清理",
+      "status": "PASS"
+    },
+    {
+      "name": "80例为2dtype乘8seed乘5种标签分布的完整无重复矩阵",
+      "status": "PASS"
+    },
+    {
+      "name": "80例逐项计数、shape元素数与有限性成立",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "独立重算摘要与原结果逐项一致",
+      "status": "PASS"
+    },
+    {
+      "name": "容器日志最终摘要与文件一致",
+      "status": "PASS"
+    },
+    {
+      "name": "直接全局分母两dtype全部对照无差异",
+      "status": "PASS"
+    },
+    {
+      "name": "BF16只对返回梯度声明无差异",
+      "status": "PASS"
+    },
+    {
+      "name": "BF16 MKLDNN回退边界可定位",
+      "status": "PASS"
+    }
+  ],
+  "findings": [],
+  "input_sha256": {
+    "tools/check_cp_denominator_rounding.py": "1fc5f886e242233c67fe1da0d0bf0f25833caff2a53cb8dce26a88b7610cb89a",
+    "evidence/f637-cp-denominator-rounding-cpu.json": "e2729ec8db1f291f03ef312b5e6279aa29a5a5bf9a3566052bec26098c324131",
+    "evidence/f637-cp-denominator-rounding-cpu.receipt.json": "3955cf3ebe39391873f8bc393c25b9d0acbb216c1388aefc7ec03aa664cea038",
+    "evidence/f637-cp-denominator-rounding-cpu.container.log": "15359efdac377fa8e4d36488387b61beb83c758dd3acf7fef2208c65c12b8e9c"
+  },
+  "source_evidence": {
+    "projected_cross_entropy": {
+      "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "path": "hyper_parallel/components/losses/chunked_cross_entropy.py",
+      "sha256": "eba4deaa90834afc2fba4a3c4dc550331e43ac51738badf2819c10a18931e41b"
+    },
+    "production_cp_adapter": {
+      "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+      "sha256": "3e01e509e10b183f78d3f2408b2a49c17fca34db756757e4f3ed30877a165a9f"
+    },
+    "jt_model_caller": {
+      "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+      "sha256": "2ddd28910688710ea777f1724fb8aeb8821c6045a01f18f21eea4e92507fd906"
+    }
+  },
+  "actions": {
+    "new_cpu_experiments": 0,
+    "npu_runs_started": 0,
+    "remote_operations": 0,
+    "production_files_modified": 0,
+    "github_writes": 0,
+    "only_written_file": "D:/Obsidian Vault D/hyperllal/jt-dev-8npu-20261014/evidence/f637-cp-denominator-rounding-independent-review.json"
+  }
+}

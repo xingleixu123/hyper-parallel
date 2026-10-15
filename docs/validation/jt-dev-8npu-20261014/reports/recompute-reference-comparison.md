@@ -1,6 +1,6 @@
 # 重计算配置能力与测量口径
 
-核对日期：2026-10-15（北京时间）。以下是配置能力核对，性能判断需使用本任务 Ascend 实测。
+核对日期：2026-10-16 02:57（北京时间）。以下是配置能力核对，性能判断需使用本任务 Ascend 实测。
 
 | 能力 | 当前 JT_dev + 本任务修复 | MindFormers PyNative 固定源码 | Megatron Core 固定版本 |
 |---|---|---|---|
@@ -34,6 +34,14 @@ JT 的 `selective` 是算子选择策略，不能据名称认定为 MindFormers 
 
 同一源码的 [`Muon`](https://github.com/mindspore-ai/mindformers/blob/5089da308ebcc146d0cbe32180c209c4f1d39d77/mindformers/pynative/optimizer/muon.py#L1195) 在FP32中做范数归一化，再进入BF16 NS；Addmm/Baddbmm通过cube_math_type=4保留FP32加法。JT当前使用独立matmul与BF16乘加，数值路径不同。本任务已核对安装的 torch_npu 存在该精度接口；这里是实现语义比较，不能直接把 MF 的实现收益当作 JT 的精度或性能实测。
 
-## 最新提交的差异核验
+## 前次提交的差异核验
 
 MF 的重计算实现与 Muon 实现文件在上述新提交和前次 `302c939f` 之间 blob 完全相同。Megatron 的 `transformer_block.py`、`transformer_layer.py` 也未变化；配置文件本次差异位于 DSA indexer / MLA 量化能力，重计算字段与校验段保持原语义。因此上表的能力判断仍成立。新引用固定到当前已核对提交，后续上游变化不自动成为本任务证据。机器记录见 [引用核对](recompute-reference-head-check.json) 和 [实现文件比较](recompute-reference-implementation-check.json)。
+
+## 2026-10-16 02:57最新复核
+
+JT_dev仍为`f637ef7ee4d4b416800716f1ebaaae7709b8a06a`。MindFormers用户指定GitCode入口及官方GitHub镜像均仍为`5089da308ebcc146d0cbe32180c209c4f1d39d77`。Megatron main已推进至[`3914483fd325e053797aff3fa431d4a3141139aa`](https://github.com/NVIDIA/Megatron-LM/commit/3914483fd325e053797aff3fa431d4a3141139aa)。
+
+对前次`0101df9`比较：`transformer_block.py`及`transformer_layer.py`的blob未变；`transformer_config.py`只增加wide_residual及moe_shortcut_connection在local/block推理CUDA Graph组合下的允许条件。重计算字段与校验语义未变，上表能力比较继续适用；不外推未核对模块。当前重算字段仍见[配置第630行](https://github.com/NVIDIA/Megatron-LM/blob/3914483fd325e053797aff3fa431d4a3141139aa/megatron/core/transformer/transformer_config.py#L630)。
+
+[官方提交复核](reference-head-recheck-20261016-0257.json) · [三个相关文件的blob及完整差异](megatron-recompute-implementation-recheck-20261016.json)。

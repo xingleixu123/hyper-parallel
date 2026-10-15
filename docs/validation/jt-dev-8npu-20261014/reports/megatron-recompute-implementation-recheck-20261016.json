@@ -1,0 +1,28 @@
+{
+  "checked_at": "2026-10-15T18:57:36.272013+00:00",
+  "old": "0101df91e5f86acb26a03bd8ad2361f3113476a6",
+  "new": "3914483fd325e053797aff3fa431d4a3141139aa",
+  "files": [
+    {
+      "path": "megatron/core/transformer/transformer_config.py",
+      "old_blob": "4c749ea1f970be62d2a829922af7eb9713528868",
+      "new_blob": "b41b1a31fe3398eba6c448bffc721572b2251fc5",
+      "identical": false,
+      "diff": "diff --git a/megatron/core/transformer/transformer_config.py b/megatron/core/transformer/transformer_config.py\nindex 4c749ea..b41b1a3 100644\n--- a/megatron/core/transformer/transformer_config.py\n+++ b/megatron/core/transformer/transformer_config.py\n@@ -1691,9 +1691,20 @@ class TransformerConfig(ModelParallelConfig):\n         if self.wide_residual is not None:\n             if self.enable_mhc_connections:\n                 raise ValueError(\"wide_residual and enable_mhc_connections are mutually exclusive.\")\n-            if self.cuda_graph_impl != \"none\" or self.enable_cuda_graph or self.external_cuda_graph:\n+            if (\n+                self.cuda_graph_impl != \"none\" or self.enable_cuda_graph or self.external_cuda_graph\n+            ) and not (\n+                self.cuda_graph_impl == \"local\"\n+                and not self.enable_cuda_graph\n+                and not self.external_cuda_graph\n+                and normalize_inference_cuda_graph_scope(\n+                    self.inference_cuda_graph_scope, self.cuda_graph_impl\n+                )\n+                == InferenceCudaGraphScope.block\n+            ):\n                 raise NotImplementedError(\n-                    \"wide_residual does not yet support CUDA graphs; use cuda_graph_impl='none'.\"\n+                    \"wide_residual supports CUDA graphs only with cuda_graph_impl='local' \"\n+                    \"and inference_cuda_graph_scope='block'.\"\n                 )\n             if self.pipeline_model_parallel_size > 1:\n                 raise NotImplementedError(\n@@ -3454,8 +3465,16 @@ class TransformerConfig(ModelParallelConfig):\n         ), 'cuda_graph_modules must be empty when cuda_graph_impl=\"full_iteration\".'\n \n         assert not (\n-            self.moe_shortcut_connection and self.cuda_graph_impl != \"none\"\n-        ), \"CUDA graphs are not supported with moe_shortcut_connection.\"\n+            self.moe_shortcut_connection\n+            and self.cuda_graph_impl != \"none\"\n+            and not (\n+                self.cuda_graph_impl == \"local\"\n+                and self.inference_cuda_graph_scope == InferenceCudaGraphScope.block\n+            )\n+        ), (\n+            \"moe_shortcut_connection supports CUDA graphs only with \"\n+            \"cuda_graph_impl='local' and inference_cuda_graph_scope='block'.\"\n+        )\n \n         if self.cuda_graph_impl != \"none\":\n \n"
+    },
+    {
+      "path": "megatron/core/transformer/transformer_block.py",
+      "old_blob": "fd205162162371aa36ac95fec653d7a2ef2bbe33",
+      "new_blob": "fd205162162371aa36ac95fec653d7a2ef2bbe33",
+      "identical": true,
+      "diff": ""
+    },
+    {
+      "path": "megatron/core/transformer/transformer_layer.py",
+      "old_blob": "932f70a83e838d318846a4757c4a3caeead1651d",
+      "new_blob": "932f70a83e838d318846a4757c4a3caeead1651d",
+      "identical": true,
+      "diff": ""
+    }
+  ]
+}
