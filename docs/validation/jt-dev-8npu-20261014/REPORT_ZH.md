@@ -6,7 +6,7 @@
 
 **当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2和CP2已完整跑完200步但精度失败；TP2仅完成69步前缀，TP及合法组合、完整/选择重算仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
 
-当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部13个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
+当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部14个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
 
 ## 按影响排序的问题、子问题与独立 PR
 
@@ -28,10 +28,23 @@
 | Top12 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
 | Top13 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
 | Top14 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；真实69步前缀确认耗时及reserved漏报，修复后NPU/PP通信仍待回归 |
+| Top15 | FSDP动态派生的重算wrapper被覆盖报告漏计 | [#229](https://github.com/hf1s/hyper-parallel/issues/229) | [#230](https://github.com/hf1s/hyper-parallel/pull/230) | 真实三处区域报告为一处；单提交2文件，CPU62测试/2子测试、两轴检视及lint通过；仅修报告，NPU训练与性能无新增结论 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `b540051`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+
+## 最新补充：重算覆盖报告的独立修复及第三次让卡（2026-10-16，UTC+8）
+
+新增中文小问题[#229](https://github.com/hf1s/hyper-parallel/issues/229)及单提交草稿PR[#230](https://github.com/hf1s/hyper-parallel/pull/230)，提交`b54005154e8d9ae3b2e1728ba106d2d628e6053e`，两文件。原报告按实例类名识别wrapper，遗漏FSDP动态生成的`HSDPCheckpointWrapper`。真实八rank构建日志和最终模块树均显示3处区域，报告却只计MTP一处。修复按完整基类身份检查MRO，保持报告结构与训练数学。
+
+同一新增回归在基点有2个测试及1个子测试失败，修复后完整model_integration目录62测试、2子测试通过。lint返回0且诊断为空，规范/需求两轴检视分别PASS；当前PR head暂无check run、combined status为pending。首版包级导入测试假设错误导致超时的日志保留，已按函数执行边界纠正后重新完成红绿对照。无设备CPU回归不等同NPU性能或200步验收。
+
+[复现、完整测试及检视](reports/checkpoint-wrapper-inventory/README_ZH.md) · [真实三处/报告一处证据](reports/checkpoint-wrapper-inventory/checkpoint-inventory-real-run-observation.json) · [文件SHA](reports/checkpoint-wrapper-inventory/manifest.json) · [当前head CI原始状态](reports/checkpoint-wrapper-inventory-publication/checkpoint-inventory-current-head-ci.json)。
+
+`full-200-r3`在前轮释放满20分钟后启动，初始化后4号卡出现不同namespace/cgroup的外部进程，守卫仅停止本任务容器；0个完整步、exit137、115.91秒释放，设备上无本任务PID残留。60份原始文件全部核验，公开59份，外部身份明细仅留本地；两端重复归档已删。新的`full-200-r4`保留已验证数值文本，实际Trainer和模型配置解析通过；2026-10-16 02:03（UTC+8）在复查125/129空卡后启动129的守卫重试，结果仍待完成，不把配置通过写成训练通过。
+
+[中断采集与清理](reports/f637-fsdp8-full-r3-interrupted/f637-fsdp8-full-r3-interrupted-local-verification.json) · [公开原始文件清单](reports/f637-fsdp8-full-r3-interrupted/public-manifest.json) · [r4实际镜像预检](reports/f637-fsdp8-full-r3-interrupted/f637-yaml-config-preflight-r4.json)。本阶段CPU临时checkout、专用venv、输入归档及暂存文件共88,781,402字节已清理，保留最终源码、测试证据、当前step200 checkpoint及用户镜像：[清理凭据](reports/checkpoint-wrapper-inventory-publication/checkpoint-inventory-scratch-cleanup.json)。
 
 ## 最新执行记录：重试配置类型错误已修正，完全重算仍待训练（2026-10-16，UTC+8）
 
