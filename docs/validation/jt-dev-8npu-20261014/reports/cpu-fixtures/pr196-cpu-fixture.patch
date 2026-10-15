@@ -1,0 +1,24 @@
+diff --git a/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py b/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py
+index c034ad8..0eeac4b 100644
+--- a/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py
++++ b/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py
+@@ -24,6 +24,7 @@ from unittest.mock import patch
+ 
+ import torch
+ from torch.nn import functional as F
++from torch.utils.checkpoint import DefaultDeviceType
+ 
+ from hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3 import (
+     JTDeepseekV3Config,
+@@ -64,6 +65,11 @@ def small_config() -> JTDeepseekV3Config:
+ class TestCompleteModel(unittest.TestCase):
+     """Exercise model semantics without a builder, EP adapter or replacement pass."""
+ 
++    def setUp(self) -> None:
++        """Keep CPU checkpoint replay independent of the installed accelerator backend."""
++        self.addCleanup(DefaultDeviceType.set_device_type, DefaultDeviceType.get_device_type())
++        DefaultDeviceType.set_device_type("cpu")
++
+     def _assert_gradients_match(self, reference: torch.nn.Module, candidate: torch.nn.Module) -> None:
+         """Compare every parameter, including parameters unused by the selected objective."""
+         for original, replayed in zip(reference.parameters(), candidate.parameters(), strict=True):

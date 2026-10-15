@@ -1,0 +1,24 @@
+diff --git a/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py b/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py
+index 6948c8a..c6f7bbd 100644
+--- a/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py
++++ b/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py
+@@ -23,6 +23,7 @@ from unittest.mock import patch
+ 
+ import torch
+ from torch.nn import functional as F
++from torch.utils.checkpoint import DefaultDeviceType
+ 
+ from hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3 import (
+     JTDeepseekV3Config,
+@@ -74,6 +75,11 @@ def _cpu_grouped_swiglu(inputs, gate_up_weight, down_weight, counts):
+ class TestCompleteModel(unittest.TestCase):
+     """Exercise model semantics without a builder, EP adapter or replacement pass."""
+ 
++    def setUp(self) -> None:
++        """Keep CPU checkpoint replay independent of the installed accelerator backend."""
++        self.addCleanup(DefaultDeviceType.set_device_type, DefaultDeviceType.get_device_type())
++        DefaultDeviceType.set_device_type("cpu")
++
+     def test_auxiliary_loss_pop_preserves_router_and_input_gradients(self):
+         """Consuming the loss clears its owner but preserves the differentiable objective."""
+         torch.manual_seed(17)

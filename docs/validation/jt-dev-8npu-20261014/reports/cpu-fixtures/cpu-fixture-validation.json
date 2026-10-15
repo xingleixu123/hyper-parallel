@@ -1,0 +1,91 @@
+{
+  "cause": "torch_npu 导入将 checkpoint 默认设备设为 npu；仅有 CPU 输入时，原生与 Hyper 重计算均会创建 NPU autocast 上下文并初始化无设备后端。",
+  "fix": "测试 setUp 先注册 addCleanup 恢复旧值，再显式设置 cpu；无生产代码改变，无断言或容差放宽。",
+  "minimal_probe": {
+    "without_torch_npu_import": "native/hyper 均通过",
+    "with_torch_npu_import": "默认 npu 均失败；只设默认 cpu 后梯度精确通过；最终恢复 npu"
+  },
+  "integration_before": {
+    "failed": 8,
+    "passed": 81,
+    "subtests_passed": 113
+  },
+  "integration_after": {
+    "passed": 82,
+    "subtests_passed": 120,
+    "warnings": 36,
+    "seconds": 36.98,
+    "head": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "upstream": "f637ef7ee4d4b416800716f1ebaaae7709b8a06a"
+  },
+  "independent_prs": {
+    "195": {
+      "passed": 21,
+      "subtests": 16,
+      "seconds": 31.02,
+      "warnings": 21
+    },
+    "196": {
+      "passed": 2,
+      "subtests": 4,
+      "seconds": 31.96,
+      "warnings": 21
+    },
+    "200": {
+      "passed": 13,
+      "subtests": 14,
+      "seconds": 0.78,
+      "warnings": 0
+    }
+  },
+  "rewrites": {
+    "195": {
+      "pr": 195,
+      "old_head": "67e8ef5b01cfabeddf7ef91b3854c543f22add94",
+      "new_head": "00ae8a77b36ed4a306147255781d986638249057",
+      "branch": "xxl-dev/fix-jt-recompute-coverage",
+      "backup": "xxl-dev/backup-pr195-before-cpu-fixture",
+      "tree": "abc8d0b62de2326b7fe45fb6bf8cb084f8ad1a4f",
+      "patch_sha256": "6cfe49ca1210dffcae1cf5a9e1c8871ac9a64b0cc025c5bce166fe500d67dbc7",
+      "one_commit": true,
+      "pushed": true
+    },
+    "196": {
+      "pr": 196,
+      "old_head": "83d3d7c15dfb94557680510991d6ea847bc8b2c0",
+      "new_head": "d1f52136421c258646463e764421d34aac503f97",
+      "branch": "xxl-dev/fix-jt-recompute-routing-counts",
+      "backup": "xxl-dev/backup-pr196-before-cpu-fixture",
+      "tree": "83954efcaf760fc90cf59d0c71361747329f9da0",
+      "patch_sha256": "4e3fc1e2f8ff949ebd07bec0f5d12bd087a4f0be82909533f06f37c3bc44ee2c",
+      "one_commit": true,
+      "pushed": true
+    },
+    "200": {
+      "pr": 200,
+      "old_head": "0ae573979ab0e0bbe834bf8988425785de73bdb4",
+      "new_head": "630d54358f94e34dc8e7f22c6a57d4043ba211f5",
+      "branch": "xxl-dev/fix-fp32-expert-gradients",
+      "backup": "xxl-dev/backup-pr200-before-cpu-fixture",
+      "tree": "ed2b352ffd483cfec44e9eeb1aa56ac6671c2594",
+      "patch_sha256": "ec356c8debe0e80fc64e9892714b61f24838072920a5bc180df6898a8c1a6f62",
+      "one_commit": true,
+      "pushed": true
+    }
+  },
+  "review": {
+    "standards": {
+      "result": "PASS",
+      "findings": 0,
+      "scope": "CPU 测试默认设备与异常清理增量"
+    },
+    "spec": {
+      "result": "PASS",
+      "findings": 0,
+      "scope": "保留全部损失、梯度、重放、路由计数断言，不改生产设备推断"
+    },
+    "new_npu_tests": false
+  },
+  "resource_status": "首次启动前因129的3、4号卡被其他实验占用而未启动。随后八卡空闲并通过两次复查，于2026-10-15 16:30:07+08:00启动新基点FSDP0–200；此快照尚未完成，不作为训练通过证据。",
+  "not_passed": "最新基点的 NPU ST、完整200步精度与续训验收仍未完成。"
+}

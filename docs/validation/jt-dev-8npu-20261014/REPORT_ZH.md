@@ -1,12 +1,20 @@
-# JT 八卡验证：中文总问题单、独立 PR 与当前证据
-
-本地整合准备：最新上游 f637ef7 加已验证独立修复，整合集成源 `9271e026c422e68cabd7dc0b0824bc5550cfa34e` 已准备，CPU 集成回归及新一轮 NPU 基线尚待执行。原有生产试验目录、配置与 checkpoint 暂时保留以便追溯。
-
 ## 上游更新与资源进展（2026-10-15）
 
 上游随后合入 #186，JT_dev 推进到 `f637ef7ee4d4b416800716f1ebaaae7709b8a06a`，包含 CP 分块损失支持、MLA 布局调整和 `enable_chunk_loss`/`chunk_loss_size` 配置。此前 `521d3a8` 的基线与续训证据属于固定旧轮次，不能改写为新基点结论。该轮连续400参考在 step168 出现外部设备进程，本任务已释放容器，保留中断日志，不计为完整参考，也没有停止他人任务。接下来先集成新基点，再按0–200→checkpoint200–400→独立连续400的顺序重建匹配参考。
 
 原 #199 与 #186 的生产功能重叠，现已保留上游实现并收敛为 #205 的独立回归测试：两个文件、单提交 `e9fc94d376ca7380c13a5e09c0020b34a75dc1d2`。新基点 CPU 20项测试、25项子测试通过，两轴检视通过；新基点四卡 ST 尚待运行，不沿用旧 NPU 通过结论。所有资源操作继续遵守空闲检查和全局20分钟间隔。
+
+当前公开证据：[详细中文总报告](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/REPORT_ZH.md)、[本次 CPU 原始日志](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-ut.log)、[隔离容器凭据](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-cpu-receipt.json)、[源码与单提交重写记录](https://github.com/xingleixu123/hyper-parallel/blob/3781c38e91aa73baf84942ff3d4cd459ead758a2/docs/validation/jt-dev-8npu-20261014/reports/pr199-f637/pr199-f637-rewrite.json)。以上链接固定到证据提交，不随分支后续更新漂移。
+
+## 最新基点组合回归与 CPU 测试隔离补充（2026-10-15）
+
+最新上游 `f637ef7` 的集成源 `18602c4524dc664b81b2bad9a7b624455ce1494f` 已通过 **82项测试、120项子测试，36.98秒**。最初组合运行出现8项失败：`torch_npu` 导入会把 checkpoint 默认设备改成 NPU，而 CPU 重计算回放会查询该设备的 autocast 能力。一个 CPU 张量的最小复现证实，PyTorch 原生与 Hyper 两条路径都受影响；显式设为 CPU 后两者梯度均精确通过。
+
+修正仅落在相应 PR 的 CPU 测试 fixture：先登记 `addCleanup` 恢复旧设备，再设为 CPU。全部 loss、梯度、重放和路由计数断言保持原样，生产设备推断未改。#195 独立回归21项测试/16项子测试通过（31.02秒），#196 为2项/4项（31.96秒），#200 为13项/14项（0.78秒）。三个独立 PR 各自仍为一个提交；规范与验收条件两轴增量复审通过，修改文件 pylint 修正前后均零告警（本机缺 Torch，明确排除 import-error/no-member）。#200 第一次独立运行因测试路径不存在而未收集测试，修正入口后的结果单独记录。
+
+本轮 CPU 容器未挂载 NPU，完成后已移除；这些结果不代替 NPU ST。旧源码与数值配置已保存在独立备份分支，新基点源码和 0–200、200–400、连续400 三份配置已部署并校验。第一次八卡0–200启动前发现外部任务占卡，因此没有启动。其后八卡空闲并通过两次复查，已于2026-10-15 16:30:07+08:00启动新基点FSDP0–200；此证据快照尚无完整训练结果。仍按空闲资源、全局20分钟间隔推进，不停止他人实验。
+
+[回归汇总与限定条件](reports/cpu-fixtures/cpu-fixture-validation.json)、[组合回归原始日志](reports/cpu-fixtures/latest-f637-cpu-fixtures-ut.log)、[修正前失败日志](reports/cpu-fixtures/latest-f637-cpu-ut.log)、[最小复现记录](reports/cpu-fixtures/checkpoint-device-minimal-npu-import.container.log)。
 
 ## 总体目标与当前结论
 
@@ -35,7 +43,7 @@
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-已固定的独立提交：#194 `bad2550`、#195 `67e8ef5`、#196 `83d3d7c`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `0ae5739`、#201 `59a03c6`、#214 `453618a`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
 
 ## 统一验收标准与执行顺序
 
@@ -128,12 +136,3 @@
 - [ ] 外部维护者评审、当前提交对应的完整 CI、最终回归与合入确认。
 
 仅在125/129获准的空闲设备上运行，优先保证其他实验；任何两轮 NPU 实验之间全局至少间隔20分钟，等待期间不占卡，冲突只释放本任务容器，不停止他人进程。八卡训练每轮有900秒上限，不常驻排队占卡。清理仅限本任务已核验无用的临时数据和重复压缩包，checkpoint200 保留到续训与连续参考比对完毕；原始镜像、共享数据和其他任务文件不删除。
-
-
-## 本次归档补充材料
-
-- [中文标题与父子问题关联回读凭据](reports/github-chinese-publication-receipt.json)
-- [PR #199 新基点 CPU 日志](reports/pr199-f637/pr199-f637-cpu-ut.log)和[源码、单提交、两轴检视记录](reports/pr199-f637/pr199-f637-rewrite.json)
-- [129 续训与中断参考的全 rank 标量](scalars/jtclean-resume-and-interrupted-reference.csv)
-- [续训自完整性检查](reports/jtclean-resume-integrity.json)，仅用于完整性核验，不是独立数值比较
-- [连续参考中断与设备释放凭据](reports/r129-jtclean-fp32-fsdp8-build-continuous400.receipt.json)

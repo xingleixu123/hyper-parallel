@@ -1,0 +1,1196 @@
+..................................................................F...............               [100%]
+=================================== FAILURES ===================================
+_ TestCompleteModel.test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients (mode='full', objective='aux') _
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients>
+grouped_swiglu = <MagicMock name='npu_grouped_swiglu' id='281472153621120'>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    @patch("hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.npu_grouped_swiglu")
+    def test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients(self, grouped_swiglu):
+        """Feature: Replay-safe router statistics.
+    
+        Description: Accumulate three microbatches with full or selective trunk and MTP replay.
+        Expectation: Router counts, losses and gradients match eager, with no retained auxiliary graph.
+        """
+        grouped_swiglu.side_effect = _cpu_grouped_swiglu
+        torch.manual_seed(19)
+        initial = JTDeepseekV3ForCausalLM(small_config())
+        for mode, objective in product(("full", "selective"), ("aux", "total")):
+            with self.subTest(mode=mode, objective=objective):
+                reference = copy.deepcopy(initial)
+                candidate = copy.deepcopy(initial)
+                kwargs = {"context_fn": make_selective_checkpoint_context_fn()} if mode == "selective" else {}
+                for index, layer in enumerate(candidate.model.layers):
+                    candidate.model.layers[index] = checkpoint_wrapper(layer, **kwargs)
+                for layer in candidate.mtp.layers:
+                    layer.transformer_layer = checkpoint_wrapper(layer.transformer_layer, **kwargs)
+                owners = [module for module in candidate.modules() if isinstance(module, JTDeepseekV3MoE)]
+                reference_owners = [module for module in reference.modules() if isinstance(module, JTDeepseekV3MoE)]
+                self.assertEqual(len(owners), 2)
+                for micro_step in range(3):
+                    tokens = (torch.arange(8).unsqueeze(0) + micro_step) % 32
+                    expected = reference(tokens, (tokens + 1) % 32).loss
+                    actual = candidate(tokens, (tokens + 1) % 32).loss
+                    torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+                    self.assertTrue(all(module.auxiliary_loss is None for module in owners))
+                    expected_loss = expected["foundation_loss/aux"] if objective == "aux" else sum(expected.values())
+                    actual_loss = actual["foundation_loss/aux"] if objective == "aux" else sum(actual.values())
+                    (expected_loss / 3).backward()
+>                   (actual_loss / 3).backward()
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/venv/lib/python3.12/site-packages/torch/_tensor.py:631: in backward
+    torch.autograd.backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py:379: in backward
+    _engine_run_backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py:882: in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+hyper_parallel/core/activation_memory/checkpoint.py:402: in unpack_hook
+    _run_recomputation(frame, session_id)
+hyper_parallel/core/activation_memory/checkpoint.py:369: in _run_recomputation
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+/workspace/venv/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:349: in _run_fn_with_dynamo_disabled
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:515: in recompute_fn
+    device_autocast_context = torch.amp.autocast(
+/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py:268: in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py:9: in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py:360: in is_bf16_supported
+    torch_npu.npu._lazy_init()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _lazy_init():
+        def _queue_call(queued_calls):
+            for queued_call, orig_traceback in queued_calls:
+                try:
+                    queued_call()
+                except Exception as e:
+                    msg = (f"NPU call failed lazily at initialization with error: {str(e)}\n\n"
+                           f"NPU call was originally invoked at:\n\n{orig_traceback}")
+                    raise DeferredNpuCallError(msg + pta_error(ErrCode.INTERNAL)) from e
+    
+        global _initialized, _original_pid, _queued_calls
+        if _initialized or hasattr(_tls, 'is_initializing'):
+            return
+        with _initialization_lock:
+            # We be double-checked locking, boys!  This is OK because
+            # the above test was GIL protected anyway.  The inner test
+            # is for when a thread blocked on some other thread which was
+            # doing the initialization; when they get the lock, they will
+            # find there is nothing left to do.
+            if _initialized:
+                return
+            # It is important to prevent other threads from entering _lazy_init
+            # immediately, while we are still guaranteed to have the GIL, because some
+            # of the C calls we make below will release the GIL
+            if _is_internal_in_bad_fork:
+                raise RuntimeError(
+                    "Cannot re-initialize NPU in forked subprocess. To use NPU with "
+                    "multiprocessing, you must use the 'spawn' start method")
+    
+>           torch_npu._C._npu_init()
+E           RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+E           [ERROR] 2026-10-15-07:58:03 (PID:62, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+E           [Error]: An internal error occurs in the Driver module. 
+E                   Rectify the fault based on the error information in the ascend log.
+E           [PID: 62] 2026-10-15-07:57:58.254.563 Invalid_Argument(EL0003): The argument is invalid.
+E                   Solution: Try again with a valid argument.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+E                   rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:273: RuntimeError
+_ TestCompleteModel.test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients (mode='full', objective='total') _
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients>
+grouped_swiglu = <MagicMock name='npu_grouped_swiglu' id='281472153621120'>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    @patch("hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.npu_grouped_swiglu")
+    def test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients(self, grouped_swiglu):
+        """Feature: Replay-safe router statistics.
+    
+        Description: Accumulate three microbatches with full or selective trunk and MTP replay.
+        Expectation: Router counts, losses and gradients match eager, with no retained auxiliary graph.
+        """
+        grouped_swiglu.side_effect = _cpu_grouped_swiglu
+        torch.manual_seed(19)
+        initial = JTDeepseekV3ForCausalLM(small_config())
+        for mode, objective in product(("full", "selective"), ("aux", "total")):
+            with self.subTest(mode=mode, objective=objective):
+                reference = copy.deepcopy(initial)
+                candidate = copy.deepcopy(initial)
+                kwargs = {"context_fn": make_selective_checkpoint_context_fn()} if mode == "selective" else {}
+                for index, layer in enumerate(candidate.model.layers):
+                    candidate.model.layers[index] = checkpoint_wrapper(layer, **kwargs)
+                for layer in candidate.mtp.layers:
+                    layer.transformer_layer = checkpoint_wrapper(layer.transformer_layer, **kwargs)
+                owners = [module for module in candidate.modules() if isinstance(module, JTDeepseekV3MoE)]
+                reference_owners = [module for module in reference.modules() if isinstance(module, JTDeepseekV3MoE)]
+                self.assertEqual(len(owners), 2)
+                for micro_step in range(3):
+                    tokens = (torch.arange(8).unsqueeze(0) + micro_step) % 32
+                    expected = reference(tokens, (tokens + 1) % 32).loss
+                    actual = candidate(tokens, (tokens + 1) % 32).loss
+                    torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+                    self.assertTrue(all(module.auxiliary_loss is None for module in owners))
+                    expected_loss = expected["foundation_loss/aux"] if objective == "aux" else sum(expected.values())
+                    actual_loss = actual["foundation_loss/aux"] if objective == "aux" else sum(actual.values())
+                    (expected_loss / 3).backward()
+>                   (actual_loss / 3).backward()
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/venv/lib/python3.12/site-packages/torch/_tensor.py:631: in backward
+    torch.autograd.backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py:379: in backward
+    _engine_run_backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py:882: in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+hyper_parallel/core/activation_memory/checkpoint.py:402: in unpack_hook
+    _run_recomputation(frame, session_id)
+hyper_parallel/core/activation_memory/checkpoint.py:369: in _run_recomputation
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+/workspace/venv/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:349: in _run_fn_with_dynamo_disabled
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:515: in recompute_fn
+    device_autocast_context = torch.amp.autocast(
+/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py:268: in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py:9: in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py:360: in is_bf16_supported
+    torch_npu.npu._lazy_init()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _lazy_init():
+        def _queue_call(queued_calls):
+            for queued_call, orig_traceback in queued_calls:
+                try:
+                    queued_call()
+                except Exception as e:
+                    msg = (f"NPU call failed lazily at initialization with error: {str(e)}\n\n"
+                           f"NPU call was originally invoked at:\n\n{orig_traceback}")
+                    raise DeferredNpuCallError(msg + pta_error(ErrCode.INTERNAL)) from e
+    
+        global _initialized, _original_pid, _queued_calls
+        if _initialized or hasattr(_tls, 'is_initializing'):
+            return
+        with _initialization_lock:
+            # We be double-checked locking, boys!  This is OK because
+            # the above test was GIL protected anyway.  The inner test
+            # is for when a thread blocked on some other thread which was
+            # doing the initialization; when they get the lock, they will
+            # find there is nothing left to do.
+            if _initialized:
+                return
+            # It is important to prevent other threads from entering _lazy_init
+            # immediately, while we are still guaranteed to have the GIL, because some
+            # of the C calls we make below will release the GIL
+            if _is_internal_in_bad_fork:
+                raise RuntimeError(
+                    "Cannot re-initialize NPU in forked subprocess. To use NPU with "
+                    "multiprocessing, you must use the 'spawn' start method")
+    
+>           torch_npu._C._npu_init()
+E           RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+E           [ERROR] 2026-10-15-07:58:04 (PID:62, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+E           [Error]: An internal error occurs in the Driver module. 
+E                   Rectify the fault based on the error information in the ascend log.
+E           [PID: 62] 2026-10-15-07:58:04.312.056 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:57:58.254.563 Invalid_Argument(EL0003): The argument is invalid.
+E                   Solution: Try again with a valid argument.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+E                   rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:273: RuntimeError
+_ TestCompleteModel.test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients (mode='selective', objective='aux') _
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients>
+grouped_swiglu = <MagicMock name='npu_grouped_swiglu' id='281472153621120'>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    @patch("hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.npu_grouped_swiglu")
+    def test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients(self, grouped_swiglu):
+        """Feature: Replay-safe router statistics.
+    
+        Description: Accumulate three microbatches with full or selective trunk and MTP replay.
+        Expectation: Router counts, losses and gradients match eager, with no retained auxiliary graph.
+        """
+        grouped_swiglu.side_effect = _cpu_grouped_swiglu
+        torch.manual_seed(19)
+        initial = JTDeepseekV3ForCausalLM(small_config())
+        for mode, objective in product(("full", "selective"), ("aux", "total")):
+            with self.subTest(mode=mode, objective=objective):
+                reference = copy.deepcopy(initial)
+                candidate = copy.deepcopy(initial)
+                kwargs = {"context_fn": make_selective_checkpoint_context_fn()} if mode == "selective" else {}
+                for index, layer in enumerate(candidate.model.layers):
+                    candidate.model.layers[index] = checkpoint_wrapper(layer, **kwargs)
+                for layer in candidate.mtp.layers:
+                    layer.transformer_layer = checkpoint_wrapper(layer.transformer_layer, **kwargs)
+                owners = [module for module in candidate.modules() if isinstance(module, JTDeepseekV3MoE)]
+                reference_owners = [module for module in reference.modules() if isinstance(module, JTDeepseekV3MoE)]
+                self.assertEqual(len(owners), 2)
+                for micro_step in range(3):
+                    tokens = (torch.arange(8).unsqueeze(0) + micro_step) % 32
+                    expected = reference(tokens, (tokens + 1) % 32).loss
+                    actual = candidate(tokens, (tokens + 1) % 32).loss
+                    torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+                    self.assertTrue(all(module.auxiliary_loss is None for module in owners))
+                    expected_loss = expected["foundation_loss/aux"] if objective == "aux" else sum(expected.values())
+                    actual_loss = actual["foundation_loss/aux"] if objective == "aux" else sum(actual.values())
+                    (expected_loss / 3).backward()
+>                   (actual_loss / 3).backward()
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/venv/lib/python3.12/site-packages/torch/_tensor.py:631: in backward
+    torch.autograd.backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py:379: in backward
+    _engine_run_backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py:882: in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+hyper_parallel/core/activation_memory/checkpoint.py:402: in unpack_hook
+    _run_recomputation(frame, session_id)
+hyper_parallel/core/activation_memory/checkpoint.py:369: in _run_recomputation
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+/workspace/venv/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:349: in _run_fn_with_dynamo_disabled
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:515: in recompute_fn
+    device_autocast_context = torch.amp.autocast(
+/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py:268: in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py:9: in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py:360: in is_bf16_supported
+    torch_npu.npu._lazy_init()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _lazy_init():
+        def _queue_call(queued_calls):
+            for queued_call, orig_traceback in queued_calls:
+                try:
+                    queued_call()
+                except Exception as e:
+                    msg = (f"NPU call failed lazily at initialization with error: {str(e)}\n\n"
+                           f"NPU call was originally invoked at:\n\n{orig_traceback}")
+                    raise DeferredNpuCallError(msg + pta_error(ErrCode.INTERNAL)) from e
+    
+        global _initialized, _original_pid, _queued_calls
+        if _initialized or hasattr(_tls, 'is_initializing'):
+            return
+        with _initialization_lock:
+            # We be double-checked locking, boys!  This is OK because
+            # the above test was GIL protected anyway.  The inner test
+            # is for when a thread blocked on some other thread which was
+            # doing the initialization; when they get the lock, they will
+            # find there is nothing left to do.
+            if _initialized:
+                return
+            # It is important to prevent other threads from entering _lazy_init
+            # immediately, while we are still guaranteed to have the GIL, because some
+            # of the C calls we make below will release the GIL
+            if _is_internal_in_bad_fork:
+                raise RuntimeError(
+                    "Cannot re-initialize NPU in forked subprocess. To use NPU with "
+                    "multiprocessing, you must use the 'spawn' start method")
+    
+>           torch_npu._C._npu_init()
+E           RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+E           [ERROR] 2026-10-15-07:58:04 (PID:62, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+E           [Error]: An internal error occurs in the Driver module. 
+E                   Rectify the fault based on the error information in the ascend log.
+E           [PID: 62] 2026-10-15-07:58:04.635.866 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.312.056 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:57:58.254.563 Invalid_Argument(EL0003): The argument is invalid.
+E                   Solution: Try again with a valid argument.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+E                   rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:273: RuntimeError
+_ TestCompleteModel.test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients (mode='selective', objective='total') _
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients>
+grouped_swiglu = <MagicMock name='npu_grouped_swiglu' id='281472153621120'>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    @patch("hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.npu_grouped_swiglu")
+    def test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients(self, grouped_swiglu):
+        """Feature: Replay-safe router statistics.
+    
+        Description: Accumulate three microbatches with full or selective trunk and MTP replay.
+        Expectation: Router counts, losses and gradients match eager, with no retained auxiliary graph.
+        """
+        grouped_swiglu.side_effect = _cpu_grouped_swiglu
+        torch.manual_seed(19)
+        initial = JTDeepseekV3ForCausalLM(small_config())
+        for mode, objective in product(("full", "selective"), ("aux", "total")):
+            with self.subTest(mode=mode, objective=objective):
+                reference = copy.deepcopy(initial)
+                candidate = copy.deepcopy(initial)
+                kwargs = {"context_fn": make_selective_checkpoint_context_fn()} if mode == "selective" else {}
+                for index, layer in enumerate(candidate.model.layers):
+                    candidate.model.layers[index] = checkpoint_wrapper(layer, **kwargs)
+                for layer in candidate.mtp.layers:
+                    layer.transformer_layer = checkpoint_wrapper(layer.transformer_layer, **kwargs)
+                owners = [module for module in candidate.modules() if isinstance(module, JTDeepseekV3MoE)]
+                reference_owners = [module for module in reference.modules() if isinstance(module, JTDeepseekV3MoE)]
+                self.assertEqual(len(owners), 2)
+                for micro_step in range(3):
+                    tokens = (torch.arange(8).unsqueeze(0) + micro_step) % 32
+                    expected = reference(tokens, (tokens + 1) % 32).loss
+                    actual = candidate(tokens, (tokens + 1) % 32).loss
+                    torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+                    self.assertTrue(all(module.auxiliary_loss is None for module in owners))
+                    expected_loss = expected["foundation_loss/aux"] if objective == "aux" else sum(expected.values())
+                    actual_loss = actual["foundation_loss/aux"] if objective == "aux" else sum(actual.values())
+                    (expected_loss / 3).backward()
+>                   (actual_loss / 3).backward()
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/venv/lib/python3.12/site-packages/torch/_tensor.py:631: in backward
+    torch.autograd.backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py:379: in backward
+    _engine_run_backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py:882: in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+hyper_parallel/core/activation_memory/checkpoint.py:402: in unpack_hook
+    _run_recomputation(frame, session_id)
+hyper_parallel/core/activation_memory/checkpoint.py:369: in _run_recomputation
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+/workspace/venv/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:349: in _run_fn_with_dynamo_disabled
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:515: in recompute_fn
+    device_autocast_context = torch.amp.autocast(
+/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py:268: in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py:9: in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py:360: in is_bf16_supported
+    torch_npu.npu._lazy_init()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _lazy_init():
+        def _queue_call(queued_calls):
+            for queued_call, orig_traceback in queued_calls:
+                try:
+                    queued_call()
+                except Exception as e:
+                    msg = (f"NPU call failed lazily at initialization with error: {str(e)}\n\n"
+                           f"NPU call was originally invoked at:\n\n{orig_traceback}")
+                    raise DeferredNpuCallError(msg + pta_error(ErrCode.INTERNAL)) from e
+    
+        global _initialized, _original_pid, _queued_calls
+        if _initialized or hasattr(_tls, 'is_initializing'):
+            return
+        with _initialization_lock:
+            # We be double-checked locking, boys!  This is OK because
+            # the above test was GIL protected anyway.  The inner test
+            # is for when a thread blocked on some other thread which was
+            # doing the initialization; when they get the lock, they will
+            # find there is nothing left to do.
+            if _initialized:
+                return
+            # It is important to prevent other threads from entering _lazy_init
+            # immediately, while we are still guaranteed to have the GIL, because some
+            # of the C calls we make below will release the GIL
+            if _is_internal_in_bad_fork:
+                raise RuntimeError(
+                    "Cannot re-initialize NPU in forked subprocess. To use NPU with "
+                    "multiprocessing, you must use the 'spawn' start method")
+    
+>           torch_npu._C._npu_init()
+E           RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+E           [ERROR] 2026-10-15-07:58:05 (PID:62, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+E           [Error]: An internal error occurs in the Driver module. 
+E                   Rectify the fault based on the error information in the ascend log.
+E           [PID: 62] 2026-10-15-07:58:05.243.333 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.635.866 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.312.056 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:57:58.254.563 Invalid_Argument(EL0003): The argument is invalid.
+E                   Solution: Try again with a valid argument.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+E                   rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:273: RuntimeError
+_ TestCompleteModel.test_public_recompute_covers_mtp_and_preserves_aux_gradients (mode='full') _
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_public_recompute_covers_mtp_and_preserves_aux_gradients>
+_grouped_swiglu = <MagicMock name='npu_grouped_swiglu' id='281472153569712'>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    @patch("hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.npu_grouped_swiglu",
+           side_effect=_cpu_grouped_swiglu)
+    def test_public_recompute_covers_mtp_and_preserves_aux_gradients(self, _grouped_swiglu) -> None:
+        """Exercise complete MTP recomputation through the normal activation-checkpoint entry point.
+    
+        Feature: JT full and selective recomputation coverage.
+        Description: Apply the public construction path and compare loss, gradients and MoE replay counts.
+        Expectation: Trunk and MTP decoders replay once, all gradients agree and no auxiliary graph remains.
+        """
+        torch.manual_seed(23)
+        reference = JTDeepseekV3ForCausalLM(small_config())
+        blocks, _ = _find_transformer_block_modules(reference)
+        names = [block.fqn for block in blocks]
+        expected_names = ["model.layers.0", "model.layers.1", "mtp.layers.0.transformer_layer"]
+        self.assertEqual(names, expected_names, f"expected={expected_names}, got={names}")
+        inputs = torch.arange(8).unsqueeze(0)
+        expected = reference(inputs, inputs + 1).loss
+        sum(expected.values()).backward()
+        for mode in ("full", "selective"):
+            with self.subTest(mode=mode):
+                candidate = copy.deepcopy(reference)
+                candidate.zero_grad(set_to_none=True)
+                _apply_activation_checkpointing(candidate, mode)
+                owners = [module for module in candidate.modules() if isinstance(module, JTDeepseekV3MoE)]
+                calls = [0] * len(owners)
+    
+                def count_call(_module: torch.nn.Module, _args: tuple, index: int) -> None:
+                    """Record which complete MoE regions execute during backward replay."""
+                    calls[index] += 1
+    
+                for index, module in enumerate(owners):
+                    module.register_forward_pre_hook(lambda module, args, index=index: count_call(module, args, index))
+                actual = candidate(inputs, inputs + 1).loss
+                for name, value in expected.items():
+                    torch.testing.assert_close(actual[name], value, rtol=0, atol=0)
+>               sum(actual.values()).backward()
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/venv/lib/python3.12/site-packages/torch/_tensor.py:631: in backward
+    torch.autograd.backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py:379: in backward
+    _engine_run_backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py:882: in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+hyper_parallel/core/activation_memory/checkpoint.py:402: in unpack_hook
+    _run_recomputation(frame, session_id)
+hyper_parallel/core/activation_memory/checkpoint.py:369: in _run_recomputation
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+/workspace/venv/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:349: in _run_fn_with_dynamo_disabled
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:515: in recompute_fn
+    device_autocast_context = torch.amp.autocast(
+/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py:268: in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py:9: in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py:360: in is_bf16_supported
+    torch_npu.npu._lazy_init()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _lazy_init():
+        def _queue_call(queued_calls):
+            for queued_call, orig_traceback in queued_calls:
+                try:
+                    queued_call()
+                except Exception as e:
+                    msg = (f"NPU call failed lazily at initialization with error: {str(e)}\n\n"
+                           f"NPU call was originally invoked at:\n\n{orig_traceback}")
+                    raise DeferredNpuCallError(msg + pta_error(ErrCode.INTERNAL)) from e
+    
+        global _initialized, _original_pid, _queued_calls
+        if _initialized or hasattr(_tls, 'is_initializing'):
+            return
+        with _initialization_lock:
+            # We be double-checked locking, boys!  This is OK because
+            # the above test was GIL protected anyway.  The inner test
+            # is for when a thread blocked on some other thread which was
+            # doing the initialization; when they get the lock, they will
+            # find there is nothing left to do.
+            if _initialized:
+                return
+            # It is important to prevent other threads from entering _lazy_init
+            # immediately, while we are still guaranteed to have the GIL, because some
+            # of the C calls we make below will release the GIL
+            if _is_internal_in_bad_fork:
+                raise RuntimeError(
+                    "Cannot re-initialize NPU in forked subprocess. To use NPU with "
+                    "multiprocessing, you must use the 'spawn' start method")
+    
+>           torch_npu._C._npu_init()
+E           RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+E           [ERROR] 2026-10-15-07:58:05 (PID:62, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+E           [Error]: An internal error occurs in the Driver module. 
+E                   Rectify the fault based on the error information in the ascend log.
+E           [PID: 62] 2026-10-15-07:58:05.528.412 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:05.243.333 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.635.866 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.312.056 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:57:58.254.563 Invalid_Argument(EL0003): The argument is invalid.
+E                   Solution: Try again with a valid argument.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+E                   rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:273: RuntimeError
+_ TestCompleteModel.test_public_recompute_covers_mtp_and_preserves_aux_gradients (mode='selective') _
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_public_recompute_covers_mtp_and_preserves_aux_gradients>
+_grouped_swiglu = <MagicMock name='npu_grouped_swiglu' id='281472153569712'>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    @patch("hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.npu_grouped_swiglu",
+           side_effect=_cpu_grouped_swiglu)
+    def test_public_recompute_covers_mtp_and_preserves_aux_gradients(self, _grouped_swiglu) -> None:
+        """Exercise complete MTP recomputation through the normal activation-checkpoint entry point.
+    
+        Feature: JT full and selective recomputation coverage.
+        Description: Apply the public construction path and compare loss, gradients and MoE replay counts.
+        Expectation: Trunk and MTP decoders replay once, all gradients agree and no auxiliary graph remains.
+        """
+        torch.manual_seed(23)
+        reference = JTDeepseekV3ForCausalLM(small_config())
+        blocks, _ = _find_transformer_block_modules(reference)
+        names = [block.fqn for block in blocks]
+        expected_names = ["model.layers.0", "model.layers.1", "mtp.layers.0.transformer_layer"]
+        self.assertEqual(names, expected_names, f"expected={expected_names}, got={names}")
+        inputs = torch.arange(8).unsqueeze(0)
+        expected = reference(inputs, inputs + 1).loss
+        sum(expected.values()).backward()
+        for mode in ("full", "selective"):
+            with self.subTest(mode=mode):
+                candidate = copy.deepcopy(reference)
+                candidate.zero_grad(set_to_none=True)
+                _apply_activation_checkpointing(candidate, mode)
+                owners = [module for module in candidate.modules() if isinstance(module, JTDeepseekV3MoE)]
+                calls = [0] * len(owners)
+    
+                def count_call(_module: torch.nn.Module, _args: tuple, index: int) -> None:
+                    """Record which complete MoE regions execute during backward replay."""
+                    calls[index] += 1
+    
+                for index, module in enumerate(owners):
+                    module.register_forward_pre_hook(lambda module, args, index=index: count_call(module, args, index))
+                actual = candidate(inputs, inputs + 1).loss
+                for name, value in expected.items():
+                    torch.testing.assert_close(actual[name], value, rtol=0, atol=0)
+>               sum(actual.values()).backward()
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/venv/lib/python3.12/site-packages/torch/_tensor.py:631: in backward
+    torch.autograd.backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py:379: in backward
+    _engine_run_backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py:882: in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+hyper_parallel/core/activation_memory/checkpoint.py:402: in unpack_hook
+    _run_recomputation(frame, session_id)
+hyper_parallel/core/activation_memory/checkpoint.py:369: in _run_recomputation
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+/workspace/venv/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:349: in _run_fn_with_dynamo_disabled
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+hyper_parallel/core/activation_memory/checkpoint.py:515: in recompute_fn
+    device_autocast_context = torch.amp.autocast(
+/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py:268: in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py:9: in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py:360: in is_bf16_supported
+    torch_npu.npu._lazy_init()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _lazy_init():
+        def _queue_call(queued_calls):
+            for queued_call, orig_traceback in queued_calls:
+                try:
+                    queued_call()
+                except Exception as e:
+                    msg = (f"NPU call failed lazily at initialization with error: {str(e)}\n\n"
+                           f"NPU call was originally invoked at:\n\n{orig_traceback}")
+                    raise DeferredNpuCallError(msg + pta_error(ErrCode.INTERNAL)) from e
+    
+        global _initialized, _original_pid, _queued_calls
+        if _initialized or hasattr(_tls, 'is_initializing'):
+            return
+        with _initialization_lock:
+            # We be double-checked locking, boys!  This is OK because
+            # the above test was GIL protected anyway.  The inner test
+            # is for when a thread blocked on some other thread which was
+            # doing the initialization; when they get the lock, they will
+            # find there is nothing left to do.
+            if _initialized:
+                return
+            # It is important to prevent other threads from entering _lazy_init
+            # immediately, while we are still guaranteed to have the GIL, because some
+            # of the C calls we make below will release the GIL
+            if _is_internal_in_bad_fork:
+                raise RuntimeError(
+                    "Cannot re-initialize NPU in forked subprocess. To use NPU with "
+                    "multiprocessing, you must use the 'spawn' start method")
+    
+>           torch_npu._C._npu_init()
+E           RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+E           [ERROR] 2026-10-15-07:58:05 (PID:62, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+E           [Error]: An internal error occurs in the Driver module. 
+E                   Rectify the fault based on the error information in the ascend log.
+E           [PID: 62] 2026-10-15-07:58:05.808.538 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:05.528.412 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:05.243.333 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.635.866 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.312.056 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:57:58.254.563 Invalid_Argument(EL0003): The argument is invalid.
+E                   Solution: Try again with a valid argument.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+E                   rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:273: RuntimeError
+_ TestGroupedSwiGLUGradients.test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once (recompute=True) _
+
+self = <test_npu_grouped_swiglu.TestGroupedSwiGLUGradients testMethod=test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once>
+
+    def test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once(self) -> None:
+        """Real autograd replay and shared ordinary uses survive no-sync then sync."""
+        initial = torch.randn(2, 4, 3, dtype=torch.bfloat16)
+        inputs = [torch.randn(5, 3, dtype=torch.bfloat16) for _ in range(2)]
+        gradients = [torch.randn(5, 4, dtype=torch.bfloat16) for _ in range(2)]
+        groups = torch.tensor([2, 5])
+        reduced = []
+        for recompute in (False, True):
+            with self.subTest(recompute=recompute):
+                parameter = make_expert_state(initial)
+                state = make_backward_state(parameter)
+                weight = parameter.unsharded_param
+                operation = grouped_swiglu._get_npu_grouped_matmul()
+    
+                def shared_forward(operand: torch.Tensor) -> torch.Tensor:
+                    """Reuse one parameter twice inside a replayable region."""
+                    first = operation.apply(operand, weight.transpose(-1, -2), groups, weight)
+                    second = operation.apply(operand * 0.5, weight.transpose(-1, -2), groups, weight)
+                    return first + second
+    
+                for step, (operand, gradient) in enumerate(zip(inputs, gradients)):
+                    operand = operand.clone().requires_grad_()
+                    output = checkpoint(shared_forward, operand, use_reentrant=False) if recompute else shared_forward(
+                        operand)
+>                   torch.autograd.backward((output, weight.sum()), (gradient, torch.tensor(0.125)))
+
+tests/ut/components/functional/test_npu_grouped_swiglu.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py:379: in backward
+    _engine_run_backward(
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py:882: in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/function.py:317: in apply
+    return user_fn(self, *args)
+           ^^^^^^^^^^^^^^^^^^^^
+hyper_parallel/components/functional/npu_grouped_swiglu.py:61: in backward
+    inputs, weight, group_list = ctx.saved_tensors
+                                 ^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py:1167: in unpack_hook
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+/workspace/venv/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py:1134: in _run_fn_with_dynamo_disabled
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py:1617: in recompute_fn
+    device_autocast_ctx = torch.amp.autocast(
+/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py:268: in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py:9: in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py:360: in is_bf16_supported
+    torch_npu.npu._lazy_init()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _lazy_init():
+        def _queue_call(queued_calls):
+            for queued_call, orig_traceback in queued_calls:
+                try:
+                    queued_call()
+                except Exception as e:
+                    msg = (f"NPU call failed lazily at initialization with error: {str(e)}\n\n"
+                           f"NPU call was originally invoked at:\n\n{orig_traceback}")
+                    raise DeferredNpuCallError(msg + pta_error(ErrCode.INTERNAL)) from e
+    
+        global _initialized, _original_pid, _queued_calls
+        if _initialized or hasattr(_tls, 'is_initializing'):
+            return
+        with _initialization_lock:
+            # We be double-checked locking, boys!  This is OK because
+            # the above test was GIL protected anyway.  The inner test
+            # is for when a thread blocked on some other thread which was
+            # doing the initialization; when they get the lock, they will
+            # find there is nothing left to do.
+            if _initialized:
+                return
+            # It is important to prevent other threads from entering _lazy_init
+            # immediately, while we are still guaranteed to have the GIL, because some
+            # of the C calls we make below will release the GIL
+            if _is_internal_in_bad_fork:
+                raise RuntimeError(
+                    "Cannot re-initialize NPU in forked subprocess. To use NPU with "
+                    "multiprocessing, you must use the 'spawn' start method")
+    
+>           torch_npu._C._npu_init()
+E           RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+E           [ERROR] 2026-10-15-07:58:09 (PID:62, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+E           [Error]: An internal error occurs in the Driver module. 
+E                   Rectify the fault based on the error information in the ascend log.
+E           [PID: 62] 2026-10-15-07:58:09.212.683 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:05.808.538 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:05.528.412 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:05.243.333 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.635.866 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:58:04.312.056 Invalid_Argument(EE1001): The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E                   Solution: 1. Check the input parameter range of the function. 2. Check the function invocation relationship.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+E           
+E           [PID: 62] 2026-10-15-07:57:58.254.563 Invalid_Argument(EL0003): The argument is invalid.
+E                   Solution: Try again with a valid argument.
+E           TraceBack (most recent call last):
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+E                   rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+E                   Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+E                   drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+E                   rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+E                   [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+E                   chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+E                   The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:273: RuntimeError
+_ TestGroupedSwiGLUGradients.test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once _
+
+self = <test_npu_grouped_swiglu.TestGroupedSwiGLUGradients testMethod=test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once>
+
+    def test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once(self) -> None:
+        """Real autograd replay and shared ordinary uses survive no-sync then sync."""
+        initial = torch.randn(2, 4, 3, dtype=torch.bfloat16)
+        inputs = [torch.randn(5, 3, dtype=torch.bfloat16) for _ in range(2)]
+        gradients = [torch.randn(5, 4, dtype=torch.bfloat16) for _ in range(2)]
+        groups = torch.tensor([2, 5])
+        reduced = []
+        for recompute in (False, True):
+            with self.subTest(recompute=recompute):
+                parameter = make_expert_state(initial)
+                state = make_backward_state(parameter)
+                weight = parameter.unsharded_param
+                operation = grouped_swiglu._get_npu_grouped_matmul()
+    
+                def shared_forward(operand: torch.Tensor) -> torch.Tensor:
+                    """Reuse one parameter twice inside a replayable region."""
+                    first = operation.apply(operand, weight.transpose(-1, -2), groups, weight)
+                    second = operation.apply(operand * 0.5, weight.transpose(-1, -2), groups, weight)
+                    return first + second
+    
+                for step, (operand, gradient) in enumerate(zip(inputs, gradients)):
+                    operand = operand.clone().requires_grad_()
+                    output = checkpoint(shared_forward, operand, use_reentrant=False) if recompute else shared_forward(
+                        operand)
+                    torch.autograd.backward((output, weight.sum()), (gradient, torch.tensor(0.125)))
+                    state.reduce_grads = step == 1
+                    state.post_backward()
+                    self.assertIsNone(weight.main_grad)
+                    self.assertIsNone(weight.grad)
+                    self.assertFalse(weight.grad_added_to_main_grad)
+                    self.assertEqual(len(state.scheduler_ctx.pre_reduce_scatter_params), int(step == 1))
+                    if step == 0:
+                        self.assertIsNone(parameter.reduce_scatter_comm_ctx.reduce_scatter_output)
+                output = parameter.reduce_scatter_comm_ctx.reduce_scatter_output.view(initial.shape)
+                expected = torch.full(initial.shape, 0.25, dtype=torch.float64)
+                for operand, gradient in zip(inputs, gradients):
+                    for expert, (left, right) in enumerate(((0, 2), (2, 5))):
+                        product = gradient[left:right].double().T @ operand[left:right].double()
+                        expected[expert].add_(product * 1.5)
+                torch.testing.assert_close(output.double(), expected, rtol=0, atol=1e-6)
+                reduced.append(output.clone())
+                parameter.clear_unsharded_source_grad()
+                self.assertIsNone(parameter.unsharded_accumulated_grad)
+>       torch.testing.assert_close(reduced[0], reduced[1], rtol=0, atol=0)
+                                               ^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/ut/components/functional/test_npu_grouped_swiglu.py:219: IndexError
+----------------------------- Captured stdout call -----------------------------
+uu
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: 2 warnings
+tests/ut/core/optimizer/test_muon_ns_precision.py: 8 warnings
+tests/ut/trainer/test_muon_precision_checkpoint.py: 5 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+tests/common/mark_utils.py:38
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+tests/common/mark_utils.py:38
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    if self.device.type != 'cpu':
+
+tests/ut/core/optimizer/test_muon_ns_precision.py::TestMuonNSPrecision::test_custom_momentum_aliases_survive_two_real_steps
+  /work/fixes/latest-jt-validation-f637/hyper_parallel/core/optimizer/muon.py:168: UserWarning: mkldnn_matmul failed, switching to BLAS gemm:mkldnn_matmul: mkldnn_matmul bf16 path needs a cpu with bf16 support
+  Exception raised from mkldnn_matmul at /pytorch/aten/src/ATen/native/mkldnn/Matmul.cpp:338 (most recent call first):
+  frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffff9ec6a988 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+  frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, char const*) + 0x6c (0xffff9ec09018 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+  frame #2: at::native::mkldnn_matmul(at::Tensor const&, at::Tensor const&, at::Tensor const&, float, float) + 0x8f0 (0xffffa093ef70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #3: <unknown function> + 0x19cf658 (0xffffa02ff658 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #4: at::native::structured_mm_out_cpu::impl(at::Tensor const&, at::Tensor const&, at::Tensor const&) + 0xb0 (0xffffa03001f0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #5: <unknown function> + 0x2881548 (0xffffa11b1548 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #6: <unknown function> + 0x5915aac (0xffffa4245aac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #7: <unknown function> + 0x510c57c (0xffffa3a3c57c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #8: at::_ops::mm_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x180 (0xffffa0f39dd0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #9: <unknown function> + 0x13b288c (0xffff9fce288c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #10: at::native::matmul_out(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x38 (0xffffa02fa7b8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #11: at::_ops::matmul_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x180 (0xffffa1090190 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #12: <unknown function> + 0x5d6d70 (0xffffa9666d70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+  <omitting python frames>
+  frame #52: <unknown function> + 0x27400 (0xffffac567400 in /lib/aarch64-linux-gnu/libc.so.6)
+  frame #53: __libc_start_main + 0x98 (0xffffac5674d8 in /lib/aarch64-linux-gnu/libc.so.6)
+   (Triggered internally at /pytorch/aten/src/ATen/native/LinearAlgebra.cpp:1531.)
+    torch.matmul(mat_x, mat_x.mT, out=buf_a)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SUBFAILED(mode='full', objective='aux') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='full', objective='total') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='selective', objective='aux') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='selective', objective='total') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='full') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_public_recompute_covers_mtp_and_preserves_aux_gradients
+SUBFAILED(mode='selective') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_public_recompute_covers_mtp_and_preserves_aux_gradients
+SUBFAILED(recompute=True) tests/ut/components/functional/test_npu_grouped_swiglu.py::TestGroupedSwiGLUGradients::test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once
+FAILED tests/ut/components/functional/test_npu_grouped_swiglu.py::TestGroupedSwiGLUGradients::test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once
+8 failed, 81 passed, 36 warnings, 113 subtests passed in 37.82s

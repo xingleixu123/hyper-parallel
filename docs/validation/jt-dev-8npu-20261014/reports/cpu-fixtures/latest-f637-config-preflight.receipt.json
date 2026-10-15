@@ -1,0 +1,15 @@
+{
+  "case": "latest-f637-config-preflight",
+  "owner": "01a13aa4-a553-7e22-a1c1-ebd16b083bb9",
+  "container_id": "c126634507c60ab23fd5378fa6e937cc23d91702e8b56698034cb82da1b3b97a",
+  "devices": [],
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "command": [
+    "-lc",
+    "source /workspace/env.sh\nexec python -c 'import json,yaml\nfrom pathlib import Path\nroot=Path('\"'\"'/work'\"'\"')\nupstream=yaml.safe_load((root/'\"'\"'repo/examples/training_demo/jt_deepseek_v3/hp_4k_1_card.yaml'\"'\"').read_text())\nfor suffix in ('\"'\"'0-200'\"'\"','\"'\"'200-400'\"'\"','\"'\"'continuous400'\"'\"'):\n    path=root/'\"'\"'configs'\"'\"'/('\"'\"'r129-f637-fp32-fsdp8-'\"'\"'+suffix+'\"'\"'.yaml'\"'\"')\n    config=yaml.safe_load(path.read_text())\n    assert config['\"'\"'plan_overrides'\"'\"']==upstream['\"'\"'plan_overrides'\"'\"']\n    assert config['\"'\"'model'\"'\"']['\"'\"'config'\"'\"']['\"'\"'enable_chunk_loss'\"'\"'] is True\n    assert config['\"'\"'model'\"'\"']['\"'\"'config'\"'\"']['\"'\"'chunk_loss_size'\"'\"']==4096\n    assert '\"'\"'loss_chunk_size'\"'\"' not in config['\"'\"'model'\"'\"']['\"'\"'config'\"'\"']\n    assert config['\"'\"'model'\"'\"']['\"'\"'config'\"'\"']['\"'\"'expert_fp32_weight_gradients'\"'\"'] is True\n    assert config['\"'\"'optimizer'\"'\"']['\"'\"'muon_config'\"'\"']['\"'\"'ns_dtype'\"'\"']=='\"'\"'float32'\"'\"'\n    assert config['\"'\"'training'\"'\"']['\"'\"'train_iters'\"'\"']==(200 if suffix=='\"'\"'0-200'\"'\"' else 400)\n    assert config['\"'\"'checkpoint'\"'\"']['\"'\"'save_ckpt'\"'\"']==(suffix=='\"'\"'0-200'\"'\"')\n    assert config['\"'\"'checkpoint'\"'\"']['\"'\"'restore_from'\"'\"']==('\"'\"'/work/checkpoints/r129-f637-fp32-fsdp8/global_step_200'\"'\"' if suffix=='\"'\"'200-400'\"'\"' else None)\n    assert config['\"'\"'fsdp_config'\"'\"']['\"'\"'dp_shard_size'\"'\"']==8\n    print(json.dumps({'\"'\"'config'\"'\"':path.name,'\"'\"'validated'\"'\"':True}))\n'"
+  ],
+  "started": 1792052268.521682,
+  "exit": 0,
+  "ended": 1792052269.3990674,
+  "removed": true
+}

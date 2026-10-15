@@ -1,0 +1,67 @@
+Looking in links: /work/tmp/issue211-test-wheels
+Processing ./tmp/issue211-test-wheels/pytest-9.1.1-py3-none-any.whl
+Processing ./tmp/issue211-test-wheels/iniconfig-2.3.1-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: packaging>=22 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (26.3)
+Processing ./tmp/issue211-test-wheels/pluggy-1.6.0-py3-none-any.whl (from pytest==9.1.1)
+Requirement already satisfied: pygments>=2.7.2 in /workspace/venv/lib/python3.12/site-packages (from pytest==9.1.1) (2.21.0)
+Installing collected packages: pluggy, iniconfig, pytest
+Successfully installed iniconfig-2.3.1 pluggy-1.6.0 pytest-9.1.1
+Obtaining file:///work/fixes/latest-jt-validation-f637
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: hyper_parallel
+  Building editable for hyper_parallel (pyproject.toml): started
+  Building editable for hyper_parallel (pyproject.toml): finished with status 'done'
+  Created wheel for hyper_parallel: filename=hyper_parallel-0.1.0-0.editable-cp312-cp312-linux_aarch64.whl size=13317 sha256=982684f592198a4c157b34f5e85d31d4dd3dd7d71623721d23b95723f9bb251d
+  Stored in directory: /tmp/pip-ephem-wheel-cache-as25f3n6/wheels/66/d9/a9/13da779614d69a1d6d1bf168ade71a0020bb1a15dda883bb31
+Successfully built hyper_parallel
+Installing collected packages: hyper_parallel
+  Attempting uninstall: hyper_parallel
+    Found existing installation: hyper_parallel 0.1.0
+    Not uninstalling hyper-parallel at /workspace/venv/lib/python3.12/site-packages, outside environment /work/venvs/latest-f637-tests
+    Can't uninstall 'hyper_parallel'. No files were found to uninstall.
+Successfully installed hyper_parallel-0.1.0
+EDITABLE_IMPORT /work/fixes/latest-jt-validation-f637/hyper_parallel/__init__.py
+LIGHTWEIGHT_LAUNCHER_PASS
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    if self.device.type != 'cpu':
+
+tests/ut/core/optimizer/test_muon_ns_precision.py::TestMuonNSPrecision::test_custom_momentum_aliases_survive_two_real_steps
+  /work/fixes/latest-jt-validation-f637/hyper_parallel/core/optimizer/muon.py:168: UserWarning: mkldnn_matmul failed, switching to BLAS gemm:mkldnn_matmul: mkldnn_matmul bf16 path needs a cpu with bf16 support
+  Exception raised from mkldnn_matmul at /pytorch/aten/src/ATen/native/mkldnn/Matmul.cpp:338 (most recent call first):
+  frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffff9ec6a988 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+  frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, char const*) + 0x6c (0xffff9ec09018 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+  frame #2: at::native::mkldnn_matmul(at::Tensor const&, at::Tensor const&, at::Tensor const&, float, float) + 0x8f0 (0xffffa093ef70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #3: <unknown function> + 0x19cf658 (0xffffa02ff658 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #4: at::native::structured_mm_out_cpu::impl(at::Tensor const&, at::Tensor const&, at::Tensor const&) + 0xb0 (0xffffa03001f0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #5: <unknown function> + 0x2881548 (0xffffa11b1548 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #6: <unknown function> + 0x5915aac (0xffffa4245aac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #7: <unknown function> + 0x510c57c (0xffffa3a3c57c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #8: at::_ops::mm_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x180 (0xffffa0f39dd0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #9: <unknown function> + 0x13b288c (0xffff9fce288c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #10: at::native::matmul_out(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x38 (0xffffa02fa7b8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #11: at::_ops::matmul_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x180 (0xffffa1090190 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #12: <unknown function> + 0x5d6d70 (0xffffa9666d70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+  <omitting python frames>
+  frame #52: <unknown function> + 0x27400 (0xffffac567400 in /lib/aarch64-linux-gnu/libc.so.6)
+  frame #53: __libc_start_main + 0x98 (0xffffac5674d8 in /lib/aarch64-linux-gnu/libc.so.6)
+   (Triggered internally at /pytorch/aten/src/ATen/native/LinearAlgebra.cpp:1531.)
+    torch.matmul(mat_x, mat_x.mT, out=buf_a)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SUBFAILED(mode='full', objective='aux') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='full', objective='total') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='selective', objective='aux') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='selective', objective='total') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+SUBFAILED(mode='full') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_public_recompute_covers_mtp_and_preserves_aux_gradients
+SUBFAILED(mode='selective') tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_public_recompute_covers_mtp_and_preserves_aux_gradients
+SUBFAILED(recompute=True) tests/ut/components/functional/test_npu_grouped_swiglu.py::TestGroupedSwiGLUGradients::test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once
+FAILED tests/ut/components/functional/test_npu_grouped_swiglu.py::TestGroupedSwiGLUGradients::test_shared_weight_checkpoint_and_no_sync_retain_each_contribution_once
+8 failed, 81 passed, 36 warnings, 113 subtests passed in 37.82s

@@ -1,0 +1,60 @@
+..................................................................................               [100%]
+=============================== warnings summary ===============================
+../../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: 2 warnings
+tests/ut/core/optimizer/test_muon_ns_precision.py: 8 warnings
+tests/ut/trainer/test_muon_precision_checkpoint.py: 5 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+tests/common/mark_utils.py:38
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+tests/common/mark_utils.py:38
+  /work/fixes/latest-jt-validation-f637/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_macos - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_checkpoint_auxiliary_loss_consumption_matches_eager_gradients
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    if self.device.type != 'cpu':
+
+tests/ut/core/optimizer/test_muon_ns_precision.py::TestMuonNSPrecision::test_custom_momentum_aliases_survive_two_real_steps
+  /work/fixes/latest-jt-validation-f637/hyper_parallel/core/optimizer/muon.py:168: UserWarning: mkldnn_matmul failed, switching to BLAS gemm:mkldnn_matmul: mkldnn_matmul bf16 path needs a cpu with bf16 support
+  Exception raised from mkldnn_matmul at /pytorch/aten/src/ATen/native/mkldnn/Matmul.cpp:338 (most recent call first):
+  frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffff7ed5a988 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+  frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, char const*) + 0x6c (0xffff7ecf9018 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+  frame #2: at::native::mkldnn_matmul(at::Tensor const&, at::Tensor const&, at::Tensor const&, float, float) + 0x8f0 (0xffff80a2ef70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #3: <unknown function> + 0x19cf658 (0xffff803ef658 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #4: at::native::structured_mm_out_cpu::impl(at::Tensor const&, at::Tensor const&, at::Tensor const&) + 0xb0 (0xffff803f01f0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #5: <unknown function> + 0x2881548 (0xffff812a1548 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #6: <unknown function> + 0x5915aac (0xffff84335aac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #7: <unknown function> + 0x510c57c (0xffff83b2c57c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #8: at::_ops::mm_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x180 (0xffff81029dd0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #9: <unknown function> + 0x13b288c (0xffff7fdd288c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #10: at::native::matmul_out(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x38 (0xffff803ea7b8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #11: at::_ops::matmul_out::call(at::Tensor const&, at::Tensor const&, at::Tensor&) + 0x180 (0xffff81180190 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+  frame #12: <unknown function> + 0x5d6d70 (0xffff89756d70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+  <omitting python frames>
+  frame #52: <unknown function> + 0x27400 (0xffff8c657400 in /lib/aarch64-linux-gnu/libc.so.6)
+  frame #53: __libc_start_main + 0x98 (0xffff8c6574d8 in /lib/aarch64-linux-gnu/libc.so.6)
+   (Triggered internally at /pytorch/aten/src/ATen/native/LinearAlgebra.cpp:1531.)
+    torch.matmul(mat_x, mat_x.mT, out=buf_a)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+82 passed, 36 warnings, 120 subtests passed in 36.98s
