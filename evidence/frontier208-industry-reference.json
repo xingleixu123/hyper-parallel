@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-10-16T01:13:47.731406+08:00",
+  "MF_pynative": {
+    "commit": "d3f5dc943f6bf50cfa238db9c320ba4ff75ac52e",
+    "url": "https://gitcode.com/mindspore/mindformers/blob/d3f5dc943f6bf50cfa238db9c320ba4ff75ac52e/mindformers/pynative/optimizer/muon.py",
+    "sha256": "9e9e5867a4225181a7014ca7809bae67d16e9bfa103a7316fb71aaa20a7fee7c",
+    "lines": [
+      1195,
+      1199
+    ],
+    "finding": "归一化显式使用FP32 Frobenius norm，再转BF16；固定源码参照，不宣称今日重新验证GitCode分支最新提交。"
+  },
+  "NVIDIA": {
+    "url": "https://docs.nvidia.com/nemo/emerging-optimizers/0.4.0/_modules/emerging_optimizers/orthogonalized_optimizers/muon_utils.html",
+    "source_read_via": "web primary official source",
+    "lines": [
+      227,
+      247
+    ],
+    "finding": "newton_schulz要求FP32输入；单卡默认调用functional.normalize，可选float64 norm；未规定本实验MF图的24路相邻归约树。",
+    "snapshot_commit": null
+  },
+  "interpretation": "数学正确性和跨运行时复现旧MF浮点路径分别评价；本次143+2个差异位置均原HP更近FP64，不支持将兼容改动当成通用错误修复。"
+}
