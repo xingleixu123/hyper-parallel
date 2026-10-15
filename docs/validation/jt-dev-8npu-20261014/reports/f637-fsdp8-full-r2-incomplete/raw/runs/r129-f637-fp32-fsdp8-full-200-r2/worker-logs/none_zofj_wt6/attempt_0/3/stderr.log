@@ -1,0 +1,45 @@
+2026-10-15 17:16:32,149 [INFO] torch_npu.env: get env LOCAL_RANK = 3
+2026-10-15 17:16:33,174 [INFO] torch_npu.env: get env WORLD_SIZE = 8
+2026-10-15 17:16:33,175 [INFO] torch_npu.env: get env MASTER_ADDR = 127.0.0.1
+2026-10-15 17:16:33,175 [INFO] torch_npu.env: get env MASTER_PORT = 30355
+2026-10-15 17:16:33,175 [INFO] torch_npu.env: get env TORCHELASTIC_USE_AGENT_STORE = True
+2026-10-15 17:16:33,363 [INFO] hyper_parallel.trainer.base: Process rank: 3, world size: 8
+2026-10-15 17:16:33,377 [INFO] hyper_parallel.distributed.mesh: Built device mesh (8, 1, 1), dense FSDP mesh (1, 8, 1) and expert FSDP mesh None
+2026-10-15 17:16:33,378 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='model.layers.[123456789]*.mlp' skipped because condition 'ep' is inactive
+2026-10-15 17:16:33,378 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='mtp.layers.*.transformer_layer.mlp' skipped because condition 'ep' is inactive
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/workspace/venv/lib/python3.12/site-packages/huggingface_hub/dataclasses.py", line 144, in __strict_setattr__
+[rank3]:     validator(value)
+[rank3]:   File "/workspace/venv/lib/python3.12/site-packages/huggingface_hub/dataclasses.py", line 625, in validator
+[rank3]:     type_validator(field.name, value, field.type)
+[rank3]:   File "/workspace/venv/lib/python3.12/site-packages/huggingface_hub/dataclasses.py", line 472, in type_validator
+[rank3]:     _validate_simple_type(name, value, expected_type)
+[rank3]:   File "/workspace/venv/lib/python3.12/site-packages/huggingface_hub/dataclasses.py", line 615, in _validate_simple_type
+[rank3]:     raise TypeError(
+[rank3]: TypeError: Field 'rms_norm_eps' expected float, got str (value: '1e-06')
+
+[rank3]: The above exception was the direct cause of the following exception:
+
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/work/runs/r129-f637-fp32-fsdp8-full-200-r2/capture_training.py", line 161, in <module>
+[rank3]:     main()
+[rank3]:   File "/work/runs/r129-f637-fp32-fsdp8-full-200-r2/capture_training.py", line 127, in main
+[rank3]:     trainer = TextTrainer(config)
+[rank3]:               ^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/trainer/text_trainer.py", line 53, in __init__
+[rank3]:     self.base._build_model()
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/trainer/base.py", line 303, in _build_model
+[rank3]:     self.model = self.config.model.build(
+[rank3]:                  ^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/trainer/config/target.py", line 110, in build
+[rank3]:     return self._target_(**kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/workspace/hyper-parallel/hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py", line 126, in build_jt_model
+[rank3]:     config = JTDeepseekV3Config(**config)
+[rank3]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/workspace/venv/lib/python3.12/site-packages/transformers/configuration_utils.py", line 115, in __init__
+[rank3]:     setattr(self, f.name, standard_kwargs[f.name])
+[rank3]:   File "/workspace/venv/lib/python3.12/site-packages/huggingface_hub/dataclasses.py", line 146, in __strict_setattr__
+[rank3]:     raise StrictDataclassFieldValidationError(field=name, cause=e) from e
+[rank3]: huggingface_hub.errors.StrictDataclassFieldValidationError: Validation error for field 'rms_norm_eps':
+[rank3]:     TypeError: Field 'rms_norm_eps' expected float, got str (value: '1e-06')

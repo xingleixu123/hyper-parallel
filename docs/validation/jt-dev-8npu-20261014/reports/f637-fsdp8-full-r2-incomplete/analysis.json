@@ -1,0 +1,23 @@
+{
+  "case": "r129-f637-fp32-fsdp8-full-200-r2",
+  "verdict": "INCOMPLETE_HARNESS_CONFIG_TYPE_ERROR",
+  "training_steps": 0,
+  "exit_code": 1,
+  "released": true,
+  "duration_seconds": 37.006818029993156,
+  "cause": "本任务重新序列化重试配置，将三个浮点指数写成YAML字符串。",
+  "affected_fields": [
+    "model/config/rms_norm_eps",
+    "optimizer/muon_config/ns_epsilon",
+    "optimizer/adamw_config/adamw_eps"
+  ],
+  "correction": "保留原配置的数值文本，只替换不启用的checkpoint目录中的本轮case名。",
+  "cpu_preflight": {
+    "passed": 26,
+    "known_invalid_control": 1,
+    "npu_initialized": false
+  },
+  "next_case": "r129-f637-fp32-fsdp8-full-200-r3",
+  "next_not_before_plus08": "2026-10-16T01:36:58.853192+08:00",
+  "limits": "配置构造通过不等于训练通过；本次无loss、显存、吞吐结果。"
+}

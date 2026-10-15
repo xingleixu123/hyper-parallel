@@ -1,0 +1,90 @@
+<frozen runpy>:128: RuntimeWarning: 'torch.distributed.run' found in sys.modules after import of package 'torch.distributed', but prior to execution of 'torch.distributed.run'; this may result in unpredictable behaviour
+W1015 17:16:37.243000 73 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 80 closing signal SIGTERM
+W1015 17:16:37.244000 73 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 82 closing signal SIGTERM
+W1015 17:16:37.244000 73 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 84 closing signal SIGTERM
+W1015 17:16:37.244000 73 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 85 closing signal SIGTERM
+W1015 17:16:37.244000 73 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 86 closing signal SIGTERM
+W1015 17:16:37.244000 73 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 87 closing signal SIGTERM
+E1015 17:16:37.790000 73 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 1 (pid: 81) of binary: /work/venvs/validation/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/work/runs/r129-f637-fp32-fsdp8-full-200-r2/capture_training.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 83) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 0 (local_rank: 0)
+  exitcode  : -15 (pid: 80)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 80
+[3]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 82) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[4]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 4 (local_rank: 4)
+  exitcode  : -15 (pid: 84)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 84
+[5]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 5 (local_rank: 5)
+  exitcode  : 1 (pid: 85) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[6]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 6 (local_rank: 6)
+  exitcode  : 1 (pid: 86) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[7]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 7 (local_rank: 7)
+  exitcode  : 1 (pid: 87) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-15_17:16:37
+  host      : localhost.localdomain
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 81) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+[ERROR] 2026-10-15-17:16:37 (PID:73, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
