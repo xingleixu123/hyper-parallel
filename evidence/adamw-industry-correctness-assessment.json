@@ -1,0 +1,18 @@
+{
+  "classification": "浮点算术兼容差异；当前未证实算法契约错误，不默认替换fused实现",
+  "installed_cann_runtime": "9.2.0-beta.2",
+  "native_moment": "m + (g - m) * (1 - beta1)",
+  "archive_moment": "beta1 * m + (1 - beta1) * g",
+  "native_denom": "sqrt(v) * (1 / sqrt(1-beta2**step)) + eps",
+  "archive_denom": "sqrt(v/(1-beta2**step)) + eps",
+  "installed_source_lines": {
+    "moment": "apply_adam_w_v2_fp.h:207-213",
+    "denom": "apply_adam_w_v2_fp.h:240-248",
+    "scalar": "apply_adam_w_v2_fp.h:112-121"
+  },
+  "megatron": "已核对固定提交0101df91：优先TE FusedAdam，再fallback Apex FusedAdam；不能宣称业界统一要求未融合。",
+  "apex": "固定提交575968bc：同AdamW数学式；decay与主更新组合后乘lr，与归档逐算子顺序不同。",
+  "modern_mf": "固定提交d3f5dc94：默认逐项_run_adamw_opt采用分立mul/add与sqrt(v/bc2)；Muon允许use_fused_adamw，存在两种模式。",
+  "precision_check": "80位Decimal以相同实际状态和梯度计算，分别使用确切FP32超参数与十进制标称超参数。两种实现均有更近样本，详见adamw-vocab-high-precision-accuracy.json。",
+  "limits": "CANN安装包源码与实际数值重放相互支持；未取得运行时具体kernel调度trace，未声称已证明二进制与源码完全对应。"
+}
