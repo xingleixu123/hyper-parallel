@@ -4,7 +4,9 @@
 
 本单是 JT DeepSeek V3 八卡验证的**总问题单**，统一关联所有已拆分的小问题及独立 PR，维护优先级、复现证据、精度曲线、显存/性能、重计算与续训验收状态。每个已确认的独立缺陷或接口需求各用一个小问题单和一个单提交 PR，两个方向均能回到本单；不把多个缺陷混入同一个修复提交。
 
-**当前总体尚未验收通过，201跨机主LM准入未通过。** 最新固定上游为 `a1e6c222`，集成验证源为 `544526f7`，包含用户指定的#180和上游#232。129与201现均完成同源FSDP8 0–200，保存各自step200 checkpoint；全200步×8rank主LM最大绝对差为 **0.009525299072265625**（第189步），首超0.005为第125步，共8个超阈值步。源码、初态、数据、输入、runtime flags与完成/释放证据通过核验，但精度未通过。按用户指示后续继续125/129，先用129的新checkpoint续训200–400，再对独立连续400参考；当前源码的续训、重算及并行矩阵仍待完成。[完整跨机结果、曲线与公开逐rank证据](reports/a1e6-cross-host-200/README_ZH.md)。
+**当前源码FSDP基线与续训已通过，整体并行/重算矩阵尚未完成。** 最新固定上游为 `a1e6c222`，集成源为 `544526f7`，含用户指定#180及#230/#232。129已完成三次独立运行：FSDP8基线0–200、从其checkpoint恢复200–400、独立连续0–400。两个完整200步×8rank窗口的主LM最大绝对差均为 **0**；已有MTP/aux日志及按系数还原值、总loss、梯度范数也全为0，输入一致，恢复计数6400项0差异。三次均exit0并释放。当前源码TP/CP/EP、组合及full/selective重算仍待完成，历史结果不转写为当前通过。[完整续训验收、曲线与逐rank证据](reports/a1e6-fsdp-resume-400/README_ZH.md)。
+
+**201跨机主LM准入仍未通过。** 同源129与201完整0–200比较的主LM最大绝对差为 **0.009525299072265625**（第189步），首超0.005为第125步，共8个超阈值步。源码、初态、数据、输入、runtime flags与完成/释放证据通过核验，但精度未通过。按用户指示后续继续125/129。[完整跨机结果、曲线与公开逐rank证据](reports/a1e6-cross-host-200/README_ZH.md)。
 
 **历史固定配方 `18602c4` 的结果仍保留：**FSDP1–200及checkpoint200恢复后的201–400分别对独立连续400参考，8rank全部LM、日志及还原MTP/aux、总loss与梯度范数最大差均为0；off/full/selective三种重算也逐步一致。该版本EP2、CP2、TP2各自完整200步的主LM最大差为0.007523、0.011062、0.021448，均超过0.005。#232取消强制设置 `CLOSE_MATMUL_K_SHIFT=1`，会影响数值执行路径，历史结果不能重标为最新源码结果。
 
@@ -26,14 +28,14 @@
 
 | 排序 | 问题与影响 | 小问题单 | 独立单提交 PR | 已有证据及剩余边界 |
 |---|---|---|---|---|
-| Top1 | 跨拓扑完整200步精度与最新源码矩阵尚未通过 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 18602c4历史配方全rank超阈值：EP2为0.007523/0.015433/0.138989，CP2为0.011062/0.022786/0.204605（LM/还原MTP/aux），TP2为0.021448/0.024670/0.155838；544526f7两侧FSDP完整200步已完成，129对201主LM最大差0.0095253；201不准入，后续继续125/129，矩阵仍待完成 |
+| Top1 | 跨拓扑完整200步精度与最新源码矩阵尚未通过 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 18602c4历史配方全rank超阈值：EP2为0.007523/0.015433/0.138989，CP2为0.011062/0.022786/0.204605（LM/还原MTP/aux），TP2为0.021448/0.024670/0.155838；544526f7的129基线及续训对独立连续400，两窗口主LM及已有其余loss/梯度差全0；129对201主LM最大差0.0095253，201不准入；当前并行与重算矩阵仍待完成 |
 | Top2 | 梯度累积按微批有效 token 归一化，改变整步目标 | [#203](https://github.com/hf1s/hyper-parallel/issues/203) | [#194](https://github.com/hf1s/hyper-parallel/pull/194) | 实际 Trainer 的不等长监督样例，正确梯度 14、旧行为 10；TP2×EP2 LM 误差显著下降但仍未过 0.005 |
 | Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
 | Top4 | 测试调度器覆盖上层NPU可见列表，使设备分配越界 | [#223](https://github.com/hf1s/hyper-parallel/issues/223) | [#224](https://github.com/hf1s/hyper-parallel/pull/224) | 单提交2文件；无设备回归10测试/18子测试通过、两轴检视通过；不等同实际多卡训练验证 |
 | Top5 | CP 分块输出损失的支持与回归覆盖 | [#205](https://github.com/hf1s/hyper-parallel/issues/205) | [#199](https://github.com/hf1s/hyper-parallel/pull/199) | 功能已由上游 #186 合入；#199 收敛为独立回归，新基点 CPU20项/25子测试及129四卡短步ST通过；每组2步，不代替200步验收 |
 | Top6 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；18602c4配方full200步×8rank全部loss/梯度范数零误差，两个主干层和一个MTP层均包裹；selective第三轮完整200步×8rank全部loss及梯度范数零误差，未拼接旧前缀 |
 | Top7 | 重计算重放重复提交专家路由 token 计数 | [#207](https://github.com/hf1s/hyper-parallel/issues/207) | [#196](https://github.com/hf1s/hyper-parallel/pull/196) | 保留必要张量运算，只约束持久副作用；均匀重复计数未必改变 sign 型 bias 更新，不能虚构旧 loss 漂移 |
-| Top8 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 18602c4配方201–400×8rank累计/逐步计数与独立400参考一致；各loss与梯度最大差0；集成结果不全部归因于本PR |
+| Top8 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 18602c4历史及当前544526f7均已完成201–400×8rank对独立400参考；当前四项恢复计数6400项零差，主LM及已有其余loss/梯度差全0；集成结果不全部归因于本PR |
 | Top9 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
 | Top10 | Muon NS 精度无法显式配置并从 checkpoint 恢复 | [#210](https://github.com/hf1s/hyper-parallel/issues/210) | [#201](https://github.com/hf1s/hyper-parallel/pull/201) | 保留 BF16 默认；CPU、8 卡和 2 卡 ST 通过；可选 FP32 成本须匹配配方评估 |
 | Top11 | Trainer向NPU写入无效CUDA属性，不能关闭预先开启的HF32 | [#227](https://github.com/hf1s/hyper-parallel/issues/227) | [#228](https://github.com/hf1s/hyper-parallel/pull/228) | 单提交2文件；真实TorchNPU选项及3项CPU测试/2项子测试通过，两轴检视通过；默认HF32关闭，未证明是CP/EP漂移根因，硬件训练未验 |

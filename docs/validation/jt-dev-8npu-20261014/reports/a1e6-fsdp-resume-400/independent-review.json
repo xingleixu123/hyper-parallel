@@ -1,0 +1,1405 @@
+{
+  "schema": "a1e6-fsdp-resume400-v2-independent-review-v1",
+  "created_utc": "2026-10-16T19:19:38.450294+00:00",
+  "status": "PASS_CURRENT_SOURCE_FSDP_RESTART_TRAJECTORY",
+  "findings": [],
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "scope_zh": "129 当前固定源码、固定配方的两段训练与独立连续 400 步比较；不是其他并行、重算或跨机准入。",
+  "runs": {
+    "baseline": {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "collection": {
+        "manifest": {
+          "path": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+          "bytes": 17543,
+          "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca"
+        },
+        "files": 91,
+        "bytes": 1707604,
+        "all_sha_size_match": true,
+        "duplicates": 0,
+        "redirects": 0
+      },
+      "ordered_step_range": [
+        1,
+        200
+      ],
+      "rows_per_rank": 200,
+      "rank_count": 8,
+      "finite_scalar_values_checked": 25600,
+      "source_and_clean_patch_pass": true,
+      "start": {
+        "global_step": 0,
+        "epoch": 0,
+        "train_iters": 200,
+        "micro_batches": 1
+      },
+      "complete": {
+        "global_step": 200,
+        "epoch": 1
+      },
+      "all_rank_initial_state_objects": 48,
+      "all_rank_initial_state_equal": true,
+      "all_rank_runtime_flags_equal": true,
+      "checkpoint_recipe": {
+        "save_ckpt": true,
+        "checkpoint_dir": "/work/checkpoints/r129-a1e6-fsdp8-0-200-v3",
+        "save_steps": 200,
+        "save_epochs": 0,
+        "is_async": false,
+        "is_peft": false,
+        "save_optimizer": true,
+        "save_train_state": true,
+        "save_extra_state_per_rank": true,
+        "restore_from": null,
+        "restore_optimizer": true,
+        "restore_train_state": true,
+        "restore_dataloader_state": true,
+        "model_save_format": "safetensors",
+        "save_consolidated": "final",
+        "staging_dir": null,
+        "best_metric_key": "default"
+      },
+      "execution_receipt": {
+        "path": "scheduling/r129-a1e6-fsdp8-0-200-v3.receipt.json",
+        "bytes": 9580,
+        "sha256": "6b5b9bcfa9aa0fbfb1fe1b74324397f3ffc1b1a1a8dbeaeff42e09754dea968b"
+      },
+      "container_id": "431499a668c960916ef11abe2fc379ef64109a2784164c992cb56d309eb6ecb1",
+      "resources": {
+        "actual_host_config": {
+          "Privileged": true,
+          "Runtime": "runc",
+          "NetworkMode": "host",
+          "PidMode": "",
+          "IpcMode": "private",
+          "Memory": 343597383680,
+          "ShmSize": 34359738368,
+          "NanoCpus": 0,
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "PidsLimit": 4096
+        },
+        "duration_seconds": 383.04995921999216,
+        "metric_global_max_gib": {
+          "memory/device_max_allocated_gb": 22.032196044921875,
+          "memory/device_max_reserved_gb": 27.25
+        },
+        "exact_final_max_bytes_across_ranks": {
+          "max_allocated_bytes": 23656889344,
+          "max_reserved_bytes": 29259464704
+        },
+        "exact_final_max_gib_across_ranks": {
+          "max_allocated_bytes": 22.03219509124756,
+          "max_reserved_bytes": 27.25
+        },
+        "per_rank_final_allocator": [
+          {
+            "global_step": 200,
+            "device": 0,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3800039424,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 29175578624,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 200,
+            "device": 1,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3821010944,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28735176704,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 200,
+            "device": 2,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3779067904,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 29259464704,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 200,
+            "device": 3,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3821010944,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28756148224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 200,
+            "device": 4,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3800039424,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28861005824,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 200,
+            "device": 5,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3821010944,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28735176704,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 200,
+            "device": 6,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3779067904,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 29259464704,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 200,
+            "device": 7,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 3800039424,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28756148224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          }
+        ],
+        "step_time_8rank_max_mean_excluding_first20": 1.1553913275400798,
+        "step_time_window": [
+          21,
+          200
+        ],
+        "step_time_samples": 180,
+        "physical_hbm_peak": "Not captured in original91; do not substitute allocator peak",
+        "cgroup_memory_peak": "Not captured in original91; HostConfig Memory is a limit, not usage",
+        "metric_allocated_float32_rounding_delta_bytes": 1024.0
+      },
+      "actual_idle_checks": {
+        "before_all8": true,
+        "second_all8": true,
+        "after_all8": true
+      }
+    },
+    "resume": {
+      "case": "r129-a1e6-fsdp8-200-400-v2",
+      "collection": {
+        "manifest": {
+          "path": "evidence/129-a1e6-fsdp8-resume200-v2-evidence-manifest.json",
+          "bytes": 17733,
+          "sha256": "640af77fd10b75af7cd634979c6f2641f57b87961ca25f2f37980f74ace02718"
+        },
+        "files": 91,
+        "bytes": 1720547,
+        "all_sha_size_match": true,
+        "duplicates": 0,
+        "redirects": 0
+      },
+      "ordered_step_range": [
+        201,
+        400
+      ],
+      "rows_per_rank": 200,
+      "rank_count": 8,
+      "finite_scalar_values_checked": 25600,
+      "source_and_clean_patch_pass": true,
+      "start": {
+        "global_step": 200,
+        "epoch": 0,
+        "train_iters": 400,
+        "micro_batches": 1
+      },
+      "complete": {
+        "global_step": 400,
+        "epoch": 1
+      },
+      "all_rank_initial_state_objects": 48,
+      "all_rank_initial_state_equal": true,
+      "all_rank_runtime_flags_equal": true,
+      "checkpoint_recipe": {
+        "save_ckpt": false,
+        "checkpoint_dir": "/work/checkpoints/r129-a1e6-fsdp8-200-400-v2",
+        "save_steps": 200,
+        "save_epochs": 0,
+        "is_async": false,
+        "is_peft": false,
+        "save_optimizer": true,
+        "save_train_state": true,
+        "save_extra_state_per_rank": true,
+        "restore_from": "/work/checkpoints/r129-a1e6-fsdp8-0-200-v3/global_step_200",
+        "restore_optimizer": true,
+        "restore_train_state": true,
+        "restore_dataloader_state": true,
+        "model_save_format": "safetensors",
+        "save_consolidated": "final",
+        "staging_dir": null,
+        "best_metric_key": "default"
+      },
+      "execution_receipt": {
+        "path": "scheduling/r129-a1e6-fsdp8-200-400-v2.receipt.json",
+        "bytes": 10130,
+        "sha256": "e54fc0115aa5f5aca8d3728eddef61994ef6d673914a15bea4fb6b101eb88969"
+      },
+      "container_id": "7ee13a865391dfb49442c9d894107739a52c1a0c7d4f33460292cf6603656c38",
+      "resources": {
+        "actual_host_config": {
+          "Privileged": true,
+          "Runtime": "runc",
+          "NetworkMode": "host",
+          "PidMode": "",
+          "IpcMode": "private",
+          "Memory": 343597383680,
+          "ShmSize": 34359738368,
+          "NanoCpus": 0,
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "PidsLimit": 4096
+        },
+        "duration_seconds": 371.02739448001375,
+        "metric_global_max_gib": {
+          "memory/device_max_allocated_gb": 22.032196044921875,
+          "memory/device_max_reserved_gb": 25.31640625
+        },
+        "exact_final_max_bytes_across_ranks": {
+          "max_allocated_bytes": 23656889344,
+          "max_reserved_bytes": 27183284224
+        },
+        "exact_final_max_gib_across_ranks": {
+          "max_allocated_bytes": 22.03219509124756,
+          "max_reserved_bytes": 25.31640625
+        },
+        "per_rank_final_allocator": [
+          {
+            "global_step": 400,
+            "device": 0,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 26952597504,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 26952597504,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 1,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 26952597504,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 26952597504,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 2,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 26952597504,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 26952597504,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 3,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 26868711424,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 26868711424,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 4,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 26952597504,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 26952597504,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 5,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 26952597504,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 26952597504,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 6,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 27183284224,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 27183284224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 7,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 26847739904,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 26847739904,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          }
+        ],
+        "step_time_8rank_max_mean_excluding_first20": 1.1571859545177883,
+        "step_time_window": [
+          221,
+          400
+        ],
+        "step_time_samples": 180,
+        "physical_hbm_peak": "Not captured in original91; do not substitute allocator peak",
+        "cgroup_memory_peak": "Not captured in original91; HostConfig Memory is a limit, not usage",
+        "metric_allocated_float32_rounding_delta_bytes": 1024.0
+      },
+      "actual_idle_checks": {
+        "before_all8": true,
+        "second_all8": true,
+        "after_all8": true
+      }
+    },
+    "continuous": {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "collection": {
+        "manifest": {
+          "path": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+          "bytes": 18270,
+          "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b"
+        },
+        "files": 91,
+        "bytes": 3040568,
+        "all_sha_size_match": true,
+        "duplicates": 0,
+        "redirects": 0
+      },
+      "ordered_step_range": [
+        1,
+        400
+      ],
+      "rows_per_rank": 400,
+      "rank_count": 8,
+      "finite_scalar_values_checked": 51200,
+      "source_and_clean_patch_pass": true,
+      "start": {
+        "global_step": 0,
+        "epoch": 0,
+        "train_iters": 400,
+        "micro_batches": 1
+      },
+      "complete": {
+        "global_step": 400,
+        "epoch": 1
+      },
+      "all_rank_initial_state_objects": 48,
+      "all_rank_initial_state_equal": true,
+      "all_rank_runtime_flags_equal": true,
+      "checkpoint_recipe": {
+        "save_ckpt": false,
+        "checkpoint_dir": "/work/checkpoints/r129-a1e6-fsdp8-continuous400-v2",
+        "save_steps": 200,
+        "save_epochs": 0,
+        "is_async": false,
+        "is_peft": false,
+        "save_optimizer": true,
+        "save_train_state": true,
+        "save_extra_state_per_rank": true,
+        "restore_from": null,
+        "restore_optimizer": true,
+        "restore_train_state": true,
+        "restore_dataloader_state": true,
+        "model_save_format": "safetensors",
+        "save_consolidated": "final",
+        "staging_dir": null,
+        "best_metric_key": "default"
+      },
+      "execution_receipt": {
+        "path": "scheduling/r129-a1e6-fsdp8-continuous400-v2.receipt.json",
+        "bytes": 9593,
+        "sha256": "43187845ad046dbc551ff397a20fa51c245d6a6dd9e1069e63e3f19dc08109d2"
+      },
+      "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+      "resources": {
+        "actual_host_config": {
+          "Privileged": true,
+          "Runtime": "runc",
+          "NetworkMode": "host",
+          "PidMode": "",
+          "IpcMode": "private",
+          "Memory": 343597383680,
+          "ShmSize": 34359738368,
+          "NanoCpus": 0,
+          "CpuPeriod": 0,
+          "CpuQuota": 0,
+          "CpusetCpus": "",
+          "CpusetMems": "",
+          "PidsLimit": 4096
+        },
+        "duration_seconds": 610.3890903799911,
+        "metric_global_max_gib": {
+          "memory/device_max_allocated_gb": 22.032196044921875,
+          "memory/device_max_reserved_gb": 27.171875
+        },
+        "exact_final_max_bytes_across_ranks": {
+          "max_allocated_bytes": 23656889344,
+          "max_reserved_bytes": 29175578624
+        },
+        "exact_final_max_gib_across_ranks": {
+          "max_allocated_bytes": 22.03219509124756,
+          "max_reserved_bytes": 27.171875
+        },
+        "per_rank_final_allocator": [
+          {
+            "global_step": 400,
+            "device": 0,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 28756148224,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28756148224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 1,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 29175578624,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 29175578624,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 2,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 29175578624,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 29175578624,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 3,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 29154607104,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 29154607104,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 4,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 28756148224,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28756148224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 5,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 28756148224,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28756148224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 6,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 28756148224,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28756148224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          },
+          {
+            "global_step": 400,
+            "device": 7,
+            "allocated_bytes": 3496637952,
+            "reserved_bytes": 28756148224,
+            "max_allocated_bytes": 23656889344,
+            "max_reserved_bytes": 28756148224,
+            "scope": "Per-process allocator lifetime peaks through completed training/checkpoint callbacks; not physical device HBM peaks"
+          }
+        ],
+        "step_time_8rank_max_mean_excluding_first20": 1.1577970642792552,
+        "step_time_window": [
+          21,
+          400
+        ],
+        "step_time_samples": 380,
+        "physical_hbm_peak": "Not captured in original91; do not substitute allocator peak",
+        "cgroup_memory_peak": "Not captured in original91; HostConfig Memory is a limit, not usage",
+        "metric_allocated_float32_rounding_delta_bytes": 1024.0
+      },
+      "actual_idle_checks": {
+        "before_all8": true,
+        "second_all8": true,
+        "after_all8": true
+      }
+    }
+  },
+  "comparisons": {
+    "baseline_vs_continuous": {
+      "config_differences_only_execution_axes": [
+        {
+          "path": "/checkpoint/checkpoint_dir",
+          "left": "/work/checkpoints/r129-a1e6-fsdp8-0-200-v3",
+          "right": "/work/checkpoints/r129-a1e6-fsdp8-continuous400-v2"
+        },
+        {
+          "path": "/checkpoint/save_ckpt",
+          "left": true,
+          "right": false
+        },
+        {
+          "path": "/training/train_iters",
+          "left": 200,
+          "right": 400
+        }
+      ],
+      "step_range": [
+        1,
+        200
+      ],
+      "rank_step_pairs": 1600,
+      "metric_max_abs": {
+        "training/total_loss": 0.0,
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0
+      },
+      "metric_nonzero_count": {
+        "training/total_loss": 0,
+        "training/foundation_loss/lm": 0,
+        "training/foundation_loss/mtp": 0,
+        "training/foundation_loss/aux": 0,
+        "training/grad_norm": 0,
+        "training/lr": 0
+      },
+      "metric_gt_0_005_count": {
+        "training/total_loss": 0,
+        "training/foundation_loss/lm": 0,
+        "training/foundation_loss/mtp": 0,
+        "training/foundation_loss/aux": 0,
+        "training/grad_norm": 0,
+        "training/lr": 0
+      },
+      "input_identity_comparisons": 1600,
+      "input_mismatch_count": 0,
+      "initial_mismatch_ranks": [],
+      "counter_fields": [
+        "data/consumed_tokens",
+        "data/consumed_samples",
+        "data/step_tokens",
+        "data/step_samples"
+      ],
+      "counter_scalar_comparisons": 6400,
+      "counter_mismatch_count": 0,
+      "derived_unweighted_max_abs": {
+        "mtp": 0.0,
+        "aux": 0.0
+      }
+    },
+    "resume_vs_continuous": {
+      "config_differences_only_execution_axes": [
+        {
+          "path": "/checkpoint/checkpoint_dir",
+          "left": "/work/checkpoints/r129-a1e6-fsdp8-200-400-v2",
+          "right": "/work/checkpoints/r129-a1e6-fsdp8-continuous400-v2"
+        },
+        {
+          "path": "/checkpoint/restore_from",
+          "left": "/work/checkpoints/r129-a1e6-fsdp8-0-200-v3/global_step_200",
+          "right": null
+        }
+      ],
+      "step_range": [
+        201,
+        400
+      ],
+      "rank_step_pairs": 1600,
+      "metric_max_abs": {
+        "training/total_loss": 0.0,
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0
+      },
+      "metric_nonzero_count": {
+        "training/total_loss": 0,
+        "training/foundation_loss/lm": 0,
+        "training/foundation_loss/mtp": 0,
+        "training/foundation_loss/aux": 0,
+        "training/grad_norm": 0,
+        "training/lr": 0
+      },
+      "metric_gt_0_005_count": {
+        "training/total_loss": 0,
+        "training/foundation_loss/lm": 0,
+        "training/foundation_loss/mtp": 0,
+        "training/foundation_loss/aux": 0,
+        "training/grad_norm": 0,
+        "training/lr": 0
+      },
+      "input_identity_comparisons": 1600,
+      "input_mismatch_count": 0,
+      "initial_mismatch_ranks": [],
+      "counter_fields": [
+        "data/consumed_tokens",
+        "data/consumed_samples",
+        "data/step_tokens",
+        "data/step_samples"
+      ],
+      "counter_scalar_comparisons": 6400,
+      "counter_mismatch_count": 0,
+      "derived_unweighted_max_abs": {
+        "mtp": 0.0,
+        "aux": 0.0
+      }
+    }
+  },
+  "runtime_flags": {
+    "before_trainer": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": null,
+        "FLASH_ATTENTION_DETERMINISTIC": null,
+        "CUBLAS_WORKSPACE_CONFIG": null,
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "scope": "Environment only; no backend queries"
+    },
+    "training": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": "true",
+        "FLASH_ATTENTION_DETERMINISTIC": "1",
+        "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "npu_matmul": {
+        "allow_tf32": null,
+        "allow_hf32": false,
+        "allow_bf16_reduced_precision_reduction": null
+      }
+    }
+  },
+  "initial_state_comparison": {
+    "all24_rank_files_identical_bytes": true,
+    "objects_per_rank": 48,
+    "timing_zh": "initialize_and_hash 在原始权重初始化之后、分片和 checkpoint 恢复之前采集。续训初态相同不证明加载后 tensor state 相同。"
+  },
+  "capture_helper_identity": {
+    "capture_a1e6_training.py": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df",
+    "capture_training.py": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+    "module_profile.py": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c",
+    "expert_probe.py": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f",
+    "precision_experiments.py": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659",
+    "fp32_wgrad_experiment.py": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+  },
+  "loss_units": {
+    "LM": "logged main LM scalar",
+    "MTP": "logged scalar weighted by 0.3",
+    "aux": "logged scalar weighted by 0.0001",
+    "derived_unweighted_zh": "日志加权标量之差除以记录系数；未独立采集乘系数前张量。"
+  },
+  "loss_coefficients": {
+    "mtp": 0.3,
+    "aux": 0.0001
+  },
+  "data_counter_boundaries": {
+    "baseline": {
+      "1": {
+        "data/consumed_tokens": 32573.0,
+        "data/consumed_samples": 8.0,
+        "data/step_tokens": 32573.0,
+        "data/step_samples": 8.0
+      },
+      "200": {
+        "data/consumed_tokens": 3713791.0,
+        "data/consumed_samples": 1600.0,
+        "data/step_tokens": 4593.0,
+        "data/step_samples": 8.0
+      }
+    },
+    "resume": {
+      "201": {
+        "data/consumed_tokens": 3720095.0,
+        "data/consumed_samples": 1608.0,
+        "data/step_tokens": 6304.0,
+        "data/step_samples": 8.0
+      },
+      "400": {
+        "data/consumed_tokens": 7467738.0,
+        "data/consumed_samples": 3200.0,
+        "data/step_tokens": 16975.0,
+        "data/step_samples": 8.0
+      }
+    },
+    "continuous": {
+      "1": {
+        "data/consumed_tokens": 32573.0,
+        "data/consumed_samples": 8.0,
+        "data/step_tokens": 32573.0,
+        "data/step_samples": 8.0
+      },
+      "200": {
+        "data/consumed_tokens": 3713791.0,
+        "data/consumed_samples": 1600.0,
+        "data/step_tokens": 4593.0,
+        "data/step_samples": 8.0
+      },
+      "201": {
+        "data/consumed_tokens": 3720095.0,
+        "data/consumed_samples": 1608.0,
+        "data/step_tokens": 6304.0,
+        "data/step_samples": 8.0
+      },
+      "400": {
+        "data/consumed_tokens": 7467738.0,
+        "data/consumed_samples": 3200.0,
+        "data/step_tokens": 16975.0,
+        "data/step_samples": 8.0
+      }
+    }
+  },
+  "all_cumulative_increments_exact": true,
+  "joint_collections": {
+    "resume": {
+      "manifest": {
+        "path": "evidence/129-a1e6-fsdp8-resume200-v2-joint-audit-manifest.json",
+        "bytes": 19527,
+        "sha256": "13a19921cdf7ce0c5078baa4fc1af797a8b3690d22921afd8e123c62aba53401"
+      },
+      "files": 95,
+      "bytes": 1760463,
+      "all_sha_size_match": true,
+      "duplicates": 0,
+      "redirects": 0,
+      "original91_entries_preserved": true,
+      "four_supplement_files": [
+        {
+          "path": "evidence/129-a1e6-fsdp8-resume200-v2-evidence-manifest.json",
+          "bytes": 17733,
+          "sha256": "640af77fd10b75af7cd634979c6f2641f57b87961ca25f2f37980f74ace02718"
+        },
+        {
+          "path": "evidence/supplemental-r129-a1e6-fsdp8-200-400-v2-3ec4ab13853e1e8069efaad53302d3c1c718bdbbbfd2310e429f54f10fb640ae.request.json",
+          "bytes": 4377,
+          "sha256": "3ec4ab13853e1e8069efaad53302d3c1c718bdbbbfd2310e429f54f10fb640ae"
+        },
+        {
+          "path": "evidence/global-resource-state-after-r129-a1e6-fsdp8-200-400-v2-a83cc8206404d524a5b5a97bd40fd36b23dc6846dddb09ac56a1e5bcdb14b96a.json",
+          "bytes": 16880,
+          "sha256": "a83cc8206404d524a5b5a97bd40fd36b23dc6846dddb09ac56a1e5bcdb14b96a"
+        },
+        {
+          "path": "evidence/r129-a1e6-fsdp8-200-400-v2-release-readback.json",
+          "bytes": 926,
+          "sha256": "8cc5bc8cdd7f3f83ee34cd7dcfcafd4aa317ae1fbf850615453fcd78ed15a471"
+        }
+      ],
+      "scope_zh": "原91及后补4份分开；95份不是单次原始归档。",
+      "release": {
+        "evidence": {
+          "path": "evidence/r129-a1e6-fsdp8-200-400-v2-release-readback.json",
+          "bytes": 926,
+          "sha256": "8cc5bc8cdd7f3f83ee34cd7dcfcafd4aa317ae1fbf850615453fcd78ed15a471"
+        },
+        "container_id": "7ee13a865391dfb49442c9d894107739a52c1a0c7d4f33460292cf6603656c38",
+        "exact_id_removed": true,
+        "owned_containers": [],
+        "request_json_matches_local_and_coordinator": true,
+        "receipt_json_matches_coordinator": true,
+        "new_checkpoint_dir_exists": false,
+        "remaining_disk_free_bytes": 79416205312,
+        "guard_sha256": "c40e3a0ef90a5e7b823c576584581f5437fa284cdc0e236fe57e6bfe7a4aaf1c",
+        "next_shared_not_before_utc": "2026-10-16T19:01:40.986806+00:00"
+      }
+    },
+    "continuous": {
+      "manifest": {
+        "path": "evidence/129-a1e6-fsdp8-continuous400-v2-joint-audit-manifest.json",
+        "bytes": 19986,
+        "sha256": "aa16e3bd351acab5f44e1c8b34a6a0a5101cf940d41882384180f63f1678a336"
+      },
+      "files": 95,
+      "bytes": 3080203,
+      "all_sha_size_match": true,
+      "duplicates": 0,
+      "redirects": 0,
+      "original91_entries_preserved": true,
+      "four_supplement_files": [
+        {
+          "path": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+          "bytes": 18270,
+          "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b"
+        },
+        {
+          "path": "evidence/supplemental-r129-a1e6-fsdp8-continuous400-v2-640cb77f9509f0d154a8dd21a15f3bff0a88382f88986068d4b0ba8054f28962.request.json",
+          "bytes": 4255,
+          "sha256": "640cb77f9509f0d154a8dd21a15f3bff0a88382f88986068d4b0ba8054f28962"
+        },
+        {
+          "path": "evidence/global-resource-state-after-r129-a1e6-fsdp8-continuous400-v2-168f3183b45f9993a46fbe6718478966fa781585c2377f3699d795731da61b44.json",
+          "bytes": 16179,
+          "sha256": "168f3183b45f9993a46fbe6718478966fa781585c2377f3699d795731da61b44"
+        },
+        {
+          "path": "evidence/r129-a1e6-fsdp8-continuous400-v2-release-readback.json",
+          "bytes": 931,
+          "sha256": "3e52d03af62bd5e8fc9837b412d3ad1b9cc92d6dc7db96d6d1789b526b8a7769"
+        }
+      ],
+      "scope_zh": "原91及后补4份分开；95份不是单次原始归档。",
+      "release": {
+        "evidence": {
+          "path": "evidence/r129-a1e6-fsdp8-continuous400-v2-release-readback.json",
+          "bytes": 931,
+          "sha256": "3e52d03af62bd5e8fc9837b412d3ad1b9cc92d6dc7db96d6d1789b526b8a7769"
+        },
+        "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+        "exact_id_removed": true,
+        "owned_containers": [],
+        "request_json_matches_local_and_coordinator": true,
+        "receipt_json_matches_coordinator": true,
+        "new_checkpoint_dir_exists": false,
+        "remaining_disk_free_bytes": 79411466240,
+        "guard_sha256": "c40e3a0ef90a5e7b823c576584581f5437fa284cdc0e236fe57e6bfe7a4aaf1c",
+        "next_shared_not_before_utc": "2026-10-16T19:32:12.585744+00:00"
+      }
+    }
+  },
+  "request_bindings": {
+    "baseline": {
+      "request": {
+        "path": "scheduling/r129-a1e6-fsdp8-0-200-v3.request.json",
+        "bytes": 4286,
+        "sha256": "279ac6b171b15b57fb67b0202a662198329b81edb6048e6a3cd6fac8240eb349"
+      },
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "timeout_seconds": 900,
+      "port": 30404,
+      "guard_sha256": "efd917a24fe082001313601efc78b329647d1bea9bbe8cc43e16333c35371e0c",
+      "runner_sha256": "16a3df0d2ea011691469e4467c4cdf6c76c3cfc0914295c99a7e8043227fb2bb",
+      "all_run_helper_and_yaml_pins_match": true
+    },
+    "resume": {
+      "request": {
+        "path": "scheduling/r129-a1e6-fsdp8-200-400-v2.request.json",
+        "bytes": 4425,
+        "sha256": "53bfd4280d48411d96ce6008917bf51f23abd7c7ea31a5b5642e73dd1ce99e01"
+      },
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "timeout_seconds": 900,
+      "port": 30405,
+      "guard_sha256": "c40e3a0ef90a5e7b823c576584581f5437fa284cdc0e236fe57e6bfe7a4aaf1c",
+      "runner_sha256": "7989b417e0b793da51bfdfdab0c9fab1a9c64b392c934e69a8d2450808ac0750",
+      "all_run_helper_and_yaml_pins_match": true
+    },
+    "continuous": {
+      "request": {
+        "path": "scheduling/r129-a1e6-fsdp8-continuous400-v2.request.json",
+        "bytes": 4302,
+        "sha256": "fe473fed3a8e6cac19bc8a0ea2fca389d734a33bc6fb74cc19c9057ce4e90982"
+      },
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "timeout_seconds": 900,
+      "port": 30406,
+      "guard_sha256": "c40e3a0ef90a5e7b823c576584581f5437fa284cdc0e236fe57e6bfe7a4aaf1c",
+      "runner_sha256": "7989b417e0b793da51bfdfdab0c9fab1a9c64b392c934e69a8d2450808ac0750",
+      "all_run_helper_and_yaml_pins_match": true
+    }
+  },
+  "integration_environment_identity": {
+    "baseline": {
+      "environment": {
+        "path": "runs/r129-a1e6-fsdp8-0-200-v3/integration/environment.json",
+        "bytes": 1332,
+        "sha256": "38a9675ae1e647aa8dd26eb3a397d2d03be3853cd89a55fba6198327062eb7d3"
+      },
+      "import_path_evidence": {
+        "path": "runs/r129-a1e6-fsdp8-0-200-v3/import-path.txt",
+        "bytes": 53,
+        "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+      },
+      "torch": {
+        "import_path": "/workspace/venv/lib/python3.12/site-packages/torch/__init__.py",
+        "version": "2.12.0+cpu"
+      },
+      "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+      "source_root": "/workspace/hyper-parallel",
+      "hyper_parallel": {
+        "import_path": "/workspace/hyper-parallel/hyper_parallel/__init__.py"
+      },
+      "executable": "/work/venvs/validation/bin/python"
+    },
+    "resume": {
+      "environment": {
+        "path": "runs/r129-a1e6-fsdp8-200-400-v2/integration/environment.json",
+        "bytes": 1334,
+        "sha256": "a690625b97f2a35ac132fd8118d86a8075d96d2088e9ecc5dec01d2b4ff96875"
+      },
+      "import_path_evidence": {
+        "path": "runs/r129-a1e6-fsdp8-200-400-v2/import-path.txt",
+        "bytes": 53,
+        "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+      },
+      "torch": {
+        "import_path": "/workspace/venv/lib/python3.12/site-packages/torch/__init__.py",
+        "version": "2.12.0+cpu"
+      },
+      "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+      "source_root": "/workspace/hyper-parallel",
+      "hyper_parallel": {
+        "import_path": "/workspace/hyper-parallel/hyper_parallel/__init__.py"
+      },
+      "executable": "/work/venvs/validation/bin/python"
+    },
+    "continuous": {
+      "environment": {
+        "path": "runs/r129-a1e6-fsdp8-continuous400-v2/integration/environment.json",
+        "bytes": 1340,
+        "sha256": "ec4408b9ccc4b09132cb23447a40aab271af02525f49d7859bb49d3c12ca49a3"
+      },
+      "import_path_evidence": {
+        "path": "runs/r129-a1e6-fsdp8-continuous400-v2/import-path.txt",
+        "bytes": 53,
+        "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+      },
+      "torch": {
+        "import_path": "/workspace/venv/lib/python3.12/site-packages/torch/__init__.py",
+        "version": "2.12.0+cpu"
+      },
+      "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+      "source_root": "/workspace/hyper-parallel",
+      "hyper_parallel": {
+        "import_path": "/workspace/hyper-parallel/hyper_parallel/__init__.py"
+      },
+      "executable": "/work/venvs/validation/bin/python"
+    }
+  },
+  "checkpoint_binding": {
+    "manifest": {
+      "path": "evidence/r129-a1e6-fsdp8-0-200-v3-checkpoint-manifest.json",
+      "bytes": 4967,
+      "sha256": "396619925c7a188d5ec58fdd751e652ed5e7cbab0f5cc02571fbb683d5a7ab06"
+    },
+    "preflight": {
+      "source_case": "r129-a1e6-fsdp8-0-200-v3",
+      "checkpoint": "/var/tmp/xxl-jt-dev-8npu-20261014/checkpoints/r129-a1e6-fsdp8-0-200-v3/global_step_200",
+      "manifest_sha256": "396619925c7a188d5ec58fdd751e652ed5e7cbab0f5cc02571fbb683d5a7ab06",
+      "files": 25,
+      "bytes": 27973262840,
+      "directories": [
+        "extra_state"
+      ],
+      "read_chunk_bytes": 4194304,
+      "duration_seconds": 23.10234259002027,
+      "scope": "Full-file identity verification only; actual training restore is not yet accepted"
+    },
+    "small_metadata_analysis": {
+      "path": "evidence/a1e6-129-v3-checkpoint-metadata-equivalence.json",
+      "bytes": 25387,
+      "sha256": "59ae806eac4e09999874f49db24c61ae537ec1dbbac3e0ad57a1bdd51bbc7875"
+    },
+    "small_metadata_input_bindings_rehashed": true,
+    "identical_metadata_files": 17,
+    "different_tensor_files": 8,
+    "saved_optimizer_primitive_step_entries": 46,
+    "saved_optimizer_step": 200,
+    "saved_scheduler_cursors": {
+      "adamw": {
+        "last_epoch": 200,
+        "step_count": 201
+      },
+      "muon": {
+        "last_epoch": 200,
+        "step_count": 201
+      }
+    },
+    "saved_data_cursors": {
+      "._index_sampler_state.consumed_samples": 1600,
+      "._index_sampler_state.epoch": 0,
+      "._index_sampler_state.global_batch_size": 8,
+      "._index_sampler_state.dp_world_size": 8,
+      "._sampler_iter_yielded": 200,
+      "._num_yielded": 200
+    },
+    "saved_meter": {
+      "consumed_tokens": 3713791,
+      "consumed_samples": 1600
+    },
+    "limits_zh": [
+      "本轮只读本机已采集清单与报告，未再次读取远端 checkpoint 或反序列化 tensor。",
+      "17份小状态文件同SHA允许迁移201 CPU解析的小状态含义；8份safetensors不同，不迁移其tensor内容/有限性或201训练结论。",
+      "保存的scheduler/optimizer/RNG游标不等同于恢复后内存对象逐字节已验证。"
+    ]
+  },
+  "checkpoint_execution_logs": {
+    "baseline": [
+      {
+        "rank": 0,
+        "load_success_count": 0,
+        "save_success_count": 1
+      },
+      {
+        "rank": 1,
+        "load_success_count": 0,
+        "save_success_count": 1
+      },
+      {
+        "rank": 2,
+        "load_success_count": 0,
+        "save_success_count": 1
+      },
+      {
+        "rank": 3,
+        "load_success_count": 0,
+        "save_success_count": 1
+      },
+      {
+        "rank": 4,
+        "load_success_count": 0,
+        "save_success_count": 1
+      },
+      {
+        "rank": 5,
+        "load_success_count": 0,
+        "save_success_count": 1
+      },
+      {
+        "rank": 6,
+        "load_success_count": 0,
+        "save_success_count": 1
+      },
+      {
+        "rank": 7,
+        "load_success_count": 0,
+        "save_success_count": 1
+      }
+    ],
+    "resume": [
+      {
+        "rank": 0,
+        "load_success_count": 1,
+        "save_success_count": 0
+      },
+      {
+        "rank": 1,
+        "load_success_count": 1,
+        "save_success_count": 0
+      },
+      {
+        "rank": 2,
+        "load_success_count": 1,
+        "save_success_count": 0
+      },
+      {
+        "rank": 3,
+        "load_success_count": 1,
+        "save_success_count": 0
+      },
+      {
+        "rank": 4,
+        "load_success_count": 1,
+        "save_success_count": 0
+      },
+      {
+        "rank": 5,
+        "load_success_count": 1,
+        "save_success_count": 0
+      },
+      {
+        "rank": 6,
+        "load_success_count": 1,
+        "save_success_count": 0
+      },
+      {
+        "rank": 7,
+        "load_success_count": 1,
+        "save_success_count": 0
+      }
+    ],
+    "continuous": [
+      {
+        "rank": 0,
+        "load_success_count": 0,
+        "save_success_count": 0
+      },
+      {
+        "rank": 1,
+        "load_success_count": 0,
+        "save_success_count": 0
+      },
+      {
+        "rank": 2,
+        "load_success_count": 0,
+        "save_success_count": 0
+      },
+      {
+        "rank": 3,
+        "load_success_count": 0,
+        "save_success_count": 0
+      },
+      {
+        "rank": 4,
+        "load_success_count": 0,
+        "save_success_count": 0
+      },
+      {
+        "rank": 5,
+        "load_success_count": 0,
+        "save_success_count": 0
+      },
+      {
+        "rank": 6,
+        "load_success_count": 0,
+        "save_success_count": 0
+      },
+      {
+        "rank": 7,
+        "load_success_count": 0,
+        "save_success_count": 0
+      }
+    ]
+  },
+  "root_summary_crosscheck": {
+    "evidence": {
+      "path": "evidence/a1e6-fsdp-resume400-v2-summary.json",
+      "bytes": 9842,
+      "sha256": "03146bce864d1190b1f9b4b5a46d5808d57857afb72c56ebbf16caed1d401667"
+    },
+    "all_four_resource_rows_exact_match": true,
+    "loss_counter_and_scope_verdict_match": true
+  },
+  "resource_windows": [
+    {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "MAX",
+      "median_step_seconds": 1.156256079673767,
+      "supervised_tokens_per_second": 15990.50334593064,
+      "allocated_gib_lifetime_peak_in_window": 22.032196044921875,
+      "reserved_gib_lifetime_peak_in_window": 27.25
+    },
+    {
+      "case": "r129-a1e6-fsdp8-200-400-v2",
+      "window": [
+        201,
+        400
+      ],
+      "timing_window": [
+        221,
+        400
+      ],
+      "rank_reduction": "MAX",
+      "median_step_seconds": 1.1575499176979065,
+      "supervised_tokens_per_second": 16120.231569289068,
+      "allocated_gib_lifetime_peak_in_window": 22.032196044921875,
+      "reserved_gib_lifetime_peak_in_window": 25.31640625
+    },
+    {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "MAX",
+      "median_step_seconds": 1.1558255553245544,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "allocated_gib_lifetime_peak_in_window": 22.032196044921875,
+      "reserved_gib_lifetime_peak_in_window": 27.171875
+    },
+    {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "window": [
+        201,
+        400
+      ],
+      "timing_window": [
+        221,
+        400
+      ],
+      "rank_reduction": "MAX",
+      "median_step_seconds": 1.1569368839263916,
+      "supervised_tokens_per_second": 16129.670740814792,
+      "allocated_gib_lifetime_peak_in_window": 22.032196044921875,
+      "reserved_gib_lifetime_peak_in_window": 27.171875
+    }
+  ],
+  "root_report_crosschecks": [
+    {
+      "evidence": {
+        "path": "evidence/a1e6-baseline-vs-continuous-v2-strict.json",
+        "bytes": 13354,
+        "sha256": "206c6c4e611ac77de06c953428b5582d2a6c416998580a3dd7237c8c7c0b10ec"
+      },
+      "independent_raw_result_matches": true
+    },
+    {
+      "evidence": {
+        "path": "evidence/a1e6-resume-vs-continuous-v2-strict.json",
+        "bytes": 13380,
+        "sha256": "ecd06295eab84f81ebe5862e58f68d89419f4ce9d9951b51fdfe566b41b4a736"
+      },
+      "independent_raw_result_matches": true
+    },
+    {
+      "evidence": {
+        "path": "evidence/a1e6-resume-v2-counters.json",
+        "bytes": 3718,
+        "sha256": "fbab51dd367c7452d9fd157e27ce19ee4c06b798df860acdc7b722b49050dd1d"
+      },
+      "independent_raw_result_matches": true
+    }
+  ],
+  "limits_zh": [
+    "PASS仅覆盖129当前544固定FSDP配方的baseline1..200和resume201..400对独立continuous400两窗口，不外推TP/CP/EP、重算矩阵或201。",
+    "初态hash在初始化后、分片/加载前；它不能证明恢复后模型或优化器tensor逐字节与保存时一致。",
+    "实际8rank加载成功、start200、200步轨迹与独立连续参考完全一致，支持本配方端到端续训行为一致；未另采恢复后scheduler/optimizer/RNG内部状态快照。",
+    "此配方LR为恒定0.0001，LR相同不能单独验证scheduler游标；游标的落盘解析与恢复源码作为补充，不能代替运行时对象快照。",
+    "MTP和aux还原是日志加权标量按0.3及0.0001系数作算术还原，未采集加权前原始张量。",
+    "显存日志为8rank全局MAX的allocator生命周期累计峰值；最终allocator为各进程整数bytes。不能把它当物理HBM或cgroup实际峰值。",
+    "HostConfig中的320GiB是容器内存上限、32GiB是shm容量；privileged暴露全部host设备，显式Devices列表不构成设备权限隔离。",
+    "步时先取每步8rank最大，再对去除窗口前20步的180步取中位数；保留观测开销，无策略性能收益归因。",
+    "resume reserved较低不证明并行或恢复节省显存；基线保存checkpoint而另外两次不保存，容器总时长还含初始化/加载/保存。",
+    "本次为本机已采集证据独立复算，无SSH、NPU、容器操作、源代码/守卫/请求/旧输出修改。"
+  ],
+  "analysis_side_effects": {
+    "ssh": false,
+    "npu": false,
+    "containers": false,
+    "existing_files_modified": false,
+    "canonical_state_modified": false
+  },
+  "source_contracts": [
+    {
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "path": "hyper_parallel/trainer/callbacks/checkpoint_callback.py",
+      "blob_sha256": "d45182bd39beaebd8fb4c4f785ae8f16e456289e75f1e9e0f6264891cb2840bf",
+      "line_anchors": [
+        137,
+        330,
+        381,
+        388,
+        411,
+        434,
+        450,
+        460,
+        471,
+        472,
+        475,
+        488,
+        489
+      ],
+      "meaning": "load callback precedes evidence callback; restores model/optimizer then progress/meter/scheduler/dataloader/RNG; source behavior is not an independent runtime state dump"
+    },
+    {
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "path": "hyper_parallel/trainer/callbacks/environ_meter_callback.py",
+      "blob_sha256": "f83e3fa5c5dabe37af299adb016045c2e6430abac010bef4cadc8a6189b9517d",
+      "line_anchors": [
+        216,
+        221,
+        222,
+        225,
+        226
+      ],
+      "meaning": "allocator lifetime high water marks are reduced with global MAX"
+    },
+    {
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "path": "hyper_parallel/trainer/runtime/distributed.py",
+      "blob_sha256": "d73eab0a6db16fa2780a8a8aac7240b69b6b221a8bbc877355160e1c5d29a000",
+      "line_anchors": [
+        66,
+        67,
+        75
+      ],
+      "meaning": "numeric reduction wraps scalar in torch.float32 before all_reduce"
+    }
+  ],
+  "capture_contracts": [
+    {
+      "path": "runs/r129-a1e6-fsdp8-200-400-v2/capture_training.py",
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+      "initial_hash_lines": [
+        46,
+        56
+      ],
+      "start_state_lines": [
+        66,
+        76
+      ],
+      "step_capture_lines": [
+        81,
+        88
+      ],
+      "callback_registered_last_lines": [
+        153,
+        154
+      ]
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-200-400-v2/capture_a1e6_training.py",
+      "sha256": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df",
+      "train_begin_flags_lines": [
+        48,
+        52
+      ],
+      "train_end_memory_lines": [
+        54,
+        67
+      ]
+    }
+  ],
+  "independent_method_zh": [
+    "Python标准库逐个核验manifest所有文件的完整SHA256、长度、唯一路径和非链接边界；未调用已有comparison函数产生结论。",
+    "直接按JSONL物理顺序检查每rank预期步号、rank字段、所有数值有限；不以dict去重替代序列检查。",
+    "直接逐rank逐步相减六指标、完整输入identity、四计数；检查累积计数等于上一行加本步值。",
+    "比对三份完整resolved配置；仅允许明确的train_iters与checkpoint保存/输出/恢复轴差异，其余字段必须相同。",
+    "先完成原始独立复算，再与已冻结strict、counter、summary对照；补采不混同原始91文件。"
+  ],
+  "verification_totals": {
+    "original_collections": 3,
+    "original_files": 273,
+    "original_bytes": 6468719,
+    "raw_metric_rows": 6400,
+    "finite_numeric_fields_including_step_and_rank": 102400,
+    "compared_rank_step_pairs": 3200,
+    "compared_loss_grad_lr_scalar_pairs": 19200,
+    "input_identity_pairs": 3200,
+    "counter_scalar_pairs_per_window": 6400,
+    "counter_scalar_pairs_both_windows": 12800
+  },
+  "review_harness_note_zh": "旧resume joint清单用original_manifest路径字段，新continuous joint用original_manifest_sha256字段；两者均通过原91条目逐项相等与后补原manifest自身SHA绑定核验。request.cards为整数卡数8，实际设备ID范围由receipt.devices另行核验。"
+}
