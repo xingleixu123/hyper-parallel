@@ -1,6 +1,6 @@
 # Muon 共享专家归一化的跨后端诊断
 
-本例对应总问题 [#217](https://github.com/hf1s/hyper-parallel/issues/217) 中第 396 步共享专家 down 的首差。
+本例对应子问题 [#240](https://github.com/hf1s/hyper-parallel/issues/240)，关联总问题 [#217](https://github.com/hf1s/hyper-parallel/issues/217) 中第 396 步共享专家 down 的首差。
 它比较同一真实输入在普通 NPU norm 与已观测旧 MF DVM 归约顺序下的结果，只输出统计和完整哈希。
 这是显式诊断复现，不导入或修改 HP 优化器，不保存模型，不用参考结果修正输入。
 
@@ -89,3 +89,10 @@ ASCEND_RT_VISIBLE_DEVICES=0 python examples/torch/alignment/compare_shared_down_
 总问题 #217 发布实际执行记录、原生 IR/CSV、完整 200 步配置/指标及独立观测保真。
 本例本身不执行训练；运行它成功不等于完整 200 步验收成功。公开内容不含用户数据、权重或梯度数组。
 目标值采集后保留哈希和复现入口，审计完成即可删除不再使用的中间数组。
+
+
+实际验证：[16项真实输入/CLI检查](https://github.com/xingleixu123/hyper-parallel/blob/f4825d1d03888ef17042e487b7efbecb05d7437d/evidence/frontier396-pr-diagnostic-validation.json)；
+[原生统计与完整因果链](https://github.com/xingleixu123/hyper-parallel/blob/f4825d1d03888ef17042e487b7efbecb05d7437d/evidence/frontier396-causal-chain.json)；
+[完整200步三项验收](https://github.com/xingleixu123/hyper-parallel/blob/f4825d1d03888ef17042e487b7efbecb05d7437d/evidence/frontier396-shared-independent200-audit.json)。
+新因素使总loss、原始MTP、原始Aux最大误差分别降到1.90735e-6、3.17891e-6、1.29733e-6，三项每一步均低于0.005。
+完整训练执行的是独立实验因素；本CLI另在同一真实输入上验证与该因素完整输出相同，不能说CLI自身执行过200步训练。

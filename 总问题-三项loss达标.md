@@ -108,8 +108,18 @@ MF200→HP离线转换使用PR166映射；独立审计完整验证48模型、28M
 
 总问题为[#217](https://github.com/hf1s/hyper-parallel/issues/217)。必要产品修改保持独立：
 token恒等权重#216→PR180、K-shift配置#187→PR192（上游另以PR232合入解耦方案）、Muon单分片精度#215→PR213。
-最新共享专家归一化问题另提交独立中文问题和诊断复现PR，详细区分归档兼容与现代正确性；链接在总issue索引中维护。
-旧阶段#149/#150/#152–#156/#210等分别复用，不把397传播差重复开多个问题。
+最新共享专家归一化已提交独立中文[子问题#240](https://github.com/hf1s/hyper-parallel/issues/240)与[PR#241](https://github.com/hf1s/hyper-parallel/pull/241)，详细区分归档兼容与现代正确性。
+| 独立问题 | PR | 当前状态与范围 |
+|---|---|---|
+| [#216 token恒等权重](https://github.com/hf1s/hyper-parallel/issues/216) | [#180](https://github.com/hf1s/hyper-parallel/pull/180) | 已合入JT_dev，当前训练基线包含 |
+| [#187 K-shift接管](https://github.com/hf1s/hyper-parallel/issues/187) | [#192](https://github.com/hf1s/hyper-parallel/pull/192)；上游另采用[#232](https://github.com/hf1s/hyper-parallel/pull/232) | #192仍开放；#232已合入，二者方案不同，不混同本轮训练版本 |
+| [#215 Muon单分片精度](https://github.com/hf1s/hyper-parallel/issues/215) | [#213](https://github.com/hf1s/hyper-parallel/pull/213) | 开放，既有212UT/真实NPU回归证据见PR；不是已合入 |
+| [#240 共享down归一化兼容](https://github.com/hf1s/hyper-parallel/issues/240) | [#241](https://github.com/hf1s/hyper-parallel/pull/241) | 新增独立诊断CLI和中文正确性说明；一个提交、两个example文件 |
+
+#192/#213/#241发布前当前head均无check-runs或commit-status条目，状态pending；未宣称CI绿色。已合入状态直接依据GitHub merge字段。
+历史[总差异#190](https://github.com/hf1s/hyper-parallel/issues/190)、[#149](https://github.com/hf1s/hyper-parallel/issues/149)、[#150](https://github.com/hf1s/hyper-parallel/issues/150)、[#152](https://github.com/hf1s/hyper-parallel/issues/152)、[#153](https://github.com/hf1s/hyper-parallel/issues/153)、[#154](https://github.com/hf1s/hyper-parallel/issues/154)、[#155](https://github.com/hf1s/hyper-parallel/issues/155)、[#156](https://github.com/hf1s/hyper-parallel/issues/156)、[#210](https://github.com/hf1s/hyper-parallel/issues/210)继续按原分类复用。
+其中框架精度选择/归档行为不自动变成需改默认的缺陷，旧MF缺陷也不虚构成当前MF master仍有同一问题；本轮最新行业源码复核针对新确认的归一化边界。397传播差不重复开多个问题。
+
 
 新诊断工具验证16项检查通过：完整真实输入、MF原生normalized哈希、已执行训练因素逐元素等价、norm/FP64参考、
 CLI和输入保护；对应[真机验证回执](evidence/frontier396-pr-diagnostic-validation.json)。它只输出统计/hash，不更新模型。
