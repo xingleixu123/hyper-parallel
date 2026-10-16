@@ -1,0 +1,668 @@
+{
+  "reference": "r129-f637-fp32-fsdp8-0-200-r4",
+  "candidate": "r129-f637-module-off-40-v1",
+  "steps": [
+    1,
+    40
+  ],
+  "ranks": 8,
+  "tolerance_absolute": 0.005,
+  "status": "FAIL",
+  "findings": [
+    "Final acceptance requires exactly 200 consecutive steps"
+  ],
+  "errors": {
+    "training/total_loss": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.0,
+      "step": 1,
+      "rank": 0
+    }
+  },
+  "input_mismatch_count": 0,
+  "input_mismatch_examples": [],
+  "initial_mismatches": [],
+  "step_errors": {
+    "training/total_loss": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/lm": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/mtp": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "training/foundation_loss/aux": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "measurement_context": {
+    "model_integration_modes": {
+      "r129-f637-fp32-fsdp8-0-200-r4": "build",
+      "r129-f637-module-off-40-v1": "build"
+    },
+    "eligible_for_matching_build_mode_performance_comparison": false,
+    "excluded_reasons": [
+      "r129-f637-module-off-40-v1: diagnostic observations: ['ns-batches-rank*.jsonl', '*-calls-rank*.jsonl']",
+      "The complete fixed-recipe execution audit failed"
+    ],
+    "common_observations": "Per-step scalar metrics and input identity capture, including NPU-to-CPU copies/hash work.",
+    "scope": "Build-mode comparisons retain matching input evidence overhead; they are not raw uninstrumented Trainer latency. Numerical gates are independent."
+  },
+  "loss_units": {
+    "lm": "unweighted",
+    "mtp": "weighted by 0.3",
+    "aux": "weighted by 0.0001"
+  },
+  "unweighted_error_diagnostics": {
+    "lm": 0.0,
+    "mtp": 0.0,
+    "aux": 0.0
+  },
+  "performance": {
+    "warmup_steps_excluded": 20,
+    "median_step_seconds": 1.1559951305389404,
+    "processed_tokens_per_second": 28346.14016472813,
+    "supervised_tokens_per_second": 15882.40448854449,
+    "allocated_gib": 22.032196044921875,
+    "reserved_gib": 27.25
+  },
+  "collection_manifest_sha256": [
+    "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11",
+    "efa79906186b00feae668df33084de39f5d877a27eb09809f13399997a74db3c"
+  ],
+  "weighted_status": "PASS",
+  "sources": {
+    "reference": {
+      "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "candidate": {
+      "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "recipe_sha256": [
+    "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5",
+    "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5"
+  ],
+  "execution_identities": [
+    {
+      "case": "r129-f637-fp32-fsdp8-0-200-r4",
+      "container_id": "d41078daf90e05af851ddd097afbd8995b7e7eafce8d08c21292839642315b40",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "exit_code": 0,
+      "reason": null
+    },
+    {
+      "case": "r129-f637-module-off-40-v1",
+      "container_id": "3b787e43c6cb667f196b9ed73c9eaf70b60dc41f9a1513544faed41faf6e398e",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "exit_code": 0,
+      "reason": null
+    }
+  ],
+  "loss_coefficients": {
+    "mtp_loss_factor": 0.3,
+    "moe_aux_loss_coeff": 0.0001
+  },
+  "unweighted_derivation": "Absolute difference of logged weighted scalars divided by the recorded coefficient",
+  "unweighted_tolerance_absolute": 0.005,
+  "unweighted_status": "UNVERIFIED",
+  "diagnostic_status": "PASS_40_STEP_OBSERVER_TRANSPARENCY_NOT_200_ACCEPTANCE",
+  "resource_observation": {
+    "steps": [
+      1,
+      40
+    ],
+    "ranks": 8,
+    "warmup_steps_excluded": 20,
+    "median_step_seconds": 1.1559951305389404,
+    "summed_step_seconds": 23.126410126686096,
+    "supervised_tokens": 367303.0,
+    "supervised_tokens_per_second": 15882.40448854449,
+    "allocated_gib": 22.032196044921875,
+    "reserved_gib": 27.25,
+    "rank0_time_underreport_steps": 0,
+    "per_step": [
+      {
+        "step": 1,
+        "seconds": 2.6207144260406494,
+        "rank0_seconds": 2.6207144260406494,
+        "tokens": 32573.0,
+        "samples": 8.0,
+        "allocated_gib": 20.041383743286133,
+        "reserved_gib": 23.578125
+      },
+      {
+        "step": 2,
+        "seconds": 1.7318511009216309,
+        "rank0_seconds": 1.7318511009216309,
+        "tokens": 21239.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.171875
+      },
+      {
+        "step": 3,
+        "seconds": 1.1678918600082397,
+        "rank0_seconds": 1.1678918600082397,
+        "tokens": 24848.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.171875
+      },
+      {
+        "step": 4,
+        "seconds": 1.1521565914154053,
+        "rank0_seconds": 1.1521565914154053,
+        "tokens": 9896.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.171875
+      },
+      {
+        "step": 5,
+        "seconds": 1.1577199697494507,
+        "rank0_seconds": 1.1577199697494507,
+        "tokens": 9658.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.171875
+      },
+      {
+        "step": 6,
+        "seconds": 1.1541448831558228,
+        "rank0_seconds": 1.1541448831558228,
+        "tokens": 17134.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.171875
+      },
+      {
+        "step": 7,
+        "seconds": 1.165144920349121,
+        "rank0_seconds": 1.165144920349121,
+        "tokens": 25012.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.171875
+      },
+      {
+        "step": 8,
+        "seconds": 1.1591092348098755,
+        "rank0_seconds": 1.1591092348098755,
+        "tokens": 16782.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.171875
+      },
+      {
+        "step": 9,
+        "seconds": 1.1614981889724731,
+        "rank0_seconds": 1.1614981889724731,
+        "tokens": 22886.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 10,
+        "seconds": 1.151286244392395,
+        "rank0_seconds": 1.151286244392395,
+        "tokens": 30581.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 11,
+        "seconds": 1.1226470470428467,
+        "rank0_seconds": 1.1226470470428467,
+        "tokens": 20533.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 12,
+        "seconds": 1.1520439386367798,
+        "rank0_seconds": 1.1520439386367798,
+        "tokens": 8497.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 13,
+        "seconds": 1.1523936986923218,
+        "rank0_seconds": 1.1523936986923218,
+        "tokens": 10974.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 14,
+        "seconds": 1.152916669845581,
+        "rank0_seconds": 1.152916669845581,
+        "tokens": 11950.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 15,
+        "seconds": 1.1603937149047852,
+        "rank0_seconds": 1.1603937149047852,
+        "tokens": 20961.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 16,
+        "seconds": 1.1573330163955688,
+        "rank0_seconds": 1.1573330163955688,
+        "tokens": 28751.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 17,
+        "seconds": 1.147902488708496,
+        "rank0_seconds": 1.147902488708496,
+        "tokens": 25914.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 18,
+        "seconds": 1.155738115310669,
+        "rank0_seconds": 1.155738115310669,
+        "tokens": 30288.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 19,
+        "seconds": 1.1608870029449463,
+        "rank0_seconds": 1.1608870029449463,
+        "tokens": 12195.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 20,
+        "seconds": 1.1510485410690308,
+        "rank0_seconds": 1.1510485410690308,
+        "tokens": 7567.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 21,
+        "seconds": 1.1589337587356567,
+        "rank0_seconds": 1.1589337587356567,
+        "tokens": 27188.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 22,
+        "seconds": 1.1560419797897339,
+        "rank0_seconds": 1.1560419797897339,
+        "tokens": 10955.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 23,
+        "seconds": 1.1551342010498047,
+        "rank0_seconds": 1.1551342010498047,
+        "tokens": 21918.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 24,
+        "seconds": 1.164206862449646,
+        "rank0_seconds": 1.164206862449646,
+        "tokens": 27338.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 25,
+        "seconds": 1.157433032989502,
+        "rank0_seconds": 1.157433032989502,
+        "tokens": 20272.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 26,
+        "seconds": 1.1504220962524414,
+        "rank0_seconds": 1.1504220962524414,
+        "tokens": 2363.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 27,
+        "seconds": 1.1541191339492798,
+        "rank0_seconds": 1.1541191339492798,
+        "tokens": 14983.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 28,
+        "seconds": 1.1634852886199951,
+        "rank0_seconds": 1.1634852886199951,
+        "tokens": 24850.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 29,
+        "seconds": 1.155948281288147,
+        "rank0_seconds": 1.155948281288147,
+        "tokens": 21970.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 30,
+        "seconds": 1.1576509475708008,
+        "rank0_seconds": 1.1576509475708008,
+        "tokens": 25541.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 31,
+        "seconds": 1.1628814935684204,
+        "rank0_seconds": 1.1628814935684204,
+        "tokens": 28715.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 32,
+        "seconds": 1.158740520477295,
+        "rank0_seconds": 1.158740520477295,
+        "tokens": 20480.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 33,
+        "seconds": 1.1559385061264038,
+        "rank0_seconds": 1.1559385061264038,
+        "tokens": 17292.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 34,
+        "seconds": 1.1578845977783203,
+        "rank0_seconds": 1.1578845977783203,
+        "tokens": 13086.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 35,
+        "seconds": 1.1496400833129883,
+        "rank0_seconds": 1.1496400833129883,
+        "tokens": 5891.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 36,
+        "seconds": 1.1510059833526611,
+        "rank0_seconds": 1.1510059833526611,
+        "tokens": 7090.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 37,
+        "seconds": 1.1602154970169067,
+        "rank0_seconds": 1.1602154970169067,
+        "tokens": 25986.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 38,
+        "seconds": 1.152963399887085,
+        "rank0_seconds": 1.152963399887085,
+        "tokens": 20828.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 39,
+        "seconds": 1.151511549949646,
+        "rank0_seconds": 1.151511549949646,
+        "tokens": 15269.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      },
+      {
+        "step": 40,
+        "seconds": 1.1522529125213623,
+        "rank0_seconds": 1.1522529125213623,
+        "tokens": 15288.0,
+        "samples": 8.0,
+        "allocated_gib": 22.032196044921875,
+        "reserved_gib": 27.25
+      }
+    ],
+    "precision_acceptance_claimed": false,
+    "scope": "Each step uses the maximum published callback time over all eight ranks. Logical token counts are counted once. Device peaks remain cumulative from process start, including warmup; timing excludes warmup and is not end-to-end wall time. This is not a precision verdict."
+  },
+  "module_counter_checks": "8 ranks x 3 steps x 9 module boundaries; no replay; hooks removed after step 3"
+}

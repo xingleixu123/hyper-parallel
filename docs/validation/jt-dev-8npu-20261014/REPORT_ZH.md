@@ -6,6 +6,8 @@
 
 **当前总体尚未验收通过；最新固定配方的FSDP基线与续训已通过。** JT_dev `f637ef7`加已检视修复源`18602c4`，FSDP1–200和checkpoint200恢复后的201–400分别对独立连续400参考：8rank全部LM、加权及按系数还原的MTP/aux、总loss和梯度范数最大差均为0。当前配方EP2、CP2、TP2均已完整跑完200步，但三者精度均失败；完全和选择重算均完整200步×8rank与off基线逐步一致，其他合法组合仍待完成同配方200步验收；旧配方的跨拓扑超阈值和重算零误差证据单独保留，不能直接转作当前配方结论。
 
+**当前执行顺序以用户最新目标为准：先解决主LM loss的完整200步对齐。主loss全部达到0.005以内后先停下来汇报，由用户决定是否继续MTP/aux专项；已有MTP/aux观测保留，但不把它们作为当前主loss排查的额外优化目标。**
+
 当前阶段推荐优先检视#194的训练目标归一化修复和#198的源参数释放修复。全部14个已确认独立问题均有中文小问题单、独立单提交PR与原生父子关联；持续补充真实证据，问题保持开启，PR保持草稿。
 
 ## 按影响排序的问题、子问题与独立 PR
@@ -232,7 +234,7 @@ LM最大差缩小，但MTP、aux分别变为原来的2.241/1.883倍。首步1,74
 
 [详细设计、四种比较、限制与复算方式](reports/f637-dgrad-four-arm/README_ZH.md) · [原始四臂无损包及SHA](reports/f637-dgrad-four-arm/four-arm-inputs-manifest.json) · [独立逐值/执行审计](reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-independent-review.json)。原字节206.59MB压缩为32.43MB，本机恢复554文件并重算后逐SHA核验，临时恢复副本已清理。
 
-当前模块成本四组（off、6处norm、1处dense MLP、2处完整MoE）已通过固定镜像真实parser4/4及CPU7项合约：实际loss/梯度、路由计数、FSDP动态wrapper身份和hook移除均检查；NPU模块成本仍未测量。[前置结果](reports/f637-dgrad-four-arm/analysis/f637-module-cost-cpu-v1.json)与[准备方案](reports/f637-dgrad-four-arm/module-cost-preparation/tools/README_f637_module_cost_v1.md)。后续单卡PTA level1/2算子探针尚未执行，不将候选设置称作已验证修复。
+模块成本四组已通过固定镜像parser4/4与CPU7项合约。新增off控制组完整40步×8rank对原基线前40步的各loss/梯度范数误差均为0，9个模块边界的前三步计数和hook移除已验证；norm/dense/MoE成本消融尚未执行，暂优先排查主loss。单卡PTA探针v1启动因诊断器自身venv路径问题失败，6.296秒后释放，没有算子结论；v2正在前置验证，下一轮仍遵守20分钟间隔。[原始130文件、40步审计及探针失败说明](reports/f637-module-off-and-probe-preflight/README_ZH.md)。
 
 
 ## 待完成项、资源与数据管理
@@ -246,7 +248,7 @@ LM最大差缩小，但MTP、aux分别变为原来的2.241/1.883倍。首步1,74
 - [ ] 数值配方若改变，重建对应FSDP基线、续训与独立连续400参考。
 - [ ] 当前提交的完整CI、维护者评审及最终回归；PR创建不等于验收或合入。
 
-按用户2026-10-16最新指示，取消实验间固定20分钟等待，就绪实验在确认125/129空卡后连续执行。仍保留单轮900秒硬上限、启动前两次空卡检查、释放确认及任务所有权保护；发现其他实验时只释放本任务容器。四臂及更早记录中的1200秒间隔是当时策略的历史证据，不约束后续。CPU与文件检查单独记录，不混入NPU性能数据。
+按用户随后给出的**最新指示恢复每轮实验至少20分钟间隔**：只使用125/129空卡，结束并确认释放后至少等待1200秒，再次检查空卡后才启动下一轮。单轮最长900秒，当前定位优先使用单卡600秒预算；不停止其他人的实验，不长期占用八卡。启动前双重空卡检查、释放确认及本任务所有权保护均保留。此前取消间隔的记录仅为历史，已被本指示替代。[最新策略](reports/f637-module-off-and-probe-preflight/resource-policy-20261016-restored-20min.json)与[部署凭据](reports/f637-module-off-and-probe-preflight/fixed-pta-probe-guard-deployment-v1.json)。CPU与文件检查单独记录，不混入NPU性能数据。
 
 当前129的step200 checkpoint约27.97GB保留作续训及状态定位。每轮复制证据后核验大小和SHA，及时删除两端重复归档及已用完的临时源码/venv。125五份旧逐步参数探针已无损gzip并读回校验，删除未压缩副本释放约6.14GB，原始证据仍保留。用户镜像、共享数据和其他任务文件不删。[已有清理凭据与CPU分母探针边界](reports/cp-denominator-cpu-and-cleanup/README_ZH.md)。
 

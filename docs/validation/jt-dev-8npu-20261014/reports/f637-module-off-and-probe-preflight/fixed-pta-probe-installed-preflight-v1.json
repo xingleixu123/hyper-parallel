@@ -1,0 +1,108 @@
+{
+  "status": "PASS_DEVICE_FREE_IDENTITY_ONLY",
+  "identity": {
+    "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "jt_model_sha256": "2ddd28910688710ea777f1724fb8aeb8821c6045a01f18f21eea4e92507fd906",
+    "manifest_sha256": "6ac6cb456f505eb19648904e373569bf815135333a3e8eabc00a62fc2a29d0fb",
+    "expected_image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "actual_image_validation": "external coordinator/guard responsibility",
+    "python": "3.12.14",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0",
+    "pta_git_version": "fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d",
+    "transformers": "5.13.1",
+    "installed_pta_python_sources": {
+      "references/installed-torch-npu-version.py": {
+        "installed_path": "/workspace/venv/lib/python3.12/site-packages/torch_npu/version.py",
+        "sha256": "9dc0a539f5507b0d9a9d8a91ca21568414aca85900edd0e241994960cfe3fa84"
+      },
+      "references/installed-torch-npu-npu-npu_config.py": {
+        "installed_path": "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/npu_config.py",
+        "sha256": "77144ac4544e21eaaf447548c684832d35f48b4936a0f42b4630333ed820938b"
+      },
+      "references/torch-npu-fa0f83fe49d3-torch_npu-npu-__init__.py": {
+        "installed_path": "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py",
+        "sha256": "355df777433fd8c85670db75d8aacf7fa076332092470d59b6ba26202ed7fd2f"
+      }
+    },
+    "hyper_parallel_import": "/workspace/hyper-parallel/hyper_parallel/__init__.py",
+    "cann_version_file": {
+      "path": "/workspace/Ascend/cann-9.2.0-beta.2/aarch64-linux/ascend_toolkit_install.info",
+      "installation_alias": "/usr/local/Ascend/ascend-toolkit/latest/aarch64-linux/ascend_toolkit_install.info",
+      "sha256": "d0bfd8c3016aec465d723af0dadd59f6014c709b572c1678f5ed1d38b5be373b",
+      "text": "package_name=Ascend-cann-toolkit\nversion=9.2.0-beta.2\ninnerversion=V100R001C12B086\ncompatible_version=[V100R001C15],[V100R001C23],[V100R001C10],[V100R001C12]\narch=aarch64\nos=linux\npath=/usr/local/Ascend/cann-9.2.0-beta.2\n"
+    },
+    "rmsnorm_forward": {
+      "decorator_chain": [
+        {
+          "function": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm.forward",
+          "file": "/workspace/venv/lib/python3.12/site-packages/transformers/models/deepseek_v32/modeling_deepseek_v32.py",
+          "file_sha256": "519f271a7e3b0a56655e1f92054d4191686b91af5df5bccdc6208b6569ef4d1a",
+          "line": 57,
+          "function_sha256": "790fa612e4fa57acfcbea31da45f92ba91f9016f7260ef539f61c5530ba06a5f",
+          "source": "    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:\n        input_dtype = hidden_states.dtype\n        hidden_states = hidden_states.to(torch.float32)\n        variance = hidden_states.pow(2).mean(-1, keepdim=True)\n        hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)\n        return self.weight * hidden_states.to(input_dtype)\n",
+          "source_truncated": false
+        }
+      ]
+    },
+    "linear_forward": {
+      "decorator_chain": [
+        {
+          "function": "torch.nn.modules.linear.Linear.forward",
+          "file": "/workspace/venv/lib/python3.12/site-packages/torch/nn/modules/linear.py",
+          "file_sha256": "1961ad1a1f650e104b3c7f78d19af2d21bf977e7af6c3fdf2420aad563c9e202",
+          "line": 130,
+          "function_sha256": "c0ab8f42cc3bf9489809b19c321cc85f0b1d4eafebacb96bd8e132cb9e95ef76",
+          "source": "    def forward(self, input: Tensor) -> Tensor:\n        \"\"\"\n        Runs the forward pass.\n        \"\"\"\n        return F.linear(input, self.weight, self.bias)\n",
+          "source_truncated": false
+        }
+      ]
+    },
+    "pta_setter": {
+      "decorator_chain": [
+        {
+          "function": "torch_npu.npu.set_deterministic_level",
+          "file": "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py",
+          "file_sha256": "355df777433fd8c85670db75d8aacf7fa076332092470d59b6ba26202ed7fd2f",
+          "line": 603,
+          "function_sha256": "87f571d3be8bd49b219a32c7782706c1ff7b50c6a02ef5bfca583a86ca9275d6",
+          "source": "def set_deterministic_level(level):\n    warnings.warn(\"After using 'torch_npu.npu.set_deterministic_level', \"\n                  \"please do not use 'torch.use_deterministic_algorithms' anymore, \"\n                  \"as it may cause unknown errors.\")\n    if level == 0 and torch.are_deterministic_algorithms_enabled():\n        warnings.warn(\"The current configuration value of 'torch_npu.npu.set_deterministic_level' \"\n                      \"conflicts with 'torch.use_deterministic_algorithms'. \"\n                      \"'torch.use_deterministic_algorithms' has been configured to 'False'\")\n        torch.use_deterministic_algorithms(False)\n    elif level >= 1 and not torch.are_deterministic_algorithms_enabled():\n        warnings.warn(\"The current configuration value of 'torch_npu.npu.set_deterministic_level' \"\n                      \"conflicts with 'torch.use_deterministic_algorithms'. \"\n                      \"'torch.use_deterministic_algorithms' has been configured to 'True'\")\n        torch.use_deterministic_algorithms(True)\n    torch_npu._C._npu_set_deterministic_level(level)\n",
+          "source_truncated": false
+        }
+      ]
+    }
+  },
+  "cann_version_candidates": {
+    "/usr/local/Ascend/ascend-toolkit/latest/opp/version.info": {
+      "resolved": "/workspace/Ascend/cann-9.2.0-beta.2/opp/version.info",
+      "text": "Version=9.2.0-beta.2\nversion_dir=cann\nrequired_package_runtime_version=\">=8.5\"\nrequired_package_ge-executor_version=\">=8.5\"\nrequired_package_metadef_version=\">=8.5\"\nrequired_package_asc-devkit_version=\">=8.5\"\nrequired_package_bisheng-compiler_version=\">=8.5\"\ntimestamp=20260826_163105218\n"
+    },
+    "/usr/local/Ascend/ascend-toolkit/latest/compiler/version.info": {
+      "resolved": "/workspace/Ascend/cann-9.2.0-beta.2/share/info/asc-devkit/version.info",
+      "text": "Version=9.2.0-beta.2\nversion_dir=cann\nrequired_package_runtime_version=\"9.2\"\nrequired_package_ge-executor_version=\"9.2\"\nrequired_package_metadef_version=\"9.2\"\nrequired_package_bisheng-compiler_version=\"9.2\"\nrequired_package_tbe-tik_version=\"9.2\"\ntimestamp=20260826_163105218\n"
+    },
+    "/usr/local/Ascend/ascend-toolkit/latest/aarch64-linux/ascend_toolkit_install.info": {
+      "resolved": "/workspace/Ascend/cann-9.2.0-beta.2/aarch64-linux/ascend_toolkit_install.info",
+      "text": "package_name=Ascend-cann-toolkit\nversion=9.2.0-beta.2\ninnerversion=V100R001C12B086\ncompatible_version=[V100R001C15],[V100R001C23],[V100R001C10],[V100R001C12]\narch=aarch64\nos=linux\npath=/usr/local/Ascend/cann-9.2.0-beta.2\n"
+    },
+    "/usr/local/Ascend/ascend-toolkit/latest/arm64-linux/ascend_toolkit_install.info": {
+      "resolved": "/workspace/Ascend/cann-9.2.0-beta.2/aarch64-linux/ascend_toolkit_install.info",
+      "text": "package_name=Ascend-cann-toolkit\nversion=9.2.0-beta.2\ninnerversion=V100R001C12B086\ncompatible_version=[V100R001C15],[V100R001C23],[V100R001C10],[V100R001C12]\narch=aarch64\nos=linux\npath=/usr/local/Ascend/cann-9.2.0-beta.2\n"
+    }
+  },
+  "selected_cann_version_file": "/usr/local/Ascend/ascend-toolkit/latest/aarch64-linux/ascend_toolkit_install.info",
+  "allocator_api": {
+    "decorator_chain": [
+      {
+        "function": "torch_npu.npu.memory.set_per_process_memory_fraction",
+        "file": "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/memory.py",
+        "file_sha256": "b489a7dc22b77d5f50b3329801fe64cb4c7f908cf2abaea75c0efbd7f4c436c1",
+        "line": 142,
+        "function_sha256": "4be6b73f68b4d6e9cde5aeb3961776a414d4a6847b389af966dfe3154aaa0cf6",
+        "source": "def set_per_process_memory_fraction(fraction, device=None) -> None:\n    r\"\"\"Set memory fraction for a process.\n    The fraction is used to limit an caching allocator to allocated memory on a NPU device.\n    The allowed value equals the total visible memory multiplied fraction.\n    If trying to allocate more than the allowed value in a process, will raise an out of\n    memory error in allocator.\n    Arguments:\n        fraction(float): Range: 0~1. Allowed memory equals total_memory * fraction.\n        device (torch.device or int, optional): selected device. If it is\n            ``None`` the default NPU device is used.\n    .. note::\n        In general, the total available free memory is less than the total capacity.\n    \"\"\"\n    _lazy_init()\n    if device is None:\n        device = torch_npu.npu.current_device()\n    device = _get_device_index(device)\n    if not isinstance(fraction, float):\n        raise TypeError('Invalid type for fraction argument, must be `float`' + pta_error(ErrCode.TYPE))\n    if fraction < 0 or fraction > 1:\n        raise ValueError('Invalid fraction value: {}. '\n                         'Allowed range: 0~1'.format(fraction) + pta_error(ErrCode.VALUE))\n\n    torch_npu._C._npu_setMemoryFraction(fraction, device)\n",
+        "source_truncated": false
+      }
+    ]
+  },
+  "accelerator_initialized": false
+}
