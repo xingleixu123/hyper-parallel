@@ -1,0 +1,2228 @@
+/**
+ * Copyright 2024-2025 Huawei Technologies Co., Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#define _CCE_KERNEL_
+#include "isa.h"
+
+constexpr uint64_t UB_WORKSPACE_SIZE = 512;
+constexpr uint64_t WORKSPACE = 192ul * 1024ul - UB_WORKSPACE_SIZE;
+
+#define PC_BASE 0
+
+#define MASK_32 0xfffffffful
+#define INVALID_INT  uint64_t(-1)
+
+#define IS_FLOAT(x) (sizeof(*x) == 4)
+#define SIMD_WIDTH_SHIFT(x) (IS_FLOAT(x) ? 3 : 4)
+#define TYPE_SHIFT(x) (32 / sizeof(x))
+#define BlockDataShift(x)  (5 - sizeof(x) / 2)   // 1B - 5, 2B - 4, 4B - 3, 8B - not support
+#define BlockNum(x)  (256 / sizeof(x))   
+#define MaxRepeat(num, x)  ((num + BlockNum(x) - 1) / BlockNum(x))   
+
+// tile format:
+//  tile_idx(32) << 32 | tile_count(28) << 4 | skip_stride(1) << 3 | tail_flag(1) << 2 | end_flag(1) << 1 | not_begin_flag(1)
+#define V_TILE_N_BEGIN_FLAG_OFFSET  0
+#define V_TILE_END_FLAG_OFFSET      1
+#define V_TILE_TAIL_FLAG_OFFSET     2
+#define V_TILE_SKIP_FLAG_OFFSET     3
+#define V_TILE_COUNT_OFFSET         4
+#define V_TILE_CUR_IDX_OFFSET       32
+#define V_TILE_COUNT_BITS           28
+
+#define TileIdx(tile)         ((tile) >> V_TILE_CUR_IDX_OFFSET)
+#define IsLastTile(tile)      (((tile) & 6ul) == 6ul)
+#define IsBeginTile(tile)     ((tile & (1ul << V_TILE_N_BEGIN_FLAG_OFFSET)) == 0)
+#define IsEndTile(tile)       ((tile) & (1ul << V_TILE_END_FLAG_OFFSET))
+#define IsSkipTile(tile)      ((tile) & (1ul << V_TILE_SKIP_FLAG_OFFSET))
+
+__aicore_inline__ uint64_t vBlockIdx() {
+  return get_subblockdim() * block_idx + get_subblockid();
+}
+
+__aicore_inline__ uint64_t vBlockNum() {
+  return get_subblockdim() * block_num;
+}
+
+__aicore_inline__ uint64_t GetBlock(uint64_t stride, uint64_t type_size) {
+  return (stride * type_size + 31) >> 5;
+}
+
+__aicore_inline__ void SetVectorMask(uint64_t simd_width) {
+  if (simd_width > 64) {
+    set_vector_mask(0xffffffffffffffffllu >> (128 - simd_width), 0xffffffffffffffffllu);
+  } else {
+    set_vector_mask(0, 0xffffffffffffffffllu >> (64 - simd_width));
+  }
+}
+
+#ifdef DEBUG
+__aicore_inline__ void OVER_WRITE_CHECK(bcodeptr_t pc, uint64_t head, uint64_t write_end) {
+  uint64_t debug_size = *(pc + (((head >> V_M_HEAD_SIZE_OFFSET) & V_M_HEAD_SIZE_MASK) - 1));
+  if (write_end > debug_size) {
+    trap();
+  }
+}
+#else
+#define OVER_WRITE_CHECK(pc, head, write_end)
+#endif
+
+// unary
+ __aicore_inline__ void vAbs(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat, uint16_t repeatStride) {
+  vabs(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+ __aicore_inline__ void vLn(__ubuf__ float *dst, __ubuf__ float*src, uint8_t repeat, uint16_t repeatStride) {
+  vln(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vExp(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat, uint16_t repeatStride) {
+  vexp(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vFloor(__ubuf__ float *x, uint8_t repeat, uint16_t repeatStride) {
+  vconv_f322s32c((__ubuf__ int32_t *)x, x, repeat, 1, 1, repeatStride, repeatStride);
+  pipe_barrier(PIPE_V);
+  vconv_s322f32(x, (__ubuf__ int32_t *)x, repeat, 1, 1, repeatStride, repeatStride);
+  pipe_barrier(PIPE_V);
+}
+
+__aicore_inline__ void vFloor(__ubuf__ half *x, uint8_t repeat, uint16_t repeatStride) {
+  vconv_f162s16c((__ubuf__ int16_t *)x, x, repeat, 1, 1, repeatStride, repeatStride);
+  pipe_barrier(PIPE_V);
+  vconv_s162f16(x, (__ubuf__ int16_t *)x, repeat, 1, 1, repeatStride, repeatStride);
+  pipe_barrier(PIPE_V);
+}
+
+__aicore_inline__ void vMuls(__ubuf__ float *dst, __ubuf__ float *src0, float src1, uint8_t repeat, uint16_t repeatStride) {
+  vmuls(dst, src0, src1, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vAdds(__ubuf__ float *dst, __ubuf__ float *src0, float src1, uint8_t repeat, uint16_t repeatStride) {
+  vadds(dst, src0, src1, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+// binary
+__aicore_inline__ void vAdd(__ubuf__ float *dst, __ubuf__ float *src0, __ubuf__ float *src1, uint8_t repeat, uint8_t repeatStride) {
+  vadd(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vSub(__ubuf__ float *dst, __ubuf__ float *src0, __ubuf__ float *src1, uint8_t repeat, uint8_t repeatStride) {
+  vsub(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vMul(__ubuf__ float *dst, __ubuf__ float *src0, __ubuf__ float *src1, uint8_t repeat, uint8_t repeatStride) {
+  vmul(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vDiv(__ubuf__ float *dst, __ubuf__ float *src0, __ubuf__ float *src1, uint8_t repeat, uint8_t repeatStride) {
+  vdiv(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vDiv(__ubuf__ float *dst, __ubuf__ float *src0, __ubuf__ float *src1, uint8_t repeat,
+                            uint8_t dstRepeatStride, uint8_t src0RepeatStride, uint16_t src1RepeatStride) {
+  vdiv(dst, src0, src1, repeat, 1, 1, 1, dstRepeatStride, src0RepeatStride, src1RepeatStride);
+}
+
+__aicore_inline__ void vDiv(__ubuf__ half *dst, __ubuf__ half *src0, __ubuf__ half *src1, uint8_t repeat,
+                            uint8_t dstRepeatStride, uint8_t src0RepeatStride, uint16_t src1RepeatStride) {
+  vdiv(dst, src0, src1, repeat, 1, 1, 1, dstRepeatStride, src0RepeatStride, src1RepeatStride);
+}
+
+__aicore_inline__ void vMax(__ubuf__ float *dst, __ubuf__ float *src0, __ubuf__ float *src1, uint8_t repeat, uint8_t repeatStride) {
+  vmax(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vMax(__ubuf__ half *dst, __ubuf__ half *src0, __ubuf__ half *src1, uint8_t repeat, uint8_t repeatStride) {
+  vmax(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vReducev2(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0, __ubuf__ uint16_t *src1, uint16_t repeat, uint8_t src0BlockStride, uint8_t patternMode, uint16_t src0RepeatStride, uint8_t src1RepeatStride) {
+  vreducev2(dst, src0, src1, repeat, src0BlockStride, patternMode, src0RepeatStride, src1RepeatStride);
+}
+
+__aicore_inline__ void vReducev2(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *src0, __ubuf__ uint32_t *src1, uint16_t repeat, uint8_t src0BlockStride, uint8_t patternMode, uint16_t src0RepeatStride, uint8_t src1RepeatStride) {
+  vreducev2(dst, src0, src1, repeat, src0BlockStride, patternMode, src0RepeatStride, src1RepeatStride);
+}
+
+// cross
+__aicore_inline__ void vCAdd(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat, uint16_t dstRepeatStride, uint16_t srcRepeatStride) {
+  vcadd(dst, src, repeat, dstRepeatStride, 1, srcRepeatStride, 0);
+}
+
+__aicore_inline__ void vCAdd(__ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat, uint16_t dstRepeatStride, uint16_t srcRepeatStride) {
+  vcadd(dst, src, repeat, dstRepeatStride, 1, srcRepeatStride, 0);
+}
+
+__aicore_inline__ void vCMax(__ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat, uint16_t dstRepeatStride, uint16_t srcRepeatStride) {
+  vcmax(dst, src, repeat, dstRepeatStride, 1, srcRepeatStride, ONLY_VALUE);
+}
+
+__aicore_inline__ void vCMax(__ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat, uint16_t dstRepeatStride, uint16_t srcRepeatStride) {
+  vcmax(dst, src, repeat, dstRepeatStride, 1, srcRepeatStride, ONLY_VALUE);
+}
+
+// other
+__aicore_inline__ void vDup(__ubuf__ float*dst, float src, uint8_t repeat, uint16_t repeatStride) {
+  vector_dup(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vDup(__ubuf__ half *dst, half src, uint8_t repeat, uint16_t repeatStride) {
+  vector_dup(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vDup(__ubuf__ int32_t *dst, int32_t src, uint8_t repeat, uint16_t repeatStride) {
+  vector_dup(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vDup(__ubuf__ uint32_t *dst, uint32_t src, uint8_t repeat, uint16_t repeatStride) {
+  vector_dup(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+__aicore_inline__ void vDup(__ubuf__ uint16_t *dst, uint16_t src, uint8_t repeat, uint16_t repeatStride) {
+  vector_dup(dst, src, repeat, 1, 1, repeatStride, repeatStride);
+}
+
+
+__aicore_inline__ void vSel(__ubuf__ float *dst, __ubuf__ float *src0, __ubuf__ float *src1, uint8_t repeat, uint8_t repeatStride, uint8_t selectMode = 0) {
+  vsel(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride, selectMode);
+}
+
+__aicore_inline__ void vSel(__ubuf__ half *dst, __ubuf__ half *src0, __ubuf__ half *src1, uint8_t repeat, uint8_t repeatStride, uint8_t selectMode = 0) {
+  vsel(dst, src0, src1, repeat, 1, 1, 1, repeatStride, repeatStride, repeatStride, selectMode);
+}
+
+__aicore_inline__ void repeat_vcadd(__ubuf__ float *dst, __ubuf__ float *src, uint16_t repeat, uint16_t dstRepeatStride,
+                                    uint16_t srcRepeatStride) {
+  for (; repeat > 255; repeat -= 255) {
+    vCAdd(dst, src, 255, dstRepeatStride, srcRepeatStride);
+    dst += 255 * dstRepeatStride;
+    src += 255 * TYPE_SHIFT(float) * srcRepeatStride;
+  }
+  vCAdd(dst, src, repeat, dstRepeatStride, srcRepeatStride);
+}
+
+template <typename T>
+__aicore_inline__ void SelectMode2(__ubuf__ T *dst, __ubuf__ T *src0, __ubuf__ T *src1, uint16_t repeat,
+                                   uint8_t repeatStride, uint64_t cond_addr) {
+  __ubuf__ uint32_t *wk = (__ubuf__ uint32_t *)(WORKSPACE);
+  set_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  wait_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  *wk = cond_addr;
+  set_flag(PIPE_S, PIPE_V, EVENT_ID0);
+  wait_flag(PIPE_S, PIPE_V, EVENT_ID0);
+  set_cmpmask((__ubuf__ void *)(WORKSPACE));
+  pipe_barrier(PIPE_V);
+  vSel(dst, src0, src1, repeat, repeatStride, 2);
+}
+
+#define DELCARE_BINARY(builtin, VTYPE)                                                                          \
+  __aicore_inline__ void repeat_##builtin(__ubuf__ VTYPE *dst, __ubuf__ VTYPE *src0, __ubuf__ VTYPE *src1,  \
+                                              uint16_t repeat, uint8_t dstBlockStride, uint8_t src0BlockStride, \
+                                              uint8_t src1BlockStride, uint8_t dstRepeatStride,                 \
+                                              uint8_t src0RepeatStride, uint8_t src1RepeatStride) {             \
+    for (; repeat > 255; repeat -= 255) {                                                                       \
+      builtin(dst, src0, src1, 255, dstBlockStride, src0BlockStride, src1BlockStride, dstRepeatStride,          \
+              src0RepeatStride, src1RepeatStride);                                                              \
+      dst += 255 * TYPE_SHIFT(VTYPE) * dstRepeatStride;                                                         \
+      src0 += 255 * TYPE_SHIFT(VTYPE) * src0RepeatStride;                                                       \
+      src1 += 255 * TYPE_SHIFT(VTYPE) * src1RepeatStride;                                                       \
+    }                                                                                                           \
+    builtin(dst, src0, src1, repeat, dstBlockStride, src0BlockStride, src1BlockStride, dstRepeatStride,         \
+            src0RepeatStride, src1RepeatStride);                                                                \
+  }
+
+#define DELCARE_BINARYS(builtin, VTYPE)                                                                             \
+  __aicore_inline__ void repeat_##builtin(__ubuf__ VTYPE *dst, __ubuf__ VTYPE *src, VTYPE val, uint16_t repeat, \
+                                              uint16_t dstBlockStride, uint16_t srcBlockStride,                     \
+                                              uint16_t dstRepeatStride, uint16_t srcRepeatStride) {                 \
+    for (; repeat > 255; repeat -= 255) {                                                                           \
+      builtin(dst, src, val, 255, dstBlockStride, srcBlockStride, dstRepeatStride, srcRepeatStride);                \
+      dst += 255 * TYPE_SHIFT(VTYPE) * dstRepeatStride;                                                             \
+      src += 255 * TYPE_SHIFT(VTYPE) * srcRepeatStride;                                                             \
+    }                                                                                                               \
+    builtin(dst, src, val, repeat, dstBlockStride, srcBlockStride, dstRepeatStride, srcRepeatStride);               \
+  }
+
+#define DELCARE_UNARYS(builtin, VTYPE)                                                              \
+  __aicore_inline__ void repeat_##builtin(__ubuf__ VTYPE *dst, VTYPE val, uint16_t repeat,      \
+                                              uint16_t dstBlockStride, uint16_t srcBlockStride,     \
+                                              uint16_t dstRepeatStride, uint16_t srcRepeatStride) { \
+    for (; repeat > 255; repeat -= 255) {                                                           \
+      builtin(dst, val, 255, dstBlockStride, srcBlockStride, dstRepeatStride, srcRepeatStride);     \
+      dst += 255 * TYPE_SHIFT(VTYPE) * dstRepeatStride;                                             \
+    }                                                                                               \
+    builtin(dst, val, repeat, dstBlockStride, srcBlockStride, dstRepeatStride, srcRepeatStride);    \
+  }
+
+// Keep uint8_t *dst 32-byte aligned for cmp mask writes.
+#define CMP_REPEAT_SHIFT(T) (sizeof(T) == 4 ? 252 : 254)
+
+#define DELCARE_CMPS(builtin, VTYPE)                                                                              \
+  __aicore_inline__ void repeat_##builtin(__ubuf__ uint8_t *dst, __ubuf__ VTYPE *src0, VTYPE src1, uint16_t repeat) { \
+    constexpr uint64_t repeat_shift = CMP_REPEAT_SHIFT(VTYPE);                                                     \
+    for (; repeat > repeat_shift; repeat -= repeat_shift) {                                                        \
+      builtin(dst, src0, src1, repeat_shift, 1, 1, 8, 8);                                                          \
+      dst += repeat_shift * TYPE_SHIFT(VTYPE);                                                                      \
+      src0 += repeat_shift * BlockNum(VTYPE);                                                                       \
+    }                                                                                                             \
+    builtin(dst, src0, src1, repeat, 1, 1, 8, 8);                                                                  \
+  }
+
+#define DELCARE_CMP(builtin, VTYPE)                                                                              \
+  __aicore_inline__ void repeat_##builtin(__ubuf__ uint8_t *dst, __ubuf__ VTYPE *src0, __ubuf__ VTYPE *src1, uint16_t repeat) { \
+    constexpr uint64_t repeat_shift = CMP_REPEAT_SHIFT(VTYPE);                                                     \
+    for (; repeat > repeat_shift; repeat -= repeat_shift) {                                                        \
+      builtin(dst, src0, src1, repeat_shift, 1, 1, 1, 8, 8, 8);                                                    \
+      dst += repeat_shift * TYPE_SHIFT(VTYPE);                                                                      \
+      src0 += repeat_shift * BlockNum(VTYPE);                                                                       \
+      src1 += repeat_shift * BlockNum(VTYPE);                                                                       \
+    }                                                                                                            \
+    builtin(dst, src0, src1, repeat, 1, 1, 1, 8, 8, 8);                                                            \
+  }
+
+DELCARE_BINARY(vadd, float)
+DELCARE_BINARY(vmax, float)
+DELCARE_BINARY(vmax, half)
+
+DELCARE_UNARYS(vector_dup, float)
+DELCARE_UNARYS(vector_dup, half)
+DELCARE_UNARYS(vector_dup, uint16_t)
+DELCARE_UNARYS(vector_dup, uint32_t)
+
+DELCARE_CMPS(vcmpvs_ne, float)
+DELCARE_CMPS(vcmpvs_ne, half)
+DELCARE_CMPS(vcmpvs_eq, float)
+DELCARE_CMPS(vcmpvs_eq, half)
+DELCARE_CMPS(vcmpvs_le, float)
+DELCARE_CMPS(vcmpvs_le, half)
+DELCARE_CMPS(vcmpvs_lt, float)
+DELCARE_CMPS(vcmpvs_lt, half)
+DELCARE_CMPS(vcmpvs_ge, float)
+DELCARE_CMPS(vcmpvs_ge, half)
+DELCARE_CMPS(vcmpvs_gt, float)
+DELCARE_CMPS(vcmpvs_gt, half)
+
+DELCARE_CMP(vcmpv_eq, int32_t)
+DELCARE_CMP(vcmpv_eq, float)
+DELCARE_CMP(vcmpv_eq, half)
+DELCARE_CMP(vcmpv_le, float)
+DELCARE_CMP(vcmpv_le, half)
+DELCARE_CMP(vcmpv_lt, float)
+DELCARE_CMP(vcmpv_lt, half)
+DELCARE_CMP(vcmpv_ge, float)
+DELCARE_CMP(vcmpv_ge, half)
+DELCARE_CMP(vcmpv_gt, float)
+DELCARE_CMP(vcmpv_gt, half)
+
+template <typename T>
+__aicore_inline__ void Reciprocals(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vBinaryS op;
+  vBinaryS::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T *)(op.xn);
+  T val = vBinaryS::GetScalar<T>(pc);
+  pipe_barrier(PIPE_V);
+  set_vector_mask(0, BlockNum(T));
+  vDup((__ubuf__ T *)WORKSPACE, val, 1, 8);
+  pipe_barrier(PIPE_V);
+  set_vector_mask(0, op.count);
+  vDiv(xd, (__ubuf__ T *)WORKSPACE, xn, 1, 8, 0, 8);
+}
+
+template <typename T>
+__aicore_inline__ void ElementAny(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vElementAny op;
+  vElementAny::Decode(pc, head, op);
+  if (IsLastTile(tile)) {
+    op.repeat = op.repeat_tail;
+  }
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T *)(op.xn);
+  uint64_t simd_width = op.simd_width;
+  set_mask_norm();
+  SetVectorMask(simd_width);
+  copy_ubuf_to_ubuf((__ubuf__ void *)xd, (__ubuf__ void *)xn, 0, 1, (op.repeat * simd_width) >> BlockDataShift(T), 0, 0);
+  pipe_barrier(PIPE_V);
+  uint64_t rs = op.simd_width >> BlockDataShift(T);
+  while (op.repeat != 1) {
+    if (op.repeat & 1) {
+      uint64_t offset_repeat = (op.repeat / 2) * 2;
+      vMax(xd, xd, xd + offset_repeat * simd_width, 1, rs);
+      pipe_barrier(PIPE_V);
+    }
+    op.repeat >>= 1;
+    repeat_vmax(xd, xd, xd + op.repeat * simd_width, op.repeat, 1, 1, 1, rs, rs, rs);
+    pipe_barrier(PIPE_V);
+  }
+  vCMax(xd, xd, 1, 1, 0);
+  set_mask_count();
+  set_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  wait_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  __ubuf__ uint32_t *result = (__ubuf__ uint32_t *)(op.xd);
+  if (*result != 0) {
+    vStoreCond::EncodeCond(pc + vElementAny::STORE_COND_OFFSET, 0, 1);
+  }
+}
+
+#define UNARY(pc, builtin, head, tile, VTYPE)       \
+  do {                                              \
+    vUnary op;                                      \
+    vUnary::Decode(pc, head, op);                   \
+    __ubuf__ VTYPE *xd = (__ubuf__ VTYPE *)(op.xd); \
+    __ubuf__ VTYPE *xn = (__ubuf__ VTYPE *)(op.xn); \
+    set_vector_mask(0, op.count);                   \
+    builtin(xd, xn, 1, 1, 1, 8, 8);                 \
+  } while (0)
+
+#define BINARY(pc, builtin, head, tile, VTYPE)      \
+  do {                                              \
+    vBinary op;                                     \
+    vBinary::Decode(pc, head, op);                  \
+    __ubuf__ VTYPE *xm = (__ubuf__ VTYPE *)(op.xm); \
+    __ubuf__ VTYPE *xd = (__ubuf__ VTYPE *)(op.xd); \
+    __ubuf__ VTYPE *xn = (__ubuf__ VTYPE *)(op.xn); \
+    set_vector_mask(0, op.count);                   \
+    builtin(xd, xn, xm, 1, 1, 1, 1, 8, 8, 8);       \
+  } while (0)
+
+#define CAST(pc, builtin, head, tile, VTYPE, CAST_TYPE)             \
+  do {                                                              \
+    vUnary op;                                                      \
+    vUnary::Decode(pc, head, op);                                   \
+    uint16_t dst_rs = (sizeof(CAST_TYPE) >= sizeof(VTYPE)) ? 8 : 4; \
+    uint16_t src_rs = (sizeof(CAST_TYPE) <= sizeof(VTYPE)) ? 8 : 4; \
+    set_vector_mask(0, op.count);                                   \
+    __ubuf__ CAST_TYPE *xd = (__ubuf__ CAST_TYPE *)(op.xd);         \
+    __ubuf__ VTYPE *xn = (__ubuf__ VTYPE *)(op.xn);                 \
+    builtin(xd, xn, 1, 1, 1, dst_rs, src_rs);                       \
+  } while (0)
+
+#define BINARYS(pc, builtin, head, VTYPE)           \
+  do {                                              \
+    vBinaryS op;                                    \
+    vBinaryS::Decode(pc, head, op);                 \
+    __ubuf__ VTYPE *xd = (__ubuf__ VTYPE *)(op.xd); \
+    __ubuf__ VTYPE *xn = (__ubuf__ VTYPE *)(op.xn); \
+    VTYPE val = vBinaryS::GetScalar<VTYPE>(pc);     \
+    set_vector_mask(0, op.count);                   \
+    builtin(xd, xn, val, 1, 1, 1, 8, 8);            \
+  } while (0)
+
+template <typename T>
+__aicore_inline__ void BinCompare(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+#define CMP_DISPATCH(op_type, builtin)                                        \
+  case op_type:                                                               \
+    do {                                                                      \
+      repeat_##builtin(ws, xn, xm, MaxRepeat(op.count, T));                    \
+      set_vector_mask(0, BlockNum(T));                                        \
+      pipe_barrier(PIPE_V);                                                   \
+      if constexpr (op_type == V_CMP_NE) {                                    \
+        vDup((__ubuf__ T *)WORKSPACE, (T)1.0, 1, 0);                          \
+        vDup((__ubuf__ T *)(WORKSPACE + 256), (T)0.0, 1, 0);                  \
+      } else {                                                                \
+        vDup((__ubuf__ T *)WORKSPACE, (T)0.0, 1, 0);                          \
+        vDup((__ubuf__ T *)(WORKSPACE + 256), (T)1.0, 1, 0);                  \
+      }                                                                       \
+    } while (0);                                                              \
+    break
+  vCompare op;
+  vCompare::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  __ubuf__ T *xm = (__ubuf__ T *)(op.xm);
+  __ubuf__ T *xn = (__ubuf__ T *)(op.xn);
+  __ubuf__ uint8_t *ws = (__ubuf__ uint8_t *)(op.ws);
+  set_vector_mask(0, op.count);                                               
+  switch (op.type) {
+    CMP_DISPATCH(V_CMP_EQ, vcmpv_eq);
+    CMP_DISPATCH(V_CMP_NE, vcmpv_eq);
+    CMP_DISPATCH(V_CMP_GT, vcmpv_gt);
+    CMP_DISPATCH(V_CMP_GE, vcmpv_ge);
+    CMP_DISPATCH(V_CMP_LT, vcmpv_lt);
+    CMP_DISPATCH(V_CMP_LE, vcmpv_le);
+    default: break;
+  }
+  pipe_barrier(PIPE_V);
+  set_vector_mask(0, op.count);
+  set_cmpmask((__ubuf__ void *)(WORKSPACE));
+  vsel(xd, (__ubuf__ T *)(WORKSPACE + 256), ws, 1, 1, 1, 1, 8, 0, 8, 1);
+}
+
+__aicore_inline__ void CompareInt(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vCompare op;
+  vCompare::Decode(pc, head, op);
+  __ubuf__ float *xd = (__ubuf__ float *)(op.xd);
+  __ubuf__ int32_t *xm = (__ubuf__ int32_t *)(op.xm);
+  __ubuf__ int32_t *xn = (__ubuf__ int32_t *)(op.xn);
+  __ubuf__ uint8_t *ws = (__ubuf__ uint8_t *)(op.ws);
+  set_vector_mask(0, op.count);
+  repeat_vcmpv_eq(ws, xn, xm, MaxRepeat(op.count, int32_t));
+  set_vector_mask(0, BlockNum(int32_t));
+  pipe_barrier(PIPE_V);                                                  
+  if (op.type == V_CMP_NE) {
+    vDup((__ubuf__ float *)WORKSPACE, (float)1.0, 1, 0);
+    vDup((__ubuf__ float *)(WORKSPACE + 256), (float)0.0, 1, 0);
+  } else {
+    vDup((__ubuf__ float *)WORKSPACE, (float)0.0, 1, 0);
+    vDup((__ubuf__ float *)(WORKSPACE + 256), (float)1.0, 1, 0);
+  }
+  pipe_barrier(PIPE_V);
+  set_vector_mask(0, op.count);
+  set_cmpmask((__ubuf__ void *)(WORKSPACE));
+  vsel(xd, (__ubuf__ float *)(WORKSPACE + 256), ws, 1, 1, 1, 1, 8, 0, 8, 1);
+  pipe_barrier(PIPE_V);
+  vconv_f322s32z((__ubuf__ int32_t *)xd, xd, 1, 1, 1, 8, 8);
+}
+
+template <typename T>
+__aicore_inline__ void BinCompareS(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+#define CMPS_DISPATCH(op_type, builtin)                                  \
+  case op_type:                                                          \
+    do {                                                                 \
+      repeat_##builtin(ws, xn, val, MaxRepeat(op.count, T));            \
+      pipe_barrier(PIPE_V);                                              \
+      set_vector_mask(0, BlockNum(T));                                   \
+      if constexpr (op_type == V_CMP_NE) {                               \
+        vDup((__ubuf__ T *)WORKSPACE, (T)1.0, 1, 0);                     \
+        vDup((__ubuf__ T *)(WORKSPACE + 256), (T)0.0, 1, 0);             \
+      } else {                                                           \
+        vDup((__ubuf__ T *)WORKSPACE, (T)0.0, 1, 0);                     \
+        vDup((__ubuf__ T *)(WORKSPACE + 256), (T)1.0, 1, 0);             \
+      }                                                                  \
+    } while (0);                                                         \
+    break
+  vCompareS op;
+  vCompareS::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T *)(op.xn);
+  __ubuf__ uint8_t *ws = (__ubuf__ uint8_t *)(op.ws);
+  set_vector_mask(0, op.count);
+  T val = vCompareS::GetScalar<T>(pc);
+  switch (op.type) {
+    CMPS_DISPATCH(V_CMP_EQ, vcmpvs_eq);
+    CMPS_DISPATCH(V_CMP_NE, vcmpvs_eq);
+    CMPS_DISPATCH(V_CMP_GT, vcmpvs_gt);
+    CMPS_DISPATCH(V_CMP_GE, vcmpvs_ge);
+    CMPS_DISPATCH(V_CMP_LT, vcmpvs_lt);
+    CMPS_DISPATCH(V_CMP_LE, vcmpvs_le);
+    default: break;
+  }
+  set_vector_mask(0, op.count);
+  pipe_barrier(PIPE_V);
+  set_cmpmask((__ubuf__ void *)(WORKSPACE));
+  vsel(xd, (__ubuf__ T *)(WORKSPACE + 256), ws, 1, 1, 1, 1, 8, 0, 8, 1);
+}
+
+__aicore_inline__ void _IsFiniteProc(__ubuf__ uint16_t *xd, __ubuf__ uint16_t *xn, uint16_t repeat, uint16_t rs) {
+  vshl(xd, xn, 1, repeat, 1, 1, rs, rs);
+  pipe_barrier(PIPE_V);
+  vshr(xd, xd, 11, repeat, 1, 1, rs, rs, false);
+  pipe_barrier(PIPE_V);
+  vsub((__ubuf__ int16_t *)xd, (__ubuf__ int16_t *)WORKSPACE, (__ubuf__ int16_t *)xd, repeat, 1, 1, 1, rs, 0, rs);
+  pipe_barrier(PIPE_V);
+  vmins((__ubuf__ int16_t *)xd, (__ubuf__ int16_t *)xd, (int16_t)1, repeat, 1, 1, rs, rs);
+  pipe_barrier(PIPE_V);
+  vconv_s162f16((__ubuf__ half *)xd, (__ubuf__ int16_t *)xd, repeat, 1, 1, rs, rs);
+}
+
+__aicore_inline__ void _IsFiniteProc(__ubuf__ uint32_t *xd, __ubuf__ uint32_t *xn, uint16_t repeat, uint16_t rs) {
+  vshl(xd, xn, 1, repeat, 1, 1, rs, rs);
+  pipe_barrier(PIPE_V);
+  vshr(xd, xd, 24, repeat, 1, 1, rs, rs, false);
+  pipe_barrier(PIPE_V);
+  vsub((__ubuf__ int32_t *)xd, (__ubuf__ int32_t *)WORKSPACE, (__ubuf__ int32_t *)xd, repeat, 1, 1, 1, rs, 0, rs);
+  pipe_barrier(PIPE_V);
+  vmins((__ubuf__ int32_t *)xd, (__ubuf__ int32_t *)xd, (int32_t)1, repeat, 1, 1, rs, rs);
+  pipe_barrier(PIPE_V);
+  vconv_s322f32((__ubuf__ float *)xd, (__ubuf__ int32_t *)xd, repeat, 1, 1, rs, rs);
+}
+
+template <typename T>
+__aicore_inline__ void IsFinite(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vUnary op;
+  vUnary::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T *)(op.xn);
+  set_vector_mask(0, BlockNum(T));
+  pipe_barrier(PIPE_V);
+  vector_dup((__ubuf__ T *)WORKSPACE, (T)(sizeof(T) == 4 ? 255 : 31), 1, 1, 1, 0, 0);
+  set_vector_mask(0, op.count);
+  _IsFiniteProc(xd, xn, 1, 8);
+}
+
+__aicore_inline__ void _PowerProc(__ubuf__ float *xd, __ubuf__ float *xm, __ubuf__ float *xn, __ubuf__ float *ws0,
+                                  __ubuf__ uint8_t *ws1, uint8_t repeat, uint32_t cmp_repeat, uint64_t rs) {
+  // x^y = e^{yln{abs{x}}}
+  vAbs(xd, xn, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vLn(xd, xd, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vMul(xd, xd, xm, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vExp(xd, xd, repeat, rs);
+
+  // Check 0^0
+  set_cmpmask((__ubuf__ void *)(WORKSPACE));
+  pipe_barrier(PIPE_V);
+  repeat_vcmpvs_ne(ws1, xm, (float)0, cmp_repeat);
+  pipe_barrier(PIPE_V);
+  vsel(xd, xd, ws1, repeat, 1, 1, 1, rs, rs, 0, 1);
+  pipe_barrier(PIPE_V);
+
+  // Check negative^{decimal}
+  vconv_f322s32z((__ubuf__ int32_t *)ws0, xm, repeat, 1, 1, rs, rs);
+  pipe_barrier(PIPE_V);
+  vconv_s322f32(ws0, (__ubuf__ int32_t *)ws0, repeat, 1, 1, rs, rs);
+  pipe_barrier(PIPE_V);
+  repeat_vcmpv_eq((__ubuf__ uint8_t *)ws1, ws0, xm, cmp_repeat);
+  set_cmpmask((__ubuf__ void *)(WORKSPACE + 256));
+
+  // Constructing the odd-even case
+  vMuls(ws0, xm, (float)0.5, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vFloor(ws0, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vsel(ws0, ws0, ws1, repeat, 1, 1, 1, rs, rs, 0, 1);
+  pipe_barrier(PIPE_V);
+  vMuls(ws0, ws0, (float)2.0, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vSub(ws0, xm, ws0, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vMuls(ws0, ws0, (float)2.0, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vAdds(ws0, ws0, (float)1.0, repeat, rs);
+  pipe_barrier(PIPE_V);
+  vMul(ws0, ws0, xd, repeat, rs);
+  pipe_barrier(PIPE_V);
+
+  repeat_vcmpvs_lt(ws1, xn, (float)0, cmp_repeat);
+}
+
+__aicore_inline__ void Power(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vBinaryWS op;
+  vBinaryWS::Decode(pc, head, op);
+  __ubuf__ float*xm = (__ubuf__ float*)(op.xm);
+  __ubuf__ float*xd = (__ubuf__ float*)(op.xd);
+  __ubuf__ float*xn = (__ubuf__ float*)(op.xn);
+  __ubuf__ float*ws0 = (__ubuf__ float*)(op.ws0);
+  __ubuf__ uint8_t*ws1 = (__ubuf__ uint8_t*)(op.ws1);
+  pipe_barrier(PIPE_V);
+  set_vector_mask(0, BlockNum(float));
+  vDup((__ubuf__ float *)(WORKSPACE), (float)1.0, 1, 0);
+  vDup((__ubuf__ float *)(WORKSPACE + 256), 0.0f / 0.0f, 1, 0);
+  set_vector_mask(0, op.count);
+  _PowerProc(xd, xm, xn, ws0, ws1, 1, MaxRepeat(op.count, float), 8);
+  SelectMode2(xd, ws0, xd, 1, 8, op.ws1);
+}
+
+template <typename T>
+__aicore_inline__ void BroadcastS(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vBroadcastS op;
+  vBroadcastS::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  T val = op.scalar;
+  set_vector_mask(0, op.count);
+  vDup(xd, val, 1, 8);
+}
+
+template <typename T>
+__aicore_inline__ void BroadcastX(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vBroadcastX op;
+  vBroadcastX::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T *)(op.xn);
+  uint64_t count = op.count;
+  uint64_t rs = count >> BlockDataShift(T);
+  if (op.lead_num & 7) {
+    set_flag(PIPE_V, PIPE_S, EVENT_ID0);
+    wait_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  }
+  set_vector_mask(0, TYPE_SHIFT(T));
+  for (uint64_t i = 0; i < op.iter_num; ++i) {
+    uint64_t repeat = op.lead_num >> 3;
+    // Use 254 (not 255) to avoid 32B misalignment when xn is uint16_t.
+    for (; repeat > 254; repeat -= 254) {
+      vbrcb(xd, xn, rs, rs << 3, 254);
+      xd += count * (254 << 3);
+      xn += 254 << 3;
+    }
+    vbrcb(xd, xn, rs, rs << 3, repeat);
+    xd += count * (repeat << 3);
+    xn += repeat << 3;
+
+    for (uint64_t j = 0; j < (op.lead_num & 7); ++j) {
+      vector_dup(xd, static_cast<T>(*xn), 1, 1, 1, 0, 0);
+      xd += count;
+      xn += 1;
+    }
+    xn += op.lead_pad;
+  }
+  if (count > TYPE_SHIFT(T)) {
+    set_vector_mask(0, count);
+    xd = (__ubuf__ T *)(op.xd);
+    pipe_barrier(PIPE_V);
+    for (uint64_t i = 0; i < op.iter_num; ++i) {
+      uint64_t repeat = op.lead_num;
+      for (; repeat > 255; repeat -= 255) {
+        vcopy(xd, xd, 255, 1, 0, rs, rs);
+        xd += 255 * count;
+      }
+      vcopy(xd, xd, repeat, 1, 0, rs, rs);
+      xd += repeat * count;
+    }
+  }
+}
+
+__aicore_inline__ void BroadcastY(bcodeptr_t pc, uint64_t head) {
+  vBroadcastY op;
+  vBroadcastY::Decode(pc, head, op);
+  __ubuf__ uint8_t *xd = (__ubuf__ uint8_t*)(op.xd);
+  __ubuf__ uint8_t *xn = (__ubuf__ uint8_t*)(op.xn);
+  for (uint64_t i = 0; i < op.dup_num; ++i) {
+    copy_ubuf_to_ubuf(xd, xn, 0, op.iter_num, op.dup_stride, 0, (op.dup_num - 1) * op.dup_stride);
+    xd += op.dup_stride << 5;
+  }
+}
+
+__aicore_inline__ void ReduceSumX(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vReduceX op;
+  vReduceX::Decode(pc, head, op);
+  if (IsLastTile(tile)) {
+    op.red_size = op.red_tail;
+  }
+  __ubuf__ float *xn = (__ubuf__ float*)(op.xn);
+  __ubuf__ float *xd = (__ubuf__ float*)(op.xd);
+  uint64_t simd_width = op.simd_width;
+  uint64_t red_size = op.red_size / simd_width; // TODO: calc by host
+  uint64_t rs = op.simd_width >> BlockDataShift(float);
+  set_mask_norm();
+  SetVectorMask(simd_width);
+  while (red_size > 1) {
+    uint64_t iter_tail = red_size & 1ul;
+    red_size >>= 1;
+    for (uint64_t i = 0; i < op.dup_size; i++) {
+      repeat_vadd(xd, xn, xn + red_size * simd_width, red_size, 1, 1, 1, rs, rs, rs);
+      if (iter_tail) {
+        pipe_barrier(PIPE_V);
+        repeat_vadd(xd, xd, xn + red_size * 2 * simd_width, 1, 1, 1, 1, rs, rs, rs);
+      }
+      xd += op.red_size;
+      xn += op.red_size;
+    }
+    xn = xd = (__ubuf__ float*)(op.xd);
+    pipe_barrier(PIPE_V);
+  }
+  vReduceX::DecodeBlock(pc, op);
+  uint64_t dst_rs = op.dup_block + op.dup_pad;
+  uint64_t src_rs = op.red_size * op.dup_block;
+  uint64_t iter_num = op.dup_size / op.dup_block;
+  while(iter_num--) {
+    repeat_vcadd(xd, xn, op.dup_block, 1, op.red_size >> 3);
+    xd += dst_rs;
+    xn += src_rs;
+  }
+  set_mask_count();
+}
+
+__aicore_inline__ void ReduceSumY(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vReduceY op;
+  vReduceY::Decode(pc, head, op);
+  __ubuf__ float *xn = (__ubuf__ float*)(op.xn);
+  __ubuf__ float *xd = (__ubuf__ float*)(op.xd);
+  uint64_t red_size = IsLastTile(tile) ? op.red_tail : op.red_size;
+  if (red_size == 1) { // red_tail may 1
+    uint64_t lenburst = op.dup_num * op.iter_size * sizeof(float) / 32;
+    copy_ubuf_to_ubuf(xd, xn, 0, 1, lenburst, 0, 0);
+    return;
+  }
+  uint64_t simd_width = op.simd_width;
+  uint64_t rs = simd_width >> BlockDataShift(float);
+  set_mask_norm();
+  SetVectorMask(simd_width);
+  uint64_t iter_repeat_num = op.iter_size / simd_width;
+  while (red_size > 1) {
+    uint64_t iter_tail = red_size & 1ul;
+    red_size >>= 1;  // op.red_size /= 2
+    uint64_t dup_stride = op.iter_size * red_size;
+    for (uint64_t dup = 0; dup < op.dup_num; ++dup) {
+      repeat_vadd(xd, xn, xn + dup_stride, red_size * iter_repeat_num, 1, 1, 1, rs, rs, rs);
+      if (iter_tail) {
+        pipe_barrier(PIPE_V);
+        repeat_vadd(xd, xd, xn + dup_stride + dup_stride, iter_repeat_num, 1, 1, 1, rs, rs, rs);
+        xn += op.iter_size;
+      }
+      xn += dup_stride * 2;
+      xd += dup_stride;
+      pipe_barrier(PIPE_V);
+    }  // end for dup
+    xn = xd = (__ubuf__ float *)(op.xd);
+  }  // end while iter_num
+  set_mask_count();
+}
+
+#define V_RED_HEAD_REPEAT_OFFSET    0
+#define V_RED_HEAD_REPEAT_MASK     0xffffffu
+#define V_RED_HEAD_THREAD_OFFSET   24
+#define V_RED_HEAD_THREAD_MASK     0x7fu
+#define V_RED_HEAD_INC_FLAG_OFFSET 31
+
+__aicore_inline__ void ReduceJoin(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vReduceJoin op;
+  vReduceJoin ::Decode(pc, head, op);
+  uint32_t red_head = *reinterpret_cast<__bcode__ uint32_t *>(pc + op.seg_tile_rel);
+  uint64_t iter_total = op.iter_num * op.iter_stride;
+  uint64_t lenburst = (iter_total + 7) >> BlockDataShift(float);
+  set_vector_mask(0, iter_total);
+  // RESTRICT: tile in segement is continuously
+  if (IsBeginTile(tile) && !(red_head >> V_RED_HEAD_INC_FLAG_OFFSET)) {
+    copy_ubuf_to_ubuf((__ubuf__ void *)op.xd, (__ubuf__ void *)op.xn, 0, 1, lenburst, 0, 0);
+  } else {
+    vadd((__ubuf__ float *)op.xd, (__ubuf__ float *)op.xd, (__ubuf__ float *)op.xn, 1, 1, 1, 1, 8, 8, 8);
+  }
+  uint32_t loop_repeat = (red_head >> V_RED_HEAD_REPEAT_OFFSET) & V_RED_HEAD_REPEAT_MASK;
+  if (!IsEndTile(tile) || loop_repeat > 0) {
+    return;
+  }
+  uint32_t thread_size = (red_head >> V_RED_HEAD_THREAD_OFFSET) & V_RED_HEAD_THREAD_MASK;
+  if (thread_size == 1) {
+    vStoreCond::EncodeCond(pc + vReduceJoin::STORE_COND_OFFSET, 0, op.iter_num > 1 ? op.iter_num : op.iter_stride);
+    return;
+  }
+  uint64_t blockidx = vBlockIdx();
+  uint64_t ws_stride = lenburst * 32;
+  set_flag(PIPE_V, PIPE_MTE3, EVENT_ID7);
+  wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID7);
+  copy_ubuf_to_gm((__gm__ uint8_t *)op.ws + blockidx * ws_stride, (__ubuf__ float *)op.xd, 0, 1, lenburst, 0, 0);
+  uint64_t iter_offset, iter_range, join_offset, join_count;
+  uint64_t thread_idx = blockidx % thread_size;
+  constexpr uint64_t flag_id = 0;
+  uint64_t sync_flag = vFftsSyncConfig(0, flag_id);
+  if (op.iter_num == 1) {
+    if (thread_idx > 0 || iter_total > 64) {
+      ffts_cross_core_sync(PIPE_MTE3, sync_flag);
+    } else {
+      ffts_cross_core_sync(PIPE_V, sync_flag);
+    }
+    join_count = ((iter_total - 1) / thread_size + 64) & ~0x3ful;
+    join_offset = join_count * thread_idx;
+    if (join_offset + join_count > iter_total) {
+      join_count = iter_total - join_offset;
+    }
+    iter_offset = join_offset;
+    iter_range = join_count;
+  } else {
+    ffts_cross_core_sync(PIPE_MTE3, sync_flag);
+    iter_range = (op.iter_num - 1) / thread_size + 1;
+    iter_offset = iter_range * thread_idx;
+    if (iter_offset + iter_range > op.iter_num) {
+      iter_range = op.iter_num - iter_offset;
+    }
+    join_offset = iter_offset * op.iter_stride;
+    join_count = iter_range * op.iter_stride;
+  }
+  wait_flag_dev(flag_id);
+  if (join_offset >= iter_total) {
+    return;
+  }
+  vStoreCond::EncodeCond(pc + vReduceJoin::STORE_COND_OFFSET, iter_offset, iter_range);
+  set_vector_mask(0, join_count);
+  op.xd += join_offset * sizeof(float);
+  op.ws += join_offset * sizeof(float);
+  uint64_t loop_cnt, bidx;
+  if (thread_idx > 0) {
+    loop_cnt = thread_size - 1;
+    bidx = blockidx - thread_idx;
+  } else {
+    loop_cnt = thread_size - 2;
+    bidx = blockidx + 1;
+  }
+  event_t ping = EVENT_ID6;
+  event_t pong = EVENT_ID7;
+  lenburst = (join_count + 7) >> BlockDataShift(float);
+  copy_gm_to_ubuf((__ubuf__ float *)op.xs, (__gm__ uint8_t *)op.ws + bidx * ws_stride, 0, 1, lenburst, 0, 0);
+  set_flag(PIPE_MTE2, PIPE_V, ping);
+  while (loop_cnt--) {
+    if (++bidx == blockidx) continue;
+    copy_gm_to_ubuf((__ubuf__ float *)op.xn, (__gm__ uint8_t *)op.ws + bidx * ws_stride, 0, 1, lenburst, 0, 0);
+    set_flag(PIPE_MTE2, PIPE_V, pong);
+    wait_flag(PIPE_MTE2, PIPE_V, ping);
+    vadd((__ubuf__ float *)op.xd, (__ubuf__ float *)op.xd, (__ubuf__ float *)op.xs, 1, 1, 1, 1, 8, 8, 8);
+    if (loop_cnt) {
+      set_flag(PIPE_V, PIPE_MTE2, ping);
+      wait_flag(PIPE_V, PIPE_MTE2, ping);
+    }
+    pipe_barrier(PIPE_V);
+    uint64_t xs = op.xs;
+    op.xs = op.xn;
+    op.xn = xs;
+    event_t event = ping;
+    ping = pong;
+    pong = event;
+  }
+  wait_flag(PIPE_MTE2, PIPE_V, ping);
+  vadd((__ubuf__ float *)op.xd, (__ubuf__ float *)op.xd, (__ubuf__ float *)op.xs, 1, 1, 1, 1, 8, 8, 8);
+}
+
+template <typename T>
+__aicore_inline__ void Select(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vSelect op;
+  vSelect::Decode(pc, head, op);
+  __ubuf__ T *xm = (__ubuf__ T*)(op.xm);
+  __ubuf__ T *cond = (__ubuf__ T*)(op.cond);
+  __ubuf__ T *xd = (__ubuf__ T*)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T*)(op.xn);
+  __ubuf__ uint8_t *ws = (__ubuf__ uint8_t*)(op.ws);
+  set_vector_mask(0, op.count);
+  repeat_vcmpvs_ne(ws, cond, (T)0, MaxRepeat(op.count, T));
+  SelectMode2(xd, xn, xm, 1, 8, op.ws);
+}
+
+__aicore_inline__ void Copy(bcodeptr_t pc, uint64_t head) {
+  vCopy op;
+  vCopy::Decode(pc, head, op);
+  if (op.xd != op.xn) {
+    copy_ubuf_to_ubuf((__ubuf__ void *)op.xd, (__ubuf__ void *)op.xn, op.config);
+  }
+}
+
+__aicore_inline__ void ClearPad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vClearPad op;
+  vClearPad::Decode(pc, head, op);
+  if (IsLastTile(tile) && op.iter_tail) {
+    op.iter_size = op.iter_tail;
+    op.iter_stride = op.iter_tail + op.simd_width - (op.iter_tail % op.simd_width);
+  }
+  if (op.iter_size == op.iter_stride) {
+    return;
+  }
+  uint64_t simd_mask = 0xffffffffffffffffllu >> (64 - op.simd_width);
+  uint64_t simd_valid = op.iter_size - (op.iter_stride - op.simd_width);
+  set_mask_norm();
+  set_vector_mask(0, simd_mask & (0xffffffffffffffffllu << simd_valid));
+  __ubuf__ float *fill = (__ubuf__ float *)(op.xd) + op.iter_size - simd_valid;
+  repeat_vector_dup(fill, 0.0f, op.iter_num, 1, 1, op.iter_stride >> BlockDataShift(float),
+                    op.iter_stride >> BlockDataShift(float));
+  set_mask_count();
+}
+
+template <typename T>
+__aicore_inline__ void Reshape(bcodeptr_t pc, uint64_t head) {
+  vReshape op;
+  vReshape::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T*)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T*)(op.xn);
+  uint64_t xn_cnt = op.xn_lead;
+  set_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  wait_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  for (uint64_t dup = 0; dup < op.dup_size; ++dup) {
+    for (uint64_t i = 0; i < op.xd_lead; ++i) {
+      *xd++ = *xn++;
+      if (--xn_cnt == 0) {
+        xn += op.xn_pad;
+        xn_cnt = op.xn_lead;
+      }
+    }
+    xd += op.xd_pad;
+  }
+  set_flag(PIPE_S, PIPE_V, EVENT_ID0);
+  wait_flag(PIPE_S, PIPE_V, EVENT_ID0);
+}
+
+enum RoundCacheMode { kRoundCacheLoad, kRoundCacheStore, kRoundCacheStoreAtomic, kRoundCacheNone };
+template <RoundCacheMode mode>
+__aicore_inline__ uint64_t RoundUpTileIdx(uint64_t tile, uint64_t tile_idx, uint64_t round_rank, bcodeptr_t rounds) {
+  if (round_rank == 1) {
+    uint64_t r1 = rounds[0];
+    uint64_t r_tile_idx = tile_idx / r1;
+    if (mode == kRoundCacheLoad) {
+      return r_tile_idx * r1 == tile_idx || IsBeginTile(tile) || IsSkipTile(tile) ? r_tile_idx : INVALID_INT;
+    } else if (mode == kRoundCacheStore) {
+      return r_tile_idx * r1 == tile_idx ? r_tile_idx : INVALID_INT;
+    } else if (mode == kRoundCacheStoreAtomic) {
+      return r_tile_idx * r1 + r1 - 1 == tile_idx || IsEndTile(tile) ? r_tile_idx : INVALID_INT;
+    } else {
+      return r_tile_idx;
+    }
+  } else if (round_rank == 2) {
+    uint64_t r2_r1 = rounds[0];
+    uint64_t r1 = r2_r1 & MASK_32;
+    uint64_t r2 = r2_r1 >> 32;
+    uint64_t p1 = tile_idx / r1;
+    if (mode == kRoundCacheStore) {
+      uint64_t align = p1 * r1;
+      return tile_idx < align + r2 ? p1 * r2 + tile_idx - align: INVALID_INT;
+    }
+    return p1 * r2 + tile_idx % r2;
+  } else if (round_rank == 3) {
+    uint64_t r2_r1 = rounds[0];
+    uint64_t r1 = r2_r1 & MASK_32;
+    uint64_t r2 = r2_r1 >> 32;
+    uint64_t r3 = rounds[1];
+    uint64_t p0 = tile_idx / r1;
+    uint64_t p1 = p0 * r2;
+    uint64_t p2 = tile_idx % (r2 * r3);
+    uint64_t p3 = p2 / r3;
+    if (mode == kRoundCacheLoad) {
+      return p3 * r3 == p2 || IsBeginTile(tile) || IsSkipTile(tile) ? p1 + p3 : INVALID_INT;
+    } else if (mode == kRoundCacheStore) {
+      return (tile_idx < p0 * r1 + r2 * r3) && (p3 * r3 == p2) ? p1 + p3 : INVALID_INT;
+    } else if (mode == kRoundCacheStoreAtomic) {
+      return p3 * r3 + r3 - 1 == p2 || IsEndTile(tile) ? p1 + p3 : INVALID_INT;
+    } else {
+      return p1 + p3;
+    }
+  } else {
+    uint64_t r2_r1 = rounds[0];
+    uint64_t r1 = r2_r1 & MASK_32;
+    uint64_t r2 = r2_r1 >> 32;
+    uint64_t r4_r3 = rounds[1];
+    uint64_t r3 = r4_r3 & MASK_32;
+    uint64_t r4 = r4_r3 >> 32;
+    uint64_t p0 = tile_idx / r1;
+    uint64_t p1 = tile_idx % (r2 * r3);
+    uint64_t p2 = p1 / r3;
+    if (mode == kRoundCacheStore) {
+      return (tile_idx < p0 * r1 + r2 * r3) && (p1 < p2 * r3 + r4) ? (p0 * r2 + p2) * r4 + p1 - p2 * r3 : INVALID_INT;
+    }
+    return (p0 * r2 + p2) * r4 + tile_idx % r4;
+  }
+}
+
+// skip some tile indices in peerload for reducescatter
+__aicore_inline__ uint64_t RoundUpTileIdxRS(uint64_t tile_idx, uint64_t round_rank, uint64_t rank_id,
+                                            bcodeptr_t rounds) {
+  if (round_rank == 1) {
+    if (tile_idx != rank_id) return -1;
+    return 0;
+  }
+  // round_rank = 1
+  uint64_t r2_r1 = rounds[0];
+  uint64_t r1 = r2_r1 & MASK_32;
+  uint64_t r2 = r2_r1 >> 32;
+  uint64_t p2 = tile_idx / r2;
+  if (p2 != rank_id) return -1;
+  uint64_t p1 = tile_idx / r1;
+  return p1 * r2 + tile_idx % r2;
+}
+
+// skip some tile indices in peerload for allgather
+__aicore_inline__ uint64_t RoundUpTileIdxAG(uint64_t tile_idx, uint64_t round_rank, uint64_t rank_id,
+                                            bcodeptr_t rounds) {
+  uint64_t r2_r1 = rounds[0];
+  uint64_t r2 = r2_r1 >> 32;
+  uint64_t p2 = tile_idx / r2;
+  if (p2 != rank_id) return INVALID_INT;
+  return tile_idx;
+}
+
+__aicore_inline__ void AtomicCum(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vAtomicCum op;
+  vAtomicCum::Decode(pc, head, op);
+  __ubuf__ float *xd = (__ubuf__ float *)(op.xd);
+  __ubuf__ float *xn = (__ubuf__ float *)(op.xn);
+  uint64_t tile_idx = TileIdx(tile);
+  if (op.round_rank) {
+    tile_idx = RoundUpTileIdx<kRoundCacheLoad>(tile, tile_idx, op.round_rank, pc + vAtomicCum::ROUND_OFFSET);
+    if (tile_idx == INVALID_INT) {
+      set_vector_mask(0, op.count);
+      vadd(xd, xd, xn, 1, 1, 1, 1, 8, 8, 8);
+      return;
+    }
+  }
+  copy_ubuf_to_ubuf((__ubuf__ void *)op.xd, (__ubuf__ void *)op.xn, 0, 1, op.count >> BlockDataShift(float), 0, 0);
+}
+
+template <typename T>
+__aicore_inline__ void OneHot(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vOneHot op;
+  vOneHot::Decode(pc, op);
+  __ubuf__ int32_t *indices = (__ubuf__ int32_t *)(op.xn);
+  __ubuf__ T *xd = (__ubuf__ T*)(op.xd);
+  T on_value, off_value;
+  vOneHot::DecodeValue(pc, on_value, off_value);
+  set_vector_mask(0, op.data_size);
+  vDup(xd, off_value, 1, 8);
+  set_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  wait_flag(PIPE_V, PIPE_S, EVENT_ID0);
+  switch (op.mode) {
+    case vOneHot::MODE_X: {
+      for (uint64_t i = 0; i < op.iter_num; ++i) {
+        if (uint64_t indice = indices[i]; indice < op.depth) {
+          xd[i * op.depth + indice] = on_value;
+        }
+      }
+      break;
+    }
+    case vOneHot::MODE_X_TILE: {
+      uint64_t begin = (TileIdx(tile) % op.dup_round) * op.depth;
+      if (uint64_t indice = indices[0]; indice >= begin && indice < begin + op.depth) {
+        xd[indice - begin] = on_value;
+      }
+      break;
+    }
+    case vOneHot::MODE_Y: {
+      for (uint64_t dup = 0; dup < op.dup_round; ++dup) {
+        for (uint64_t i = 0; i < op.iter_num; ++i) {
+          if (uint64_t indice = indices[op.iter_num * dup + i]; indice < op.depth) {
+            xd[(op.depth * dup + indice) * op.iter_num + i] = on_value;
+          }
+        }
+      }
+      break;
+    }
+    case vOneHot::MODE_Y_TILE: {
+      uint64_t begin = (TileIdx(tile) % op.dup_round) * op.depth;
+      uint64_t end = begin + op.depth;
+      for (uint64_t i = 0; i < op.iter_num; ++i) {
+        if (uint64_t indice = indices[i]; indice >= begin && indice < end) {
+          xd[(indice - begin) * op.iter_num + i] = on_value;
+        }
+      }
+      break;
+    }
+    case vOneHot::MODE_Y_TILE_2: {
+      uint64_t begin = (TileIdx(tile) % op.dup_round) / op.depth;
+      uint64_t end = begin + 1ul;
+      for (uint64_t i = 0; i < op.iter_num; ++i) {
+        if (uint64_t indice = indices[i]; indice >= begin && indice < end) {
+          xd[i] = on_value;
+        }
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  set_flag(PIPE_S, PIPE_V, EVENT_ID0);
+  wait_flag(PIPE_S, PIPE_V, EVENT_ID0);
+}
+
+__aicore_inline__ void SliceLoad2D(__ubuf__ uint8_t *dst, __gm__ uint8_t *src, uint64_t begin_m, uint64_t end_m,
+                                        uint64_t begin_n, uint64_t end_n, uint64_t slice_n, uint64_t src_n,
+                                        uint64_t pad_size, uint64_t type_size) {
+  if (begin_m == end_m && begin_n <= end_n) {
+    copy_gm_to_ubuf_align_b8(dst, src, 0, 1, (end_n - begin_n + 1) * type_size, 0, 0, 0, 0);
+  } else if (begin_m < end_m) {
+    uint64_t num = end_m - begin_m + 1;
+    copy_gm_to_ubuf_align_b8(dst, src, 0, num, slice_n * type_size, 0, 0, (src_n - slice_n) * type_size,
+                             (pad_size * type_size) >> 5);
+  }
+}
+
+__aicore_inline__ void SliceStore2D(__gm__ uint8_t *dst, __ubuf__ uint8_t *src, uint64_t begin_m, uint64_t end_m,
+                                         uint64_t begin_n, uint64_t end_n, uint64_t slice_n, uint64_t src_n,
+                                         uint64_t pad_size, uint64_t type_size, uint64_t one_flag = 0) {
+  if (one_flag) {
+    set_flag(PIPE_V, PIPE_S, EVENT_ID0);
+    wait_flag(PIPE_V, PIPE_S, EVENT_ID0);
+    uint64_t num = end_m - begin_m + 1;
+    while (num--) {
+      for (size_t j = 0; j < type_size; j++) {
+        *(__ubuf__ uint8_t *)(WORKSPACE + j) = *((__ubuf__ uint8_t *)(src++));
+      }
+      copy_ubuf_to_gm_align_b8(dst, (__ubuf__ uint8_t *)WORKSPACE, 0, 1, type_size, 0, 0, 0, 0);
+      set_flag(PIPE_MTE3, PIPE_S, EVENT_ID0);
+      wait_flag(PIPE_MTE3, PIPE_S, EVENT_ID0);
+      dst += src_n * type_size;
+    }
+    return;
+  }
+  if (begin_m == end_m && begin_n <= end_n) {
+    copy_ubuf_to_gm_align_b8(dst, src, 0, 1, (end_n - begin_n + 1) * type_size, 0, 0, 0, 0);
+  } else if (begin_m < end_m) {
+    uint64_t num = end_m - begin_m + 1;
+    copy_ubuf_to_gm_align_b8(dst, src, 0, num, slice_n * type_size, 0, 0, (pad_size * type_size) >> 5,
+                             (src_n - slice_n) * type_size);
+  }
+}
+
+__aicore_inline__ void SLoad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vSLoad op;
+  vShard2D shard;
+  vSLoad::Decode(pc, head, op);
+  vShard2D::Decode(pc + op.shard_rel, shard);
+  uint64_t tile_idx = TileIdx(tile);
+  uint64_t begin_tmp = op.tile_stride * tile_idx;
+  uint64_t end_tmp = begin_tmp + op.tile_stride - 1;
+  __ubuf__ uint8_t *dst = (__ubuf__ uint8_t *)(op.xn);
+  __gm__ uint8_t *src = (__gm__ uint8_t *)op.gm;
+  uint64_t shard_offset = shard.offset;
+  uint64_t cidx = vGetBitRange(shard.pos, V_MM_POS_C_OFFSET, V_MM_POS_C_BITS);
+  if (op.round_rank) {
+    uint64_t base_cidx = cidx;
+    cidx = RoundUpTileIdx<kRoundCacheNone>(tile, base_cidx, op.round_rank, pc + vSLoad::ROUND_OFFSET);
+    shard_offset -= (base_cidx - cidx) * shard.stride_m;
+  }
+  if (op.broadcast_m) {
+    if (op.broadcast_n) {
+      src += cidx * op.type_size;
+      copy_gm_to_ubuf_align_b8(dst, src, 0, 1, op.type_size, 0, 0, 0, 0);
+    } else {
+      src += (cidx * shard.stride_n + shard_offset % shard.stride_n) * op.type_size;
+      copy_gm_to_ubuf_align_b8(dst, src, 0, 1, op.tile_stride * op.type_size, 0, 0, 0, 0); // TODO: tail overflow
+    }
+  } else if (op.broadcast_n) {
+    src += (shard_offset / shard.stride_n + begin_tmp) * op.type_size;
+    copy_gm_to_ubuf_align_b8(dst, src, 0, 1, op.tile_stride * op.type_size, 0, 0, 0, 0); // TODO: tail overflow
+  } else {
+    uint64_t slice_m = shard.slice_m;
+    uint64_t slice_n = shard.slice_n;
+    uint64_t begin_m = begin_tmp / slice_n;
+    uint64_t end_m = IsLastTile(tile) ? slice_m - 1 : end_tmp / slice_n;
+    uint64_t begin_n = begin_tmp % slice_n;
+    uint64_t end_n = IsLastTile(tile) ? slice_n - 1 : end_tmp % slice_n;
+    uint64_t pad_size = op.pad_size;
+    if (shard.last_m) {
+      end_m = min(end_m, shard.tail_m - 1);
+    }
+    if (shard.last_n) {
+      uint64_t tail_n = shard.tail_n;
+      end_n = min(end_n, tail_n - 1);
+      pad_size += slice_n - tail_n;
+      slice_n = tail_n;
+    }
+    uint64_t offset_slice = begin_m * shard.stride_n + begin_n + shard_offset;
+    src += offset_slice * op.type_size;
+    SliceLoad2D(dst, src, begin_m, end_m, begin_n, end_n, slice_n, shard.stride_n, pad_size, op.type_size);
+  }
+}
+
+__aicore_inline__ void SStore(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vSStore op;
+  vShard2D shard;
+  vSStore::Decode(pc, head, op);
+  vShard2D::Decode(pc + op.shard_rel, shard);
+  uint64_t tile_idx = TileIdx(tile);
+  uint64_t begin_tmp = op.tile_stride * tile_idx;
+  __ubuf__ uint8_t *src = (__ubuf__ uint8_t *)op.xn;
+  __gm__ uint8_t *dst = (__gm__ uint8_t *)op.gm;
+  uint64_t cidx = vGetBitRange(shard.pos, V_MM_POS_C_OFFSET, V_MM_POS_C_BITS);
+  uint64_t shard_offset = shard.offset;
+  if (op.round_rank) {
+    uint64_t base_cidx = cidx;
+    cidx = RoundUpTileIdx<kRoundCacheNone>(tile, base_cidx, op.round_rank, pc + vSStore::ROUND_OFFSET);
+    shard_offset -= (base_cidx - cidx) * shard.stride_m;
+  }
+  if (op.broadcast_m || op.broadcast_n) {
+    uint64_t midx = vGetBitRange(shard.pos, V_MM_POS_M_OFFSET, V_MM_POS_M_BITS);
+    uint64_t nidx = vGetBitRange(shard.pos, V_MM_POS_N_OFFSET, V_MM_POS_N_BITS);
+    if (!op.broadcast_m) {
+      if (uint64_t end_m = shard.last_m ? shard.tail_m : shard.slice_m; begin_tmp < end_m && nidx == 0) {
+        dst += (shard_offset / shard.stride_n + begin_tmp) * op.type_size;
+        copy_ubuf_to_gm_align_b8(dst, src, 0, 1, min(end_m - begin_tmp, op.tile_stride) * op.type_size, 0, 0, 0, 0);
+      }
+    } else if (!op.broadcast_n) {
+      if (uint64_t end_n = shard.last_n ? shard.tail_n : shard.slice_n; begin_tmp < end_n && midx == 0) {
+        dst += (cidx * shard.stride_n + shard_offset % shard.stride_n) * op.type_size;
+        copy_ubuf_to_gm_align_b8(dst, src, 0, 1, min(end_n - begin_tmp, op.tile_stride) * op.type_size, 0, 0, 0, 0);
+      }
+    } else if (midx == 0 && nidx == 0 && tile_idx == 0) {
+      dst += cidx * op.type_size;
+      copy_ubuf_to_gm_align_b8(dst, src, 0, 1, op.type_size, 0, 0, 0, 0);
+    }
+    return;
+  }
+  uint64_t end_tmp = begin_tmp + op.tile_stride - 1;
+  uint64_t slice_m = shard.slice_m;
+  uint64_t slice_n = shard.slice_n;
+  uint64_t begin_m = begin_tmp  / slice_n;
+  uint64_t end_m = IsLastTile(tile) ? slice_m - 1 : end_tmp  / slice_n;
+  uint64_t begin_n = begin_tmp % slice_n;
+  uint64_t end_n = IsLastTile(tile) ? slice_n - 1 : end_tmp % slice_n;
+  if (shard.last_m) {
+    end_m = min(end_m, shard.tail_m - 1);
+  }
+  uint64_t pad_size = op.pad_size;
+  if (shard.last_n) {
+    uint64_t tail_n = shard.tail_n;
+    end_n = min(end_n, tail_n - 1);
+    pad_size += slice_n - tail_n;
+    slice_n = tail_n;
+  }
+  uint64_t offset_slice = begin_m * shard.stride_n + begin_n + shard_offset;
+  dst += offset_slice * op.type_size;
+  SliceStore2D(dst, src, begin_m, end_m, begin_n, end_n, slice_n, shard.stride_n, pad_size, op.type_size);
+}
+
+__aicore_inline__ void SliceStore(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vSliceSL op;
+  vSliceSL::Decode(pc, head, op);
+  uint64_t tile_idx = TileIdx(tile);
+
+  uint64_t begin_tmp = op.tile_stride * tile_idx;
+  uint64_t end_tmp = begin_tmp + op.tile_stride - 1;
+
+  uint64_t begin_m = begin_tmp / op.slice_n;
+  uint64_t end_m = IsLastTile(tile) ? op.src_m - 1 : end_tmp / op.slice_n;
+  uint64_t begin_n = begin_tmp - begin_m * op.slice_n;
+  uint64_t end_n = IsLastTile(tile) ? op.slice_n - 1 : end_tmp - end_m * op.slice_n;
+  uint64_t offset_slice = begin_m * op.src_n + begin_n;
+
+  __gm__ uint8_t *dst = (__gm__ uint8_t *)op.gm + offset_slice * op.type_size;
+  __ubuf__ uint8_t *src = (__ubuf__ uint8_t *)(op.xn);
+  SliceStore2D(dst, src, begin_m, end_m, begin_n, end_n, op.slice_n, op.src_n, op.pad_size, op.type_size, op.one_flag);
+}
+
+__aicore_inline__ void SliceLoad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vSliceSL op;
+  vSliceSL::Decode(pc, head, op);
+  uint64_t tile_idx = TileIdx(tile);
+  if (op.round_rank > 0) {
+    tile_idx = RoundUpTileIdx<kRoundCacheLoad>(tile, tile_idx, op.round_rank, pc + vSliceSL::ROUND_OFFSET);
+    if (tile_idx == INVALID_INT) {
+      return;
+    }
+  }
+  uint64_t slice_mn = op.slice_n * op.slice_m;
+  uint64_t src_mn = op.src_n * op.src_m;
+
+  uint64_t begin_tmp = op.tile_stride * tile_idx;
+  uint64_t end_tmp = begin_tmp + op.tile_stride - 1;
+
+  uint64_t begin_k = begin_tmp / slice_mn;
+  uint64_t end_k = IsLastTile(tile) ? op.slice_k - 1 : end_tmp / slice_mn;
+  uint64_t begin_m = begin_tmp % slice_mn / op.slice_n;
+  uint64_t end_m = IsLastTile(tile) ? op.slice_m - 1 : end_tmp % slice_mn / op.slice_n;
+  uint64_t begin_n = begin_tmp % op.slice_n;
+  uint64_t end_n = IsLastTile(tile) ? op.slice_n - 1 : end_tmp % op.slice_n;
+  uint64_t offset_slice = begin_k * src_mn + begin_m * op.src_n + begin_n;
+
+  __gm__ uint8_t *src = (__gm__ uint8_t *)op.gm + op.offset + offset_slice * op.type_size;
+  __ubuf__ uint8_t *dst = (__ubuf__ uint8_t *)(op.xn);
+  if (begin_k == end_k) {
+    SliceLoad2D(dst, src, begin_m, end_m, begin_n, end_n, op.slice_n, op.src_n, op.pad_size, op.type_size);
+  } else {
+    SliceLoad2D(dst, src, begin_m, op.slice_m - 1, begin_n, op.slice_n - 1, op.slice_n, op.src_n, op.pad_size, op.type_size);
+    uint64_t pad_size_2d = (op.slice_n + op.pad_size) * op.slice_m;
+    src += (src_mn - begin_n - begin_m * op.src_n) * op.type_size;
+    if (op.pad_size) {
+      dst += (pad_size_2d - (op.slice_n + op.pad_size) * begin_m) * op.type_size;
+    } else {
+      dst += (pad_size_2d - op.slice_n * begin_m - begin_n) * op.type_size;
+    }
+    for (uint64_t i = 0; i < end_k - begin_k - 1; ++i) {
+      SliceLoad2D(dst, src, 0, op.slice_m - 1, 0, op.slice_n - 1, op.slice_n, op.src_n, op.pad_size, op.type_size);
+      src += src_mn * op.type_size;
+      dst += pad_size_2d * op.type_size;
+    }
+    SliceLoad2D(dst, src, 0, end_m, 0, end_n, op.slice_n, op.src_n, op.pad_size, op.type_size);
+  }
+}
+
+template <typename T>
+__aicore_inline__ void RemovePad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vRemovePad op;
+  vRemovePad::Decode(pc, head, op);
+  __ubuf__ T *xd = (__ubuf__ T *)(op.xd);
+  __ubuf__ T *xn = (__ubuf__ T *)(op.xn);
+  set_vector_mask(0, op.iter_num);
+  vReducev2(xd, xn, xn, op.repeat, 1, 7, op.rs, 0);
+}
+
+__aicore_inline__ void Load(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vLoad op;
+  vLoad::Decode(pc, head, op);
+  uint64_t tile_idx = TileIdx(tile);
+  if (op.round_rank > 0) {
+    tile_idx = RoundUpTileIdx<kRoundCacheLoad>(tile, tile_idx, op.round_rank, pc + vLoad::ROUND_OFFSET);
+    if (tile_idx == INVALID_INT) {
+      return;
+    }
+  }
+  __gm__ uint8_t* src = (__gm__ uint8_t*)op.from + op.tile_stride * tile_idx;
+  if (IsLastTile(tile)) {
+    if (op.body_iter == 1) {
+      op.iter_size = op.tail_iter;
+    } else {
+      op.body_iter = op.tail_iter;
+    }
+  }
+  __ubuf__ uint8_t* dst = (__ubuf__ uint8_t*)(op.xn);
+  copy_gm_to_ubuf_align_b8(dst, src, 0, op.body_iter, op.iter_size, 0, 0, 0, op.pad_size >> 5);
+  OVER_WRITE_CHECK(pc, head, op.tile_stride * tile_idx + op.body_iter * op.iter_size);
+}
+
+__aicore_inline__ void MultiLoad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vMultiLoad op;
+  vMultiLoad::Decode(pc, head, op);
+  uint64_t tile_idx = TileIdx(tile);
+
+  __gm__ uint8_t *src = (__gm__ uint8_t *)op.from + op.tile_stride * tile_idx;
+  __ubuf__ uint8_t *dst = (__ubuf__ uint8_t *)(op.xn);
+  uint64_t truck_num = IsLastTile(tile) ? op.tail_iter : op.body_iter;
+
+  uint64_t offset_idx = vBlockIdx() * 2 + (op.pingpong & 0x1ul);
+  __gm__ uint64_t *flag_mem = (__gm__ uint64_t *)((__gm__ uint8_t *)op.flag_mem + offset_idx * CACHE_LINE_SIZE);
+  __gm__ uint8_t *gm = (__gm__ uint8_t *)op.peer_mem + op.tile_stride2 * offset_idx * (op.multi_size - 1);
+  uint64_t len_burst = (op.tile_stride + 31) >> 5;
+  vMultiLoad::PingPongSwitch(pc);
+
+  for (uint64_t i = 1; i < op.multi_size; ++i) {
+    if (i > 2) {
+      wait_flag(PIPE_MTE3, PIPE_MTE2, i % 2 == 1 ? EVENT_ID0 : EVENT_ID1);
+    }
+    auto rank_id = (op.rank_id + i) % op.multi_size;
+    auto xbuf_addr =
+      dst + ((i + op.multi_size) % 2) * op.xbuf_size;  // make sure xbuf_ can be used to store this rank's data
+    copy_gm_to_ubuf_align_b8(xbuf_addr, src + op.gap * rank_id, 0, truck_num, op.iter_size, 0, 0, 0, op.pad_size >> 5);
+    set_flag(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    wait_flag(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    copy_ubuf_to_gm(gm, xbuf_addr, 0, 1, len_burst, 0, 0);
+    // TODO: MTE3 backsync MTE2(maybe peerload is too long)
+    if (op.multi_size > 2 && i < op.multi_size - 1) {
+      set_flag(PIPE_MTE3, PIPE_MTE2, i % 2 == 1 ? EVENT_ID0 : EVENT_ID1);
+    }
+    gm += op.tile_stride2;
+  }
+  if (op.multi_size > 2) {
+    wait_flag(PIPE_MTE3, PIPE_MTE2, op.multi_size % 2 == 1 ? EVENT_ID0 : EVENT_ID1);
+  }
+  copy_gm_to_ubuf_align_b8(dst, src + op.gap * op.rank_id, 0, truck_num, op.iter_size, 0, 0, 0, op.pad_size >> 5);
+  // soft sync
+  set_flag(PIPE_MTE3, PIPE_S, EVENT_ID0);
+  wait_flag(PIPE_MTE3, PIPE_S, EVENT_ID0);
+  uint64_t sync_flag = (op.unique_id << 32) | (tile_idx + 1);
+  *flag_mem = sync_flag;
+  dcci(flag_mem, 0);
+}
+
+__aicore_inline__ void PingPongLoad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vPingPongLoad op;
+  vPingPongLoad::Decode(pc, head, op);
+  if (IsEndTile(tile)) {
+    vPingPongLoad::PingPongSwitch(pc);
+  }
+  uint64_t tile_idx = TileIdx(tile);
+  if (op.round_rank > 0) {
+    tile_idx = RoundUpTileIdx<kRoundCacheLoad>(tile, tile_idx, op.round_rank, pc + vPingPongLoad::ROUND_OFFSET);
+    if (tile_idx == INVALID_INT) {
+      return;
+    }
+  }
+  uint64_t pingpong_offset = op.pingpong ? block_num + block_idx : block_idx;
+  __gm__ uint8_t* src = (__gm__ uint8_t*)op.from + pingpong_offset * op.pingpong_stride + op.tile_stride * tile_idx;
+  __ubuf__ uint8_t* dst = (__ubuf__ uint8_t*)(op.xn);
+  uint64_t truck_num = IsLastTile(tile) ? op.tail_iter : op.body_iter;
+  copy_gm_to_ubuf_align_b8(dst, src, 0, truck_num, op.iter_size, 0, 0, 0, op.pad_size >> 5);
+}
+
+__aicore_inline__ void Store(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vStore op;
+  vStore::Decode(pc, head, op);
+  uint64_t tile_idx = TileIdx(tile);
+  if (op.round_rank > 0) {
+    tile_idx = RoundUpTileIdx<kRoundCacheStore>(tile, tile_idx, op.round_rank, pc + vStore::ROUND_OFFSET);
+    if (tile_idx == INVALID_INT) {
+      return;
+    }
+  }
+  uint64_t iter_num = op.iter_num;
+  uint64_t iter_size = op.iter_size;
+  __gm__ uint8_t *dst = (__gm__ uint8_t*)op.to + op.tile_stride * tile_idx;
+  if (IsLastTile(tile)) {
+    if (iter_num == 1) {
+      iter_size = op.iter_tail;
+    } else {
+      iter_num = op.iter_tail;
+    }
+  }
+  copy_ubuf_to_gm_align_b8(dst, (__ubuf__ uint8_t *)(op.xn), 0, iter_num, iter_size, 0, 0, op.pad_size >> 5, 0);
+  OVER_WRITE_CHECK(pc, head, op.tile_stride * tile_idx + iter_num * iter_size);
+}
+
+__aicore_inline__ void CondStore(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vStoreCond op;
+  if (vStoreCond::Decode<true>(pc, head, op)) {
+    uint64_t tile_idx = TileIdx(tile);
+    if (op.round_rank > 0) {
+      tile_idx = RoundUpTileIdx<kRoundCacheNone>(tile, tile_idx, op.round_rank, pc + vStoreCond::ROUND_OFFSET);
+    }
+    __gm__ uint8_t *dst = (__gm__ uint8_t*)op.to + op.tile_stride * tile_idx;
+    if (op.pad_size == 0) {
+      op.iter_offset = op.iter_offset << op.dtype_shift;
+      op.iter_range = op.iter_range << op.dtype_shift;
+      copy_ubuf_to_gm_align_b8(dst + op.iter_offset, (__ubuf__ uint8_t*)(op.xn + op.iter_offset), 0, 1, op.iter_range, 0, 0, 0, 0);
+      OVER_WRITE_CHECK(pc, head, op.tile_stride * tile_idx + op.iter_offset + op.iter_range);
+    } else {
+      uint64_t src_offset = op.iter_offset * (op.iter_size + op.pad_size);
+      uint64_t dst_offset = op.iter_offset * op.iter_size;
+      copy_ubuf_to_gm_align_b8(dst + dst_offset, (__ubuf__ uint8_t*)(op.xn + src_offset), 0, op.iter_range, op.iter_size, 0, 0, op.pad_size >> 5, 0);
+      OVER_WRITE_CHECK(pc, head, op.tile_stride * tile_idx + dst_offset + op.iter_range * op.iter_size);
+    }
+  }
+}
+
+__aicore_inline__ void StoreAtomic(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vStoreAtomic op;
+  vStoreAtomic::Decode(pc, head, op);
+  uint64_t tile_idx = TileIdx(tile);
+  if (op.cum_flag) {
+    tile_idx = RoundUpTileIdx<kRoundCacheStoreAtomic>(tile, tile_idx, op.round_rank, pc + vStoreAtomic::ROUND_OFFSET);
+    if (tile_idx == INVALID_INT) {
+      return;
+    }
+  } else {
+    tile_idx = RoundUpTileIdx<kRoundCacheNone>(tile, tile_idx, op.round_rank, pc + vStoreAtomic::ROUND_OFFSET);
+  }
+  if (IsLastTile(tile)) {
+    op.iter_num = op.iter_tail;
+  }
+  __gm__ uint8_t* gm = (__gm__ uint8_t*)op.to + op.tile_stride * tile_idx;
+  set_atomic_add();
+  set_atomic_f32();
+  if (op.pad_size == 0) {
+    copy_ubuf_to_gm_align_b32(gm, (__ubuf__ void *)(op.xn), 0, 1, op.iter_num * op.iter_size, 0, 0, 0, 0);
+  } else {
+    copy_ubuf_to_gm_align_b32(gm, (__ubuf__ void *)(op.xn), 0, op.iter_num, op.iter_size, 0, 0, op.pad_size >> 5, 0);
+  }
+  set_atomic_none();
+  OVER_WRITE_CHECK(pc, head, op.tile_stride * tile_idx + op.iter_num * op.iter_size);
+}
+
+/******************************************************
+ * Collective Communication Operations
+*******************************************************/
+__aicore_inline__ void WaitBuffFlag(uint64_t flag, __gm__ uint64_t *buff){
+  while (1) {
+    if (*buff == flag) {
+      break;
+    }
+    dcci(buff, 0);
+    // TODO: do we need this?
+    for (int64_t i = 0; i < 10; ++i) {
+      __asm__ __volatile__("nop");
+    }
+  }
+}
+
+__aicore_inline__ void StoreAG(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vStoreAG op;
+
+  vStoreAG::Decode(pc, head, op);
+
+  uint64_t tile_idx = TileIdx(tile);
+  uint64_t rank_size = op.rank_size;
+  if (IsLastTile(tile)) {
+    if (op.iter_num == 1) {
+      for (size_t i = 0; i < rank_size; i++) {
+        __ubuf__ void* ub = (__ubuf__ void*)(op.xn + i * op.xbuf_size);
+        __gm__ void* gm = (__gm__ uint8_t*)op.to + i * op.shard_stride + op.tile_stride * tile_idx;
+        copy_ubuf_to_gm_align_b8(gm, ub, 0, 1, op.iter_tail, 0, 0, 0, 0);
+      }
+      OVER_WRITE_CHECK(pc, head, (rank_size - 1) * op.shard_stride + op.tile_stride * tile_idx + op.iter_tail);
+      return;
+    }
+    op.iter_num = op.iter_tail;
+  }
+
+  for (size_t i = 0; i < rank_size; i++) {
+    __ubuf__ void* ub = (__ubuf__ void*)(op.xn + i * op.xbuf_size);
+    __gm__ void* gm = (__gm__ uint8_t*)op.to + i * op.shard_stride + op.tile_stride * tile_idx;
+    copy_ubuf_to_gm_align_b8(gm, ub, 0, op.iter_num, op.iter_size, 0, 0, op.pad_size >> 5, 0);
+  }
+  OVER_WRITE_CHECK(pc, head, (rank_size - 1) * op.shard_stride + op.tile_stride * tile_idx + op.iter_num * op.iter_size);
+}
+
+__aicore_inline__ void StoreRS(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vStoreRS op;
+  vStoreRS::Decode(pc, head, op);
+  uint64_t tile_idx = TileIdx(tile);
+  tile_idx = RoundUpTileIdxRS(tile_idx, op.round_rank, op.rank_id, pc + vStoreRS::ROUND_OFFSET);
+  if (tile_idx == INVALID_INT) return;
+  if (IsLastTile(tile)) {
+    // TODO: last tile may be from round
+    op.iter_num = op.iter_tail;
+  }
+  __gm__ uint8_t *gm = (__gm__ uint8_t *)op.to + op.tile_stride * tile_idx;
+  if (op.pad_size == 0) {
+    copy_ubuf_to_gm_align_b32(gm, (__ubuf__ void *)(op.xn), 0, 1, op.iter_num * op.iter_size, 0, 0, 0, 0);
+  } else {
+    copy_ubuf_to_gm_align_b32(gm, (__ubuf__ void *)(op.xn), 0, op.iter_num, op.iter_size, 0, 0, op.pad_size >> 5, 0);
+  }
+  OVER_WRITE_CHECK(pc, head, op.tile_stride * tile_idx + op.iter_num * op.iter_size);
+}
+
+template <bool MIX>
+__aicore_inline__ void PeerLoad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  pipe_barrier(PIPE_ALL);
+  vPeerDMA op;
+  vPeerDMA::Decode(pc, head, op);
+  if (op.lenburst == 0) {
+    return;
+  }
+  uint32_t tile_idx;
+  if constexpr (MIX) {
+    // pingpong2(2) << 16 | tile_idx(16)
+    tile_idx = ((op.pingpong) << 16) | (TileIdx(tile) & 0xfffful);
+  } else {
+    tile_idx = TileIdx(tile);
+  }
+  if (op.wait_flag) {
+    wait_flag(PIPE_V, PIPE_MTE2, op.event_id);
+  }
+  if (op.set_flag) {
+    set_flag(PIPE_V, PIPE_MTE2, op.event_id);
+  }
+  uint64_t offset_idx = vBlockIdx() * 2 + (op.pingpong & 0x1ul);
+  vPeerDMA::PingPongSwitch(pc);
+  // soft sync
+  __gm__ uint64_t *flag_mem = (__gm__ uint64_t *)((__gm__ uint8_t *)op.flag_mem + offset_idx * CACHE_LINE_SIZE);
+  uint64_t sync_flag = (op.unique_id << 32) | (tile_idx + 1);
+  WaitBuffFlag(sync_flag, flag_mem);
+  set_flag(PIPE_S, PIPE_MTE2, EVENT_ID0);
+  wait_flag(PIPE_S, PIPE_MTE2, EVENT_ID0);
+  if (op.round_rank) {
+    if (op.comm_type == CommType::kCommReduceScatter && RoundUpTileIdxRS(tile_idx, op.round_rank, op.rank_id, pc + vPeerDMA::ROUND_OFFSET) == INVALID_INT) {
+      return;
+    }
+    if (op.comm_type == CommType::kCommAllGather && RoundUpTileIdxAG(tile_idx, op.round_rank, op.rank_id, pc + vPeerDMA::ROUND_OFFSET) == INVALID_INT) {
+      return;
+    }
+  }
+  uint64_t len_burst = IsLastTile(tile) ? op.tail_lenburst : op.lenburst;
+  __gm__ void *gm = (__gm__ uint8_t *)op.peer_mem + op.tile_stride * offset_idx;
+  copy_gm_to_ubuf((__ubuf__ void *)op.xn, gm, 0, 1, len_burst, 0, 0);
+}
+
+template <bool MIX>
+__aicore_inline__ void PeerStore(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vPeerDMA op;
+  vPeerDMA::Decode(pc, head, op);
+  if (op.lenburst == 0) {
+    return;
+  }
+  uint32_t tile_idx;
+  if constexpr (MIX) {
+    // pingpong2(2) << 16 | tile_idx(16)
+    tile_idx = ((op.pingpong) << 16) | (TileIdx(tile) & 0xfffful);
+  } else {
+    tile_idx = TileIdx(tile);
+  }
+  uint64_t offset_idx = vBlockIdx() * 2  + (op.pingpong & 0x1ul);
+  vPeerDMA::PingPongSwitch(pc);
+  __gm__ uint64_t *flag_mem = (__gm__ uint64_t *)((__gm__ uint8_t *)op.flag_mem + offset_idx * CACHE_LINE_SIZE);
+  __gm__ void *gm = (__gm__ uint8_t *)op.peer_mem + op.tile_stride * offset_idx;
+  uint64_t len_burst = IsLastTile(tile) ? op.tail_lenburst : op.lenburst;
+  copy_ubuf_to_gm(gm, (__ubuf__ void *)op.xn, 0, 1, len_burst, 0, 0);
+  set_flag(PIPE_MTE3, PIPE_S, EVENT_ID0);
+  wait_flag(PIPE_MTE3, PIPE_S, EVENT_ID0);
+  uint64_t sync_flag = (op.unique_id << 32) | (tile_idx + 1);
+  *flag_mem = sync_flag;
+  dcci(flag_mem, 0);
+}
+
+__aicore_inline__ void PingPongPeerLoad(bcodeptr_t pc, uint64_t head, uint64_t tile) {
+  vPingPongPeerLoad speer_load;
+  vPingPongPeerLoad::Decode(pc, head, speer_load);
+  vPingPongLoad &op = speer_load.base;
+  if (IsEndTile(tile)) {
+    vPingPongPeerLoad::PingPongSwitch(pc);
+  }
+  if(speer_load.wait_flag){
+    wait_flag(PIPE_V, PIPE_MTE2, speer_load.event_id);
+  }
+  if(speer_load.set_flag){
+    set_flag(PIPE_V, PIPE_MTE2, speer_load.event_id);
+  }
+
+  uint64_t tile_idx = TileIdx(tile);
+  if (op.round_rank > 0) {
+    tile_idx = RoundUpTileIdx<kRoundCacheLoad>(tile, tile_idx, op.round_rank, pc + vPingPongPeerLoad::ROUND_OFFSET);
+    if (tile_idx == INVALID_INT) {
+      return;
+    }
+  }
+  uint64_t pingpong_offset = op.pingpong ? block_num + block_idx : block_idx;
+  __gm__ uint64_t *flag_mem =
+    (__gm__ uint64_t *)((__gm__ uint8_t *)op.from + PEERMEM_FLAG_OFFSET + pingpong_offset * CACHE_LINE_SIZE);
+
+  uint32_t group_offset = vShard2D::DecodeOffset(pc + speer_load.shard_rel);
+  uint64_t sync_flag = (speer_load.unique_id << 32) | (group_offset + 1);
+  WaitBuffFlag(sync_flag, flag_mem);
+  set_flag(PIPE_S, PIPE_MTE2, EVENT_ID0);
+  wait_flag(PIPE_S, PIPE_MTE2, EVENT_ID0);
+  __gm__ uint8_t *src = (__gm__ uint8_t *)op.from + speer_load.peer_mem_offset + pingpong_offset * op.pingpong_stride + op.tile_stride * tile_idx;
+  __ubuf__ uint8_t *dst = (__ubuf__ uint8_t *)(op.xn);
+  uint64_t truck_num = IsLastTile(tile) ? op.tail_iter : op.body_iter;
+  copy_gm_to_ubuf_align_b8(dst, src, 0, truck_num, op.iter_size, 0, 0, 0, op.pad_size >> 5);
+
+  if (IsEndTile(tile)) {
+    set_flag(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    wait_flag(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    __gm__ int32_t *gm_accum =
+      (__gm__ int32_t *)((__gm__ uint8_t *)(op.from) + PEERMEM_ATOMIC_OFFSET + pingpong_offset * CACHE_LINE_SIZE);
+    uint64_t step_addr = (uint64_t)speer_load.step_addr & 0x1fffful;
+    uint64_t align_step_addr = (step_addr >> 5) << 5;
+    uint64_t align_size = step_addr - align_step_addr;
+    set_atomic_f32();
+    set_atomic_add();
+    copy_ubuf_to_gm_align_b8((__gm__ uint8_t *)gm_accum - align_size, (__ubuf__ void *)align_step_addr, 0, 1,
+                             align_size + sizeof(int32_t), 0, 0, 0, 0);
+    set_atomic_none();
+  }
+}
+
+#define PushSkipStride(stride) do { *((__ubuf__ uint64_t *)(WORKSPACE + sizeof(uint64_t))) = (stride); } while (0)
+#define PopSkipStride() *((__ubuf__ uint64_t *)(WORKSPACE + sizeof(uint64_t)))
+
+typedef uint64_t (*VisitFunc)(bcodeptr_t pc);
+
+template <typename T, bool inc = false>
+__aicore_inline__ T MakeRedHead(T repeat, T thread_size) {
+  T head = repeat << V_RED_HEAD_REPEAT_OFFSET | thread_size << V_RED_HEAD_THREAD_OFFSET;
+  if constexpr (inc) {
+    head |= 1ul << V_RED_HEAD_INC_FLAG_OFFSET;
+  }
+  return head;
+}
+
+__aicore_inline__ uint64_t VisitRed_1(bcodeptr_t pc) {
+  __bcode__ vVisitRed1 *__restrict__ op = reinterpret_cast<__bcode__ vVisitRed1*>(pc);
+  uint64_t blocknum = vBlockNum();
+  uint64_t blockidx = vBlockIdx();
+  uint64_t e_idx = op->e & MASK_32;
+  uint64_t e_num = op->e >> 32;
+  if (e_idx >= e_num) {
+    return 0;
+  }
+  uint64_t r1 = op->r1;
+  if (e_idx + blocknum / 2 < e_num) {
+    op->e += blocknum;
+    uint64_t e_cur = e_idx + blockidx;
+    if (e_cur >= e_num) {
+      return 0;
+    }
+    op->head = MakeRedHead<uint32_t>(0, 1);
+    uint64_t tile = (e_cur * r1) << V_TILE_CUR_IDX_OFFSET | r1 << V_TILE_COUNT_OFFSET;
+    if (e_cur == e_num - 1) {
+      tile |= 1ul << V_TILE_TAIL_FLAG_OFFSET;
+    }
+    return tile;
+  } else {
+    uint64_t group_num = e_num - e_idx;
+    uint64_t thread_size = min(r1, blocknum / group_num);
+    op->e += group_num;
+    if (blockidx >= thread_size * group_num) {
+      ffts_cross_core_sync(PIPE_MTE3, vFftsSyncConfig(0, 0));
+      wait_flag_dev(0);
+      return 0;
+    }
+    uint64_t thread_idx = blockidx % thread_size;
+    uint64_t group_idx = blockidx / thread_size;
+    uint64_t e_cur = e_idx + group_idx;
+    uint64_t tidx = e_cur * r1 + thread_idx;
+    uint64_t loop = (r1 - thread_idx - 1) / thread_size + 1;
+    op->head = MakeRedHead<uint32_t>(0, thread_size);
+    uint64_t tile = tidx << V_TILE_CUR_IDX_OFFSET | loop << V_TILE_COUNT_OFFSET | 1ul << V_TILE_SKIP_FLAG_OFFSET;
+    if (e_cur == e_num - 1 && thread_size * (loop - 1)  + thread_idx == r1 - 1) {
+      tile |= 1ul << V_TILE_TAIL_FLAG_OFFSET;
+    }
+    PushSkipStride(thread_size);
+    return tile;
+  }
+}
+
+__aicore_inline__ uint64_t VisitRed_2(bcodeptr_t pc) {
+  __bcode__ vVisitRed2 *__restrict__ op = reinterpret_cast<__bcode__ vVisitRed2*>(pc);
+  uint64_t blocknum = vBlockNum();
+  uint64_t blockidx = vBlockIdx();
+  uint64_t e_idx = op->e & MASK_32;
+  uint64_t e_num = op->e >> 32;
+  if (e_idx >= e_num) {
+    return 0;
+  }
+  uint64_t tidx, count, stride;
+  uint64_t e1 = op->e1_r1 >> 32;
+  uint64_t r1 = op->e1_r1 & MASK_32;
+  if (e_idx + blocknum / 2 < e_num) {
+    op->e += blocknum;
+    uint64_t e_cur = e_idx + blockidx;
+    if (e_cur >= e_num) {
+      return 0;
+    }
+    op->head = MakeRedHead<uint32_t>(0, 1);
+    tidx = r1 * e1 * (e_cur / e1) + e_cur % e1;
+    count = r1;
+    stride = e1;
+  } else {
+    uint64_t group_num = e_num - e_idx;
+    uint64_t thread_size = min(r1, blocknum / group_num);
+    op->e += group_num;
+    if (blockidx >= thread_size * group_num) {
+      ffts_cross_core_sync(PIPE_MTE3, vFftsSyncConfig(0, 0));
+      wait_flag_dev(0);
+      return 0;
+    }
+    uint64_t thread_idx = blockidx % thread_size;
+    uint64_t group_idx = blockidx / thread_size;
+    uint64_t e_cur = e_idx + group_idx;
+    uint64_t group_tile = r1 * e1 * (e_cur / e1) + e_cur % e1;
+    op->head = MakeRedHead<uint32_t>(0, thread_size);
+    tidx = group_tile + thread_idx * e1;
+    count = (r1 - thread_idx - 1) / thread_size + 1;
+    stride = e1 * thread_size;
+  }
+  PushSkipStride(stride);
+  return tidx << V_TILE_CUR_IDX_OFFSET | count << V_TILE_COUNT_OFFSET | 1ul << V_TILE_SKIP_FLAG_OFFSET;
+}
+
+__aicore_inline__ uint64_t VisitRed_3(bcodeptr_t pc) {
+  __bcode__ vVisitRed3 *__restrict__ op = reinterpret_cast<__bcode__ vVisitRed3 *>(pc);
+  uint64_t tidx_head = op->tidx_head;
+  uint64_t e1 = op->e1_r2 >> 32;
+  uint64_t r2 = op->e1_r2 & MASK_32;
+  if (tidx_head & V_RED_HEAD_REPEAT_MASK) {
+    uint64_t thread_size = (tidx_head  >> V_RED_HEAD_THREAD_OFFSET) & V_RED_HEAD_THREAD_MASK;
+    tidx_head = (tidx_head | 1ul << V_RED_HEAD_INC_FLAG_OFFSET) + ((r2 * e1 * thread_size) << 32) - 1ul;
+    op->tidx_head = tidx_head;
+    return (tidx_head >> 32) << V_TILE_CUR_IDX_OFFSET | r2 << V_TILE_COUNT_OFFSET;
+  }
+  uint64_t blocknum = vBlockNum();
+  uint64_t blockidx = vBlockIdx();
+  uint64_t e_idx = op->e & MASK_32;
+  uint64_t e_num = op->e >> 32;
+  if (e_idx >= e_num) {
+    return 0;
+  }
+  uint64_t tidx;
+  uint64_t r1 = op->r1;
+  if (e_idx + blocknum / 2 < e_num) {
+    op->e += blocknum;
+    uint64_t e_cur = e_idx + blockidx;
+    if (e_cur >= e_num) {
+      return 0;
+    }
+    tidx = (r1 * e1 * (e_cur / e1) + e_cur % e1) * r2;
+    op->tidx_head = tidx << 32 | MakeRedHead<uint64_t>(r1 - 1, 1);
+  } else {
+    uint64_t group_num = e_num - e_idx;
+    uint64_t thread_size = min(r1, blocknum / group_num);
+    op->e += group_num;
+    if (blockidx >= thread_size * group_num) {
+      ffts_cross_core_sync(PIPE_MTE3, vFftsSyncConfig(0, 0));
+      wait_flag_dev(0);
+      return 0;
+    }
+    uint64_t thread_idx = blockidx % thread_size;
+    uint64_t group_idx = blockidx / thread_size;
+    uint64_t e_cur = e_idx + group_idx;
+    uint64_t repeat = (r1 - thread_idx - 1) / thread_size + 1;
+    tidx = (r1 * e1 * (e_cur / e1) + e_cur % e1 + thread_idx * e1) * r2;
+    op->tidx_head = tidx << 32 | MakeRedHead<uint64_t>(repeat - 1, thread_size);
+  }
+  return tidx << V_TILE_CUR_IDX_OFFSET | r2 << V_TILE_COUNT_OFFSET;
+}
+
+__aicore_inline__ uint64_t VisitRed_4(bcodeptr_t pc) {
+  __bcode__ vVisitRed4 *__restrict__ op = reinterpret_cast<__bcode__ vVisitRed4 *>(pc);
+  uint64_t tidx_head = op->tidx_head;
+  uint64_t e1 = op->e1_r1 >> 32;
+  uint64_t r1 = op->e1_r1 & MASK_32;
+  uint64_t e2 = op->e2_r2 >> 32;
+  uint64_t r2 = op->e2_r2 & MASK_32;
+  if (tidx_head & V_RED_HEAD_REPEAT_MASK) {
+    uint64_t thread_size = (tidx_head  >> V_RED_HEAD_THREAD_OFFSET) & V_RED_HEAD_THREAD_MASK;
+    tidx_head = (tidx_head | 1ul << V_RED_HEAD_INC_FLAG_OFFSET) + ((r2 * e1 * e2 * thread_size) << 32) - 1ul;
+    op->tidx_head = tidx_head;
+    PushSkipStride(e2);
+    return (tidx_head >> 32) << V_TILE_CUR_IDX_OFFSET | 1ul << V_TILE_SKIP_FLAG_OFFSET | r2 << V_TILE_COUNT_OFFSET;
+  }
+  uint64_t blocknum = vBlockNum();
+  uint64_t blockidx = vBlockIdx();
+  uint64_t e_idx = op->e & MASK_32;
+  uint64_t e_num = op->e >> 32;
+  if (e_idx >= e_num) {
+    return 0;
+  }
+  uint64_t tidx;
+  if (e_idx + blocknum / 2 < e_num) {
+    op->e += blocknum;
+    uint64_t e_cur = e_idx + blockidx;
+    if (e_cur >= e_num) {
+      return 0;
+    }
+    uint64_t e0_idx = e_cur / (e1 * e2);
+    uint64_t e0_offset = e_cur % (e1 * e2);
+    uint64_t e1_idx = e0_offset / e2;
+    uint64_t e2_idx = e0_offset % e2;
+    tidx = e0_idx * (r1 * e1 * r2 * e2) + e1_idx * (r2 * e2) + e2_idx;
+    op->tidx_head = tidx << 32 | MakeRedHead<uint64_t>(r1 - 1, 1);
+  } else {
+    uint64_t group_num = e_num - e_idx;
+    uint64_t thread_size = min(r1, blocknum / group_num);
+    op->e += group_num;
+    if (blockidx >= thread_size * group_num) {
+      ffts_cross_core_sync(PIPE_MTE3, vFftsSyncConfig(0, 0));
+      wait_flag_dev(0);
+      return 0;
+    }
+    uint64_t thread_idx = blockidx % thread_size;
+    uint64_t group_idx = blockidx / thread_size;
+    uint64_t e_cur = e_idx + group_idx;
+    uint64_t e0_idx = e_cur / (e1 * e2);
+    uint64_t e0_offset = e_cur % (e1 * e2);
+    uint64_t e1_idx = e0_offset / e2;
+    uint64_t e2_idx = e0_offset % e2;
+    uint64_t group_tile = e0_idx * (r1 * e1 * r2 * e2) + e1_idx * (r2 * e2) + e2_idx;
+    uint64_t repeat = (r1 - thread_idx - 1) / thread_size + 1;
+    tidx = group_tile + r2 * e2 * e1 * thread_idx;
+    op->tidx_head = tidx << 32 | MakeRedHead<uint64_t>(repeat - 1, thread_size);
+  }
+  PushSkipStride(e2);
+  return tidx << V_TILE_CUR_IDX_OFFSET | r2 << V_TILE_COUNT_OFFSET | 1ul << V_TILE_SKIP_FLAG_OFFSET;
+}
+
+__aicore_inline__ uint64_t VisitMix(bcodeptr_t pc) {
+  vVisitMix op;
+  vVisitMix::Decode(pc, op);
+  __gm__ vCubeOp *__restrict__ cube = op.cube;
+  uint64_t group_idx = op.group_idx > 0 ? op.group_idx : block_idx;
+  if (group_idx >= cube->group_num) {
+    return 0;
+  }
+  if (group_idx >= block_num) {
+    // Use vector to backsync, then use ffts to sync core
+    if (cube->flags & V_CUBE_FLAG_PEER_STORE) {
+      // cube peer_store backsync
+      int32_t subblocknum = op.subtile1 == 0 ? 1 : 2;
+      int32_t expect = ((group_idx - block_idx) / block_num + 1) / 2 * subblocknum * (cube->rank_size -1);
+      uint64_t pingpong_offset = op.pingpong ? block_idx : block_idx + block_num;
+      __gm__ int32_t *peer_mem =
+        (__gm__ int32_t *)((__gm__ uint8_t *)cube->gm_c + PEERMEM_ATOMIC_OFFSET + pingpong_offset * CACHE_LINE_SIZE);
+      while (1) {
+        if (*peer_mem == expect) {
+          break;
+        }
+        dcci(peer_mem, 0);
+        // TODO: do we need this?
+        for (int64_t i = 0; i < 10; ++i) {
+          __asm__ __volatile__("nop");
+        }
+      }
+    }
+    ffts_cross_core_sync(PIPE_MTE3, vFftsSyncConfig(2, 1));
+  }
+  uint64_t tile;
+  if (get_subblockid() == 0) {
+    tile = op.subtile0 << V_TILE_COUNT_OFFSET;
+    if (op.subtile1 == 0) tile |= 1ul << V_TILE_TAIL_FLAG_OFFSET;
+  } else {
+    tile = op.subtile0 << V_TILE_CUR_IDX_OFFSET | 1ul << V_TILE_TAIL_FLAG_OFFSET | op.subtile1 << V_TILE_COUNT_OFFSET;
+  }
+  wait_flag_dev(0);
+  __gm__ vMixGroupMsg *msg = reinterpret_cast<__gm__ vMixGroupMsg *>(cube->gm_pos + sizeof(vMixGroupMsg) * block_idx);
+  dcci(msg, 0);
+  uint64_t pos = msg->pos[op.pingpong];
+  uint64_t cidx = vGetBitRange(pos, V_MM_POS_C_OFFSET, V_MM_POS_C_BITS);
+  uint64_t midx = vGetBitRange(pos, V_MM_POS_M_OFFSET, V_MM_POS_M_BITS);
+  uint64_t nidx = vGetBitRange(pos, V_MM_POS_N_OFFSET, V_MM_POS_N_BITS);
+  bool last_m = (midx + 1) * cube->m0 > cube->m_real; // TODO: use shard
+  bool last_n = (nidx + 1) * cube->n0 > cube->n_real;
+  uint64_t offset = (cidx * cube->m_real + midx * cube->m0) * cube->n_real + nidx * cube->n0;
+  vVisitMix::UpdateShard(pc, pos, offset, last_m, last_n);
+  vVisitMix::Update(pc, group_idx + block_num, op.pingpong ^ 1ul);
+  if (cube->flags & V_CUBE_FLAG_PEER_STORE) {
+    uint64_t pingpong_offset = op.pingpong ? block_num + block_idx : block_idx;
+    __gm__ uint64_t *peer_flag_mem =
+      (__gm__ uint64_t *)((__gm__ uint8_t *)cube->gm_c + PEERMEM_FLAG_OFFSET + pingpong_offset * CACHE_LINE_SIZE);
+    *peer_flag_mem = ((uint64_t)(cube->unique_id) << 32) | (offset + 1);
+    dcci(peer_flag_mem, 0);
+  }
+  return tile;
+}
+
+#define VA_UB_OFFSET     0x80000ul
+#define VA_VMAIN_BASE    ((get_pc() - VMAIN_OFFSET) & (~0xffful))
+typedef void (*OpFunc) (__bcode__ uint64_t *pc, uint64_t head, uint64_t tile);
+
+#ifndef __VM_DRY_RUN__
+#define VA_BCODE_BASE_UB (get_sys_va_base() + VA_UB_OFFSET + PC_BASE)
+#define DEF_DRY_FUNC(offset, op, func)
+__aicore_inline__ uint8_t *GetFunc(uint64_t id, uint8_t *base_addr) {
+  return base_addr + id;
+}
+#endif
+
+extern "C" __global__ __aicore__ void vmain_mix_aiv(uint64_t ffts_addr, uint64_t entry) {
+  __gm__ uint8_t * body_addr = (__gm__ uint8_t*)(get_para_base()) + sizeof(ffts_addr) + sizeof(entry);
+  if (entry & V_ENTRY_FLAG_EXTERN_CODE) {
+    __gm__ uint64_t *ext_addr = reinterpret_cast<__gm__ uint64_t*>(ffts_addr);
+    ffts_addr = *ext_addr;
+    body_addr = reinterpret_cast<__gm__ uint8_t*>(ext_addr + 2);
+  }
+  set_atomic_none();
+  set_mask_count();
+  uint8_t* main_addr = (uint8_t*)(VA_VMAIN_BASE);
+  uint64_t tile = 0;
+  uint64_t code_size = vGetBitRange(entry, V_ENTRY_CODE_SIZE_OFFSET, V_ENTRY_CODE_SIZE_BITS);
+  uint64_t ktype = entry & V_ENTRY_MASK_TYPE;
+  if (ktype == V_ENTRY_TYPE_V) {
+    uint64_t num = vGetBitRange(entry, V_ENTRY_V_BLOCK_NUM_OFFSET, V_ENTRY_V_BLOCK_NUM_BITS);
+    uint64_t idx = vBlockIdx();
+    if (idx < num) {
+      copy_gm_to_ubuf(reinterpret_cast<__ubuf__ void*>(PC_BASE), body_addr, 0, 1, (code_size + 3) >> 2, 0, 0);
+      uint64_t count = vGetBitRange(entry, V_ENTRY_V_TILE_BODY_OFFSET, V_ENTRY_V_TILE_BODY_BITS);
+      tile = (idx * count) << V_TILE_CUR_IDX_OFFSET;
+      if (idx == num - 1) {
+        count -= vGetBitRange(entry, V_ENTRY_V_TILE_TAIL_OFFSET, V_ENTRY_V_TILE_TAIL_BITS);
+        tile |= 1ul << V_TILE_TAIL_FLAG_OFFSET;
+      }
+      tile |= count << V_TILE_COUNT_OFFSET;
+    }
+    pipe_barrier(PIPE_ALL);
+  } else if (ktype == V_ENTRY_TYPE_VE) {
+    if (entry & V_ENTRY_FLAG_CUBE_MIX) {
+      body_addr += sizeof(vCubeOp);
+      code_size -= sizeof(vCubeOp) / sizeof(uint64_t);
+    }
+    copy_gm_to_ubuf(reinterpret_cast<__ubuf__ void*>(PC_BASE), body_addr, 0, 1, (code_size + 3) >> 2, 0, 0);
+    set_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
+    set_ffts_base_addr(ffts_addr);
+    uint64_t visit_id = vGetBitRange(entry, V_ENTRY_VE_VISIT_ID_OFFSET, V_ENTRY_VE_VISIT_ID_BITS);
+    uint64_t visit_offset = vGetBitRange(entry, V_ENTRY_VE_VISIT_OFFSET_OFFSET, V_ENTRY_VE_VISIT_OFFSET_BITS);
+    bcodeptr_t visit_code = reinterpret_cast<bcodeptr_t>(VA_BCODE_BASE_UB) + visit_offset;
+    wait_flag(PIPE_MTE2, PIPE_S, EVENT_ID0);
+    if (entry & V_ENTRY_FLAG_CUBE_MIX) {
+      vVisitMix::UpdateCube(visit_code, body_addr - sizeof(vCubeOp));
+    }
+    tile = ((VisitFunc)GetFunc(visit_id, main_addr))(visit_code);
+  } else if (ktype == V_ENTRY_TYPE_VP) {
+    // summary[BLOCK_NUM] + codeseg[KERNEL_NUM]
+    // summary = lenburst(6) << 58 | offset(9) << 49 | reserved(8) << 41 | tail_tile(1) << 40 | tile_loops(20) << 20 | start_idx(20)
+    uint64_t blocksum = vGetBitRange(entry, V_ENTRY_VP_BLOCK_SUM_OFFSET, V_ENTRY_VP_BLOCK_SUM_BITS);
+    uint64_t blockidx = vBlockIdx();
+    if (blockidx < blocksum) {
+      uint64_t summary = *(reinterpret_cast<__gm__ uint64_t*>(body_addr) + blockidx);
+      uint64_t offset = (summary >> (49 - 5)) & (0x1fful << 5);
+      uint64_t lenburst = summary >> 58;
+      copy_gm_to_ubuf(reinterpret_cast<__ubuf__ void*>(PC_BASE), body_addr + offset, 0, 1, lenburst, 0, 0);
+      uint64_t start_idx = summary & 0xffffful;
+      tile = start_idx << V_TILE_CUR_IDX_OFFSET | ((summary >> 20) & 0xffffful) << V_TILE_COUNT_OFFSET |
+            ((summary >> (40 - V_TILE_TAIL_FLAG_OFFSET)) & (1ul << V_TILE_TAIL_FLAG_OFFSET));
+    }
+    pipe_barrier(PIPE_ALL);
+  }
+  // Note: vmain_mix_aiv should be the first function in this file(inline function is not included)
+  // We need that fact to calculate the right offset of dispatch functions
+TILE_LOOP:
+  uint64_t tile_stride = ((IsSkipTile(tile) ? PopSkipStride() : 1ul) << V_TILE_CUR_IDX_OFFSET) - (1ul << V_TILE_COUNT_OFFSET);
+  while (uint64_t count = vGetBitRange(tile, V_TILE_COUNT_OFFSET, V_TILE_COUNT_BITS)) {
+    if (count == 1) {
+      tile |= 1ul << V_TILE_END_FLAG_OFFSET;
+    }
+    bcodeptr_t pc = reinterpret_cast<bcodeptr_t >(VA_BCODE_BASE_UB);
+    for (uint64_t head = *pc; head != 0; head = *pc) {
+      if (head & (0x1ul << V_HEAD_SIMD_FLAG_OFFSET)) {
+        if (head & (0x1ul << V_HEAD_BAR_FLAG_OFFSET)) {
+          pipe_barrier(PIPE_V);
+        }
+        if ((head & (0x1ul << V_HEAD_BACK_WAIT_OFFSET)) && !IsBeginTile(tile)) {
+          event_t event = event_t((head >> V_HEAD_B_WAIT_EVENT_OFFSET) & V_HEAD_EVENT_MASK);
+          wait_flag(PIPE_MTE3, PIPE_V, event);
+        }
+        if (head & (0x1ul << V_HEAD_WAIT_FLAG_OFFSET)) {
+          event_t event = event_t((head >> V_HEAD_WAIT_EVENT_OFFSET) & V_HEAD_EVENT_MASK);
+          wait_flag(PIPE_MTE2, PIPE_V, event);
+        }
+        ((OpFunc)(GetFunc(head >> V_HEAD_ID_OFFSET, main_addr)))(pc, head, tile);
+        if (head & (0x1ul << V_HEAD_SET_FLAG_OFFSET)) {
+          event_t event = event_t((head >> V_HEAD_SET_EVENT_OFFSET) & V_HEAD_EVENT_MASK);
+          set_flag(PIPE_V, PIPE_MTE3, event);
+        }
+        if ((head & (0x1ul << V_HEAD_BACK_SET_OFFSET)) && !IsEndTile(tile)) {
+          event_t event = event_t((head >> V_HEAD_B_SET_EVENT_OFFSET) & V_HEAD_EVENT_MASK);
+          set_flag(PIPE_V, PIPE_MTE2, event);
+        }
+        pc += (head >> V_HEAD_SIZE_OFFSET) & V_HEAD_SIZE_MASK;
+      } else {
+        ((OpFunc)(GetFunc(head >> V_HEAD_ID_OFFSET, main_addr)))(pc, head, tile);
+        pc += (head >> V_M_HEAD_SIZE_OFFSET) & V_M_HEAD_SIZE_MASK;
+      }
+    }
+    tile |= 1ul << V_TILE_N_BEGIN_FLAG_OFFSET;
+    tile += tile_stride;
+  }
+  if ((entry & V_ENTRY_MASK_TYPE) == V_ENTRY_TYPE_VE) {
+    set_flag(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    wait_flag(PIPE_MTE3, PIPE_MTE2, EVENT_ID0);
+    uint64_t visit_id = vGetBitRange(entry, V_ENTRY_VE_VISIT_ID_OFFSET, V_ENTRY_VE_VISIT_ID_BITS);
+    uint64_t visit_offset = vGetBitRange(entry, V_ENTRY_VE_VISIT_OFFSET_OFFSET, V_ENTRY_VE_VISIT_OFFSET_BITS);
+    bcodeptr_t visit_code = reinterpret_cast<bcodeptr_t>(VA_BCODE_BASE_UB) + visit_offset;
+    tile = ((VisitFunc)GetFunc(visit_id, main_addr))(visit_code);
+    if (tile) {
+      goto TILE_LOOP;
+    }
+  }
+  pipe_barrier(PIPE_ALL);
+}
+
+#define DEF_DISP_SIMD(OP, func) \
+  extern "C" __aicore__ void D_##OP(bcodeptr_t pc, uint64_t head, uint64_t tile) { func; } \
+  DEF_DRY_FUNC(g_simd_func_offset, OP, D_##OP);
+
+#define DEF_DISP_LOAD(OP, func)                                                               \
+  extern "C" __aicore__ void D_##OP(bcodeptr_t pc, uint64_t head, uint64_t tile) {  \
+    if ((head & (0x1ul << V_M_HEAD_WAIT_FLAG_OFFSET)) && !IsBeginTile(tile)) {                \
+      event_t event = event_t((head >> V_M_HEAD_WAIT_EVENT_OFFSET) & V_HEAD_EVENT_MASK);      \
+      wait_flag(PIPE_V, PIPE_MTE2, event);                                                    \
+    }                                                                                         \
+    func;                                                                                     \
+    if (head & (0x1ul << V_M_HEAD_SET_FLAG_OFFSET)) {                                         \
+      event_t event = event_t((head >> V_M_HEAD_SET_EVENT_OFFSET) & V_HEAD_EVENT_MASK);       \
+      set_flag(PIPE_MTE2, PIPE_V, event);                                                     \
+    }                                                                                         \
+  }                                                                                           \
+  DEF_DRY_FUNC(g_access_func_offset, OP, D_##OP);
+
+
+#define DEF_DISP_STORE(OP, func)                                                              \
+  extern "C" __aicore__ void D_##OP(bcodeptr_t pc, uint64_t head, uint64_t tile) {  \
+    if (head & (0x1ul << V_M_HEAD_WAIT_FLAG_OFFSET)) {                                        \
+      event_t event = event_t((head >> V_M_HEAD_WAIT_EVENT_OFFSET) & V_HEAD_EVENT_MASK);      \
+      wait_flag(PIPE_V, PIPE_MTE3, event);                                                    \
+    }                                                                                         \
+    func;                                                                                     \
+    if ((head & (0x1ul << V_M_HEAD_SET_FLAG_OFFSET)) && !IsEndTile(tile)) {                   \
+      event_t event = event_t((head >> V_M_HEAD_SET_EVENT_OFFSET) & V_HEAD_EVENT_MASK);       \
+      set_flag(PIPE_MTE3, PIPE_V, event);                                                     \
+    }                                                                                         \
+  }                                                                                           \
+  DEF_DRY_FUNC(g_access_func_offset, OP, D_##OP);
+
+#define DEF_DISP_VISIT(ID, func) \
+  extern "C" __aicore__ uint64_t D_##ID(bcodeptr_t pc) { return func(pc); } \
+  DEF_DRY_FUNC(g_visit_func_offset, ID, D_##ID);
+
+DEF_DISP_VISIT(V_VISIT_RED_1, VisitRed_1);
+DEF_DISP_VISIT(V_VISIT_RED_2, VisitRed_2);
+DEF_DISP_VISIT(V_VISIT_RED_3, VisitRed_3);
+DEF_DISP_VISIT(V_VISIT_RED_4, VisitRed_4);
+DEF_DISP_VISIT(V_VISIT_MIX, VisitMix);
+
+DEF_DISP_LOAD(V_LOAD, Load(pc, head, tile))
+DEF_DISP_LOAD(V_LOAD_DUMMY, void(0))
+DEF_DISP_LOAD(V_SLICE_LOAD, SliceLoad(pc, head, tile))
+DEF_DISP_LOAD(V_SLOAD, SLoad(pc, head, tile))
+DEF_DISP_LOAD(V_MULTI_LOAD, MultiLoad(pc, head, tile))
+DEF_DISP_LOAD(V_PINGPONG_LOAD, PingPongLoad(pc, head, tile))
+DEF_DISP_LOAD(V_PINGPONG_PEER_LOAD, PingPongPeerLoad(pc, head, tile))
+DEF_DISP_LOAD(V_PEER_LOAD, PeerLoad<false>(pc, head, tile))
+DEF_DISP_LOAD(V_PEER_LOAD_MIX, PeerLoad<true>(pc, head, tile))
+
+DEF_DISP_STORE(V_STORE, Store(pc, head, tile))
+DEF_DISP_STORE(V_STORE_ATOMIC, StoreAtomic(pc, head, tile))
+DEF_DISP_STORE(V_STORE_COND, CondStore(pc, head, tile))
+DEF_DISP_STORE(V_SSTORE, SStore(pc, head, tile))
+DEF_DISP_STORE(V_SLICE_STORE, SliceStore(pc, head, tile))
+DEF_DISP_STORE(V_STORE_AG, StoreAG(pc, head, tile))
+DEF_DISP_STORE(V_STORE_RS, StoreRS(pc, head, tile))
+DEF_DISP_STORE(V_PEER_STORE, PeerStore<false>(pc, head, tile))
+DEF_DISP_STORE(V_PEER_STORE_MIX, PeerStore<true>(pc, head, tile))
+
+DEF_DISP_SIMD(V_COPY, Copy(pc, head))
+DEF_DISP_SIMD(V_NOP,  ;)
+DEF_DISP_SIMD(V_BROADCAST_X_B32, BroadcastX<uint32_t>(pc, head, tile))
+DEF_DISP_SIMD(V_BROADCAST_Y, BroadcastY(pc, head))
+DEF_DISP_SIMD(V_BROADCAST_S, BroadcastS<uint32_t>(pc, head, tile))
+DEF_DISP_SIMD(V_SQRT, UNARY(pc, vsqrt, head, tile, float))
+DEF_DISP_SIMD(V_ABS, UNARY(pc, vabs, head, tile, float))
+DEF_DISP_SIMD(V_LOG, UNARY(pc, vln, head, tile, float))
+DEF_DISP_SIMD(V_EXP, UNARY(pc, vexp, head, tile, float))
+DEF_DISP_SIMD(V_ROUND, CAST(pc, vconv_f322f32r, head, tile, float, float))
+DEF_DISP_SIMD(V_FLOOR, CAST(pc, vconv_f322f32f, head, tile, float, float))
+DEF_DISP_SIMD(V_CEIL, CAST(pc, vconv_f322f32c, head, tile, float, float))
+DEF_DISP_SIMD(V_TRUNC, CAST(pc, vconv_f322f32z, head, tile, float, float))
+
+DEF_DISP_SIMD(V_ADDS, BINARYS(pc, vadds, head, float))
+DEF_DISP_SIMD(V_MULS, BINARYS(pc, vmuls, head, float))
+DEF_DISP_SIMD(V_ADD, BINARY(pc, vadd, head, tile, float))
+DEF_DISP_SIMD(V_SUB, BINARY(pc, vsub, head, tile, float))
+DEF_DISP_SIMD(V_MUL, BINARY(pc, vmul, head, tile, float))
+DEF_DISP_SIMD(V_DIV, BINARY(pc, vdiv, head, tile, float))
+DEF_DISP_SIMD(V_MIN, BINARY(pc, vmin, head, tile, float))
+DEF_DISP_SIMD(V_MAX, BINARY(pc, vmax, head, tile, float))
+
+DEF_DISP_SIMD(V_CMP, BinCompare<float>(pc, head, tile))
+DEF_DISP_SIMD(V_CMPS, BinCompareS<float>(pc, head, tile))
+DEF_DISP_SIMD(V_CAST_FP32_TO_FP16, CAST(pc, vconv_f322f16, head, tile, float, half))
+DEF_DISP_SIMD(V_CAST_FP32_TO_INT32, CAST(pc, vconv_f322s32z, head, tile, float, int32_t))
+DEF_DISP_SIMD(V_RSUM_X, ReduceSumX(pc, head, tile))
+DEF_DISP_SIMD(V_RSUM_Y, ReduceSumY(pc, head, tile))
+DEF_DISP_SIMD(V_RSUM_JOIN, ReduceJoin(pc, head, tile))
+DEF_DISP_SIMD(V_SEL, Select<float>(pc, head, tile))
+DEF_DISP_SIMD(V_POW, Power(pc, head, tile))
+DEF_DISP_SIMD(V_CLR_PAD, ClearPad(pc, head, tile))
+DEF_DISP_SIMD(V_ELEMENT_ANY, ElementAny<float>(pc, head, tile))
+DEF_DISP_SIMD(V_ONE_HOT, OneHot<uint32_t>(pc, head, tile))
+
+DEF_DISP_SIMD(V_BROADCAST_X_B16, BroadcastX<uint16_t>(pc, head, tile))
+DEF_DISP_SIMD(V_BROADCAST_S_B16, BroadcastS<uint16_t>(pc, head, tile))
+DEF_DISP_SIMD(V_SQRT_FP16, UNARY(pc, vsqrt, head, tile, half))
+DEF_DISP_SIMD(V_ABS_FP16, UNARY(pc, vabs, head, tile, half))
+DEF_DISP_SIMD(V_LOG_FP16, UNARY(pc, vln, head, tile, half))
+DEF_DISP_SIMD(V_EXP_FP16, UNARY(pc, vexp, head, tile, half))
+
+DEF_DISP_SIMD(V_ADDS_FP16, BINARYS(pc, vadds, head, half))
+DEF_DISP_SIMD(V_MULS_FP16, BINARYS(pc, vmuls, head, half))
+DEF_DISP_SIMD(V_ADD_FP16, BINARY(pc, vadd, head, tile, half))
+DEF_DISP_SIMD(V_SUB_FP16, BINARY(pc, vsub, head, tile, half))
+DEF_DISP_SIMD(V_MUL_FP16, BINARY(pc, vmul, head, tile, half))
+DEF_DISP_SIMD(V_DIV_FP16, BINARY(pc, vdiv, head, tile, half))
+DEF_DISP_SIMD(V_MIN_FP16, BINARY(pc, vmin, head, tile, half))
+DEF_DISP_SIMD(V_MAX_FP16, BINARY(pc, vmax, head, tile, half))
+
+DEF_DISP_SIMD(V_CAST_FP16_TO_BOOL, CAST(pc, vconv_f162s8, head, tile, half, int8_t))
+DEF_DISP_SIMD(V_CAST_FP16_TO_FP32, CAST(pc, vconv_f162f32, head, tile, half, float))
+DEF_DISP_SIMD(V_CAST_FP16_TO_INT32, CAST(pc, vconv_f162s32z, head, tile, half, int32_t))
+DEF_DISP_SIMD(V_CMP_FP16, BinCompare<half>(pc, head, tile))
+DEF_DISP_SIMD(V_CMPS_FP16, BinCompareS<half>(pc, head, tile))
+DEF_DISP_SIMD(V_SEL_FP16, Select<half>(pc, head, tile))
+DEF_DISP_SIMD(V_ISFINITE_FP16, IsFinite<uint16_t>(pc, head, tile))
+DEF_DISP_SIMD(V_ONE_HOT_B16, OneHot<uint16_t>(pc, head, tile))
+
+DEF_DISP_SIMD(V_CAST_BOOL_TO_FP16, CAST(pc, vconv_s82f16, head, tile, int8_t, half))
+
+
+DEF_DISP_SIMD(V_RESHAPE_B32, Reshape<uint32_t>(pc, head))
+DEF_DISP_SIMD(V_RESHAPE_B16, Reshape<uint16_t>(pc, head))
+
+DEF_DISP_SIMD(V_ADD_INT32, BINARY(pc, vadd, head, tile, int32_t))
+DEF_DISP_SIMD(V_SUB_INT32, BINARY(pc, vsub, head, tile, int32_t))
+DEF_DISP_SIMD(V_MUL_INT32, BINARY(pc, vmul, head, tile, int32_t))
+DEF_DISP_SIMD(V_MIN_INT32, BINARY(pc, vmin, head, tile, int32_t))
+DEF_DISP_SIMD(V_MAX_INT32, BINARY(pc, vmax, head, tile, int32_t))
+DEF_DISP_SIMD(V_CMP_INT32, CompareInt(pc, head, tile))
+DEF_DISP_SIMD(V_SEL_INT32, Select<float>(pc, head, tile))
+DEF_DISP_SIMD(V_CAST_INT32_TO_FP16, set_deqscale((half)1.0);CAST(pc, vconv_deq, head, tile, int32_t, half);)
+DEF_DISP_SIMD(V_CAST_INT32_TO_FP32, CAST(pc, vconv_s322f32, head, tile, int32_t, float))
+
+DEF_DISP_SIMD(V_ISFINITE, IsFinite<uint32_t>(pc, head, tile))
+DEF_DISP_SIMD(V_MAXS, BINARYS(pc, vmaxs, head, float))
+DEF_DISP_SIMD(V_MINS, BINARYS(pc, vmins, head, float))
+DEF_DISP_SIMD(V_MAXS_FP16, BINARYS(pc, vmaxs, head, half))
+DEF_DISP_SIMD(V_MINS_FP16, BINARYS(pc, vmins, head, half))
+DEF_DISP_SIMD(V_ADDS_INT32, BINARYS(pc, vadds, head, int32_t))
+DEF_DISP_SIMD(V_MULS_INT32, BINARYS(pc, vmuls, head, int32_t))
+DEF_DISP_SIMD(V_MAXS_INT32, BINARYS(pc, vmaxs, head, int32_t))
+DEF_DISP_SIMD(V_MINS_INT32, BINARYS(pc, vmins, head, int32_t))
+DEF_DISP_SIMD(V_REMOVEPAD_U16, RemovePad<uint16_t>(pc, head, tile))
+DEF_DISP_SIMD(V_REMOVEPAD, RemovePad<uint32_t>(pc, head, tile))
+DEF_DISP_SIMD(V_ATOMICCUM, AtomicCum(pc, head, tile))
+
+DEF_DISP_SIMD(V_CAST_BF16_TO_FP32, CAST(pc, vconv_bf162f32, head, tile, bfloat16_t, float))
+DEF_DISP_SIMD(V_CAST_BF16_TO_INT32, CAST(pc, vconv_bf162s32z, head, tile, bfloat16_t, int32_t))
+DEF_DISP_SIMD(V_CAST_FP32_TO_BF16, CAST(pc, vconv_f322bf16r, head, tile, float, bfloat16_t))
+
+DEF_DISP_SIMD(V_SDIV, Reciprocals<float>(pc, head, tile))
+DEF_DISP_SIMD(V_SDIV_FP16, Reciprocals<half>(pc, head, tile))

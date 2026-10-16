@@ -1,5 +1,5 @@
 {
-  "complete_runs": 98,
+  "complete_runs": 99,
   "excluded": [
     {
       "run": "hp-cann92-jt81-best-mf-bias-diag",
@@ -10298,7 +10298,87 @@
       "numerical_passed": false,
       "total_loss_passed": false,
       "scope": "dense fc1背景下只增加Q-up RoPE实时归约兼容；配置及既有因素不变；当前仅验收总loss。"
+    },
+    {
+      "run": "hp-jte213-expertnorm328400",
+      "source_revision": {
+        "commit": "181fab5f5c31ceeb2e385c1267aa586d5c6c8835",
+        "upstream_commit": "e21302f9e7b47d41b61f5f4987fc34c000f7c978",
+        "previous_integration_commit": "9213a97147020fb75e7a98a40f7e7b636f98d349",
+        "included_prs": [
+          180,
+          186,
+          192,
+          230
+        ],
+        "archive_sha256": "0653587fbc15a8b3c9ab1f9354f012fb9a74209376c8def1e84a474464a62e32",
+        "manifest": "evidence/jt-e213-pr192-source-manifest.json",
+        "runtime_manifest": "runs/hp-jte213-expertnorm328400/SOURCE_REVISION.json"
+      },
+      "metrics_sha256": "4409e38ff39a12289b3a82dfb99127243c60d576b2fb892166baee99446a7476",
+      "comparison": "evidence/frontier328-expert-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.00276947021484375,
+          "max_step": 398,
+          "mean": 2.1147727966308594e-05,
+          "last": 0.0008792877197265625,
+          "over_window_tolerance": 0,
+          "passed": true
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.0010585784912109375,
+          "max_step": 400,
+          "mean": 7.476806640625e-06,
+          "last": 0.0010585784912109375,
+          "over_window_tolerance": 0,
+          "passed": true
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.0029010772705078125,
+          "max_step": 398,
+          "mean": 1.6833245754241945e-05,
+          "last": 0.000179290771484375,
+          "over_window_tolerance": 0,
+          "passed": true
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.009670257568359375,
+          "max_step": 398,
+          "mean": 5.611081918084127e-05,
+          "last": 0.0005976359049473245,
+          "over_window_tolerance": 1,
+          "passed": false
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 1.3825865462419908e-07,
+          "max_step": 399,
+          "mean": 1.9717521499836522e-09,
+          "last": 1.3119950890538423e-07,
+          "over_window_tolerance": 0,
+          "passed": true
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 0.001382586546242237,
+          "max_step": 399,
+          "mean": 1.9717521499842405e-05,
+          "last": 0.0013119950890541077,
+          "over_window_tolerance": 0,
+          "passed": true
+        }
+      },
+      "numerical_passed": false,
+      "total_loss_passed": true,
+      "scope": "Only live expert-down reduction added; epsilon and all prior factors unchanged. Current gate is total loss only."
     }
   ],
-  "current_acceptance": "仅总loss：201首步<=0.001且201-400每步<=0.005；numerical_passed保留历史六指标口径，不作为当前门槛。"
+  "current_acceptance": "仅总loss：201首步<=0.001且201-400每步<=0.005；numerical_passed保留历史六指标口径，不作为当前门槛。",
+  "total_loss_passed_runs": 1,
+  "updated_at": "2026-10-16T17:42:16.786302+08:00"
 }

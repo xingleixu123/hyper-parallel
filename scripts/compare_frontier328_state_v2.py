@@ -1,0 +1,143 @@
+# Copyright 2026 Huawei Technologies Co., Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+"""Locate the sole328 main-layer1 expert down divergence in gradient, momentum or weight update."""
+import hashlib
+import json
+from pathlib import Path
+
+import numpy as np
+
+from compare_frontier219_state import load
+from compare_preclip217 import compare_arrays
+from compare_vocab_optimizer_trace import fidelity, read_rows
+from model_hash_stream import model_record
+
+ROOT = Path('/alignment/phase12')
+STATE = Path('/state/jt-recipe-20261014')
+HP = 'hp-jte213-fc1norm-qupboth-state328'
+MF = 'mf-frontier328-state'
+BASE = 'hp-jte213-fc1norm-qupboth400'
+TARGET = 'model.layers.1.mlp.experts.down_proj'
+MF_TARGET = 'decoder.layers.1.mlp.experts.weight2'
+
+
+def digest(path: Path) -> str:
+    """Hash bounded source or metadata files."""
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main() -> None:
+    """Require full trajectory fidelity and link sampled states to independent model hashes."""
+    checks = {'hp': fidelity(HP, BASE, 128), 'mf': fidelity(MF, 'mf-resume', 128)}
+    for family, run in [('hp', HP), ('mf', MF)]:
+        checks[family]['exit_zero'] = (ROOT / 'runs' / (run + '.exit')).read_text().strip() == '0'
+        original = BASE if family == 'hp' else 'mf-frontier306-state'
+        before, after = ('  train_iters: 400', '  train_iters: 328') if family == 'hp' else (
+            '  stop_step: 106', '  stop_step: 128')
+        checks[family]['only_window_and_paths'] = (ROOT / 'configs' / (original + '.yaml')).read_text().replace(
+            original, run).replace(before, after) == (ROOT / 'configs' / (run + '.yaml')).read_text()
+        launch = json.loads((ROOT / 'evidence' / (run + '-launch.json')).read_text())
+        checks[family]['config_sha'] = launch['config_sha256'] == digest(ROOT / 'configs' / (run + '.yaml'))
+        checks[family]['launcher_sha'] = launch['launcher_sha256'] == digest(ROOT / ('run-' + run + '.sh'))
+        folder = ROOT / ('tools-f637' if family == 'hp' else 'tools')
+        entry_folder = ROOT / 'tools-e213' if family == 'hp' else folder
+        checks[family]['entry_sha'] = launch['entry_sha256'] == digest(entry_folder / ('capture_' + family + '_frontier328_state.py'))
+    for filename in ['SOURCE_REVISION.json', 'PROBE_SOURCE_MANIFEST.json', 'HEAD_GEMM_ROUTE.json',
+                     'SHARED_UP_FP32_FACTOR.json', 'ADAMW_ARCHIVE_ARITHMETIC.json', 'Q_NS_ADJACENT_FACTOR.json',
+                     'ROUTER_NS_NPU_SQRT_FACTOR.json', 'WEIGHTED_DVM_FACTOR.json', 'PACKED_SEMANTICS_FACTOR.json',
+                     'NORM219_FACTOR.json', 'Q_NPU_SQRT222_FACTOR.json', 'CE_TAIL226_FACTOR.json', 'NS_EPSILON229_FACTOR.json', 'GLOBAL_NPU_SQRT235_FACTOR.json', 'QUP258_FACTOR.json', 'FC1293_FACTOR.json']:
+        checks['hp']['unchanged_' + filename] = (ROOT / 'runs' / HP / filename).read_bytes() == (
+            ROOT / 'runs' / BASE / filename).read_bytes()
+    for filename in ['HEAD_GEMM_ROUTE_CALLS.jsonl', 'Q_NS_ADJACENT_CALLS.jsonl', 'ROUTER_NS_NPU_SQRT_CALLS.jsonl',
+                     'WEIGHTED_DVM_CALLS.jsonl', 'PACKED_SEMANTICS_CALLS.jsonl', 'NORM219_CALLS.jsonl',
+                     'CLIP_REDUCTION.jsonl', 'CE_TAIL226_CALLS.jsonl', 'QUP258_CALLS.jsonl', 'FC1293_CALLS.jsonl']:
+        checks['hp']['same128_' + filename] = read_rows(ROOT / 'runs' / HP / filename) == read_rows(
+            ROOT / 'runs' / BASE / filename)[:128]
+    manifest = json.loads((ROOT / 'runs' / HP / 'PROBE_SOURCE_MANIFEST.json').read_text())
+    checks['hp']['49_frozen_sources'] = len(manifest['files']) == 49 and all(
+        row['sha256'] == digest(ROOT / 'tools-f637' / row['name']) for row in manifest['files'])
+    models = {}
+    for family, run in [('hp', HP), ('mf', MF)]:
+        records = read_rows(ROOT / 'runs' / run / 'MODEL_HASHES.jsonl')
+        models[family] = {row['step']: {item['name']: item for item in row['records']} for row in records}
+        checks[family]['both_model_steps_complete'] = set(models[family]) == {327, 328} and all(
+            len(row) == 48 for row in models[family].values())
+        folder = ROOT / ('tools-f637' if family == 'hp' else 'tools')
+        observer = json.loads((ROOT / 'runs' / run / 'MODEL_HASH_OBSERVER.json').read_text())
+        checks[family]['model_observer_source'] = observer['source_sha256'] == digest(
+            folder / (family + '_tail328_model_hash.py'))
+        checks[family]['model_helper_source'] = observer['helper_sha256'] == digest(folder / 'model_hash_stream.py')
+        if family == 'mf':
+            checks[family]['converter_source'] = observer['converter_sha256'] == digest(
+                ROOT / 'hyper-parallel/scripts/checkpoint_conversion/convert_mf_ckpt_to_hp.py')
+        independent = 'hp-jte213-fc1norm-qupboth-state329' if family == 'hp' else 'mf-frontier329-state'
+        native = next(row for row in read_rows(ROOT / 'runs' / independent / 'MODEL_HASHES.jsonl')
+                      if row['step'] == 328)
+        checks[family]['independent328_full_model_exact'] = {row['name']: row for row in native['records']} == models[family][328]
+    boundary = json.loads((ROOT / 'evidence/frontier329-temporal-first-difference.json').read_text())
+    checks['hp']['independent_boundary_fidelity'] = boundary['complete'] and all(
+        all(row.values()) for row in boundary['fidelity'].values())
+    full_model_comparisons = []
+    for step in [327, 328]:
+        differences = {key: [name for name, row in models['hp'][step].items()
+                            if row[key] != models['mf'][step][name][key]]
+                       for key in ['fp32_sha256', 'bf16_as_fp32_sha256']}
+        full_model_comparisons.append({'step': step, 'different': differences})
+    states, links = {}, {}
+    for step in [327, 328]:
+        arrays = {}
+        for family, run in [('hp', HP), ('mf', MF)]:
+            report = json.loads((ROOT / 'runs' / run / ('FRONTIER_STATE-' + str(step) + '.json')).read_text())
+            folder = ROOT / ('tools-f637' if family == 'hp' else 'tools')
+            source = 'hp_frontier328_state_probe.py' if family == 'hp' else 'mf_frontier328_state_tap.py'
+            checks[family]['source_' + str(step)] = report['source_sha256'] == digest(folder / source)
+            checks[family]['readonly_' + str(step)] = report['read_only'] and not report['teacher_values_used']
+            checks[family]['two_states_' + str(step)] = len(report['records']) == 2
+            if family == 'mf':
+                checks[family]['optimizer_step_' + str(step)] = report['optimizer_step'] == step
+            for row in report['records']:
+                array = load(STATE / run / ('state-' + str(step)), row)
+                if family == 'mf':
+                    array = np.ascontiguousarray(array.reshape(8, 1536, 5120).transpose(0, 2, 1))
+                arrays[family, row['kind']] = array
+            observed = model_record(TARGET, arrays[family, 'weight'])
+            links[family + '_' + str(step)] = all(observed[key] == models[family][step][TARGET][key]
+                for key in ['fp32_sha256', 'bf16_as_fp32_sha256'])
+        states[step] = {kind: compare_arrays(arrays['hp', kind], arrays['mf', kind])
+                        for kind in ['weight', 'muon_m']}
+        del arrays
+    native = json.loads((ROOT / 'runs' / MF / 'FRONTIER_GRADIENTS-328.json').read_text())
+    checks['mf']['one_native_gradient'] = len(native) == 1 and native[0]['name'] == MF_TARGET and native[0]['retained']
+    hp_gradient = json.loads((ROOT / 'runs' / HP / 'FRONTIER_GRADIENT-328.json').read_text())
+    checks['hp']['gradient_source'] = hp_gradient['source_sha256'] == digest(ROOT / 'tools-f637/hp_frontier328_state_probe.py')
+    checks['hp']['two_gradient_boundaries'] = len(hp_gradient['records']) == 2
+    row = next(row for row in hp_gradient['records'] if row['kind'] == 'postclip')
+    gradient = compare_arrays(load(STATE / HP / 'gradient-328', row), load(STATE / MF / 'gradients', native[0]))
+    if not all(all(row.values()) for row in checks.values()) or not all(links.values()):
+        raise ValueError({'fidelity': checks, 'model_hash_links': links})
+    report = {'complete': True, 'fidelity': checks, 'model_hash_links': links, 'states': states,
+              'clipped_gradient': gradient, 'full_model_comparisons': full_model_comparisons,
+              'source_sha256': digest(Path(__file__)),
+              'scope': 'One entire expert-down tensor (8,5120,1536), selected327/328 states and328 gradient; '
+                       'both full-model boundaries captured, with328 linked to the previous independent selected-state observation. '
+                       'MF states mapped by reshape(8,1536,5120).transpose(0,2,1). '
+                       'No conclusion on unobserved optimizer slots.'}
+    (ROOT / 'evidence/frontier328-state-comparison.json').write_text(json.dumps(report, indent=2))
+    print(json.dumps(report))
+
+
+if __name__ == '__main__':
+    main()

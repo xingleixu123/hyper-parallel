@@ -1,0 +1,2188 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_only_paths": true,
+      "config_hash": true,
+      "launcher_hash": true,
+      "entry_hash": true,
+      "49_frozen_sources": true,
+      "unchanged_RESTORE.json": true,
+      "unchanged_SOURCE_REVISION.json": true,
+      "unchanged_PROBE_SOURCE_MANIFEST.json": true,
+      "unchanged_WEIGHTED_DVM_FACTOR.json": true,
+      "unchanged_CE_TAIL226_FACTOR.json": true,
+      "unchanged_NS_EPSILON229_FACTOR.json": true,
+      "unchanged_NORM219_FACTOR.json": true,
+      "unchanged_Q_NPU_SQRT222_FACTOR.json": true,
+      "unchanged_GLOBAL_NPU_SQRT235_FACTOR.json": true,
+      "unchanged_QUP258_FACTOR.json": true,
+      "unchanged_FC1293_FACTOR.json": true,
+      "weighted_both_calls": true,
+      "unchanged_all_clip_calls": true,
+      "preclip_329_source": true,
+      "preclip_329_helper": true,
+      "preclip_329_native_hash_helper": true,
+      "preclip_329_complete": true,
+      "preclip_330_source": true,
+      "preclip_330_helper": true,
+      "preclip_330_native_hash_helper": true,
+      "preclip_330_complete": true,
+      "model_observer_hash": true,
+      "model_helper_hash": true
+    },
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_only_paths": true,
+      "config_hash": true,
+      "launcher_hash": true,
+      "entry_hash": true,
+      "converter_hash": true,
+      "dump_config_hash": true,
+      "no_array_files": true,
+      "model_observer_hash": true,
+      "model_helper_hash": true
+    }
+  },
+  "comparisons": [
+    {
+      "step": 329,
+      "dump_iteration": 128,
+      "native_norm_matches_training_sha1": true,
+      "gradient_exact_count": 46,
+      "square_sum_exact_count": 46,
+      "total_square_sum_exact": true,
+      "global_norm_exact": true,
+      "hp_norm": 8.404341697692871,
+      "mf_norm": 8.404341697692871,
+      "hp_square_sum": 70.6329574584961,
+      "mf_square_sum_sha1": "1f2ff9bb7c3b5b23b775ae0823a245edb46e7156",
+      "mf_norm_sha1": "1f299d510ae94a6c8b30397c9452ef68b53afb35",
+      "mf_scale_sha1": "8fb74851d9e101c93b2dc97265cd0a4fbafdd810",
+      "records": [
+        {
+          "name": "embedding.word_embeddings.weight",
+          "shape": [
+            152064,
+            5120
+          ],
+          "index": 0,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op0",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "c68b3de5310be743ca3fa92abd9cbe8cdb023d76",
+          "mf_gradient_sha1": "c68b3de5310be743ca3fa92abd9cbe8cdb023d76",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 4.768816947937012,
+          "mf_square_sum_sha1": "fed5375851d91dc9d7f0b5dbcadb1e029866fe0f",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0406226",
+            "Max Value": "0.0498519",
+            "L2Norm Value": "2.18376"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_proj.weight",
+          "shape": [
+            5120,
+            16384
+          ],
+          "index": 1,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op1",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "3456f21dcb54fdacd4d6ee4f290bb1d1a4adb525",
+          "mf_gradient_sha1": "3456f21dcb54fdacd4d6ee4f290bb1d1a4adb525",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 13.109908103942871,
+          "mf_square_sum_sha1": "a7e0e13ec0eddae8d35d97b41527d0498e4ec062",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00640869",
+            "Max Value": "0.006073",
+            "L2Norm Value": "3.62076"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_q_down_proj.weight",
+          "shape": [
+            1536,
+            5120
+          ],
+          "index": 2,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op2",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "2a60d92e4a3e111f5e3e64476e9b9226dcc44ea1",
+          "mf_gradient_sha1": "2a60d92e4a3e111f5e3e64476e9b9226dcc44ea1",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 1.3489410877227783,
+          "mf_square_sum_sha1": "87a86cbe7606e7dc89d77742d2c2a83c79dd2ebe",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00285339",
+            "Max Value": "0.00241089",
+            "L2Norm Value": "1.16144"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_q_up_proj.weight",
+          "shape": [
+            24576,
+            1536
+          ],
+          "index": 3,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op3",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "ce10192548bdcc63b936d7762164d5cd9e27bec3",
+          "mf_gradient_sha1": "ce10192548bdcc63b936d7762164d5cd9e27bec3",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 1.291266679763794,
+          "mf_square_sum_sha1": "4337f5f19c9468240b88983cf941f038b90c6c55",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00497437",
+            "Max Value": "0.00485229",
+            "L2Norm Value": "1.13634"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_kv_down_proj.weight",
+          "shape": [
+            576,
+            5120
+          ],
+          "index": 4,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op4",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "61e9a9f8a39dec09708210c9f16722dfc27a99dd",
+          "mf_gradient_sha1": "61e9a9f8a39dec09708210c9f16722dfc27a99dd",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 3.119882106781006,
+          "mf_square_sum_sha1": "3e7ac9801c0777961e21f50cf96fa8cd736d13ac",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00830078",
+            "Max Value": "0.00860596",
+            "L2Norm Value": "1.76632"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_kv_up_proj.weight",
+          "shape": [
+            32768,
+            512
+          ],
+          "index": 5,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op5",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "2cae378f20e4bde3995d5f26e5ecebccb7b8fea0",
+          "mf_gradient_sha1": "2cae378f20e4bde3995d5f26e5ecebccb7b8fea0",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 3.37711501121521,
+          "mf_square_sum_sha1": "022eba16728860019f02392491fe1fcc6d037f27",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00668335",
+            "Max Value": "0.00765991",
+            "L2Norm Value": "1.83769"
+          }
+        },
+        {
+          "name": "decoder.layers.0.mlp.linear_fc1.weight",
+          "shape": [
+            24576,
+            5120
+          ],
+          "index": 6,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op6",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "3ad1f9287dcefb453ef0d81d064d584524062043",
+          "mf_gradient_sha1": "3ad1f9287dcefb453ef0d81d064d584524062043",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 4.12501859664917,
+          "mf_square_sum_sha1": "5a13d46004df7abf329171258e7e25a75b1c3c93",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00732422",
+            "Max Value": "0.00909424",
+            "L2Norm Value": "2.03101"
+          }
+        },
+        {
+          "name": "decoder.layers.0.mlp.linear_fc2.weight",
+          "shape": [
+            5120,
+            12288
+          ],
+          "index": 7,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op7",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "df68c4fa8ded3acd441336dc475aa4349ce8ae64",
+          "mf_gradient_sha1": "df68c4fa8ded3acd441336dc475aa4349ce8ae64",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 15.282028198242188,
+          "mf_square_sum_sha1": "ddbe4f1d569b89bda7c43d926939f1e2b8a1cb94",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0305176",
+            "Max Value": "0.0275879",
+            "L2Norm Value": "3.90922"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_proj.weight",
+          "shape": [
+            5120,
+            16384
+          ],
+          "index": 8,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op8",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "8c72efa21d3809ed04ba290958f983513ab0fdc5",
+          "mf_gradient_sha1": "8c72efa21d3809ed04ba290958f983513ab0fdc5",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 1.0456459522247314,
+          "mf_square_sum_sha1": "7335d4b261bf5073527eea7faabc08342bfc0f5f",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00218201",
+            "Max Value": "0.00192261",
+            "L2Norm Value": "1.02257"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_q_down_proj.weight",
+          "shape": [
+            1536,
+            5120
+          ],
+          "index": 9,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op9",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "067e4851cdefb557700c7caa17b5ec892dbea2bc",
+          "mf_gradient_sha1": "067e4851cdefb557700c7caa17b5ec892dbea2bc",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0005886609433218837,
+          "mf_square_sum_sha1": "915acbb489cf970761369c5f38769f22515ad885",
+          "mf_printed_statistics": {
+            "Min Value": "-8.53539e-05",
+            "Max Value": "8.91685e-05",
+            "L2Norm Value": "0.0242623"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_q_up_proj.weight",
+          "shape": [
+            24576,
+            1536
+          ],
+          "index": 10,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op10",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "596bd41d1e6ce0e5becc502465d301340999f0c0",
+          "mf_gradient_sha1": "596bd41d1e6ce0e5becc502465d301340999f0c0",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0005999368149787188,
+          "mf_square_sum_sha1": "74a0f2a5c9bbb01588b2c86fa349c749cd370f48",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000126839",
+            "Max Value": "0.000123024",
+            "L2Norm Value": "0.0244936"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_kv_down_proj.weight",
+          "shape": [
+            576,
+            5120
+          ],
+          "index": 11,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op11",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "aa439f8e413552eb24ee8313f2eb8219f1075cf0",
+          "mf_gradient_sha1": "aa439f8e413552eb24ee8313f2eb8219f1075cf0",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.27588385343551636,
+          "mf_square_sum_sha1": "197a5878d3797950a2b05ce0e9e679ce38c1a3a1",
+          "mf_printed_statistics": {
+            "Min Value": "-0.003479",
+            "Max Value": "0.00361633",
+            "L2Norm Value": "0.525246"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_kv_up_proj.weight",
+          "shape": [
+            32768,
+            512
+          ],
+          "index": 12,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op12",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "d43218c072f62e824df0d5e38d04d0718953580a",
+          "mf_gradient_sha1": "d43218c072f62e824df0d5e38d04d0718953580a",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.2556682229042053,
+          "mf_square_sum_sha1": "d530425a29a0f6a9edcbb4101b1bd3bd58f587ec",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0018692",
+            "Max Value": "0.00184631",
+            "L2Norm Value": "0.505636"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.router.weight",
+          "shape": [
+            8,
+            5120
+          ],
+          "index": 13,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op13",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "196ea776604a7f35a6f3072720febb1f31f65fd9",
+          "mf_gradient_sha1": "196ea776604a7f35a6f3072720febb1f31f65fd9",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.24508912861347198,
+          "mf_square_sum_sha1": "d1a46f897d7a3d553d8b2506684b183afc9ee539",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0150965",
+            "Max Value": "0.0158238",
+            "L2Norm Value": "0.495065"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.experts.weight1",
+          "shape": [
+            40960,
+            3072
+          ],
+          "index": 14,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op14",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "fdeb17e851156c0bbf16fcb1b29af332e739ba63",
+          "mf_gradient_sha1": "fdeb17e851156c0bbf16fcb1b29af332e739ba63",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 4.901205062866211,
+          "mf_square_sum_sha1": "bdfd52221e2ee14bf876c09aa36033c8da4f9aba",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0568848",
+            "Max Value": "0.0495605",
+            "L2Norm Value": "2.21387"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.experts.weight2",
+          "shape": [
+            12288,
+            5120
+          ],
+          "index": 15,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op15",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "68c57b2191c4e80fdc8c590a09c5f6173682dde2",
+          "mf_gradient_sha1": "68c57b2191c4e80fdc8c590a09c5f6173682dde2",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 6.874129295349121,
+          "mf_square_sum_sha1": "508da07e9718dd6bdc09bdd7e560e9eb614e8bde",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0683594",
+            "Max Value": "0.0541992",
+            "L2Norm Value": "2.62186"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.shared_experts.linear_fc1.weight",
+          "shape": [
+            6144,
+            5120
+          ],
+          "index": 16,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op16",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "a12b70aab1a4a2eefaf9990e374b5e6f8f968a5b",
+          "mf_gradient_sha1": "a12b70aab1a4a2eefaf9990e374b5e6f8f968a5b",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.11617070436477661,
+          "mf_square_sum_sha1": "a8aa84d88ce7c0e65c8833c74d373adf208b5890",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00182343",
+            "Max Value": "0.00180054",
+            "L2Norm Value": "0.340838"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.shared_experts.linear_fc2.weight",
+          "shape": [
+            5120,
+            3072
+          ],
+          "index": 17,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op17",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "9730421c98b78c236a11e2058b3481e8a9661246",
+          "mf_gradient_sha1": "9730421c98b78c236a11e2058b3481e8a9661246",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.2898031175136566,
+          "mf_square_sum_sha1": "be547ccd93bb76ed1d43e4db2652107cf11bccd1",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00582886",
+            "Max Value": "0.00592041",
+            "L2Norm Value": "0.538334"
+          }
+        },
+        {
+          "name": "mtp.layers.0.eh_proj.weight",
+          "shape": [
+            5120,
+            10240
+          ],
+          "index": 18,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op18",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "abb8e60a3383b140402b66b4dc3c0f98d4ed70eb",
+          "mf_gradient_sha1": "abb8e60a3383b140402b66b4dc3c0f98d4ed70eb",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.8672928214073181,
+          "mf_square_sum_sha1": "cfc95c5fa38b0e34843dd2b955a5906ce24bc5cc",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00188446",
+            "Max Value": "0.00182343",
+            "L2Norm Value": "0.931286"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_proj.weight",
+          "shape": [
+            5120,
+            16384
+          ],
+          "index": 19,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op19",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "d82456ca8d62ff4dcf798e71d3d2e8358eb12517",
+          "mf_gradient_sha1": "d82456ca8d62ff4dcf798e71d3d2e8358eb12517",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.15080608427524567,
+          "mf_square_sum_sha1": "1550aafe1609c9ae72d676836482b0e5697fd3e9",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000572205",
+            "Max Value": "0.000587463",
+            "L2Norm Value": "0.388338"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_q_down_proj.weight",
+          "shape": [
+            1536,
+            5120
+          ],
+          "index": 20,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op20",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "fbdcc48f40ad8426b7ecb6b538ba23411b1ad519",
+          "mf_gradient_sha1": "fbdcc48f40ad8426b7ecb6b538ba23411b1ad519",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0002692948910407722,
+          "mf_square_sum_sha1": "433f585014612e1dc807a2b7de23f5cb581dd82c",
+          "mf_printed_statistics": {
+            "Min Value": "-5.55515e-05",
+            "Max Value": "5.19753e-05",
+            "L2Norm Value": "0.0164102"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_q_up_proj.weight",
+          "shape": [
+            24576,
+            1536
+          ],
+          "index": 21,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op21",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "9f1da362a6dc7f25319441caa2211d688aa076b6",
+          "mf_gradient_sha1": "9f1da362a6dc7f25319441caa2211d688aa076b6",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.00023042189422994852,
+          "mf_square_sum_sha1": "c8aeea968d5b76ad6aaf4536683ada25c7ffc7b2",
+          "mf_printed_statistics": {
+            "Min Value": "-6.81877e-05",
+            "Max Value": "6.4373e-05",
+            "L2Norm Value": "0.0151797"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_kv_down_proj.weight",
+          "shape": [
+            576,
+            5120
+          ],
+          "index": 22,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op22",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "231e662c411fe11eb29bb25da41a49a9a9774ff0",
+          "mf_gradient_sha1": "231e662c411fe11eb29bb25da41a49a9a9774ff0",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.04600480943918228,
+          "mf_square_sum_sha1": "e9cfd88091e148de88729aecbf26d535b990d5de",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0014801",
+            "Max Value": "0.00159454",
+            "L2Norm Value": "0.214487"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_kv_up_proj.weight",
+          "shape": [
+            32768,
+            512
+          ],
+          "index": 23,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op23",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "49d2bc5290355ce5f731ac1eee7d134b27766048",
+          "mf_gradient_sha1": "49d2bc5290355ce5f731ac1eee7d134b27766048",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.03659118711948395,
+          "mf_square_sum_sha1": "5391687caed216e052d5656a7428534e770e6aca",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00100708",
+            "Max Value": "0.00088501",
+            "L2Norm Value": "0.191288"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.router.weight",
+          "shape": [
+            8,
+            5120
+          ],
+          "index": 24,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op24",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "e6597e27b200a527004ac1c142f71fbaf79b5044",
+          "mf_gradient_sha1": "e6597e27b200a527004ac1c142f71fbaf79b5044",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.07118462771177292,
+          "mf_square_sum_sha1": "c29c853f8c459888f31fe74417df7f1817d96674",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00811579",
+            "Max Value": "0.00918061",
+            "L2Norm Value": "0.266804"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.experts.weight1",
+          "shape": [
+            40960,
+            3072
+          ],
+          "index": 25,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op25",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "028ff3b0876ba3691a74298532d112dda913fe4a",
+          "mf_gradient_sha1": "028ff3b0876ba3691a74298532d112dda913fe4a",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.38812056183815,
+          "mf_square_sum_sha1": "e77ce2db4ec334569a72d1c74be749c4d6d98834",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00141144",
+            "Max Value": "0.00151825",
+            "L2Norm Value": "0.622993"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.experts.weight2",
+          "shape": [
+            12288,
+            5120
+          ],
+          "index": 26,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op26",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "2bb79e074caf49939fd948bac2ac1bdcb8f8fbbf",
+          "mf_gradient_sha1": "2bb79e074caf49939fd948bac2ac1bdcb8f8fbbf",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.23798435926437378,
+          "mf_square_sum_sha1": "33e8f3b38760fb411500274fc1deff4ea37584af",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00176239",
+            "Max Value": "0.00177765",
+            "L2Norm Value": "0.487836"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.shared_experts.linear_fc1.weight",
+          "shape": [
+            6144,
+            5120
+          ],
+          "index": 27,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op27",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "7824d6d924db3218976691f2d12e956010b6ad42",
+          "mf_gradient_sha1": "7824d6d924db3218976691f2d12e956010b6ad42",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0743001326918602,
+          "mf_square_sum_sha1": "001c616f92d6f3903e718dd732a027615181176f",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00125122",
+            "Max Value": "0.00144196",
+            "L2Norm Value": "0.272581"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.shared_experts.linear_fc2.weight",
+          "shape": [
+            5120,
+            3072
+          ],
+          "index": 28,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op28",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "0e0e679bc81a6cec597c3adefca42bb12132d1ed",
+          "mf_gradient_sha1": "0e0e679bc81a6cec597c3adefca42bb12132d1ed",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.1610087752342224,
+          "mf_square_sum_sha1": "4cce156a71f21b13b1ae55c2d3f88efb05cfd4c8",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00209045",
+            "Max Value": "0.00231934",
+            "L2Norm Value": "0.401259"
+          }
+        },
+        {
+          "name": "output_layer.weight",
+          "shape": [
+            152064,
+            5120
+          ],
+          "index": 29,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op29",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "772bd291e669742cfaac33399ed01aa5840814a8",
+          "mf_gradient_sha1": "772bd291e669742cfaac33399ed01aa5840814a8",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 8.158575057983398,
+          "mf_square_sum_sha1": "6456f2cd50a582c68966c3b8c5a994d146e894cb",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0433197",
+            "Max Value": "0.0475769",
+            "L2Norm Value": "2.85634"
+          }
+        },
+        {
+          "name": "decoder.layers.0.input_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 30,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op30",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "88e9ee3b4efc1289f72692fc2e6160f4a30501bf",
+          "mf_gradient_sha1": "88e9ee3b4efc1289f72692fc2e6160f4a30501bf",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0017661320744082332,
+          "mf_square_sum_sha1": "d49ccd64a0f91454110cc1df9667d7c5985b6ee6",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00381501",
+            "Max Value": "0.00255252",
+            "L2Norm Value": "0.0420254"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.q_layernorm.weight",
+          "shape": [
+            1536
+          ],
+          "index": 31,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op31",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "4b111161dc4e058607b4713c7e7cfa669f81cc71",
+          "mf_gradient_sha1": "4b111161dc4e058607b4713c7e7cfa669f81cc71",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.000595361168961972,
+          "mf_square_sum_sha1": "2baf9ac8a8867f91630f1f1c8b968711c08c1104",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00221995",
+            "Max Value": "0.00175737",
+            "L2Norm Value": "0.0244"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.kv_layernorm.weight",
+          "shape": [
+            512
+          ],
+          "index": 32,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op32",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "0689b3bd2c7a56b77194f9d2b1016d264731637d",
+          "mf_gradient_sha1": "0689b3bd2c7a56b77194f9d2b1016d264731637d",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0020237667486071587,
+          "mf_square_sum_sha1": "714197e48a0302355155f345f7fee9fe0326f74c",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00634806",
+            "Max Value": "0.0101056",
+            "L2Norm Value": "0.0449863"
+          }
+        },
+        {
+          "name": "decoder.layers.0.pre_mlp_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 33,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op33",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "a498741a64579b3c3865ea59e1aac6eaae0f50b8",
+          "mf_gradient_sha1": "a498741a64579b3c3865ea59e1aac6eaae0f50b8",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0017407492268830538,
+          "mf_square_sum_sha1": "632b8968a16a74dff8301ff9476832b3d76bb5cc",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00425945",
+            "Max Value": "0.00317502",
+            "L2Norm Value": "0.0417223"
+          }
+        },
+        {
+          "name": "decoder.layers.1.input_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 34,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op34",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "3754c54bf053def00626aa1cf8791410e3f5505e",
+          "mf_gradient_sha1": "3754c54bf053def00626aa1cf8791410e3f5505e",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.00011521799024194479,
+          "mf_square_sum_sha1": "c07d08a9d06888ac65a922c3552088b06acb53f9",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000958826",
+            "Max Value": "0.000938891",
+            "L2Norm Value": "0.010734"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.q_layernorm.weight",
+          "shape": [
+            1536
+          ],
+          "index": 35,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op35",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "defc28f187d8c16e4d4c9b0c0edf438a1f787e5b",
+          "mf_gradient_sha1": "defc28f187d8c16e4d4c9b0c0edf438a1f787e5b",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 2.710078206291655e-07,
+          "mf_square_sum_sha1": "f0085f0f92265b152bc7cbc6d97f1838813b3164",
+          "mf_printed_statistics": {
+            "Min Value": "-5.95126e-05",
+            "Max Value": "9.09452e-05",
+            "L2Norm Value": "0.000520584"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.kv_layernorm.weight",
+          "shape": [
+            512
+          ],
+          "index": 36,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op36",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "497e590bf378fc22f318d005fcd0e912975683a4",
+          "mf_gradient_sha1": "497e590bf378fc22f318d005fcd0e912975683a4",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.00018543361511547118,
+          "mf_square_sum_sha1": "e35dcd38485262a765f5b3441937ffc52d94e41f",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0020419",
+            "Max Value": "0.00318793",
+            "L2Norm Value": "0.0136174"
+          }
+        },
+        {
+          "name": "decoder.layers.1.pre_mlp_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 37,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op37",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "0b1f6a0ab2f7e22f2372a1b412053966444ec2c1",
+          "mf_gradient_sha1": "0b1f6a0ab2f7e22f2372a1b412053966444ec2c1",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.0021968879736959934,
+          "mf_square_sum_sha1": "02618302731d48aebbb554bd477270287ba2fa02",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00347313",
+            "Max Value": "0.00490445",
+            "L2Norm Value": "0.046871"
+          }
+        },
+        {
+          "name": "decoder.final_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 38,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op38",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "88d6abb46e77d0f3e3196105a303889696c979da",
+          "mf_gradient_sha1": "88d6abb46e77d0f3e3196105a303889696c979da",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.003234896343201399,
+          "mf_square_sum_sha1": "8dbd6530803cd17b6048626a2b345fa47527975f",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00491219",
+            "Max Value": "0.00549923",
+            "L2Norm Value": "0.0568761"
+          }
+        },
+        {
+          "name": "mtp.layers.0.enorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 39,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op39",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "26bae085098795e7d7c343bfbe0a20e8bdf32b3a",
+          "mf_gradient_sha1": "26bae085098795e7d7c343bfbe0a20e8bdf32b3a",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.00012356720981188118,
+          "mf_square_sum_sha1": "187648b624a5e5d1591ceaf008b904d1c895b281",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000621321",
+            "Max Value": "0.000563843",
+            "L2Norm Value": "0.0111161"
+          }
+        },
+        {
+          "name": "mtp.layers.0.hnorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 40,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op40",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "a885b1f61f2e739773f31ac8bd98058831a76e2c",
+          "mf_gradient_sha1": "a885b1f61f2e739773f31ac8bd98058831a76e2c",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.00024157512234523892,
+          "mf_square_sum_sha1": "1c13ea186dd3ec8eace6f806691466d2744b2a14",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00137081",
+            "Max Value": "0.00126741",
+            "L2Norm Value": "0.0155427"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.input_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 41,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op41",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "0b2257b70da9b9f34996683e6901df9e40a2ab7e",
+          "mf_gradient_sha1": "0b2257b70da9b9f34996683e6901df9e40a2ab7e",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 1.8991513570654206e-05,
+          "mf_square_sum_sha1": "1eeac1f5369c613ee0d5a0e806f0a128299edd09",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000444418",
+            "Max Value": "0.000283936",
+            "L2Norm Value": "0.00435793"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.q_layernorm.weight",
+          "shape": [
+            1536
+          ],
+          "index": 42,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op42",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "9b3fce3c81a4fcfd015f8fc2974866247039d16a",
+          "mf_gradient_sha1": "9b3fce3c81a4fcfd015f8fc2974866247039d16a",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 1.7167906207760097e-07,
+          "mf_square_sum_sha1": "76952c0274da9364e51a78d811106531d88415bf",
+          "mf_printed_statistics": {
+            "Min Value": "-4.76288e-05",
+            "Max Value": "3.36441e-05",
+            "L2Norm Value": "0.000414342"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.kv_layernorm.weight",
+          "shape": [
+            512
+          ],
+          "index": 43,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op43",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "9cb22b1f8c7491bf27a39318f731254ebed723b5",
+          "mf_gradient_sha1": "9cb22b1f8c7491bf27a39318f731254ebed723b5",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 3.3434851502534e-05,
+          "mf_square_sum_sha1": "b0c021afc726cb4a5321555a45128e262c6719c9",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00118756",
+            "Max Value": "0.00115061",
+            "L2Norm Value": "0.00578229"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.pre_mlp_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 44,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op44",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "0d5b70d0c2e6e4a5c8258d45365915e5ddd26b9b",
+          "mf_gradient_sha1": "0d5b70d0c2e6e4a5c8258d45365915e5ddd26b9b",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.00021772788022644818,
+          "mf_square_sum_sha1": "4b092c4c3064b2e79d0e70f30e35eff781b5f5a3",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00113029",
+            "Max Value": "0.000957304",
+            "L2Norm Value": "0.0147556"
+          }
+        },
+        {
+          "name": "mtp.layers.0.final_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 45,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op45",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "a4f2d6141a6ba03bb79947361ad2c8a568e85bfd",
+          "mf_gradient_sha1": "a4f2d6141a6ba03bb79947361ad2c8a568e85bfd",
+          "gradient_exact": true,
+          "square_sum_exact": true,
+          "hp_square_sum": 0.000352455914253369,
+          "mf_square_sum_sha1": "a5b8a3266d975236a332fb8ba8bfa518f5fabe83",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00149985",
+            "Max Value": "0.00106584",
+            "L2Norm Value": "0.0187738"
+          }
+        }
+      ],
+      "statistics_sha256": "57656536dca43f67419ec966d75e3075abfd30343222572d9268ea031f1428b6",
+      "statistics_rows": 95
+    },
+    {
+      "step": 330,
+      "dump_iteration": 129,
+      "native_norm_matches_training_sha1": true,
+      "gradient_exact_count": 0,
+      "square_sum_exact_count": 0,
+      "total_square_sum_exact": false,
+      "global_norm_exact": false,
+      "hp_norm": 7.338912010192871,
+      "mf_norm": 7.3389363288879395,
+      "hp_square_sum": 53.8596305847168,
+      "mf_square_sum_sha1": "2d814f8734a52924e28dd03167aa6444d8443ec4",
+      "mf_norm_sha1": "04024ba549818c5a3940e96c81587c9585e85463",
+      "mf_scale_sha1": "5bf5985fa418118db0e41217fa1e2d5cc6ca20e1",
+      "records": [
+        {
+          "name": "embedding.word_embeddings.weight",
+          "shape": [
+            152064,
+            5120
+          ],
+          "index": 0,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op0",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "0140baf24706ec8001bc24c6e82e900996f5758d",
+          "mf_gradient_sha1": "a7300e69b95a33e2735d928d47329191c0805d82",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 5.5355610847473145,
+          "mf_square_sum_sha1": "246a1cd94b5a2e9ec8e2a471727848f03eae0c74",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0460426",
+            "Max Value": "0.0461123",
+            "L2Norm Value": "2.35267"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_proj.weight",
+          "shape": [
+            5120,
+            16384
+          ],
+          "index": 1,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op1",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "7a6bbe0b89716a544f500ab4307ce195b021f6cf",
+          "mf_gradient_sha1": "b50352da39d9901bfe6bf3ce7057f1c187297801",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 10.026555061340332,
+          "mf_square_sum_sha1": "50f1d2e12e0bf8d6d3ce325b9a287aa0479f2403",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0043335",
+            "Max Value": "0.00415039",
+            "L2Norm Value": "3.16644"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_q_down_proj.weight",
+          "shape": [
+            1536,
+            5120
+          ],
+          "index": 2,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op2",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "65890c5d6294cbde358e670ffa4133ab98f09ed2",
+          "mf_gradient_sha1": "2725a8de216ab6e287fc2efe900a4af1b8578031",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 1.1620115041732788,
+          "mf_square_sum_sha1": "d22739d85c878748549a4a400e6d83532f5498e9",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00230408",
+            "Max Value": "0.00210571",
+            "L2Norm Value": "1.07789"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_q_up_proj.weight",
+          "shape": [
+            24576,
+            1536
+          ],
+          "index": 3,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op3",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "dcb725df0b9b9138d81c40d8d19198c185d6cbf9",
+          "mf_gradient_sha1": "71df7d002b01b1c8599136ce68221ee747e25d94",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 1.119199514389038,
+          "mf_square_sum_sha1": "3541730583d516bb737bc3e6aa4218a0529ba561",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00360107",
+            "Max Value": "0.00372314",
+            "L2Norm Value": "1.05785"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_kv_down_proj.weight",
+          "shape": [
+            576,
+            5120
+          ],
+          "index": 4,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op4",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "c32a7bdced66816e2625911ee9af143a1296f688",
+          "mf_gradient_sha1": "52c22452456630f41ff1fbcf2cfa58ab7e7e6e09",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 3.9772863388061523,
+          "mf_square_sum_sha1": "20c3180d8889160ad832838a1e2db23ea36131ec",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0137329",
+            "Max Value": "0.0115356",
+            "L2Norm Value": "1.99431"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.linear_kv_up_proj.weight",
+          "shape": [
+            32768,
+            512
+          ],
+          "index": 5,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op5",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "2fb36756387fc43f17869320ef56b7a3097e760b",
+          "mf_gradient_sha1": "f9c0bccbb24eb0c5e919dfce139ee9f86f752a82",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 2.6436588764190674,
+          "mf_square_sum_sha1": "56e297924c27f064a1537a614533aaa7ab837f35",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00646973",
+            "Max Value": "0.00613403",
+            "L2Norm Value": "1.62594"
+          }
+        },
+        {
+          "name": "decoder.layers.0.mlp.linear_fc1.weight",
+          "shape": [
+            24576,
+            5120
+          ],
+          "index": 6,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op6",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "156e0e10d66bf721f6b504d8a88f7b0e4596c982",
+          "mf_gradient_sha1": "da8f7fee8cbf95114ac2266936155be45beb8f2d",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 3.040926456451416,
+          "mf_square_sum_sha1": "e02177124df72c61b4033c599a1c180bcc4c579d",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0139771",
+            "Max Value": "0.0130005",
+            "L2Norm Value": "1.7439"
+          }
+        },
+        {
+          "name": "decoder.layers.0.mlp.linear_fc2.weight",
+          "shape": [
+            5120,
+            12288
+          ],
+          "index": 7,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op7",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "2d5b60ae965121d82390f88ade659c866a3ef6df",
+          "mf_gradient_sha1": "f324d55931db2cf91d9e27c5ef1746a9204a1358",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 8.910489082336426,
+          "mf_square_sum_sha1": "96a349d3c668f4afbe4a93d822dabe05805f9c48",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0272217",
+            "Max Value": "0.0270996",
+            "L2Norm Value": "2.98515"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_proj.weight",
+          "shape": [
+            5120,
+            16384
+          ],
+          "index": 8,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op8",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "07e43ef9b31643bc0f43a26ec1154f9dff24dbd2",
+          "mf_gradient_sha1": "d8bba759fbf2e7ab4fa89fc15e983d856b0405dd",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.5311822295188904,
+          "mf_square_sum_sha1": "786a67efc8c887b5493a9977f0c71815fe4f2845",
+          "mf_printed_statistics": {
+            "Min Value": "-0.001091",
+            "Max Value": "0.00117493",
+            "L2Norm Value": "0.728885"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_q_down_proj.weight",
+          "shape": [
+            1536,
+            5120
+          ],
+          "index": 9,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op9",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "10f43c4a4849d41b78cc6b84eb129a38c03490e5",
+          "mf_gradient_sha1": "36c72a64156475dea5eb7c0cd131fc5f6b3fc6c7",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.0006104745552875102,
+          "mf_square_sum_sha1": "8d921a7dfbd1d771eff0cc29543e000660c9de2c",
+          "mf_printed_statistics": {
+            "Min Value": "-8.82149e-05",
+            "Max Value": "8.86917e-05",
+            "L2Norm Value": "0.0247092"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_q_up_proj.weight",
+          "shape": [
+            24576,
+            1536
+          ],
+          "index": 10,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op10",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "3ad2c304e4c7f578b0c314dc743271859a0aad6d",
+          "mf_gradient_sha1": "80cb7c8a3cd119ec784ae61fd504fb1016570503",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.0006133493734523654,
+          "mf_square_sum_sha1": "d7ba2e2c6665a5f91da328f6ad6a421f81042d86",
+          "mf_printed_statistics": {
+            "Min Value": "-9.10759e-05",
+            "Max Value": "7.86781e-05",
+            "L2Norm Value": "0.0247664"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_kv_down_proj.weight",
+          "shape": [
+            576,
+            5120
+          ],
+          "index": 11,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op11",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "9a5a2f782d8fb90461b431237b19c58ab23817d8",
+          "mf_gradient_sha1": "4b8f84001d9964923d4ab2f422592a50db550414",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.17125079035758972,
+          "mf_square_sum_sha1": "58dd1f09c97b5160697a00b1e6a33af07466e576",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00250244",
+            "Max Value": "0.00230408",
+            "L2Norm Value": "0.413781"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.linear_kv_up_proj.weight",
+          "shape": [
+            32768,
+            512
+          ],
+          "index": 12,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op12",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "d1f4797734e36e0aa4bd8dc85b6afd0442fa725c",
+          "mf_gradient_sha1": "3545162bf5435eea7c7aaa2f3ce18ec9c5ac2c9a",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.13145455718040466,
+          "mf_square_sum_sha1": "488cd3d19f86809bfb545c26f8b77ee967320ff8",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00143433",
+            "Max Value": "0.00150299",
+            "L2Norm Value": "0.362586"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.router.weight",
+          "shape": [
+            8,
+            5120
+          ],
+          "index": 13,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op13",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "1575a9b69a9650ff5b1b576b27636476c850deeb",
+          "mf_gradient_sha1": "08c8af61e648e92ab94140ab6ba1ce26f677c254",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.03524322807788849,
+          "mf_square_sum_sha1": "6ab11c6a15e7145703eaa5cf6eaa487878dd0444",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00580789",
+            "Max Value": "0.00617115",
+            "L2Norm Value": "0.187668"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.experts.weight1",
+          "shape": [
+            40960,
+            3072
+          ],
+          "index": 14,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op14",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "dd0ece3bbca2fa51f6f43b0af7c760e1e4da737b",
+          "mf_gradient_sha1": "441c5e305624170e2ebcbb3f5161b46de87e445c",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 2.4004299640655518,
+          "mf_square_sum_sha1": "ba40d32f5218bd76504daa21a9b3eb7b948be71a",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0158691",
+            "Max Value": "0.0167236",
+            "L2Norm Value": "1.54941"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.experts.weight2",
+          "shape": [
+            12288,
+            5120
+          ],
+          "index": 15,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op15",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "487dd591a5094cee06fbac156672af4c09f60b3d",
+          "mf_gradient_sha1": "77b08aac4ae15c71433536742b0fc4c86f1f6203",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 5.405890464782715,
+          "mf_square_sum_sha1": "359816e7533b89293ff96c033e710d5675444168",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0395508",
+            "Max Value": "0.041748",
+            "L2Norm Value": "2.32501"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.shared_experts.linear_fc1.weight",
+          "shape": [
+            6144,
+            5120
+          ],
+          "index": 16,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op16",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "01635185a8ec69a3ca394e532c5ab22be9363ee8",
+          "mf_gradient_sha1": "32a44c2940c654a1c04ea872897512165b390730",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.1084507629275322,
+          "mf_square_sum_sha1": "2812a5e25b1f07936495e94c793e2df93b583d0e",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00137329",
+            "Max Value": "0.00141144",
+            "L2Norm Value": "0.329316"
+          }
+        },
+        {
+          "name": "decoder.layers.1.mlp.shared_experts.linear_fc2.weight",
+          "shape": [
+            5120,
+            3072
+          ],
+          "index": 17,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op17",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "c9d5237411e36cfeeb2059bf9bc653d28dd62c99",
+          "mf_gradient_sha1": "ac2c035d02672fca9b25799c483ad5ab337a494d",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.25294065475463867,
+          "mf_square_sum_sha1": "acfb6c9d0042e156d87c7b8bc1f906d2f37ed5f5",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00424194",
+            "Max Value": "0.00485229",
+            "L2Norm Value": "0.502924"
+          }
+        },
+        {
+          "name": "mtp.layers.0.eh_proj.weight",
+          "shape": [
+            5120,
+            10240
+          ],
+          "index": 18,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op18",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "b9a862e47004ef3a9708210f2bc0fae7364a39a0",
+          "mf_gradient_sha1": "ca2d1bd79d5782ec663f759b0195fc6ac5f9def9",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.6009739637374878,
+          "mf_square_sum_sha1": "5739df1a5b39dc97e0809266dab2ad4ed9f13070",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00154877",
+            "Max Value": "0.00164795",
+            "L2Norm Value": "0.775286"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_proj.weight",
+          "shape": [
+            5120,
+            16384
+          ],
+          "index": 19,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op19",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "7f87be1992edaae49ecbb4ddb552a6f97823b22c",
+          "mf_gradient_sha1": "4aeb2d3e0e802e2f62ba662f0fa1160b3e35debf",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.10205157101154327,
+          "mf_square_sum_sha1": "a2c81715917e87b1995c506de52688259c915c68",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000492096",
+            "Max Value": "0.00050354",
+            "L2Norm Value": "0.31951"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_q_down_proj.weight",
+          "shape": [
+            1536,
+            5120
+          ],
+          "index": 20,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op20",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "64b224f359368c00579f2e21e07953bf6e6ee3f4",
+          "mf_gradient_sha1": "a20ecfdd27af71a5f7bab97a36682e5621e7a14b",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.00022069468104746193,
+          "mf_square_sum_sha1": "8116fda37206f221e9163dcd9e870b5a03cd871c",
+          "mf_printed_statistics": {
+            "Min Value": "-4.79221e-05",
+            "Max Value": "4.48227e-05",
+            "L2Norm Value": "0.0148543"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_q_up_proj.weight",
+          "shape": [
+            24576,
+            1536
+          ],
+          "index": 21,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op21",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "06a1b33938ecd317de84025c110d99278905a073",
+          "mf_gradient_sha1": "c65ba2ab23bb46225cbd1581d6d9baa06e196bec",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.00020412095182109624,
+          "mf_square_sum_sha1": "5f8520574f198ba4df62ecefa196e023555de2b2",
+          "mf_printed_statistics": {
+            "Min Value": "-4.79221e-05",
+            "Max Value": "4.31538e-05",
+            "L2Norm Value": "0.0142863"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_kv_down_proj.weight",
+          "shape": [
+            576,
+            5120
+          ],
+          "index": 22,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op22",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "7856de0fc4e9587c6855b7c9991cdbccc502eb9e",
+          "mf_gradient_sha1": "53990067d64b0a413bf792dfb1582255e640fa4e",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.02974269539117813,
+          "mf_square_sum_sha1": "924e239e7ec232f38bfcfa11af64ae48169410af",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00173187",
+            "Max Value": "0.0015564",
+            "L2Norm Value": "0.17245"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.linear_kv_up_proj.weight",
+          "shape": [
+            32768,
+            512
+          ],
+          "index": 23,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op23",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "4770da0f4053c7916bb2be13ecef31ade8e34f39",
+          "mf_gradient_sha1": "a1bca4cfcdb5e722a6cd313eba3aef29c028c5af",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.025103416293859482,
+          "mf_square_sum_sha1": "ccd9aa75518e1959b86956adaaf585b90bb1383a",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000656128",
+            "Max Value": "0.000583649",
+            "L2Norm Value": "0.15846"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.router.weight",
+          "shape": [
+            8,
+            5120
+          ],
+          "index": 24,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op24",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "474af2e3455a203e9cc9e6ab84e8ee41117bfb45",
+          "mf_gradient_sha1": "2fb85d05f5aed29e746a32cd298b79a286438746",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.02416682057082653,
+          "mf_square_sum_sha1": "6b3e6f0b564c6438c9c7b5f474e03db0c67663a0",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00465214",
+            "Max Value": "0.0043429",
+            "L2Norm Value": "0.156031"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.experts.weight1",
+          "shape": [
+            40960,
+            3072
+          ],
+          "index": 25,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op25",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "6581a6dbd0cdf4744ac4e8f8dc6070b5ea439187",
+          "mf_gradient_sha1": "4940c833b0524f9815ada58bcb3ac2130e1bd8ff",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.30110877752304077,
+          "mf_square_sum_sha1": "5be20d682fe07c5cd9998f117441bed42c573946",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00180817",
+            "Max Value": "0.0015564",
+            "L2Norm Value": "0.548742"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.experts.weight2",
+          "shape": [
+            12288,
+            5120
+          ],
+          "index": 26,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op26",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "d814c836debe4af2dbae4300fc49c09e7983fbd9",
+          "mf_gradient_sha1": "02e16540a41d0acbafebb5365637c17eca8665e2",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.19099697470664978,
+          "mf_square_sum_sha1": "716f317f027d89cdbce2f862e4fc0581f630d5f6",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00159454",
+            "Max Value": "0.0016098",
+            "L2Norm Value": "0.437071"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.shared_experts.linear_fc1.weight",
+          "shape": [
+            6144,
+            5120
+          ],
+          "index": 27,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op27",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "032d5495ed9f5f8e5f63764fedd6f4a8720330d0",
+          "mf_gradient_sha1": "b29bdc334b25bf66b7da859b00d8a347613efc71",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.05271797999739647,
+          "mf_square_sum_sha1": "1a79815c59e0540b473ae97d432ccb0ec184a43d",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00136566",
+            "Max Value": "0.00137329",
+            "L2Norm Value": "0.229608"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.mlp.shared_experts.linear_fc2.weight",
+          "shape": [
+            5120,
+            3072
+          ],
+          "index": 28,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op28",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "4450fb9fb8f508337e7383bf31cf968c07991e40",
+          "mf_gradient_sha1": "44724748a5065c319cd33160696a920ddc105d5a",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.11360188573598862,
+          "mf_square_sum_sha1": "a5189da028c2613f7f6f36157bc7dbdeafc27cd2",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00190735",
+            "Max Value": "0.00193787",
+            "L2Norm Value": "0.33706"
+          }
+        },
+        {
+          "name": "output_layer.weight",
+          "shape": [
+            152064,
+            5120
+          ],
+          "index": 29,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op29",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "9208cb9e3e5167dcbbefed48526fb2abe1b373f4",
+          "mf_gradient_sha1": "61f61dc1aa8d91ee0b8177c1477bd551edf03098",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 6.953719139099121,
+          "mf_square_sum_sha1": "e0353424357e1b23bcb833a7d48bf99cb424e658",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0427513",
+            "Max Value": "0.0470276",
+            "L2Norm Value": "2.63702"
+          }
+        },
+        {
+          "name": "decoder.layers.0.input_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 30,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op30",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "76df4416d9f79d32b890ccb8a74abc67345923d6",
+          "mf_gradient_sha1": "20c8bbbe57d1f82596431ded7c95bdd895c61ee9",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.00220192177221179,
+          "mf_square_sum_sha1": "50e25d5403a00a55c4fe85356a4282376c0a600c",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00388432",
+            "Max Value": "0.00258092",
+            "L2Norm Value": "0.0469241"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.q_layernorm.weight",
+          "shape": [
+            1536
+          ],
+          "index": 31,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op31",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "2768c8d5b2ac220d1a2d437b75bd76dc695b1d11",
+          "mf_gradient_sha1": "eafc251824b6672b92b00752ecceac1e6b0ec339",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.0005740988999605179,
+          "mf_square_sum_sha1": "d6c951dd23b3a262eaa7de3e3474b496cbe72b6c",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00227927",
+            "Max Value": "0.00190505",
+            "L2Norm Value": "0.0239573"
+          }
+        },
+        {
+          "name": "decoder.layers.0.self_attention.kv_layernorm.weight",
+          "shape": [
+            512
+          ],
+          "index": 32,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op32",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "ec56c2dea704bae732ebee698116ac536957e47b",
+          "mf_gradient_sha1": "bdd262d96f0e328c854978812555c4e6a232d339",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.0025069902185350657,
+          "mf_square_sum_sha1": "45274a98e5cffe2978e538d665449aa6cb1d9f21",
+          "mf_printed_statistics": {
+            "Min Value": "-0.0144823",
+            "Max Value": "0.0106288",
+            "L2Norm Value": "0.0500581"
+          }
+        },
+        {
+          "name": "decoder.layers.0.pre_mlp_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 33,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op33",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "1f3b943bcb867eb264ff8da445349e1c72986769",
+          "mf_gradient_sha1": "535cf44e8d9bd3a82a811afdce390b8a9917f954",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.0013337205164134502,
+          "mf_square_sum_sha1": "879c8be7259fa27550d4375413b079e2a85253f5",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00221981",
+            "Max Value": "0.00283102",
+            "L2Norm Value": "0.0365216"
+          }
+        },
+        {
+          "name": "decoder.layers.1.input_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 34,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op34",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "30900ce2d7c449d1900379e02091abeb54dffe30",
+          "mf_gradient_sha1": "f51d1688026ccfe4b9e256e03b27f424cd15fae8",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 7.284995081136003e-05,
+          "mf_square_sum_sha1": "702f64512e68a683a2f97e7897b0e8a9d741c5c2",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00072243",
+            "Max Value": "0.000770729",
+            "L2Norm Value": "0.00853388"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.q_layernorm.weight",
+          "shape": [
+            1536
+          ],
+          "index": 35,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op35",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "15a521a3089d33363dcd3fa221d6eea80a32b08c",
+          "mf_gradient_sha1": "816544482e78a4c3102c68e23d66052a3bdafaea",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 2.5039304318852373e-07,
+          "mf_square_sum_sha1": "74ed1c14740b6395a514bb1ae48f2a10b205b855",
+          "mf_printed_statistics": {
+            "Min Value": "-5.69969e-05",
+            "Max Value": "5.50372e-05",
+            "L2Norm Value": "0.000500317"
+          }
+        },
+        {
+          "name": "decoder.layers.1.self_attention.kv_layernorm.weight",
+          "shape": [
+            512
+          ],
+          "index": 36,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op36",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "7f1a0e6cd744aae9ef75178e72a9cdbcf4b51f33",
+          "mf_gradient_sha1": "4cd2175922be165e1768d68d8a24a936f2211498",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.00010930418648058549,
+          "mf_square_sum_sha1": "1f96c97be0af33e44a5d683aa12d1a4a76530737",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00193473",
+            "Max Value": "0.00293769",
+            "L2Norm Value": "0.0104532"
+          }
+        },
+        {
+          "name": "decoder.layers.1.pre_mlp_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 37,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op37",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "15d3aa6fa7405f21efc3bfd77efdc994d60bc6b3",
+          "mf_gradient_sha1": "a2a163672e1a61d01b14a01167ec73bc4c413863",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.0010721641592681408,
+          "mf_square_sum_sha1": "cdb5d0d743ca7cbede40f766ba717fae51b09a1f",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00203453",
+            "Max Value": "0.00301996",
+            "L2Norm Value": "0.0327471"
+          }
+        },
+        {
+          "name": "decoder.final_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 38,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op38",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "2788f0ee7cc6a3f849fd2224f976b3bd8318935d",
+          "mf_gradient_sha1": "c65c81607e2ad61fe1bf9ada075b131dda75abc4",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.002682819962501526,
+          "mf_square_sum_sha1": "34dfeaf2903fedce24cf6c9eb487c70ccd28c31a",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00464001",
+            "Max Value": "0.00375732",
+            "L2Norm Value": "0.0517959"
+          }
+        },
+        {
+          "name": "mtp.layers.0.enorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 39,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op39",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "0599c0a01cab687c8792b1ccee5918eb5edaf0fe",
+          "mf_gradient_sha1": "7222e8900cc234720b1e7ad9239cf1c3f6ae62ee",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 9.215003228746355e-05,
+          "mf_square_sum_sha1": "f852e35269f81828b8ea07119ad9e4904ae916d1",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000608341",
+            "Max Value": "0.000509373",
+            "L2Norm Value": "0.00959951"
+          }
+        },
+        {
+          "name": "mtp.layers.0.hnorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 40,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op40",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "f7dee10e1e9f5996dd61aec08da0ea75c223efde",
+          "mf_gradient_sha1": "348060dc7e508752d6e5eb512343f5947066b702",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.00015109218657016754,
+          "mf_square_sum_sha1": "f3a9ff1b5220191feffde60d6224eff35d089d65",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000965845",
+            "Max Value": "0.00095169",
+            "L2Norm Value": "0.0122913"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.input_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 41,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op41",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "8438620ee2e8d102af9cec41966f5da5ff968eb2",
+          "mf_gradient_sha1": "f55179f876a2d354a10e00802a27251332376ac4",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 1.221292041009292e-05,
+          "mf_square_sum_sha1": "285fd8e6796eeecbafec93bddd86ded6c22eb364",
+          "mf_printed_statistics": {
+            "Min Value": "-0.000433324",
+            "Max Value": "0.000248804",
+            "L2Norm Value": "0.0034948"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.q_layernorm.weight",
+          "shape": [
+            1536
+          ],
+          "index": 42,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op42",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "26af8fa7f8b8be14c9f913c2155215a27b20f020",
+          "mf_gradient_sha1": "5dfcce692ca52344c45b465ba1489054e294168b",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 1.358265535600367e-07,
+          "mf_square_sum_sha1": "66d14ce90cd6fb8f18bf58937530de357a9d1f7d",
+          "mf_printed_statistics": {
+            "Min Value": "-4.38532e-05",
+            "Max Value": "1.85241e-05",
+            "L2Norm Value": "0.000368494"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.self_attention.kv_layernorm.weight",
+          "shape": [
+            512
+          ],
+          "index": 43,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op43",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "e2354f239d5c31dc8cca7babbacd9fb72f5df8a9",
+          "mf_gradient_sha1": "d838f98266d70d9edd1e78a99e2c4e38a86574f7",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 2.1431493223644793e-05,
+          "mf_square_sum_sha1": "b538e0137d75b054596c62361fd325938c991d5a",
+          "mf_printed_statistics": {
+            "Min Value": "-0.001383",
+            "Max Value": "0.000562184",
+            "L2Norm Value": "0.00462666"
+          }
+        },
+        {
+          "name": "mtp.layers.0.transformer_layer.pre_mlp_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 44,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op44",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "a3674fb683a4606bccc9a9704d9046199d124cf2",
+          "mf_gradient_sha1": "88d69e8c4e550b744e81d265007515b1da172b79",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.00015636060561519116,
+          "mf_square_sum_sha1": "a8fb7598b23a392075af818caf3b0b2cab6e58b0",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00121477",
+            "Max Value": "0.000851713",
+            "L2Norm Value": "0.0125081"
+          }
+        },
+        {
+          "name": "mtp.layers.0.final_layernorm.weight",
+          "shape": [
+            5120
+          ],
+          "index": 45,
+          "native_op": "Default/GraphKernel_Mul_Mul_ReduceSum_split-op45",
+          "gradient_output_slot": 0,
+          "square_sum_output_slot": 1,
+          "hp_native_dump_sha1": "ffad9661f48ac6ac94aa92c762466e42901e9cc3",
+          "mf_gradient_sha1": "376122020ac2a7e88ac7673fd84413f60ad3dd60",
+          "gradient_exact": false,
+          "square_sum_exact": false,
+          "hp_square_sum": 0.00027505139587447047,
+          "mf_square_sum_sha1": "17cf9e667570c18aac800711d3ae980c41d5b8f7",
+          "mf_printed_statistics": {
+            "Min Value": "-0.00136211",
+            "Max Value": "0.000757516",
+            "L2Norm Value": "0.0165846"
+          }
+        }
+      ],
+      "statistics_sha256": "cae8c293ee02aeab37b3c8a25dd56e056037b468d47c700a386d1baae0449de7",
+      "statistics_rows": 95
+    }
+  ],
+  "models": [
+    {
+      "step": 329,
+      "different": {
+        "fp32_sha256": [
+          "model.layers.1.mlp.experts.down_proj"
+        ],
+        "bf16_as_fp32_sha256": [
+          "model.layers.1.mlp.experts.down_proj"
+        ]
+      }
+    },
+    {
+      "step": 330,
+      "different": {
+        "fp32_sha256": [
+          "lm_head.weight",
+          "model.embed_tokens.weight",
+          "model.layers.0.input_layernorm.weight",
+          "model.layers.0.mlp.down_proj.weight",
+          "model.layers.0.mlp.gate_proj.weight",
+          "model.layers.0.mlp.up_proj.weight",
+          "model.layers.0.post_attention_layernorm.weight",
+          "model.layers.0.self_attn.kv_a_layernorm.weight",
+          "model.layers.0.self_attn.kv_b_proj.weight",
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.0.self_attn.o_proj.weight",
+          "model.layers.0.self_attn.q_a_layernorm.weight",
+          "model.layers.0.self_attn.q_b_proj.weight",
+          "model.layers.1.input_layernorm.weight",
+          "model.layers.1.mlp.experts.down_proj",
+          "model.layers.1.mlp.experts.gate_up_proj",
+          "model.layers.1.mlp.gate.weight",
+          "model.layers.1.mlp.shared_experts.down_proj.weight",
+          "model.layers.1.mlp.shared_experts.gate_proj.weight",
+          "model.layers.1.mlp.shared_experts.up_proj.weight",
+          "model.layers.1.post_attention_layernorm.weight",
+          "model.layers.1.self_attn.kv_a_layernorm.weight",
+          "model.layers.1.self_attn.kv_b_proj.weight",
+          "model.layers.1.self_attn.linear_qkv.weight",
+          "model.layers.1.self_attn.o_proj.weight",
+          "model.layers.1.self_attn.q_a_layernorm.weight",
+          "model.layers.1.self_attn.q_b_proj.weight",
+          "model.norm.weight",
+          "mtp.layers.0.eh_proj.weight",
+          "mtp.layers.0.enorm.weight",
+          "mtp.layers.0.final_layernorm.weight",
+          "mtp.layers.0.hnorm.weight",
+          "mtp.layers.0.transformer_layer.input_layernorm.weight",
+          "mtp.layers.0.transformer_layer.mlp.experts.down_proj",
+          "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj",
+          "mtp.layers.0.transformer_layer.mlp.gate.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight",
+          "mtp.layers.0.transformer_layer.post_attention_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+          "mtp.layers.0.transformer_layer.self_attn.o_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight"
+        ],
+        "bf16_as_fp32_sha256": [
+          "lm_head.weight",
+          "model.embed_tokens.weight",
+          "model.layers.0.mlp.down_proj.weight",
+          "model.layers.0.mlp.gate_proj.weight",
+          "model.layers.0.mlp.up_proj.weight",
+          "model.layers.0.self_attn.kv_b_proj.weight",
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.0.self_attn.o_proj.weight",
+          "model.layers.0.self_attn.q_b_proj.weight",
+          "model.layers.1.mlp.experts.down_proj",
+          "model.layers.1.mlp.experts.gate_up_proj",
+          "model.layers.1.mlp.gate.weight",
+          "model.layers.1.mlp.shared_experts.down_proj.weight",
+          "model.layers.1.mlp.shared_experts.gate_proj.weight",
+          "model.layers.1.mlp.shared_experts.up_proj.weight",
+          "model.layers.1.self_attn.kv_b_proj.weight",
+          "model.layers.1.self_attn.linear_qkv.weight",
+          "model.layers.1.self_attn.o_proj.weight",
+          "model.layers.1.self_attn.q_b_proj.weight",
+          "mtp.layers.0.eh_proj.weight",
+          "mtp.layers.0.hnorm.weight",
+          "mtp.layers.0.transformer_layer.mlp.experts.down_proj",
+          "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj",
+          "mtp.layers.0.transformer_layer.mlp.gate.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj.weight",
+          "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.kv_b_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+          "mtp.layers.0.transformer_layer.self_attn.o_proj.weight",
+          "mtp.layers.0.transformer_layer.self_attn.q_b_proj.weight"
+        ]
+      }
+    }
+  ],
+  "source_sha256": "e11e7ac2ebe5e06fffc358937b8ae108a0ce721fb1cced580d3a96dd951b931e",
+  "native_graph_sha256": "7215cdb0302f98ef1630930fdb1974649f15a1e7492ee4495b265a09f0d3a296",
+  "scope": "Native composed SHA1 over all elements of 46 preclip gradients and square sums; printed statistics are not exact values. Iteration mapping is checked against actual FP32 norm hashes. Hash inequality alone does not quantify gradient differences."
+}

@@ -1,0 +1,388 @@
+# IR entry: @kernel_graph0
+# Total subgraphs: 1
+
+# Attrs:
+enable_zero_copy_in_graph: 1
+
+# Total params: 7
+# Params:
+%para1_lr: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+%para2_weight_decay: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+%para3_actual_weight: <Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>  :  has_default  :  <Float32xDefaultFormat[const vector]{12288, 5120}>  :  IsWeight: true
+%para4_actual_momentum: <Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>  :  has_default  :  <Float32xDefaultFormat[const vector]{12288, 5120}>  :  IsWeight: true
+%para5_beta: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+%para6_gradient: <Tensor[Float32], (12288, 5120)> : [12288, 5120]  :  <Float32xDefaultFormat[const vector]{12288, 5120}>  :  IsWeight: false
+%para7_rms: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 151
+Total number of cnodes: 53
+
+subgraph attr:
+enable_zero_copy_in_graph: 1
+subgraph instance: kernel_graph0 : 0xaaab37452340
+
+subgraph @kernel_graph0() {
+  %0(CNode_44) = Load(%para4_actual_momentum, UMonad[U]) primitive_attrs: {visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Tensor[Float32], (12288, 5120)>)
+      # Fullname with scope: (Default/Load-op0)
+  %1(CNode_43) = GraphKernel_Mul_fusion(%0, %para5_beta) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__42, graph_kernel: "Mul_fusion", visited: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (12288, 5120)>, <Tensor[Float32], (1)>) -> (<Tensor[Float32], (12288, 5120)>)
+      : (<Float32xDefaultFormat[const vector]{12288, 5120}>, <Float32xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{12288, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_fusion-op0)
+  %2(CNode_33) = Load(%para3_actual_weight, UMonad[U]) primitive_attrs: {visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Tensor[Float32], (12288, 5120)>)
+      # Fullname with scope: (Default/Load-op1)
+  %3(CNode_32) = GraphKernel_Mul_Sub_Mul_fusion(%para1_lr, %para2_weight_decay, %2) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2), func_graph: seg_trans__anonymous__31, graph_kernel: "Mul_Sub_Mul_fusion", visited: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (1)>, <Tensor[Float32], (1)>, <Tensor[Float32], (12288, 5120)>) -> (<Tensor[Float32], (12288, 5120)>)
+      : (<Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{12288, 5120}>) -> (<Float32xDefaultFormat[const vector]{12288, 5120}>)
+      : (Tensor, Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Sub_Mul_fusion-op0)
+  %4(CNode_207) = MakeTuple(%0, %2, %1, %3) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (12288, 5120)>, <Tensor[Float32], (12288, 5120)>, <Tensor[Float32], (12288, 5120)>, <Tensor[Float32], (12288, 5120)>) -> (<Tuple[Tensor[Float32]*4], TupleShape((12288, 5120), (12288, 5120), (12288, 5120), (12288, 5120))>)
+      # Fullname with scope: (Default/MakeTuple-op0)
+  %5(CNode_208) = UpdateState(UMonad[U], %4) primitive_attrs: {visited: Bool(1)}
+      : (<UMonad, NoShape>, <Tuple[Tensor[Float32]*4], TupleShape((12288, 5120), (12288, 5120), (12288, 5120), (12288, 5120))>) -> (<UMonad, NoShape>)
+      # Fullname with scope: (Default/UpdateState-op0)
+  %6(CNode_48) = Depend(%para4_actual_momentum, %5) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)}
+      : (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/Depend-op0)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:154, 38~46/    next_param = F.depend(next_param, F.assign(param, op_cast(next_param, F.dtype(param))))/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7583~7607/def assign(variable, value):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7607, 11~37/    return assign_op(variable, value)/
+  %7(CNode_47) = GraphKernel_Add_Mul_Add_Cast_Assign_fusion(%1, %para6_gradient, %para5_beta, %6) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (0, 1, 2, 3), side_effect_mem: Bool(1), graph_kernel: "Add_Mul_Add_Cast_Assign_fusion", visited: Bool(1), IsFeatureMapOutput: Bool(1), func_graph: seg_trans__anonymous__46} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (12288, 5120)>, <Tensor[Float32], (12288, 5120)>, <Tensor[Float32], (1)>, <Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>) -> (<Tuple[Tensor[BFloat16],Ref[Tensor[Float32]]], TupleShape((12288, 5120), (12288, 5120))>)
+      : (<Float32xDefaultFormat[const vector]{12288, 5120}>, <Float32xDefaultFormat[const vector]{12288, 5120}>, <Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{12288, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{12288, 5120}>, <Float32xDefaultFormat[const vector]{12288, 5120}>)
+      : (Tensor, Tensor, Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Add_Mul_Add_Cast_Assign_fusion-op0)
+  %8(CNode_209) = TupleGetItem(%7, I64(0)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[BFloat16],Ref[Tensor[Float32]]], TupleShape((12288, 5120), (12288, 5120))>, <Int64, NoShape>) -> (<Tensor[BFloat16], (12288, 5120)>)
+      # Fullname with scope: (Default/TupleGetItem-op0)
+  %9(CNode_55) = PrimFunc_Reshape(%8, (I64(-1), I64(1536), I64(5120))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (12288, 5120)>, <Tuple[Int64*3], TupleShape(NoShape, NoShape, NoShape), elements_use_flags={[const vector]{1, 1, 1}}>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{12288, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Reshape-op0)
+      # In file /workspace/mindformers/mindformers/core/optim/muon_utils.py:87~89, 4~34/    def reshape_fn(self, x, shp):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon_utils.py:89, 15~34/        return P.Reshape()(x, shp)/
+  %10(CNode_210) = GraphKernel_Cast_Mul_ReduceSum_split(%9) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (), node_name: "Square_ReduceSum_Sqrt_Add_fusion_0", graph_kernel: "Cast_Mul_ReduceSum_split", visited: Bool(1), IsFeatureMapOutput: Bool(0), func_graph: 2seg_trans__anonymous__118} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>) -> (<Tensor[Float32], (8)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>) -> (<Float32xDefaultFormat[const vector]{8}>)
+      : (Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Cast_Mul_ReduceSum_split-op0)
+  %11(CNode_211) = GraphKernel_Sqrt_Add_Cast_split(%10) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (0), node_name: "Square_ReduceSum_Sqrt_Add_fusion_1", graph_kernel: "Sqrt_Add_Cast_split", visited: Bool(1), IsFeatureMapOutput: Bool(1), func_graph: 2seg_trans__anonymous__119} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (8)>) -> (<Tensor[BFloat16], (8)>)
+      : (<Float32xDefaultFormat[const vector]{8}>) -> (<BFloat16xDefaultFormat[const vector]{8}>)
+      : (Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Sqrt_Add_Cast_split-op0)
+  %12(CNode_212) = PrimFunc_ExpandDims(%11, I64(1)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8)>, <Int64, NoShape>) -> (<Tensor[BFloat16], (8, 1)>)
+      : (<BFloat16xDefaultFormat[const vector]{8}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1}>)
+      : (Tensor, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/ExpandDims-op0)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:81, 27~73/    x = x / P.ExpandDims()(P.ExpandDims()((x.norm(dim=(1, 2)) + 1e-7), 1), 1)/
+  %13(CNode_62) = PrimFunc_ExpandDims(%12, I64(1)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1)>, <Int64, NoShape>) -> (<Tensor[BFloat16], (8, 1, 1)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1, 1}>)
+      : (Tensor, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/ExpandDims-op1)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:81, 12~77/    x = x / P.ExpandDims()(P.ExpandDims()((x.norm(dim=(1, 2)) + 1e-7), 1), 1)/
+  %14(CNode_61) = GraphKernel_Div_fusion(%9, %13) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__60, graph_kernel: "Div_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1, 1)>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1, 1}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Div_fusion-op0)
+  %15(a_mat) = PrimFunc_BatchMatMul(%14, %14, Bool(0), Bool(1)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op0)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:84, 16~53/        a_mat = P.BatchMatMul(transpose_b=True)(x, x)/
+  %16(CNode_70) = PrimFunc_BatchMatMul(%15, %15, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op1)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:85, 32~61/        b_mat = b * a_mat + c * P.BatchMatMul()(a_mat, a_mat)/
+  %17(CNode_69) = GraphKernel_Mul_Mul_Add_fusion(%15, %16) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__68, graph_kernel: "Mul_Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Mul_Add_fusion-op0)
+  %18(CNode_65) = PrimFunc_BatchMatMul(%17, %14, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op2)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:86, 20~45/        x = a * x + P.BatchMatMul()(b_mat, x)/
+  %19(CNode_64) = GraphKernel_Mul_Add_fusion(%14, %18) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__63, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op0)
+  %20(a_mat) = PrimFunc_BatchMatMul(%19, %19, Bool(0), Bool(1)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op3)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:84, 16~53/        a_mat = P.BatchMatMul(transpose_b=True)(x, x)/
+  %21(CNode_81) = PrimFunc_BatchMatMul(%20, %20, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op4)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:85, 32~61/        b_mat = b * a_mat + c * P.BatchMatMul()(a_mat, a_mat)/
+  %22(CNode_80) = GraphKernel_Mul_Mul_Add_fusion(%20, %21) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__79, graph_kernel: "Mul_Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Mul_Add_fusion-op1)
+  %23(CNode_76) = PrimFunc_BatchMatMul(%22, %19, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op5)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:86, 20~45/        x = a * x + P.BatchMatMul()(b_mat, x)/
+  %24(CNode_75) = GraphKernel_Mul_Add_fusion(%19, %23) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__74, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op1)
+  %25(a_mat) = PrimFunc_BatchMatMul(%24, %24, Bool(0), Bool(1)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op6)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:84, 16~53/        a_mat = P.BatchMatMul(transpose_b=True)(x, x)/
+  %26(CNode_92) = PrimFunc_BatchMatMul(%25, %25, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op7)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:85, 32~61/        b_mat = b * a_mat + c * P.BatchMatMul()(a_mat, a_mat)/
+  %27(CNode_91) = GraphKernel_Mul_Mul_Add_fusion(%25, %26) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__90, graph_kernel: "Mul_Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Mul_Add_fusion-op2)
+  %28(CNode_87) = PrimFunc_BatchMatMul(%27, %24, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op8)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:86, 20~45/        x = a * x + P.BatchMatMul()(b_mat, x)/
+  %29(CNode_86) = GraphKernel_Mul_Add_fusion(%24, %28) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__85, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op2)
+  %30(a_mat) = PrimFunc_BatchMatMul(%29, %29, Bool(0), Bool(1)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op9)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:84, 16~53/        a_mat = P.BatchMatMul(transpose_b=True)(x, x)/
+  %31(CNode_103) = PrimFunc_BatchMatMul(%30, %30, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op10)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:85, 32~61/        b_mat = b * a_mat + c * P.BatchMatMul()(a_mat, a_mat)/
+  %32(CNode_102) = GraphKernel_Mul_Mul_Add_fusion(%30, %31) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__101, graph_kernel: "Mul_Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Mul_Add_fusion-op3)
+  %33(CNode_98) = PrimFunc_BatchMatMul(%32, %29, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op11)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:86, 20~45/        x = a * x + P.BatchMatMul()(b_mat, x)/
+  %34(CNode_97) = GraphKernel_Mul_Add_fusion(%29, %33) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__96, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op3)
+  %35(a_mat) = PrimFunc_BatchMatMul(%34, %34, Bool(0), Bool(1)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op12)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:84, 16~53/        a_mat = P.BatchMatMul(transpose_b=True)(x, x)/
+  %36(CNode_114) = PrimFunc_BatchMatMul(%35, %35, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op13)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:85, 32~61/        b_mat = b * a_mat + c * P.BatchMatMul()(a_mat, a_mat)/
+  %37(CNode_113) = GraphKernel_Mul_Mul_Add_fusion(%35, %36) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__112, graph_kernel: "Mul_Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 1536)>) -> (<Tensor[BFloat16], (8, 1536, 1536)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Mul_Add_fusion-op4)
+  %38(CNode_109) = PrimFunc_BatchMatMul(%37, %34, Bool(0), Bool(0)) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2, 3), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 1536)>, <Tensor[BFloat16], (8, 1536, 5120)>, <Bool, NoShape>, <Bool, NoShape>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 1536}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BoolxDefaultFormat[const vector]{}>, <BoolxDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor, Scalar, Scalar) -> (Tensor)
+      # Fullname with scope: (Default/BatchMatMul-op14)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:142, 16~46/            x = zeropower_via_newtonschulz5_3d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:74~89/def zeropower_via_newtonschulz5_3d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:86, 20~45/        x = a * x + P.BatchMatMul()(b_mat, x)/
+  %39(CNode_108) = GraphKernel_Mul_Add_fusion(%34, %38) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__107, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tensor[BFloat16], (8, 1536, 5120)>) -> (<Tensor[BFloat16], (8, 1536, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op4)
+  %40(CNode_38) = PrimFunc_Reshape(%39, (I64(-1), I64(5120))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (8, 1536, 5120)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (12288, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{8, 1536, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{12288, 5120}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Reshape-op1)
+      # In file /workspace/mindformers/mindformers/core/optim/muon_utils.py:166~168, 4~34/    def reshape_fn(self, x, shp):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon_utils.py:168, 15~34/        return P.Reshape()(x, shp)/
+  %41(CNode_39) = Depend(%para3_actual_weight, %5) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)}
+      : (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/Depend-op1)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:154, 38~46/    next_param = F.depend(next_param, F.assign(param, op_cast(next_param, F.dtype(param))))/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7583~7607/def assign(variable, value):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7607, 11~37/    return assign_op(variable, value)/
+  %42(CNode_37) = GraphKernel_Mul_Mul_Cast_Mul_Sub_Assign_fusion(%para7_rms, %para1_lr, %40, %3, %41) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (0, 1, 2, 3, 4), side_effect_mem: Bool(1), graph_kernel: "Mul_Mul_Cast_Mul_Sub_Assign_fusion", visited: Bool(1), IsFeatureMapOutput: Bool(1), func_graph: seg_trans__anonymous__36} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (1)>, <Tensor[Float32], (1)>, <Tensor[BFloat16], (12288, 5120)>, <Tensor[Float32], (12288, 5120)>, <Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>) -> (<Tuple[Tensor[Float32],Ref[Tensor[Float32]]], TupleShape((12288, 5120), (12288, 5120))>)
+      : (<Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{1}>, <BFloat16xDefaultFormat[const vector]{12288, 5120}>, <Float32xDefaultFormat[const vector]{12288, 5120}>, <Float32xDefaultFormat[const vector]{12288, 5120}>) -> (<Float32xDefaultFormat[const vector]{12288, 5120}>, <Float32xDefaultFormat[const vector]{12288, 5120}>)
+      : (Tensor, Tensor, Tensor, Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Mul_Cast_Mul_Sub_Assign_fusion-op0)
+  %43(CNode_41) = TupleGetItem(%42, I64(0)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32],Ref[Tensor[Float32]]], TupleShape((12288, 5120), (12288, 5120))>, <Int64, NoShape>) -> (<Tensor[Float32], (12288, 5120)>)
+      # Fullname with scope: (Default/TupleGetItem-op1)
+  %44(CNode_213) = TupleGetItem(%42, I64(1)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32],Ref[Tensor[Float32]]], TupleShape((12288, 5120), (12288, 5120))>, <Int64, NoShape>) -> (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/TupleGetItem-op2)
+  %45(next_param) = Depend(%43, %44) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (12288, 5120)>, <Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>) -> (<Tensor[Float32], (12288, 5120)>)
+      # Fullname with scope: (Default/Depend-op2)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:154, 17~91/    next_param = F.depend(next_param, F.assign(param, op_cast(next_param, F.dtype(param))))/
+  %46(CNode_214) = TupleGetItem(%7, I64(1)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[BFloat16],Ref[Tensor[Float32]]], TupleShape((12288, 5120), (12288, 5120))>, <Int64, NoShape>) -> (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/TupleGetItem-op3)
+  %47(next_param) = Depend(%45, %46) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (12288, 5120)>, <Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>) -> (<Tensor[Float32], (12288, 5120)>)
+      # Fullname with scope: (Default/Depend-op3)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:155, 17~89/    next_param = F.depend(next_param, F.assign(muon_m, op_cast(next_m, F.dtype(muon_m))))/
+  %48(CNode_215) = MakeTuple(%44, %46) primitive_attrs: {visited: Bool(1)}
+      : (<Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_weight, is_parameter, is_inplace>, <Ref[Tensor[Float32]], (12288, 5120), ref_key=actual_momentum, is_parameter, is_inplace>) -> (<Tuple[Ref[Tensor[Float32]]*2], TupleShape((12288, 5120), (12288, 5120))>)
+      # Fullname with scope: (Default/MakeTuple-op1)
+  %49(CNode_216) = UpdateState(%5, %48) primitive_attrs: {visited: Bool(1)}
+      : (<UMonad, NoShape>, <Tuple[Ref[Tensor[Float32]]*2], TupleShape((12288, 5120), (12288, 5120))>) -> (<UMonad, NoShape>)
+      # Fullname with scope: (Default/UpdateState-op1)
+  %50(CNode_217) = Depend(%47, %49) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (12288, 5120)>, <UMonad, NoShape>) -> (<Tensor[Float32], (12288, 5120)>)
+      # Fullname with scope: (Default/Depend-op4)
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:53~56, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier329_builtin_dump.py:54, 15~38/        return muon._apply_muon_update(/
+  %51(CNode_218) = MakeTuple(%50) primitive_attrs: {visited: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (12288, 5120)>) -> (<Tuple[Tensor[Float32]], TupleShape((12288, 5120))>)
+      : (Tensor) -> (TupleUnfold)
+      # Fullname with scope: (Default/MakeTuple-op2)
+  Return(%51) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]], TupleShape((12288, 5120))>)
+      # Fullname with scope: (Default/Return-op0)
+}
+
+
