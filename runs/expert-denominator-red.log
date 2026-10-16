@@ -1,0 +1,42 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ TestArchivedArithmetic.test_expert_denominator_rounds_norm_and_epsilon_together _
+
+self = <test_jt_mf_archive.TestArchivedArithmetic testMethod=test_expert_denominator_rounds_norm_and_epsilon_together>
+
+    def test_expert_denominator_rounds_norm_and_epsilon_together(self):
+        """An independent FP64 reference detects premature BF16 norm rounding."""
+        values = torch.tensor([1., .125, .375, 2.25], dtype=torch.bfloat16).reshape(1, 2, 2) * 2.**-18
+        reference_norm = values.double().square().sum().sqrt()
+        expected = (values / (reference_norm + 1e-7).bfloat16()).bfloat16()
+        early_rounded = values / (values.norm(dim=(-2, -1), keepdim=True) + 1e-7)
+        self.assertFalse(torch.equal(expected, early_rounded))
+>       torch.testing.assert_close(normalize_ns(values), expected, rtol=0, atol=0)
+E       AssertionError: Tensor-likes are not equal!
+E       
+E       Mismatched elements: 4 / 4 (100.0%)
+E       Greatest absolute difference: 0.00390625 at index (0, 0, 0)
+E       Greatest relative difference: 0.00982666015625 at index (0, 0, 0)
+
+tests/ut/model_integration/test_jt_mf_archive.py:91: AssertionError
+=============================== warnings summary ===============================
+tests/common/mark_utils.py:38
+  /alignment/phase13/development/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.platform_ascend910b - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /alignment/phase13/development/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /alignment/phase13/development/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.dryrun - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /alignment/phase13/development/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/ut/model_integration/test_jt_mf_archive.py::TestArchivedArithmetic::test_expert_denominator_rounds_norm_and_epsilon_together
+1 failed, 8 deselected, 4 warnings in 4.10s
