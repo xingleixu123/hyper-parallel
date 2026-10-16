@@ -30,11 +30,11 @@
 | Top12 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
 | Top13 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
 | Top14 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；旧69步前缀确认耗时及reserved漏报；新完整200步有51步时间漏报；真实8进程CPU/Gloo资源偏差64→0，NPU/PP训练通信仍待回归 |
-| Top15 | FSDP动态派生的重算wrapper被覆盖报告漏计 | [#229](https://github.com/hf1s/hyper-parallel/issues/229) | [#230](https://github.com/hf1s/hyper-parallel/pull/230) | 真实三处区域报告为一处；单提交2文件，CPU62测试/2子测试、两轴检视及lint通过；仅修报告，NPU训练与性能无新增结论 |
+| Top15 | FSDP动态派生的重算wrapper被覆盖报告漏计 | [#229](https://github.com/hf1s/hyper-parallel/issues/229) | [#230](https://github.com/hf1s/hyper-parallel/pull/230) | 真实三处区域报告为一处；采用真实基类isinstance，单提交2文件；CPU62测试/4子测试、两种导入顺序和lint通过；仅修报告，Maintainer复核/CI另计 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `b540051`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `81f54d2`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
 
 ## 当前固定环境
 
@@ -212,7 +212,7 @@ JT底层已有checkpoint、exclude及策略接口；当前YAML的off/full/select
 
 ## 其他独立修复及回归边界
 
-#228真实TorchNPU选项及CPU定向测试通过，修复预先开启HF32后Trainer不能关闭的问题；镜像默认HF32关闭，尚未证明是本轮漂移根因。[复现、修复前后与两轴检视](reports/npu-precision-switch/README_ZH.md)。#230修复FSDP动态派生wrapper被报告漏计；62项CPU测试/2项子测试及两轴检视通过，只修报告，不能称改变了训练性能。[原始证据](reports/checkpoint-wrapper-inventory/README_ZH.md)。
+#228真实TorchNPU选项及CPU定向测试通过，修复预先开启HF32后Trainer不能关闭的问题；镜像默认HF32关闭，尚未证明是本轮漂移根因。[复现、修复前后与两轴检视](reports/npu-precision-switch/README_ZH.md)。#230按评审建议改用真实基类isinstance识别FSDP动态派生wrapper，已squash为`81f54d2`；当前完整CPU回归62项测试/4项子测试、两种导入顺序与lint通过。旧MRO方案会误计同模块同名的无关类，新回归已覆盖。只修报告，保持草稿，Maintainer复核和当前head的CI另计。[本轮原始证据与失败边界](https://github.com/xingleixu123/hyper-parallel/blob/0137ab4462bc1190d45ce71ce1063a0398903d20/README_ZH.md)。
 
 #214保持一个提交，在Ascend完成两卡FP32/BF16及四卡Partial回归，普通非整除Shard的行为为明确拒绝不支持布局。#199功能由上游#186提供，该PR保留独立回归并完成四卡短步ST。各PR的测试范围与剩余限制见顶部排序表及对应中文小问题；短回归和CPU通过不代替200步训练或完整CI。
 
