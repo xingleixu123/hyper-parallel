@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec / 增量复核",
+  "status": "PASS",
+  "findings": [],
+  "reviewed_tool": "tools/analyze_dgrad_four_arm.py",
+  "reviewed_tool_sha256": "250eaa92852ed7c596e2dda514e833aa00b43f08922ab8c48205bbf689e6637b",
+  "closed_findings": [
+    {
+      "priority": "P2",
+      "issue": "reference/candidate采样坐标相同时，dtype、global_sequence或feature宽度不一致仍可能被解释为零差。",
+      "resolution": "logical_signature保存(dtype, shape[0], global_sequence, shape[2])；reference的同组分区在102–104行核对，candidate在123–124行核对，之后才消费坐标。",
+      "compatibility": "不将局部shape[1]纳入逻辑签名，保留CP1序长4096与CP2局部序长2048的合法比较。"
+    }
+  ],
+  "conclusion_zh": "PASS：原P2已关闭。独立执行当前函数AST的小型内存测试，9个负例均拒绝，3个原版本错误零差反例重现；CP局部序长差异正例和非零误差手算oracle通过。新签名不改变已有逐坐标误差累计。父v3真实A/B交叉核对摘要与此前独立142组报告汇总相符；本轮没有重新执行大规模分析。",
+  "method_zh": [
+    "读取当前工具、保留v1、check_sample源及两份摘要证据，记录字节数与SHA。",
+    "从AST提取coordinates/logical_signature/reference_batch/compare_batch/compare_pair及check_sample，read_indexed用纯内存记录替代；执行的是当前算法，不重写比较实现。",
+    "每个fixture含8个batch，每batch含output和output_gradient两组；reference为4096局部序长，candidate分为两个2048分区。对照保持全局序长4096。",
+    "不导入Torch，不启动容器、训练、设备或额外大坐标分析。"
+  ],
+  "independent_checks": {
+    "status": "PASS",
+    "finding_closed": "P2: 逻辑dtype/全局序长/特征宽度未校验",
+    "tool_sha256": "250eaa92852ed7c596e2dda514e833aa00b43f08922ab8c48205bbf689e6637b",
+    "independent_old_false_zero_reproductions": [
+      {
+        "field": "dtype",
+        "old_version_false_zero_reproduced": true
+      },
+      {
+        "field": "global_sequence",
+        "old_version_false_zero_reproduced": true
+      },
+      {
+        "field": "feature_width",
+        "old_version_false_zero_reproduced": true
+      }
+    ],
+    "negative_fixtures": [
+      {
+        "name": "dtype_mismatch",
+        "rejected": true,
+        "message": "Candidate dtype or logical tensor shape differs"
+      },
+      {
+        "name": "global_sequence_mismatch",
+        "rejected": true,
+        "message": "Candidate dtype or logical tensor shape differs"
+      },
+      {
+        "name": "feature_width_mismatch",
+        "rejected": true,
+        "message": "Candidate dtype or logical tensor shape differs"
+      },
+      {
+        "name": "duplicate_reference",
+        "rejected": true,
+        "message": "Duplicated reference coordinate"
+      },
+      {
+        "name": "duplicate_candidate",
+        "rejected": true,
+        "message": "Unexpected or duplicated candidate coordinate"
+      },
+      {
+        "name": "missing_candidate",
+        "rejected": true,
+        "message": "Missing candidate module/call/stage coordinates"
+      },
+      {
+        "name": "wrong_call",
+        "rejected": true,
+        "message": "Unexpected candidate module/call/stage"
+      },
+      {
+        "name": "wrong_position",
+        "rejected": true,
+        "message": "Unexpected or duplicated candidate coordinate"
+      },
+      {
+        "name": "reference_partition_signature_mismatch",
+        "rejected": true,
+        "message": "Reference partitions have different logical tensor signatures"
+      }
+    ],
+    "positive_cp_partition": {
+      "reference_local_sequence": 4096,
+      "candidate_local_sequence": 2048,
+      "global_sequence": 4096,
+      "batches": 8,
+      "each_stage_coordinates": 32,
+      "max_abs": 0
+    },
+    "numeric_oracle": {
+      "forward_count": 32,
+      "different": 2,
+      "max_abs": 2,
+      "sum_delta2": 5,
+      "sum_reference2": 240,
+      "relative_l2": 0.14433756729740643,
+      "gradient_max_abs": 0
+    },
+    "parent_native_crosscheck_summary_matches_prior_independent_142_groups": true,
+    "prior_native_summary": {
+      "forward": {
+        "groups": 72,
+        "different_groups": 0,
+        "coordinates": 1747200,
+        "different_coordinates": 0,
+        "max_abs": 0
+      },
+      "gradient": {
+        "groups": 70,
+        "different_groups": 66,
+        "coordinates": 1138944,
+        "different_coordinates": 193767,
+        "max_abs": 0.000034332275390625
+      }
+    },
+    "input_files": [
+      {
+        "path": "tools/analyze_dgrad_four_arm.py",
+        "bytes": 8980,
+        "sha256": "250eaa92852ed7c596e2dda514e833aa00b43f08922ab8c48205bbf689e6637b"
+      },
+      {
+        "path": "evidence/dgrad-four-arm-analyzer-v1.py",
+        "bytes": 8207,
+        "sha256": "170c797a18d12aeca981b300d2c6bb37575e6bfdbf0e1bbe8aa5d7443bb60a80"
+      },
+      {
+        "path": "tools/audit_dgrad_short_run.py",
+        "bytes": 16023,
+        "sha256": "4a15d6c12dd8eae8da7e11db6d27ef5dee34b983ba929d9eecaaf6c125825cf2"
+      },
+      {
+        "path": "evidence/f637-dgrad-streaming-analyzer-native-crosscheck-v3.json",
+        "bytes": 1605,
+        "sha256": "df416cc0b9165ee0994fc22f77df5bf89125391519d7b7a774c9045769531429"
+      },
+      {
+        "path": "evidence/f637-dgrad-cp2-native-3-independent-review.json",
+        "bytes": 203666,
+        "sha256": "6a04004937e4fffa2420fc1088fdeb5c7a6405e5fa130760d80c4cc0fd8c5607"
+      }
+    ]
+  },
+  "scope_and_memory": [
+    "本工具只负责已有activation采样的相对比较；每臂完整执行、源/输入/Linear/loss覆盖仍由audit-v4和独立原始证据审计承接。",
+    "索引仅保留行偏移；每次构建一个逻辑batch的坐标表，candidate逐记录消费；四组对照顺序处理。新增每组4字段签名未改变主要内存量级。",
+    "此复核不证明四臂完成、不判断FP32 dgrad是否缩小跨布局误差，也不替代全8rank的200步验收。",
+    "此前独立A/B报告142组统计已保存；本轮只重新汇总该报告并对照父v3摘要，未声称重新从2,886,144原始坐标计算。"
+  ]
+}

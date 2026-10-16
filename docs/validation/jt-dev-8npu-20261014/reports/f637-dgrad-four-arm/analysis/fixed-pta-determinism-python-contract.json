@@ -1,0 +1,660 @@
+{
+  "commit": "fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d",
+  "fetched_at": "2026-10-15T21:17:41.834419+00:00",
+  "files": [
+    {
+      "source": "torch_npu/npu/__init__.py",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/npu/__init__.py",
+      "sha256": "355df777433fd8c85670db75d8aacf7fa076332092470d59b6ba26202ed7fd2f",
+      "local": "references/torch-npu-fa0f83fe49d3-torch_npu-npu-__init__.py",
+      "lines": [
+        {
+          "line": 104,
+          "text": "    \"config\","
+        },
+        {
+          "line": 105,
+          "text": "    \"matmul\","
+        },
+        {
+          "line": 106,
+          "text": "    \"conv\","
+        },
+        {
+          "line": 107,
+          "text": "    \"enable_deterministic_with_backward\","
+        },
+        {
+          "line": 108,
+          "text": "    \"disable_deterministic_with_backward\","
+        },
+        {
+          "line": 109,
+          "text": "    \"mstx\","
+        },
+        {
+          "line": 110,
+          "text": "    \"SyncLaunchStream\","
+        },
+        {
+          "line": 111,
+          "text": "    \"NPUGraph\","
+        },
+        {
+          "line": 112,
+          "text": "    \"graph\","
+        },
+        {
+          "line": 113,
+          "text": "    \"graph_pool_handle\","
+        },
+        {
+          "line": 114,
+          "text": "    \"is_current_stream_capturing\","
+        },
+        {
+          "line": 115,
+          "text": "    \"make_graphed_callables\","
+        },
+        {
+          "line": 116,
+          "text": "    \"ExternalEvent\","
+        },
+        {
+          "line": 117,
+          "text": "    \"graph_task_group_begin\","
+        },
+        {
+          "line": 118,
+          "text": "    \"graph_task_group_end\","
+        },
+        {
+          "line": 119,
+          "text": "    \"graph_task_update_begin\","
+        },
+        {
+          "line": 120,
+          "text": "    \"graph_task_update_end\","
+        },
+        {
+          "line": 121,
+          "text": "    \"set_device_limit\","
+        },
+        {
+          "line": 122,
+          "text": "    \"get_device_limit\","
+        },
+        {
+          "line": 123,
+          "text": "    \"set_stream_limit\","
+        },
+        {
+          "line": 124,
+          "text": "    \"reset_stream_limit\","
+        },
+        {
+          "line": 133,
+          "text": "    \"host_memory_stats_as_nested_dict\","
+        },
+        {
+          "line": 134,
+          "text": "    \"reset_accumulated_host_memory_stats\","
+        },
+        {
+          "line": 135,
+          "text": "    \"reset_peak_host_memory_stats\","
+        },
+        {
+          "line": 136,
+          "text": "    \"set_deterministic_level\","
+        },
+        {
+          "line": 137,
+          "text": "    \"use_compatible_impl\","
+        },
+        {
+          "line": 138,
+          "text": "    \"are_compatible_impl_enabled\","
+        },
+        {
+          "line": 139,
+          "text": "    \"NpuGraphOpHandler\","
+        },
+        {
+          "line": 140,
+          "text": "    \"register_npu_graph_handler\","
+        },
+        {
+          "line": 141,
+          "text": "    \"super_kernel_scope_begin\","
+        },
+        {
+          "line": 142,
+          "text": "    \"super_kernel_scope_end\","
+        },
+        {
+          "line": 143,
+          "text": "]"
+        },
+        {
+          "line": 144,
+          "text": ""
+        },
+        {
+          "line": 145,
+          "text": "from typing import Tuple, Union, List, cast, Optional"
+        },
+        {
+          "line": 146,
+          "text": "from multiprocessing.util import register_after_fork as _register_after_fork"
+        },
+        {
+          "line": 147,
+          "text": "import traceback"
+        },
+        {
+          "line": 148,
+          "text": "import threading"
+        },
+        {
+          "line": 149,
+          "text": "import os"
+        },
+        {
+          "line": 150,
+          "text": "import re"
+        },
+        {
+          "line": 151,
+          "text": "import torch"
+        },
+        {
+          "line": 152,
+          "text": "from torch.storage import _LegacyStorage, _warn_typed_storage_removal"
+        },
+        {
+          "line": 168,
+          "text": "from .autocast_utils import *  # noqa: F403"
+        },
+        {
+          "line": 169,
+          "text": "from .backends import *  # noqa: F403"
+        },
+        {
+          "line": 170,
+          "text": "from ._backends import *  # noqa: F403"
+        },
+        {
+          "line": 171,
+          "text": "from .deterministic import enable_deterministic_with_backward, disable_deterministic_with_backward # noqa: F403"
+        },
+        {
+          "line": 172,
+          "text": "from . import npugraph_ex"
+        },
+        {
+          "line": 173,
+          "text": ""
+        },
+        {
+          "line": 174,
+          "text": "from .graphs import ("
+        },
+        {
+          "line": 175,
+          "text": "    NPUGraph,"
+        },
+        {
+          "line": 176,
+          "text": "    graph,"
+        },
+        {
+          "line": 177,
+          "text": "    graph_pool_handle,"
+        },
+        {
+          "line": 178,
+          "text": "    is_current_stream_capturing,"
+        },
+        {
+          "line": 179,
+          "text": "    make_graphed_callables,"
+        },
+        {
+          "line": 180,
+          "text": "    graph_task_group_begin,"
+        },
+        {
+          "line": 181,
+          "text": "    graph_task_group_end,"
+        },
+        {
+          "line": 182,
+          "text": "    graph_task_update_begin,"
+        },
+        {
+          "line": 183,
+          "text": "    graph_task_update_end,"
+        },
+        {
+          "line": 184,
+          "text": "    super_kernel_scope_begin,"
+        },
+        {
+          "line": 185,
+          "text": "    super_kernel_scope_end,"
+        },
+        {
+          "line": 186,
+          "text": ")"
+        },
+        {
+          "line": 187,
+          "text": ""
+        },
+        {
+          "line": 600,
+          "text": "    return torch_npu.distributed.distributed_c10d._comm_switch_nic(ranks, useBackup)"
+        },
+        {
+          "line": 601,
+          "text": ""
+        },
+        {
+          "line": 602,
+          "text": ""
+        },
+        {
+          "line": 603,
+          "text": "def set_deterministic_level(level):"
+        },
+        {
+          "line": 604,
+          "text": "    warnings.warn(\"After using 'torch_npu.npu.set_deterministic_level', \""
+        },
+        {
+          "line": 605,
+          "text": "                  \"please do not use 'torch.use_deterministic_algorithms' anymore, \""
+        },
+        {
+          "line": 606,
+          "text": "                  \"as it may cause unknown errors.\")"
+        },
+        {
+          "line": 607,
+          "text": "    if level == 0 and torch.are_deterministic_algorithms_enabled():"
+        },
+        {
+          "line": 608,
+          "text": "        warnings.warn(\"The current configuration value of 'torch_npu.npu.set_deterministic_level' \""
+        },
+        {
+          "line": 609,
+          "text": "                      \"conflicts with 'torch.use_deterministic_algorithms'. \""
+        },
+        {
+          "line": 610,
+          "text": "                      \"'torch.use_deterministic_algorithms' has been configured to 'False'\")"
+        },
+        {
+          "line": 611,
+          "text": "        torch.use_deterministic_algorithms(False)"
+        },
+        {
+          "line": 612,
+          "text": "    elif level >= 1 and not torch.are_deterministic_algorithms_enabled():"
+        },
+        {
+          "line": 613,
+          "text": "        warnings.warn(\"The current configuration value of 'torch_npu.npu.set_deterministic_level' \""
+        },
+        {
+          "line": 614,
+          "text": "                      \"conflicts with 'torch.use_deterministic_algorithms'. \""
+        },
+        {
+          "line": 615,
+          "text": "                      \"'torch.use_deterministic_algorithms' has been configured to 'True'\")"
+        },
+        {
+          "line": 616,
+          "text": "        torch.use_deterministic_algorithms(True)"
+        },
+        {
+          "line": 617,
+          "text": "    torch_npu._C._npu_set_deterministic_level(level)"
+        },
+        {
+          "line": 618,
+          "text": ""
+        },
+        {
+          "line": 619,
+          "text": ""
+        },
+        {
+          "line": 620,
+          "text": "def _get_deterministic_level():"
+        },
+        {
+          "line": 621,
+          "text": "    level = torch_npu._C._npu_get_deterministic_level()"
+        },
+        {
+          "line": 622,
+          "text": "    if level == 0 and torch.are_deterministic_algorithms_enabled():"
+        },
+        {
+          "line": 623,
+          "text": "        level = 1"
+        },
+        {
+          "line": 624,
+          "text": "        torch_npu.npu.set_deterministic_level(level)"
+        },
+        {
+          "line": 625,
+          "text": "        return level"
+        },
+        {
+          "line": 626,
+          "text": "    if level >= 1 and not torch.are_deterministic_algorithms_enabled():"
+        },
+        {
+          "line": 627,
+          "text": "        level = 0"
+        },
+        {
+          "line": 628,
+          "text": "        torch_npu.npu.set_deterministic_level(level)"
+        },
+        {
+          "line": 629,
+          "text": "        return level"
+        },
+        {
+          "line": 630,
+          "text": "    return level"
+        },
+        {
+          "line": 631,
+          "text": ""
+        },
+        {
+          "line": 632,
+          "text": ""
+        },
+        {
+          "line": 633,
+          "text": "def use_compatible_impl(is_enable):"
+        },
+        {
+          "line": 634,
+          "text": "    option = {\"TORCH_NPU_USE_COMPATIBLE_IMPL\": \"1\" if is_enable else \"0\"}"
+        },
+        {
+          "line": 635,
+          "text": "    torch_npu._C._npu_setOption(option)"
+        },
+        {
+          "line": 636,
+          "text": ""
+        },
+        {
+          "line": 637,
+          "text": ""
+        },
+        {
+          "line": 638,
+          "text": "def are_compatible_impl_enabled():"
+        },
+        {
+          "line": 639,
+          "text": "    compatible_value = torch_npu._C._npu_getOption(\"TORCH_NPU_USE_COMPATIBLE_IMPL\")"
+        },
+        {
+          "line": 640,
+          "text": "    return compatible_value is not None and compatible_value.decode() == \"1\""
+        },
+        {
+          "line": 641,
+          "text": ""
+        },
+        {
+          "line": 642,
+          "text": ""
+        },
+        {
+          "line": 643,
+          "text": "class _NPUBase:"
+        },
+        {
+          "line": 644,
+          "text": "    is_npu = True"
+        }
+      ]
+    },
+    {
+      "source": "torch_npu/csrc/core/npu/NpuVariables.cpp",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/core/npu/NpuVariables.cpp",
+      "sha256": "8e2544718cb76b8eb51101d6e75ae47990188af992888c804137e8a9fcd3e042",
+      "local": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-NpuVariables.cpp",
+      "lines": []
+    },
+    {
+      "source": "torch_npu/csrc/core/npu/NpuVariables.h",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/core/npu/NpuVariables.h",
+      "sha256": "d51e961204d462f2b321324c1b8069b127da8334a4c6c1ead7d564f26c4608a1",
+      "local": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-NpuVariables.h",
+      "lines": []
+    },
+    {
+      "source": "test/npu/test_torch_deterministicalgorithms.py",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/test/npu/test_torch_deterministicalgorithms.py",
+      "sha256": "e5402e6e4a5b010d2394b05dab15d50d6ada55c94928f60ff8bfeb25480b4c89",
+      "local": "references/torch-npu-fa0f83fe49d3-test-npu-test_torch_deterministicalgorithms.py",
+      "lines": [
+        {
+          "line": 4,
+          "text": "from torch_npu.testing.testcase import TestCase, run_tests"
+        },
+        {
+          "line": 5,
+          "text": ""
+        },
+        {
+          "line": 6,
+          "text": ""
+        },
+        {
+          "line": 7,
+          "text": "class TorchDeterministicApiTestCase(TestCase):"
+        },
+        {
+          "line": 8,
+          "text": ""
+        },
+        {
+          "line": 9,
+          "text": "    def npu_op_exec(self, data, target, reduction):"
+        },
+        {
+          "line": 10,
+          "text": "        loss = torch.nn.NLLLoss2d(reduction=reduction)"
+        },
+        {
+          "line": 11,
+          "text": "        output = loss(data, target)"
+        },
+        {
+          "line": 12,
+          "text": "        output = output.to(\"cpu\")"
+        },
+        {
+          "line": 13,
+          "text": "        output = output.detach().numpy()"
+        },
+        {
+          "line": 14,
+          "text": "        return output"
+        },
+        {
+          "line": 15,
+          "text": ""
+        },
+        {
+          "line": 16,
+          "text": "    def test_npu_set_deterministic(self):"
+        },
+        {
+          "line": 17,
+          "text": "        torch.use_deterministic_algorithms(True)"
+        },
+        {
+          "line": 18,
+          "text": "        res = torch.are_deterministic_algorithms_enabled()"
+        },
+        {
+          "line": 19,
+          "text": "        self.assertEqual(res, True)"
+        },
+        {
+          "line": 20,
+          "text": ""
+        },
+        {
+          "line": 21,
+          "text": "        torch.use_deterministic_algorithms(False)"
+        },
+        {
+          "line": 22,
+          "text": "        res = torch.are_deterministic_algorithms_enabled()"
+        },
+        {
+          "line": 23,
+          "text": "        self.assertEqual(res, False)"
+        },
+        {
+          "line": 24,
+          "text": ""
+        },
+        {
+          "line": 25,
+          "text": ""
+        },
+        {
+          "line": 26,
+          "text": "def test_npu_set_deterministic_true():"
+        },
+        {
+          "line": 27,
+          "text": "    torch.use_deterministic_algorithms(True)"
+        },
+        {
+          "line": 28,
+          "text": "    tensora = torch.randn(64, 3, 64, 64, dtype=torch.float, device=\"npu:0\")"
+        },
+        {
+          "line": 29,
+          "text": "    tensorsum = torch.sum(tensora)"
+        },
+        {
+          "line": 30,
+          "text": "    index = 0"
+        },
+        {
+          "line": 31,
+          "text": "    for i in range(100):"
+        },
+        {
+          "line": 32,
+          "text": "        res = torch.sum(tensora)"
+        },
+        {
+          "line": 33,
+          "text": "        if (res == tensorsum):"
+        },
+        {
+          "line": 34,
+          "text": "            index = index + 1"
+        },
+        {
+          "line": 35,
+          "text": "    if (index != 100):"
+        },
+        {
+          "line": 36,
+          "text": "        raise AssertionError(\"failed to test_npu_set_deterministic_true!\")"
+        },
+        {
+          "line": 37,
+          "text": ""
+        },
+        {
+          "line": 38,
+          "text": ""
+        },
+        {
+          "line": 39,
+          "text": "def test_deterministic_newprocessing():"
+        },
+        {
+          "line": 40,
+          "text": "    Process_jobs = []"
+        },
+        {
+          "line": 41,
+          "text": "    multiprocessing.set_start_method(\"spawn\", force=True)"
+        },
+        {
+          "line": 42,
+          "text": "    p = multiprocessing.Process(target=test_npu_set_deterministic_true)"
+        },
+        {
+          "line": 43,
+          "text": "    Process_jobs.append(p)"
+        },
+        {
+          "line": 44,
+          "text": "    p.start()"
+        },
+        {
+          "line": 45,
+          "text": "    p.join()"
+        },
+        {
+          "line": 46,
+          "text": ""
+        },
+        {
+          "line": 47,
+          "text": ""
+        },
+        {
+          "line": 48,
+          "text": "if __name__ == \"__main__\":"
+        },
+        {
+          "line": 49,
+          "text": "    test_deterministic_newprocessing()"
+        },
+        {
+          "line": 50,
+          "text": "    option = {}"
+        },
+        {
+          "line": 51,
+          "text": "    option[\"ACL_OP_COMPILER_CACHE_MODE\"] = \"disable\""
+        },
+        {
+          "line": 52,
+          "text": "    torch.npu.set_option(option)"
+        },
+        {
+          "line": 53,
+          "text": "    run_tests()"
+        }
+      ]
+    }
+  ]
+}

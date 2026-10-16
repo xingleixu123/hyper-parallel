@@ -1,0 +1,6316 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec / 独立原始证据审核",
+  "candidate": "r129-f637-dgrad-fsdp8-fp32-3",
+  "reference": "r129-f637-dgrad-fsdp8-native-3",
+  "status": "PASS",
+  "status_scope": "三步干预诊断的执行、证据与独立复算通过；不是200步训练精度验收。",
+  "final_200_step_acceptance": "NOT_EVALUATED_THREE_STEPS",
+  "findings": [],
+  "conclusion_zh": "C臂130份原始采集文件及A臂130份文件的长度与SHA全部匹配各自清单，run目录文件全集一致；8 rank均完整执行1–3步，开始0/完成3，exit0且已释放。C在B释放后1221.2695503234863秒开始。初始状态摘要、输入身份、数据计数、LR、模型参数元数据与A相同，resolved配置仅checkpoint输出目录不同。实际数值配方并不相同：C启用FP32 dgrad。C全8×3步共576次实际导数计算；首步72组前向采样、1,747,200个坐标全部零差。LM、按实际系数还原MTP/aux的三步最大变化分别为0.0007457733154296875、0.0010999043782552085、0.00017782440409064293；与父报告一致。不能据此单独认定跨布局改善或唯一根因。",
+  "independent_method": [
+    "未调用strict_compare_runs.py、audit_dgrad_short_run.py或analyze_activation_trace.py执行验收；使用独立Python标准库代码从原始JSON/JSONL重算，最后才核对父报告数值。",
+    "逐文件读取字节并重新计算SHA256、字节数；清单无重复、路径均在任务根内，文件集合等于129个run文件加1个receipt。C/A两侧共260份原始文件，本轮另外核验B receipt在其清单中的SHA以复算冷却间隔，未宣称本轮重验全部B文件。",
+    "逐rank检查3行metric步号、rank、所有数值有限性；每步8rank全局input SHA、rank_count及micro_steps一致；验证累计token/sample递推、LR、16份初态48条目及起始参数46条目相同。",
+    "以candidate-reference计算加权日志绝对差；还原MTP差=加权MTP差/0.3，aux差=加权aux差/0.0001。不是重新捕获乘法前原始张量。",
+    "逐rank交叉检查functional Linear enter/return/output-gradient/derivative事件、连续call_id及metadata、summary计数、注册模块、首步batch身份与后两步null；区分head replay与实际backward。",
+    "activation按rank顺序读取，同一batch/module/call/stage直接比较shape、dtype、坐标及数组值；仅保留142组汇总，不建立跨rank百万坐标字典，不并行运行大内存分析。5个watched Linear模块的8次首步调用另与functional事件核对。"
+  ],
+  "integrity_and_scalar_recomputation": {
+    "status": "PASS",
+    "manifest_verification": [
+      {
+        "path": "evidence/f637-dgrad-fsdp8-native-3-evidence-manifest.json",
+        "sha256": "1edb511b2732c9bc79b9049256082f30b6de10bd620eb445e8ed8c080cea983f",
+        "file_count": 130,
+        "exact_run_inventory": 129,
+        "verified": true
+      },
+      {
+        "path": "evidence/f637-dgrad-fsdp8-fp32-3-evidence-manifest.json",
+        "sha256": "94c89c94e84073accacf5e2cfcb575250287b1c08bedcbf129b749c44c4f618b",
+        "file_count": 130,
+        "exact_run_inventory": 129,
+        "verified": true
+      }
+    ],
+    "previous_receipt_verified_against_manifest": "scheduling/r129-f637-dgrad-cp2-native-3.receipt.json",
+    "source_commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "distinct_execution_containers": true,
+    "start_step": 0,
+    "complete_step": 3,
+    "all_rank_metric_pairs": 24,
+    "initial_snapshot_count": 16,
+    "initial_entries_each": 48,
+    "model_parameter_metadata_count": 46,
+    "helper_pin_verification": {
+      "r129-f637-dgrad-fsdp8-native-3": {
+        "request_entries_verified": 16,
+        "captured_helpers_verified": 13
+      },
+      "r129-f637-dgrad-fsdp8-fp32-3": {
+        "request_entries_verified": 16,
+        "captured_helpers_verified": 13
+      }
+    },
+    "resolved_config_differences": [
+      {
+        "path": "/checkpoint/checkpoint_dir",
+        "reference": "/work/checkpoints/r129-f637-dgrad-fsdp8-native-3",
+        "candidate": "/work/checkpoints/r129-f637-dgrad-fsdp8-fp32-3"
+      }
+    ],
+    "numeric_recipe_note": "resolved配置相同不等于数值配方相同：C启用FP32 dgrad干预，A为native。",
+    "loss_coefficients": {
+      "mtp_loss_factor": 0.3,
+      "moe_aux_loss_coeff": 0.0001
+    },
+    "max_abs_errors": {
+      "training/foundation_loss/lm": {
+        "max_abs": 0.0007457733154296875,
+        "step": 2,
+        "rank": 0,
+        "signed_delta": 0.0007457733154296875
+      },
+      "training/foundation_loss/mtp": {
+        "max_abs": 0.0003299713134765625,
+        "step": 3,
+        "rank": 0,
+        "signed_delta": 0.0003299713134765625
+      },
+      "training/foundation_loss/aux": {
+        "max_abs": 1.7782440409064293e-8,
+        "step": 2,
+        "rank": 0,
+        "signed_delta": -1.7782440409064293e-8
+      },
+      "training/total_loss": {
+        "max_abs": 0.0008544921875,
+        "step": 2,
+        "rank": 0,
+        "signed_delta": 0.0008544921875
+      },
+      "training/grad_norm": {
+        "max_abs": 0.0015277862548828125,
+        "step": 2,
+        "rank": 0,
+        "signed_delta": 0.0015277862548828125
+      }
+    },
+    "derived_unweighted_max_abs": {
+      "lm": 0.0007457733154296875,
+      "mtp": 0.0010999043782552085,
+      "aux": 0.00017782440409064293
+    },
+    "per_step_max_abs": {
+      "training/foundation_loss/lm": [
+        0,
+        0.0007457733154296875,
+        0.00010204315185546875
+      ],
+      "training/foundation_loss/mtp": [
+        0,
+        0.00011110305786132812,
+        0.0003299713134765625
+      ],
+      "training/foundation_loss/aux": [
+        0,
+        1.7782440409064293e-8,
+        8.803908713161945e-9
+      ],
+      "training/total_loss": [
+        0,
+        0.0008544921875,
+        0.000225067138671875
+      ],
+      "training/grad_norm": [
+        0.0000133514404296875,
+        0.0015277862548828125,
+        0.0011091232299804688
+      ]
+    },
+    "per_step_signed_delta_all_ranks_same": {
+      "1": {
+        "training/foundation_loss/lm": 0,
+        "training/foundation_loss/mtp": 0,
+        "training/foundation_loss/aux": 0,
+        "training/total_loss": 0,
+        "training/grad_norm": -0.0000133514404296875
+      },
+      "2": {
+        "training/foundation_loss/lm": 0.0007457733154296875,
+        "training/foundation_loss/mtp": 0.00011110305786132812,
+        "training/foundation_loss/aux": -1.7782440409064293e-8,
+        "training/total_loss": 0.0008544921875,
+        "training/grad_norm": 0.0015277862548828125
+      },
+      "3": {
+        "training/foundation_loss/lm": -0.00010204315185546875,
+        "training/foundation_loss/mtp": 0.0003299713134765625,
+        "training/foundation_loss/aux": 8.803908713161945e-9,
+        "training/total_loss": 0.000225067138671875,
+        "training/grad_norm": 0.0011091232299804688
+      }
+    },
+    "global_input_sha256": {
+      "1": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+      "2": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+      "3": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25"
+    },
+    "counter_check": {
+      "tokens_each_step": [
+        32573,
+        21239,
+        24848
+      ],
+      "consumed_tokens": [
+        32573,
+        53812,
+        78660
+      ],
+      "samples_each_step": 8,
+      "consumed_samples": [
+        8,
+        16,
+        24
+      ],
+      "lr": 0.0001
+    },
+    "candidate_execution": {
+      "exit_code": 0,
+      "released": true,
+      "no_remaining_owned_pids": true,
+      "duration_seconds": 142.35725896000804,
+      "started_wall": 1792099757.190982,
+      "finished_wall": 1792099899.5482361,
+      "preceding_case": "r129-f637-dgrad-cp2-native-3",
+      "preceding_finished_wall": 1792098535.9214318,
+      "gap_after_preceding_release_seconds": 1221.2695503234863,
+      "required_gap_seconds": 1200
+    },
+    "parent_scalar_report_matches": true,
+    "reference_rank0_metrics": [
+      {
+        "step": 1,
+        "rank": 0,
+        "training/total_loss": 16.809673309326172,
+        "training/grad_norm": 22.47356605529785,
+        "training/lr": 0.0001,
+        "training/foundation_loss/aux": 0.0002530855708755553,
+        "training/foundation_loss/lm": 12.881054878234863,
+        "training/foundation_loss/mtp": 3.928363800048828,
+        "performance/step_time": 4.4534592628479,
+        "performance/tokens_per_second": 7314.08958239133,
+        "data/step_tokens": 32573,
+        "data/consumed_tokens": 32573,
+        "data/step_samples": 8,
+        "data/consumed_samples": 8,
+        "memory/device_max_allocated_gb": 20.041383743286133,
+        "memory/device_max_reserved_gb": 23.578125,
+        "input_identity": {
+          "global_sha256": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+          "rank_count": 8,
+          "micro_steps": 1
+        }
+      },
+      {
+        "step": 2,
+        "rank": 0,
+        "training/total_loss": 16.73357391357422,
+        "training/grad_norm": 8.05074405670166,
+        "training/lr": 0.0001,
+        "training/foundation_loss/aux": 0.00022270521731115878,
+        "training/foundation_loss/lm": 12.84907341003418,
+        "training/foundation_loss/mtp": 3.884277582168579,
+        "performance/step_time": 1.1783791780471802,
+        "performance/tokens_per_second": 18023.909786998654,
+        "data/step_tokens": 21239,
+        "data/consumed_tokens": 53812,
+        "data/step_samples": 8,
+        "data/consumed_samples": 16,
+        "memory/device_max_allocated_gb": 22.032196044921875,
+        "memory/device_max_reserved_gb": 26.8203125,
+        "input_identity": {
+          "global_sha256": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+          "rank_count": 8,
+          "micro_steps": 1
+        }
+      },
+      {
+        "step": 3,
+        "rank": 0,
+        "training/total_loss": 16.317394256591797,
+        "training/grad_norm": 13.129860877990723,
+        "training/lr": 0.0001,
+        "training/foundation_loss/aux": 0.00024046290491241962,
+        "training/foundation_loss/lm": 12.472532272338867,
+        "training/foundation_loss/mtp": 3.8446197509765625,
+        "performance/step_time": 1.1654560565948486,
+        "performance/tokens_per_second": 21320.40917321175,
+        "data/step_tokens": 24848,
+        "data/consumed_tokens": 78660,
+        "data/step_samples": 8,
+        "data/consumed_samples": 24,
+        "memory/device_max_allocated_gb": 22.032196044921875,
+        "memory/device_max_reserved_gb": 26.83984375,
+        "input_identity": {
+          "global_sha256": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25",
+          "rank_count": 8,
+          "micro_steps": 1
+        }
+      }
+    ],
+    "candidate_rank0_metrics": [
+      {
+        "step": 1,
+        "rank": 0,
+        "training/total_loss": 16.809673309326172,
+        "training/grad_norm": 22.473552703857422,
+        "training/lr": 0.0001,
+        "training/foundation_loss/aux": 0.0002530855708755553,
+        "training/foundation_loss/lm": 12.881054878234863,
+        "training/foundation_loss/mtp": 3.928363800048828,
+        "performance/step_time": 5.174695014953613,
+        "performance/tokens_per_second": 6294.670488960593,
+        "data/step_tokens": 32573,
+        "data/consumed_tokens": 32573,
+        "data/step_samples": 8,
+        "data/consumed_samples": 8,
+        "memory/device_max_allocated_gb": 23.811893463134766,
+        "memory/device_max_reserved_gb": 25.90234375,
+        "input_identity": {
+          "global_sha256": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+          "rank_count": 8,
+          "micro_steps": 1
+        }
+      },
+      {
+        "step": 2,
+        "rank": 0,
+        "training/total_loss": 16.73442840576172,
+        "training/grad_norm": 8.052271842956543,
+        "training/lr": 0.0001,
+        "training/foundation_loss/aux": 0.0002226874348707497,
+        "training/foundation_loss/lm": 12.84981918334961,
+        "training/foundation_loss/mtp": 3.8843886852264404,
+        "performance/step_time": 1.4980409145355225,
+        "performance/tokens_per_second": 14177.850413775443,
+        "data/step_tokens": 21239,
+        "data/consumed_tokens": 53812,
+        "data/step_samples": 8,
+        "data/consumed_samples": 16,
+        "memory/device_max_allocated_gb": 25.802703857421875,
+        "memory/device_max_reserved_gb": 28.34375,
+        "input_identity": {
+          "global_sha256": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+          "rank_count": 8,
+          "micro_steps": 1
+        }
+      },
+      {
+        "step": 3,
+        "rank": 0,
+        "training/total_loss": 16.31761932373047,
+        "training/grad_norm": 13.130970001220703,
+        "training/lr": 0.0001,
+        "training/foundation_loss/aux": 0.00024047170882113278,
+        "training/foundation_loss/lm": 12.472430229187012,
+        "training/foundation_loss/mtp": 3.844949722290039,
+        "performance/step_time": 1.5077568292617798,
+        "performance/tokens_per_second": 16480.111061520412,
+        "data/step_tokens": 24848,
+        "data/consumed_tokens": 78660,
+        "data/step_samples": 8,
+        "data/consumed_samples": 24,
+        "memory/device_max_allocated_gb": 25.802703857421875,
+        "memory/device_max_reserved_gb": 28.34375,
+        "input_identity": {
+          "global_sha256": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25",
+          "rank_count": 8,
+          "micro_steps": 1
+        }
+      }
+    ]
+  },
+  "actual_branch_and_identity_evidence": {
+    "status": "PASS",
+    "rank_summary": [
+      {
+        "rank": 0,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      },
+      {
+        "rank": 1,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      },
+      {
+        "rank": 2,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      },
+      {
+        "rank": 3,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "1fa441baf1f0a45e5274ae72dcf30ee7d1718255b9328afa7757b192473dc4e9",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      },
+      {
+        "rank": 4,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      },
+      {
+        "rank": 5,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      },
+      {
+        "rank": 6,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "a65cabedddd55bf59011450b3d4be6aa8225f26c983d803aab6b803a206c2d09",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      },
+      {
+        "rank": 7,
+        "records_reference": 246,
+        "records_candidate": 318,
+        "calls_each": 84,
+        "registered_seen": 23,
+        "candidate_derivative_calculated": 72,
+        "candidate_per_step": {
+          "1": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "2": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          },
+          "3": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26,
+            "derivative_calculated": 24
+          }
+        },
+        "candidate_bf16_forward_calls": 78,
+        "candidate_fp32_router_native_forward_calls": 6,
+        "candidate_head_checkpoint_replays": 6,
+        "first_step_batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+        "later_step_identity_null": true,
+        "same_call_signatures_as_native": true,
+        "scalar_loss_trace_exact_to_native": true
+      }
+    ],
+    "total_candidate_events": {
+      "forward_enter": 672,
+      "forward_return": 672,
+      "output_gradient_observed": 624,
+      "derivative_calculated": 576
+    },
+    "total_candidate_derivative_calculated": 576,
+    "first_step_loss_objectives": [
+      {
+        "rank": 0,
+        "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+        "objective_count": 3,
+        "gradient": 0.9580941200256348,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      },
+      {
+        "rank": 1,
+        "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+        "objective_count": 3,
+        "gradient": 1.0059865713119507,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      },
+      {
+        "rank": 2,
+        "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+        "objective_count": 3,
+        "gradient": 1.0059865713119507,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      },
+      {
+        "rank": 3,
+        "batch_sha256": "1fa441baf1f0a45e5274ae72dcf30ee7d1718255b9328afa7757b192473dc4e9",
+        "objective_count": 3,
+        "gradient": 1.0059865713119507,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      },
+      {
+        "rank": 4,
+        "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+        "objective_count": 3,
+        "gradient": 1.0059865713119507,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      },
+      {
+        "rank": 5,
+        "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+        "objective_count": 3,
+        "gradient": 1.0059865713119507,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      },
+      {
+        "rank": 6,
+        "batch_sha256": "a65cabedddd55bf59011450b3d4be6aa8225f26c983d803aab6b803a206c2d09",
+        "objective_count": 3,
+        "gradient": 1.0059865713119507,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      },
+      {
+        "rank": 7,
+        "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+        "objective_count": 3,
+        "gradient": 1.0059865713119507,
+        "all_forward_values_and_scalar_derivatives_exact": true
+      }
+    ],
+    "unique_first_step_batches": 8,
+    "registered_modules": [
+      "model.layers.0.self_attn.linear_qkv",
+      "model.layers.0.self_attn.q_b_proj",
+      "model.layers.0.self_attn.kv_b_proj",
+      "model.layers.0.self_attn.o_proj",
+      "model.layers.0.mlp.gate_proj",
+      "model.layers.0.mlp.up_proj",
+      "model.layers.0.mlp.down_proj",
+      "model.layers.1.self_attn.linear_qkv",
+      "model.layers.1.self_attn.q_b_proj",
+      "model.layers.1.self_attn.kv_b_proj",
+      "model.layers.1.self_attn.o_proj",
+      "model.layers.1.mlp.shared_experts.gate_proj",
+      "model.layers.1.mlp.shared_experts.up_proj",
+      "model.layers.1.mlp.shared_experts.down_proj",
+      "lm_head",
+      "mtp.layers.0.eh_proj",
+      "mtp.layers.0.transformer_layer.self_attn.linear_qkv",
+      "mtp.layers.0.transformer_layer.self_attn.q_b_proj",
+      "mtp.layers.0.transformer_layer.self_attn.kv_b_proj",
+      "mtp.layers.0.transformer_layer.self_attn.o_proj",
+      "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj",
+      "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj",
+      "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj"
+    ],
+    "all_rank_training_scalars_identical_within_each_arm": true,
+    "scope": "C实际执行576次BF16输入梯度的FP32乘法后回转BF16分支；每rank每步24次。26次eligible BF16 forward包含2次head checkpoint replay，replay本身没有额外derivative_calculated。2次FP32 router F.linear/步保持native，非F.linear专家GMM不在干预覆盖中。"
+  },
+  "sampled_boundary_comparison": {
+    "status": "PASS",
+    "comparison_method": "按rank顺序读取A/C各142条记录，用batch+module+call+stage匹配；逐一核对shape/dtype/坐标/取样长度，直接比较对应数组。没有构建跨rank百万坐标字典。",
+    "ranks": [
+      {
+        "rank": 0,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 25902,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      },
+      {
+        "rank": 1,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 26124,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      },
+      {
+        "rank": 2,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 25038,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      },
+      {
+        "rank": 3,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 26526,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      },
+      {
+        "rank": 4,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 24974,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      },
+      {
+        "rank": 5,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 24659,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      },
+      {
+        "rank": 6,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 25573,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      },
+      {
+        "rank": 7,
+        "records_each": 142,
+        "watched_modules": 33,
+        "watched_linear_modules": 5,
+        "watched_linear_calls_crosschecked": 8,
+        "coordinates": 360768,
+        "forward_coordinates": 218400,
+        "different_coordinates": 25758,
+        "forward_different_coordinates": 0,
+        "stage_counts": {
+          "output": 37,
+          "input": 35,
+          "output_gradient": 35,
+          "input_gradient": 35
+        }
+      }
+    ],
+    "total_groups": 142,
+    "forward_groups": 72,
+    "gradient_groups": 70,
+    "sampled_coordinates": 2886144,
+    "different_sampled_coordinates": 204554,
+    "forward_sampled_coordinates": 1747200,
+    "forward_different_coordinates": 0,
+    "forward_max_abs": 0,
+    "gradient_nonzero_groups": 66,
+    "first_difference_by_reference_record_order": {
+      "module": "mtp.layers.0.transformer_layer",
+      "call": 0,
+      "stage": "output_gradient",
+      "reference_record_order": 74,
+      "coordinates": 10240,
+      "different_coordinates": 1,
+      "max_abs": 3.637978807091713e-12,
+      "max_coordinate": {
+        "rank": 3,
+        "batch_sha256": "1fa441baf1f0a45e5274ae72dcf30ee7d1718255b9328afa7757b192473dc4e9",
+        "batch_item": 0,
+        "global_sequence": 512,
+        "feature": 4864
+      },
+      "ranks_seen": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "l2_difference": 3.637978807091713e-12,
+      "l2_reference": 0.00004690051568459646,
+      "relative_l2": 7.7567991609238e-8,
+      "different_fraction": 0.00009765625
+    },
+    "all_groups": [
+      {
+        "module": "model.embed_tokens",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 1,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 2.031817810760449,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 2,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 2.031817810760449,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.input_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 3,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 2.031817810760449,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.input_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 4,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 101.18445562295227,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 5,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 101.18445562295227,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 6,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 101.18445562295227,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 7,
+        "coordinates": 4352,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 90.89861080156494,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 8,
+        "coordinates": 3072,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 76.15949608385262,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 9,
+        "coordinates": 3072,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 53.17789388465776,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 10,
+        "coordinates": 1024,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 43.92713478586806,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 11,
+        "coordinates": 1024,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 30.515777013975608,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 12,
+        "coordinates": 256,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 23.08019565368105,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 13,
+        "coordinates": 256,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 23.08019565368105,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.self_attn",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 14,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 31.442290330559025,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.post_attention_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 15,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 31.47019329900035,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.post_attention_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 16,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.1572277347274,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.mlp",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 17,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.1572277347274,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0.mlp",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 18,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 299.1917110899861,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.0",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 19,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 301.2243605839838,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 20,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 301.2243605839838,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.input_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 21,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 301.2243605839838,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.input_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 22,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 104.32657557496188,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 23,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 104.32657557496188,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 24,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 104.32657557496188,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 25,
+        "coordinates": 4352,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 86.11986900837968,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 26,
+        "coordinates": 3072,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 70.47290804143663,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 27,
+        "coordinates": 3072,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 49.29820674730745,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 28,
+        "coordinates": 1024,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 44.92051869608063,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 29,
+        "coordinates": 1024,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 30.896120578053285,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 30,
+        "coordinates": 256,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 20.79298127442921,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 31,
+        "coordinates": 256,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 20.79298127442921,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.self_attn",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 32,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 82.22938510311657,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.post_attention_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 33,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 301.6564565989766,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.post_attention_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 34,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 100.37850153476064,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.mlp",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 35,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 100.37850153476064,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1.mlp",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 36,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 247.4938142590582,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.layers.1",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 37,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 398.0371393755025,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.norm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 38,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 398.0371393755025,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.norm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 39,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.38586952132245,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 40,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.38586952132245,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 41,
+        "coordinates": 304128,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 785.2257149151459,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "model.embed_tokens",
+        "call": 1,
+        "stage": "output",
+        "reference_record_order": 42,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 2.039710834710916,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.hnorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 43,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 398.0371393755025,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.hnorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 44,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.38586952132245,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.enorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 45,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 2.039710834710916,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.enorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 46,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 101.66648423963038,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.eh_proj",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 47,
+        "coordinates": 20480,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 144.28769973661747,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.eh_proj",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 48,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 211.0618071781344,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 49,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 211.0618071781344,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.input_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 50,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 211.0618071781344,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.input_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 51,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 104.7476289419881,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 52,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 104.7476289419881,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 53,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 104.7476289419881,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 54,
+        "coordinates": 4352,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 97.96885741682975,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 55,
+        "coordinates": 3072,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 83.09901484492713,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 56,
+        "coordinates": 3072,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 58.13793019444289,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 57,
+        "coordinates": 1024,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 46.42651369261719,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 58,
+        "coordinates": 1024,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 32.493118020760726,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 59,
+        "coordinates": 256,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 23.17389871624818,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 60,
+        "coordinates": 256,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 23.17389871624818,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 61,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 54.06748103926063,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 62,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 219.3052084474504,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 63,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 105.24840986049406,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.mlp",
+        "call": 0,
+        "stage": "input",
+        "reference_record_order": 64,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 105.24840986049406,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.mlp",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 65,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 254.4210336891328,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer",
+        "call": 0,
+        "stage": "output",
+        "reference_record_order": 66,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 334.50386863233325,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 1,
+        "stage": "input",
+        "reference_record_order": 67,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.93666643653692,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 1,
+        "stage": "output",
+        "reference_record_order": 68,
+        "coordinates": 304128,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 789.8297482750381,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 2,
+        "stage": "input",
+        "reference_record_order": 69,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.93666643653692,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 2,
+        "stage": "output",
+        "reference_record_order": 70,
+        "coordinates": 304128,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 789.8297482750381,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 1,
+        "stage": "output_gradient",
+        "reference_record_order": 71,
+        "coordinates": 304128,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 0.0001280176935854608,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 1,
+        "stage": "input_gradient",
+        "reference_record_order": 72,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 0.00015230251854300364,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 2,
+        "stage": "input_gradient",
+        "reference_record_order": 73,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 0.00015230251854300364,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 74,
+        "coordinates": 10240,
+        "different_coordinates": 1,
+        "max_abs": 3.637978807091713e-12,
+        "max_coordinate": {
+          "rank": 3,
+          "batch_sha256": "1fa441baf1f0a45e5274ae72dcf30ee7d1718255b9328afa7757b192473dc4e9",
+          "batch_item": 0,
+          "global_sequence": 512,
+          "feature": 4864
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 3.637978807091713e-12,
+        "l2_reference": 0.00004690051568459646,
+        "relative_l2": 7.7567991609238e-8,
+        "different_fraction": 0.00009765625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.mlp",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 75,
+        "coordinates": 10240,
+        "different_coordinates": 1,
+        "max_abs": 3.637978807091713e-12,
+        "max_coordinate": {
+          "rank": 3,
+          "batch_sha256": "1fa441baf1f0a45e5274ae72dcf30ee7d1718255b9328afa7757b192473dc4e9",
+          "batch_item": 0,
+          "global_sequence": 512,
+          "feature": 4864
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 3.637978807091713e-12,
+        "l2_reference": 0.00004690051568459646,
+        "relative_l2": 7.7567991609238e-8,
+        "different_fraction": 0.00009765625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 76,
+        "coordinates": 10240,
+        "different_coordinates": 808,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 1280,
+          "feature": 4096
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 2.3602183717254896e-7,
+        "l2_reference": 0.0001660333193078357,
+        "relative_l2": 0.0014215329679397083,
+        "different_fraction": 0.07890625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.mlp",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 77,
+        "coordinates": 10240,
+        "different_coordinates": 808,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 1280,
+          "feature": 4096
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 2.3602183717254896e-7,
+        "l2_reference": 0.0001660333193078357,
+        "relative_l2": 0.0014215329679397083,
+        "different_fraction": 0.07890625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 78,
+        "coordinates": 10240,
+        "different_coordinates": 618,
+        "max_abs": 1.4901161193847656e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 896,
+          "feature": 896
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.2393907803679874e-7,
+        "l2_reference": 0.0000926683913455027,
+        "relative_l2": 0.0013374471730571767,
+        "different_fraction": 0.0603515625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 79,
+        "coordinates": 10240,
+        "different_coordinates": 618,
+        "max_abs": 1.4901161193847656e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 896,
+          "feature": 896
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.2393907803679874e-7,
+        "l2_reference": 0.0000926683913455027,
+        "relative_l2": 0.0013374471730571767,
+        "different_fraction": 0.0603515625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 80,
+        "coordinates": 1024,
+        "different_coordinates": 433,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.517241548563455e-8,
+        "l2_reference": 0.00002896898648799081,
+        "relative_l2": 0.0029401241055134275,
+        "different_fraction": 0.4228515625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 81,
+        "coordinates": 3072,
+        "different_coordinates": 1364,
+        "max_abs": 1.862645149230957e-9,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 512,
+          "feature": 1152
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 2.176650451909849e-8,
+        "l2_reference": 0.0000065936051177860505,
+        "relative_l2": 0.003301153789204634,
+        "different_fraction": 0.4440104166666667
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 82,
+        "coordinates": 1024,
+        "different_coordinates": 388,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 7.337598512755523e-8,
+        "l2_reference": 0.00001989620912444092,
+        "relative_l2": 0.003687937971933489,
+        "different_fraction": 0.37890625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 83,
+        "coordinates": 256,
+        "different_coordinates": 162,
+        "max_abs": 2.514570951461792e-8,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 3.7364601986169364e-8,
+        "l2_reference": 0.000004462546338294513,
+        "relative_l2": 0.008372933108958886,
+        "different_fraction": 0.6328125
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 84,
+        "coordinates": 256,
+        "different_coordinates": 162,
+        "max_abs": 2.514570951461792e-8,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 3.7364601986169364e-8,
+        "l2_reference": 0.000004462546338294513,
+        "relative_l2": 0.008372933108958886,
+        "different_fraction": 0.6328125
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 85,
+        "coordinates": 3072,
+        "different_coordinates": 1258,
+        "max_abs": 1.862645149230957e-9,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 2816,
+          "feature": 1408
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.6436332890507207e-8,
+        "l2_reference": 0.000004601539605103222,
+        "relative_l2": 0.003571920335593527,
+        "different_fraction": 0.4095052083333333
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 86,
+        "coordinates": 4352,
+        "different_coordinates": 1808,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 1536
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.396607477970865e-8,
+        "l2_reference": 0.000020903292182865487,
+        "relative_l2": 0.004016882797463645,
+        "different_fraction": 0.41544117647058826
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.input_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 87,
+        "coordinates": 10240,
+        "different_coordinates": 5857,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 5,
+          "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 3328
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.4778063851304974e-7,
+        "l2_reference": 0.00003534117567587606,
+        "relative_l2": 0.00418154279496494,
+        "different_fraction": 0.57197265625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 88,
+        "coordinates": 10240,
+        "different_coordinates": 5857,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 5,
+          "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 3328
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.4778063851304974e-7,
+        "l2_reference": 0.00003534117567587606,
+        "relative_l2": 0.00418154279496494,
+        "different_fraction": 0.57197265625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 89,
+        "coordinates": 10240,
+        "different_coordinates": 5857,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 5,
+          "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 3328
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.4778063851304974e-7,
+        "l2_reference": 0.00003534117567587606,
+        "relative_l2": 0.00418154279496494,
+        "different_fraction": 0.57197265625
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 90,
+        "coordinates": 10240,
+        "different_coordinates": 1556,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 6,
+          "batch_sha256": "a65cabedddd55bf59011450b3d4be6aa8225f26c983d803aab6b803a206c2d09",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 1664
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.7231473210647368e-7,
+        "l2_reference": 0.0000945159813838081,
+        "relative_l2": 0.0018231279999806848,
+        "different_fraction": 0.151953125
+      },
+      {
+        "module": "mtp.layers.0.transformer_layer.input_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 91,
+        "coordinates": 10240,
+        "different_coordinates": 1556,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 6,
+          "batch_sha256": "a65cabedddd55bf59011450b3d4be6aa8225f26c983d803aab6b803a206c2d09",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 1664
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.7231473210647368e-7,
+        "l2_reference": 0.0000945159813838081,
+        "relative_l2": 0.0018231279999806848,
+        "different_fraction": 0.151953125
+      },
+      {
+        "module": "mtp.layers.0.eh_proj",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 92,
+        "coordinates": 10240,
+        "different_coordinates": 1556,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 6,
+          "batch_sha256": "a65cabedddd55bf59011450b3d4be6aa8225f26c983d803aab6b803a206c2d09",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 1664
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.7231473210647368e-7,
+        "l2_reference": 0.0000945159813838081,
+        "relative_l2": 0.0018231279999806848,
+        "different_fraction": 0.151953125
+      },
+      {
+        "module": "mtp.layers.0.eh_proj",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 93,
+        "coordinates": 20480,
+        "different_coordinates": 7729,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 1152,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 4.903590625547314e-7,
+        "l2_reference": 0.000189225352207403,
+        "relative_l2": 0.002591402562259558,
+        "different_fraction": 0.377392578125
+      },
+      {
+        "module": "mtp.layers.0.enorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 94,
+        "coordinates": 10240,
+        "different_coordinates": 3869,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 3072,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 3.521438530907461e-7,
+        "l2_reference": 0.00013430661890005037,
+        "relative_l2": 0.002621939677841254,
+        "different_fraction": 0.37783203125
+      },
+      {
+        "module": "mtp.layers.0.hnorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 95,
+        "coordinates": 10240,
+        "different_coordinates": 3860,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 1152,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 3.412429002337749e-7,
+        "l2_reference": 0.00013329653422971033,
+        "relative_l2": 0.002560028302354133,
+        "different_fraction": 0.376953125
+      },
+      {
+        "module": "model.embed_tokens",
+        "call": 1,
+        "stage": "output_gradient",
+        "reference_record_order": 96,
+        "coordinates": 10240,
+        "different_coordinates": 3508,
+        "max_abs": 0.0000019073486328125,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000019162016451705718,
+        "l2_reference": 0.006690225781206375,
+        "relative_l2": 0.0028641808331094083,
+        "different_fraction": 0.342578125
+      },
+      {
+        "module": "mtp.layers.0.enorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 97,
+        "coordinates": 10240,
+        "different_coordinates": 3508,
+        "max_abs": 0.0000019073486328125,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000019162016451705718,
+        "l2_reference": 0.006690225781206375,
+        "relative_l2": 0.0028641808331094083,
+        "different_fraction": 0.342578125
+      },
+      {
+        "module": "lm_head",
+        "call": 3,
+        "stage": "input",
+        "reference_record_order": 98,
+        "coordinates": 10240,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 102.38586952132245,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 3,
+        "stage": "output",
+        "reference_record_order": 99,
+        "coordinates": 304128,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 785.2257149151459,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 100,
+        "coordinates": 304128,
+        "different_coordinates": 0,
+        "max_abs": 0,
+        "max_coordinate": null,
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0,
+        "l2_reference": 0.0000023231090827247196,
+        "relative_l2": 0,
+        "different_fraction": 0
+      },
+      {
+        "module": "lm_head",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 101,
+        "coordinates": 10240,
+        "different_coordinates": 3,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 1024,
+          "feature": 4736
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 6.828569911354542e-8,
+        "l2_reference": 0.0005090744343529349,
+        "relative_l2": 0.0001341369640774453,
+        "different_fraction": 0.00029296875
+      },
+      {
+        "module": "lm_head",
+        "call": 3,
+        "stage": "input_gradient",
+        "reference_record_order": 102,
+        "coordinates": 10240,
+        "different_coordinates": 3,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 1024,
+          "feature": 4736
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 6.828569911354542e-8,
+        "l2_reference": 0.0005090744343529349,
+        "relative_l2": 0.0001341369640774453,
+        "different_fraction": 0.00029296875
+      },
+      {
+        "module": "model.norm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 103,
+        "coordinates": 10240,
+        "different_coordinates": 3,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 1024,
+          "feature": 4736
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 6.828569911354542e-8,
+        "l2_reference": 0.0005090744343529349,
+        "relative_l2": 0.0001341369640774453,
+        "different_fraction": 0.00029296875
+      },
+      {
+        "module": "model.layers.1",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 104,
+        "coordinates": 10240,
+        "different_coordinates": 1265,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 1920,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.6519493263954676e-7,
+        "l2_reference": 0.0001358247155188415,
+        "relative_l2": 0.0012162361762254608,
+        "different_fraction": 0.12353515625
+      },
+      {
+        "module": "model.norm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 105,
+        "coordinates": 10240,
+        "different_coordinates": 1265,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 1920,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.6519493263954676e-7,
+        "l2_reference": 0.0001358247155188415,
+        "relative_l2": 0.0012162361762254608,
+        "different_fraction": 0.12353515625
+      },
+      {
+        "module": "mtp.layers.0.hnorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 106,
+        "coordinates": 10240,
+        "different_coordinates": 1265,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 1920,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.6519493263954676e-7,
+        "l2_reference": 0.0001358247155188415,
+        "relative_l2": 0.0012162361762254608,
+        "different_fraction": 0.12353515625
+      },
+      {
+        "module": "model.layers.1.mlp",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 107,
+        "coordinates": 10240,
+        "different_coordinates": 1265,
+        "max_abs": 2.9802322387695312e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 1920,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 1.6519493263954676e-7,
+        "l2_reference": 0.0001358247155188415,
+        "relative_l2": 0.0012162361762254608,
+        "different_fraction": 0.12353515625
+      },
+      {
+        "module": "model.layers.1.post_attention_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 108,
+        "coordinates": 10240,
+        "different_coordinates": 5171,
+        "max_abs": 1.1920928955078125e-7,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 384,
+          "feature": 4608
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000002084545944073986,
+        "l2_reference": 0.0004697120024984084,
+        "relative_l2": 0.004437923521192221,
+        "different_fraction": 0.50498046875
+      },
+      {
+        "module": "model.layers.1.mlp",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 109,
+        "coordinates": 10240,
+        "different_coordinates": 5171,
+        "max_abs": 1.1920928955078125e-7,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 384,
+          "feature": 4608
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000002084545944073986,
+        "l2_reference": 0.0004697120024984084,
+        "relative_l2": 0.004437923521192221,
+        "different_fraction": 0.50498046875
+      },
+      {
+        "module": "model.layers.1.post_attention_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 110,
+        "coordinates": 10240,
+        "different_coordinates": 4136,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 768,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.40641439231757e-7,
+        "l2_reference": 0.00020800456297045565,
+        "relative_l2": 0.004041456722039118,
+        "different_fraction": 0.40390625
+      },
+      {
+        "module": "model.layers.1.self_attn",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 111,
+        "coordinates": 10240,
+        "different_coordinates": 4136,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 768,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.40641439231757e-7,
+        "l2_reference": 0.00020800456297045565,
+        "relative_l2": 0.004041456722039118,
+        "different_fraction": 0.40390625
+      },
+      {
+        "module": "model.layers.1.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 112,
+        "coordinates": 1024,
+        "different_coordinates": 515,
+        "max_abs": 1.1920928955078125e-7,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 256
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 2.899987083780002e-7,
+        "l2_reference": 0.00006732216672699961,
+        "relative_l2": 0.004307625890206174,
+        "different_fraction": 0.5029296875
+      },
+      {
+        "module": "model.layers.1.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 113,
+        "coordinates": 3072,
+        "different_coordinates": 2199,
+        "max_abs": 7.450580596923828e-9,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 128,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 7.641079839851353e-8,
+        "l2_reference": 0.000013381469237321809,
+        "relative_l2": 0.00571019497510772,
+        "different_fraction": 0.7158203125
+      },
+      {
+        "module": "model.layers.1.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 114,
+        "coordinates": 1024,
+        "different_coordinates": 480,
+        "max_abs": 1.1920928955078125e-7,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 256
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 2.3309397358465077e-7,
+        "l2_reference": 0.000046557443122643507,
+        "relative_l2": 0.005006588806232876,
+        "different_fraction": 0.46875
+      },
+      {
+        "module": "model.layers.1.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 115,
+        "coordinates": 256,
+        "different_coordinates": 192,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.752097364550306e-8,
+        "l2_reference": 0.000018077045975900814,
+        "relative_l2": 0.004841552860029263,
+        "different_fraction": 0.75
+      },
+      {
+        "module": "model.layers.1.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 116,
+        "coordinates": 256,
+        "different_coordinates": 192,
+        "max_abs": 5.960464477539063e-8,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.752097364550306e-8,
+        "l2_reference": 0.000018077045975900814,
+        "relative_l2": 0.004841552860029263,
+        "different_fraction": 0.75
+      },
+      {
+        "module": "model.layers.1.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 117,
+        "coordinates": 3072,
+        "different_coordinates": 2073,
+        "max_abs": 5.587935447692871e-9,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 128,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 5.5771395670546466e-8,
+        "l2_reference": 0.000009378704322858585,
+        "relative_l2": 0.005946599205032578,
+        "different_fraction": 0.6748046875
+      },
+      {
+        "module": "model.layers.1.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 118,
+        "coordinates": 4352,
+        "different_coordinates": 2745,
+        "max_abs": 1.1920928955078125e-7,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 1792
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 2.5515322832443126e-7,
+        "l2_reference": 0.00005081668226191693,
+        "relative_l2": 0.005021052476612555,
+        "different_fraction": 0.6307444852941176
+      },
+      {
+        "module": "model.layers.1.input_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 119,
+        "coordinates": 10240,
+        "different_coordinates": 6695,
+        "max_abs": 6.332993507385254e-8,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 4480
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 4.386678368144572e-7,
+        "l2_reference": 0.00008444916801979666,
+        "relative_l2": 0.005194460136204352,
+        "different_fraction": 0.65380859375
+      },
+      {
+        "module": "model.layers.1.self_attn",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 120,
+        "coordinates": 10240,
+        "different_coordinates": 6695,
+        "max_abs": 6.332993507385254e-8,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 4480
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 4.386678368144572e-7,
+        "l2_reference": 0.00008444916801979666,
+        "relative_l2": 0.005194460136204352,
+        "different_fraction": 0.65380859375
+      },
+      {
+        "module": "model.layers.1.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 121,
+        "coordinates": 10240,
+        "different_coordinates": 6695,
+        "max_abs": 6.332993507385254e-8,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 4480
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 4.386678368144572e-7,
+        "l2_reference": 0.00008444916801979666,
+        "relative_l2": 0.005194460136204352,
+        "different_fraction": 0.65380859375
+      },
+      {
+        "module": "model.layers.1",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 122,
+        "coordinates": 10240,
+        "different_coordinates": 4479,
+        "max_abs": 7.450580596923828e-8,
+        "max_coordinate": {
+          "rank": 5,
+          "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+          "batch_item": 0,
+          "global_sequence": 1024,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.809164293243854e-7,
+        "l2_reference": 0.00020927283199211196,
+        "relative_l2": 0.004209416104989631,
+        "different_fraction": 0.43740234375
+      },
+      {
+        "module": "model.layers.1.input_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 123,
+        "coordinates": 10240,
+        "different_coordinates": 4479,
+        "max_abs": 7.450580596923828e-8,
+        "max_coordinate": {
+          "rank": 5,
+          "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+          "batch_item": 0,
+          "global_sequence": 1024,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.809164293243854e-7,
+        "l2_reference": 0.00020927283199211196,
+        "relative_l2": 0.004209416104989631,
+        "different_fraction": 0.43740234375
+      },
+      {
+        "module": "model.layers.0",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 124,
+        "coordinates": 10240,
+        "different_coordinates": 4479,
+        "max_abs": 7.450580596923828e-8,
+        "max_coordinate": {
+          "rank": 5,
+          "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+          "batch_item": 0,
+          "global_sequence": 1024,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.809164293243854e-7,
+        "l2_reference": 0.00020927283199211196,
+        "relative_l2": 0.004209416104989631,
+        "different_fraction": 0.43740234375
+      },
+      {
+        "module": "model.layers.0.mlp",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 125,
+        "coordinates": 10240,
+        "different_coordinates": 4479,
+        "max_abs": 7.450580596923828e-8,
+        "max_coordinate": {
+          "rank": 5,
+          "batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+          "batch_item": 0,
+          "global_sequence": 1024,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 8.809164293243854e-7,
+        "l2_reference": 0.00020927283199211196,
+        "relative_l2": 0.004209416104989631,
+        "different_fraction": 0.43740234375
+      },
+      {
+        "module": "model.layers.0.post_attention_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 126,
+        "coordinates": 10240,
+        "different_coordinates": 6959,
+        "max_abs": 2.384185791015625e-7,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 2048,
+          "feature": 3584
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0000052086121153808205,
+        "l2_reference": 0.0008447485198940007,
+        "relative_l2": 0.006165873029329958,
+        "different_fraction": 0.67958984375
+      },
+      {
+        "module": "model.layers.0.mlp",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 127,
+        "coordinates": 10240,
+        "different_coordinates": 6959,
+        "max_abs": 2.384185791015625e-7,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 2048,
+          "feature": 3584
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0000052086121153808205,
+        "l2_reference": 0.0008447485198940007,
+        "relative_l2": 0.006165873029329958,
+        "different_fraction": 0.67958984375
+      },
+      {
+        "module": "model.layers.0.post_attention_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 128,
+        "coordinates": 10240,
+        "different_coordinates": 6792,
+        "max_abs": 0.0000019073486328125,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 2048,
+          "feature": 3584
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000026065345151396042,
+        "l2_reference": 0.004077904026709427,
+        "relative_l2": 0.006391848601799707,
+        "different_fraction": 0.66328125
+      },
+      {
+        "module": "model.layers.0.self_attn",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 129,
+        "coordinates": 10240,
+        "different_coordinates": 6792,
+        "max_abs": 0.0000019073486328125,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 2048,
+          "feature": 3584
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000026065345151396042,
+        "l2_reference": 0.004077904026709427,
+        "relative_l2": 0.006391848601799707,
+        "different_fraction": 0.66328125
+      },
+      {
+        "module": "model.layers.0.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 130,
+        "coordinates": 1024,
+        "different_coordinates": 570,
+        "max_abs": 0.000001430511474609375,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 128
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.00000383607235115323,
+        "l2_reference": 0.001046393243691015,
+        "relative_l2": 0.003665994953887496,
+        "different_fraction": 0.556640625
+      },
+      {
+        "module": "model.layers.0.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 131,
+        "coordinates": 3072,
+        "different_coordinates": 2363,
+        "max_abs": 2.384185791015625e-7,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 512,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0000033782797230581515,
+        "l2_reference": 0.0004621157470180812,
+        "relative_l2": 0.007310462248597578,
+        "different_fraction": 0.7692057291666666
+      },
+      {
+        "module": "model.layers.0.self_attn.kv_a_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 132,
+        "coordinates": 1024,
+        "different_coordinates": 523,
+        "max_abs": 9.5367431640625e-7,
+        "max_coordinate": {
+          "rank": 0,
+          "batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 384
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0000029471275768662756,
+        "l2_reference": 0.0007232467856474738,
+        "relative_l2": 0.004074857483435494,
+        "different_fraction": 0.5107421875
+      },
+      {
+        "module": "model.layers.0.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 133,
+        "coordinates": 256,
+        "different_coordinates": 199,
+        "max_abs": 0.0000011920928955078125,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0000018266130018656523,
+        "l2_reference": 0.00019834355581842242,
+        "relative_l2": 0.0092093387875826,
+        "different_fraction": 0.77734375
+      },
+      {
+        "module": "model.layers.0.self_attn.key_rope_gather",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 134,
+        "coordinates": 256,
+        "different_coordinates": 199,
+        "max_abs": 0.0000011920928955078125,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 0
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0000018266130018656523,
+        "l2_reference": 0.00019834355581842242,
+        "relative_l2": 0.0092093387875826,
+        "different_fraction": 0.77734375
+      },
+      {
+        "module": "model.layers.0.self_attn.q_a_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 135,
+        "coordinates": 3072,
+        "different_coordinates": 2250,
+        "max_abs": 1.7881393432617188e-7,
+        "max_coordinate": {
+          "rank": 1,
+          "batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+          "batch_item": 0,
+          "global_sequence": 512,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.00000243808437801027,
+        "l2_reference": 0.0003224784625542835,
+        "relative_l2": 0.00756045646800323,
+        "different_fraction": 0.732421875
+      },
+      {
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 136,
+        "coordinates": 4352,
+        "different_coordinates": 2972,
+        "max_abs": 0.0000011920928955078125,
+        "max_coordinate": {
+          "rank": 4,
+          "batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 2048
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000004238670952929475,
+        "l2_reference": 0.0008163445583180383,
+        "relative_l2": 0.005192257251843086,
+        "different_fraction": 0.6829044117647058
+      },
+      {
+        "module": "model.layers.0.input_layernorm",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 137,
+        "coordinates": 10240,
+        "different_coordinates": 7648,
+        "max_abs": 7.152557373046875e-7,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000006719917273071981,
+        "l2_reference": 0.001100839410697061,
+        "relative_l2": 0.006104357463743846,
+        "different_fraction": 0.746875
+      },
+      {
+        "module": "model.layers.0.self_attn",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 138,
+        "coordinates": 10240,
+        "different_coordinates": 7648,
+        "max_abs": 7.152557373046875e-7,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000006719917273071981,
+        "l2_reference": 0.001100839410697061,
+        "relative_l2": 0.006104357463743846,
+        "different_fraction": 0.746875
+      },
+      {
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 139,
+        "coordinates": 10240,
+        "different_coordinates": 7648,
+        "max_abs": 7.152557373046875e-7,
+        "max_coordinate": {
+          "rank": 2,
+          "batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 768
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.000006719917273071981,
+        "l2_reference": 0.001100839410697061,
+        "relative_l2": 0.006104357463743846,
+        "different_fraction": 0.746875
+      },
+      {
+        "module": "model.layers.0",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 140,
+        "coordinates": 10240,
+        "different_coordinates": 7270,
+        "max_abs": 0.0000457763671875,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 2816
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0003552124914833334,
+        "l2_reference": 0.054954520646084894,
+        "relative_l2": 0.006463753796906964,
+        "different_fraction": 0.7099609375
+      },
+      {
+        "module": "model.layers.0.input_layernorm",
+        "call": 0,
+        "stage": "input_gradient",
+        "reference_record_order": 141,
+        "coordinates": 10240,
+        "different_coordinates": 7270,
+        "max_abs": 0.0000457763671875,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 2816
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0003552124914833334,
+        "l2_reference": 0.054954520646084894,
+        "relative_l2": 0.006463753796906964,
+        "different_fraction": 0.7099609375
+      },
+      {
+        "module": "model.embed_tokens",
+        "call": 0,
+        "stage": "output_gradient",
+        "reference_record_order": 142,
+        "coordinates": 10240,
+        "different_coordinates": 7270,
+        "max_abs": 0.0000457763671875,
+        "max_coordinate": {
+          "rank": 7,
+          "batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+          "batch_item": 0,
+          "global_sequence": 0,
+          "feature": 2816
+        },
+        "ranks_seen": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "l2_difference": 0.0003552124914833334,
+        "l2_reference": 0.054954520646084894,
+        "relative_l2": 0.006463753796906964,
+        "different_fraction": 0.7099609375
+      }
+    ],
+    "watched_modules": [
+      {
+        "name": "model.embed_tokens",
+        "class": "Embedding"
+      },
+      {
+        "name": "model.layers.0",
+        "class": "HSDPJTDeepseekV3Decoder"
+      },
+      {
+        "name": "model.layers.0.self_attn",
+        "class": "JTDeepseekV3MLAAttention"
+      },
+      {
+        "name": "model.layers.0.self_attn.linear_qkv",
+        "class": "Linear"
+      },
+      {
+        "name": "model.layers.0.self_attn.q_a_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.layers.0.self_attn.kv_a_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.layers.0.self_attn.key_rope_gather",
+        "class": "Identity"
+      },
+      {
+        "name": "model.layers.0.mlp",
+        "class": "DeepseekV32MLP"
+      },
+      {
+        "name": "model.layers.0.input_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.layers.0.post_attention_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.layers.1",
+        "class": "HSDPJTDeepseekV3Decoder"
+      },
+      {
+        "name": "model.layers.1.self_attn",
+        "class": "JTDeepseekV3MLAAttention"
+      },
+      {
+        "name": "model.layers.1.self_attn.linear_qkv",
+        "class": "Linear"
+      },
+      {
+        "name": "model.layers.1.self_attn.q_a_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.layers.1.self_attn.kv_a_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.layers.1.self_attn.key_rope_gather",
+        "class": "Identity"
+      },
+      {
+        "name": "model.layers.1.mlp",
+        "class": "JTDeepseekV3MoE"
+      },
+      {
+        "name": "model.layers.1.input_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.layers.1.post_attention_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "model.norm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "lm_head",
+        "class": "Linear"
+      },
+      {
+        "name": "mtp.layers.0.enorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "mtp.layers.0.hnorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "mtp.layers.0.eh_proj",
+        "class": "Linear"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer",
+        "class": "HSDPJTDeepseekV3Decoder"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.self_attn",
+        "class": "JTDeepseekV3MLAAttention"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.self_attn.linear_qkv",
+        "class": "Linear"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.self_attn.key_rope_gather",
+        "class": "Identity"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.mlp",
+        "class": "JTDeepseekV3MoE"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.input_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      },
+      {
+        "name": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+        "class": "DeepseekV32RMSNorm"
+      }
+    ],
+    "scope": "仅step1所记录的三维边界，序列及feature每128采样；包含head checkpoint replay。逐调用完整性用独立functional Linear事件核对5个watched Linear模块/8次调用；其余模块仅检查已记录调用和模块覆盖，不是所有原始算子/完整张量oracle。"
+  },
+  "arithmetic_scope": {
+    "source_evidence": [
+      {
+        "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear_dgrad_experiment.py",
+        "lines": [
+          17,
+          22,
+          26,
+          44
+        ],
+        "meaning": "forward保留NATIVE_LINEAR；dgrad将dy与weight转FP32相乘，再转回输入BF16；wgrad/bias由原生BF16 Linear autograd replay求导。"
+      },
+      {
+        "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear_dgrad_trace_experiment.py",
+        "lines": [
+          33,
+          49,
+          108,
+          149
+        ],
+        "meaning": "derivative_calculated在实际反向计算返回后记录；只干预plain Tensor/Parameter且X/W均BF16的Linear，HF32为真时拒绝。"
+      },
+      {
+        "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp_backward_trace.py",
+        "lines": [
+          71,
+          79,
+          96,
+          137
+        ],
+        "meaning": "只采首步3D边界，序列/特征步长128，梯度hook不修改梯度。"
+      }
+    ],
+    "candidate_per_rank_per_step": {
+      "functional_forward_calls": 28,
+      "eligible_bf16_forward_calls": 26,
+      "registered_linear_modules_seen": 23,
+      "fp32_dgrad_backward_calls": 24,
+      "head_checkpoint_replay_calls": 2,
+      "fp32_router_native_calls": 2
+    },
+    "bf16_forward_preserved": "已记录72组前向的全部采样值严格一致；源码仍调用原生BF16 Linear。",
+    "bf16_weight_gradient_preserved": "仅指wgrad的原生BF16计算路径/配方在给定操作数下保留。上游dY被干预后，下游wgrad数值可以改变；本证据没有单独逐元素对照所有wgrad。",
+    "exclusions": "不覆盖DTensor/subclass Linear的FP32干预，不改变FP32 router F.linear或非F.linear专家grouped matmul。该组实验TP1/CP1；不将C的覆盖推广到TP/EP。",
+    "scalar_objectives": "首步24个（8rank×3分量）loss forward值及对目标的归一化梯度与A均严格一致。",
+    "first_step_loss_and_grad_norm": "首步LM/加权MTP/aux/total全0差；grad_norm变化-1.33514404296875e-05。",
+    "head_samples": "lm_head call0的input_gradient有3/10240坐标变化，最大5.960464477539063e-08；call3 replay有相同采样变化。两条记录有重放/别名关系，不能视作两个独立因果证据；MTP head call1及call2 input_gradient采样为0差。"
+  },
+  "evidence_boundaries": [
+    "初始状态与输入一致性依据原始捕获摘要及其文件SHA；本机未持有并重新计算完整模型张量或训练输入的字节哈希。",
+    "first_difference_by_reference_record_order是参考日志一基记录序号，不是计算图拓扑/因果排序；分支的hook触发顺序不能证明唯一根因。",
+    "采样包含所有已记录坐标，但序列和feature均步长128，不代表完整张量相同。仅5个watched Linear有独立调用oracle；非Linear只核对已记录调用/模块覆盖。",
+    "C/A是在同拓扑下测量干预效应。需要D（CP2 FP32 dgrad）与C对比并结合A/B，才能判断同一干预是否缩小跨布局差异；即使三步改善也不能替代200步全部8rank阈值。",
+    "FP32 dgrad+原生wgrad replay和观测会产生诊断额外开销；不据此给生产性能/显存收益结论。",
+    "仅本地离线标准库读取；没有启动设备、容器或改动实验helper、生产源码、队列、原始证据或GitHub。"
+  ],
+  "input_file_count": 284,
+  "input_files": [
+    {
+      "path": "configs/r129-f637-dgrad-fsdp8-fp32-3.yaml",
+      "bytes": 5803,
+      "sha256": "1f522a34e95aef6a97fe9e508ded292f16c0877d1c175092d177e5ce621347c1"
+    },
+    {
+      "path": "configs/r129-f637-dgrad-fsdp8-native-3.yaml",
+      "bytes": 5805,
+      "sha256": "e42f9569758436a901d64fd879e8ae76ee714e66b163b5bc33a1dc571ff20a4c"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-native-3-evidence-manifest.json",
+      "bytes": 25738,
+      "sha256": "667a8d847240a83a684918948f01cfec92c7b95bf190871dee6eb899e347c031"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-fp32-3-audit-v4.json",
+      "bytes": 161393,
+      "sha256": "67a3071d775b173f70b4ce2de9605dd984b6da26ab6d6527f5b6317ae6b5108b"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-fp32-3-evidence-manifest.json",
+      "bytes": 25722,
+      "sha256": "94c89c94e84073accacf5e2cfcb575250287b1c08bedcbf129b749c44c4f618b"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-evidence-manifest.json",
+      "bytes": 25982,
+      "sha256": "1edb511b2732c9bc79b9049256082f30b6de10bd620eb445e8ed8c080cea983f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank0.jsonl",
+      "bytes": 5938675,
+      "sha256": "ef32ea1b3c38b06f0ac7d66a97c21dd80620212d49442e88a188eabf7d9c0deb"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank1.jsonl",
+      "bytes": 6040733,
+      "sha256": "21469e03e02d16de0322bed980ffdf2a5432a0a70c8fbf5ea9fd065fdcfcbdd9"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank2.jsonl",
+      "bytes": 6038026,
+      "sha256": "2f5dbb8e9b45c5a1c57130e60d4ed402574b4f12c409ab947e9c2f3348620758"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank3.jsonl",
+      "bytes": 6035969,
+      "sha256": "828a1b11096acd71b79af26bcb06c6e757bbecaf9cba34d228972a07284f53a5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank4.jsonl",
+      "bytes": 6036076,
+      "sha256": "b0bcf5a1a408387a25cd826eb7dbe2d301a5ee0907e71b4681fc1d870ece938e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank5.jsonl",
+      "bytes": 6040722,
+      "sha256": "b75bf165e8cc9d94e73010b0bd95142530626a7fe6302bcde6dc71bf412047cd"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank6.jsonl",
+      "bytes": 6038210,
+      "sha256": "906d7748613cbeb8e5377188c506c9599448499c5d649e49cdf3629fcbe33d8d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/activations-rank7.jsonl",
+      "bytes": 6039493,
+      "sha256": "6bbcd037fb20e64e396a57d2544202b65fb903094f8ad5c21409c7fbbeaa591c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/capture_cp_loss_training.py",
+      "bytes": 2147,
+      "sha256": "47bfe15b93fba3dc1fba732eac143748a800ebc0b3e31aee1cf8ece169d7381e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/capture_fair_dgrad_training.py",
+      "bytes": 2860,
+      "sha256": "0ee23ecae60977dda9dd7efee91c34de1e809acb428e10da82850dc8b306f97b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/capture_precision_training.py",
+      "bytes": 287,
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank0.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank1.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank2.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank3.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank4.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank5.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank6.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/complete-rank7.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/config.resolved.json",
+      "bytes": 13151,
+      "sha256": "942156edcffae5cc39f8c45f0d194caf6f2d0e37c30dc1efe8abd99a104a8ab4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/config.yaml",
+      "bytes": 5803,
+      "sha256": "1f522a34e95aef6a97fe9e508ded292f16c0877d1c175092d177e5ce621347c1"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp_backward_trace.py",
+      "bytes": 6521,
+      "sha256": "b682fcbfe3067988245d16dcecaf1a32f6232d574ccee923a250d95a7471da32"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank0.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank1.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank2.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank3.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank4.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank5.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank6.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/cp-backward-probe-rank7.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/EXIT_CODE",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/import-path.txt",
+      "bytes": 53,
+      "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank0.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank1.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank2.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank3.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank4.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank5.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank6.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/initial-state-rank7.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/check/activation_checkpoint.json",
+      "bytes": 35,
+      "sha256": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/check/findings.json",
+      "bytes": 388,
+      "sha256": "20ca3ae160fb953659e45164929dd0c3c7b4bafcc9763e58479e4a927c054ccd"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/check/fsdp_units.json",
+      "bytes": 2621,
+      "sha256": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/check/optimizer_layout_initial.json",
+      "bytes": 46868,
+      "sha256": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/check/parameter_ownership.csv",
+      "bytes": 3863,
+      "sha256": "2f63402178bfd952812a7ea6483299d1edc6f9451785565e64b15db8d6906ad6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/checkpoint/coverage.json",
+      "bytes": 127,
+      "sha256": "c2c685e1fe5995375393df9abec6fc4807d65ae63768f41818f9fe4cc431ddd6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/data/field_ownership.json",
+      "bytes": 229,
+      "sha256": "41896dc974540373fa01a10a0b7087f543fac3d5df44c4ebe6fe37c6728d6cc3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/data/findings.json",
+      "bytes": 41,
+      "sha256": "ff9c9fad82662fc12754bd8f6714c7d329754d5a483e2aaa948566861f333170"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/environment.json",
+      "bytes": 1336,
+      "sha256": "be15d7d67878d139f71175af9e7ddcbb6efa69fe5e24bb7438903ba28ab80f9b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/integration_state.json",
+      "bytes": 223,
+      "sha256": "7e3defc6c12dd748ecd2325f6f3fe71f910eff1aed554b80ad3d343a8c50f111"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/inventory/candidate.json",
+      "bytes": 45899,
+      "sha256": "c369274e8e697c77445d33556a60dacb94bf3a8dd58320d96084c39e363794bc"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/integration/trainer_config.resolved.json",
+      "bytes": 13151,
+      "sha256": "3bc332b21437493ad9b9a06c2d41dabbae63e1fa2acc788beb4cb6d8cf9e6740"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/launcher.log",
+      "bytes": 220,
+      "sha256": "8295fc6178458ca9e848e833b57ccc311ace668172358c01293efa77b1924c35"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear_dgrad_experiment.py",
+      "bytes": 3514,
+      "sha256": "373b5ed016604a92dbfec9afeb2c76edc8b456cf427ade592dfab2aa8098f925"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear_dgrad_trace_experiment.py",
+      "bytes": 8869,
+      "sha256": "62a18e143b1a8af826cc8ebdaf201e7be442c8179362caa102e02a73bea8ab87"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank0.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank1.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank2.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank3.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank4.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank5.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank6.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-coverage-rank7.json",
+      "bytes": 17527,
+      "sha256": "0428888f30aa5e647417de7639c4147e4265efb397bd0995ee220ed963e872e4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank0.jsonl",
+      "bytes": 215068,
+      "sha256": "bafa6c3ebf9f384f063296ac53a7ef7f47f26c3f3c2a7a5d5378d5d1861edd52"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank1.jsonl",
+      "bytes": 215068,
+      "sha256": "2600018335d3fc03c9cd204990c50850d34d975d5bb7a64440046dadff5cfc68"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank2.jsonl",
+      "bytes": 215068,
+      "sha256": "40fd3a36aef91cdafe218e9e026beb85f193164ceb248ba8c910d4502fb7ca02"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank3.jsonl",
+      "bytes": 215068,
+      "sha256": "0e3c3638177641cf5c86c1ee11689da4b4b23bb70ab548f3db8b043010201048"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank4.jsonl",
+      "bytes": 215068,
+      "sha256": "e9e60aa4dd64dc9fc1e14d3b4a0de9af544bd57f10e926afd48d7aa9a63fa069"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank5.jsonl",
+      "bytes": 215068,
+      "sha256": "1ffc1ab74e951cdc9860e71261830ab2f447731ed8d3eb86a587eda841fb8c60"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank6.jsonl",
+      "bytes": 215068,
+      "sha256": "664769f9d88ff83a0e402b7e99d5591c2dcd9a22c54b36877510d5938e8dd1c3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-events-rank7.jsonl",
+      "bytes": 215068,
+      "sha256": "e8535f93c3f199a4d4c235e7b85220b936b0f55a2172da7c84e5eae052662169"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank0.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank1.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank2.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank3.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank4.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank5.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank6.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/linear-dgrad-experiment-rank7.json",
+      "bytes": 328,
+      "sha256": "3d0735c1d604a7d9118fb069027277bbf2f335645f96eae32a8dceb6cda2f59f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss_gradient_trace.py",
+      "bytes": 2406,
+      "sha256": "9b57516f6a5800197ca0fddf19a0878e509fb84da556138a0665e66683ef1f60"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank0.jsonl",
+      "bytes": 731,
+      "sha256": "9ae4e2ca6e4ade491b5e51569555163736a99247fda4731168244d35db23a9c3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank1.jsonl",
+      "bytes": 731,
+      "sha256": "8e6c5c831353e8facb76f26a905faf1671675c454a91782cff9d6e88ffcff1ba"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank2.jsonl",
+      "bytes": 730,
+      "sha256": "acbb29c1d86fa198b75f5e035729e646eccbabc785975e15c04fafe104981c78"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank3.jsonl",
+      "bytes": 728,
+      "sha256": "f36a22527656eeb5c6c9a08b2d9c4cfc06e3d106824ea34fb6c460930d8c5ea5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank4.jsonl",
+      "bytes": 731,
+      "sha256": "7225fa5952817f9210e11dfe765101db6fbdfdecbeb12dcf16588e6f2816cd88"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank5.jsonl",
+      "bytes": 732,
+      "sha256": "cff9ca026f5f2706d2c7cb57bc3a9c3e17afd7dd5a485b073bd8eb88a03619b8"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank6.jsonl",
+      "bytes": 730,
+      "sha256": "b171b6f499e0ccbb58d9c9138170b7e2151e5506d6ff4a172256e45e72a1be36"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/loss-gradients-rank7.jsonl",
+      "bytes": 731,
+      "sha256": "d371f04ae0d0014693a638aaf0da0477ffd012daed6f472aadf1c83d34f52d6d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank0.jsonl",
+      "bytes": 2224,
+      "sha256": "6149677dd007470bfc6143b9e8a6d1ed7c7ec363dbe824885bacfc74eff79e30"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank1.jsonl",
+      "bytes": 2224,
+      "sha256": "a7b0e3c32f77a74a857659d28ccb0bc84148faf1794099ef844586d20bfef325"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank2.jsonl",
+      "bytes": 2224,
+      "sha256": "f7278edc2c1f4068d91ffc3e28b974919f1a2521f53c64e5f3b939022f51199e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank3.jsonl",
+      "bytes": 2224,
+      "sha256": "6b038cdd94888d0f960645fd92a3ab93a7e22c6b2bdfb5dfc3f61bc6859cb50d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank4.jsonl",
+      "bytes": 2224,
+      "sha256": "a974b1adc0fcb5b4bf9648b1be0afa42c1ed553975df081a61ca8902b25c0661"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank5.jsonl",
+      "bytes": 2224,
+      "sha256": "2846529be2c2aaf1c3cd238c3c20f6770ef498613e55dda09d8c7883f83becf0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank6.jsonl",
+      "bytes": 2224,
+      "sha256": "4a2ed3fdf3eae37ce256508f445812209809b03b4ff0a8f26cc33872eb133733"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/metrics-rank7.jsonl",
+      "bytes": 2224,
+      "sha256": "44dd9e9aa334d0db6df34e01c20c23e764723f63ab80a82189fa9aeaa31189ae"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/ns_batch_trace.py",
+      "bytes": 1998,
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/source-commit.txt",
+      "bytes": 41,
+      "sha256": "11e1103266493a353af04b3be5136176b9341f77fb898c261b3028070b051334"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/source-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/source.patch",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank0.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank1.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank2.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank3.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank4.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank5.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank6.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/start-rank7.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/0/stderr.log",
+      "bytes": 24955,
+      "sha256": "cfc18526e5f3f5a24547b78779b147c4a9cfc875c3c1c1a77b8bf8c0ff7da6b3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/0/stdout.log",
+      "bytes": 846,
+      "sha256": "47015adf01587491a991cbfcd712d2030b1375e3d1e289305af04233b876157c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/1/stderr.log",
+      "bytes": 2803,
+      "sha256": "3719c41d29be62482d88a16ea7cf6110e84cdb7751fd0c0d91cd086176156a0e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/1/stdout.log",
+      "bytes": 186,
+      "sha256": "cc922d8af9ad6bbb4662ce8cacfc03766e958c4fde34e6faf78dfb5c0a673450"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/2/stderr.log",
+      "bytes": 2803,
+      "sha256": "7fbb26304fbda6c2deb18fa9bc14c1dc46fc59a238b9474b7bf7e79de7c34f61"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/2/stdout.log",
+      "bytes": 186,
+      "sha256": "713cd02769d7036e61709dea05cf9c13c9083e3af11eb09c55f4dd2b8fd775fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/3/stderr.log",
+      "bytes": 2803,
+      "sha256": "6d4f6a35c87e810ba96800409ca24774f0d2ac975d2ac1e9bbdfe9dba7cb7463"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/3/stdout.log",
+      "bytes": 186,
+      "sha256": "6887632e10ecdcd2365d29eac6c095d68c425b50cd2766b168992d00825757f1"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/4/stderr.log",
+      "bytes": 2803,
+      "sha256": "8b6106fa0c13103d4c564b50c8740aadd8bf1adaae3f2df1f4afe8c3fb2c3d6d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/4/stdout.log",
+      "bytes": 186,
+      "sha256": "28ea1b867af79931e849e8fd4e46d6c0e90e914d8f73b6c60f3cd72810f315c0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/5/stderr.log",
+      "bytes": 2803,
+      "sha256": "418b69c15d6f0646c1edd79eb031c130ac1d65eb9cf3543eca3465065e9e2dcf"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/5/stdout.log",
+      "bytes": 186,
+      "sha256": "e4f3c9fced6f33365e4c9ae1a985883322f987b64c22592e460722a030078fb9"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/6/stderr.log",
+      "bytes": 2803,
+      "sha256": "5f6a3a583fb8278ecb88fd9be30f3edebf3561bf99d5e22fe741815ba1b220b8"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/6/stdout.log",
+      "bytes": 186,
+      "sha256": "bcf7984f76754fdf9d09e7e545162e51d507f989fee839a2ca67af78b480116a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/7/stderr.log",
+      "bytes": 2803,
+      "sha256": "58014bd8bdf6412f506b393b72ce4e197aa50f739d1bf93d40b44fd31d66bb01"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-fp32-3/worker-logs/none_j1yxlsd2/attempt_0/7/stdout.log",
+      "bytes": 186,
+      "sha256": "762d1a9a2fdd004ec74618c03ea04b866c75c8977b07841745f6fed74b210dbd"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank0.jsonl",
+      "bytes": 5938894,
+      "sha256": "cadf7e3793419ae7cea13c87f7b93551a47381305c600016a58a14332e3d2045"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank1.jsonl",
+      "bytes": 6040770,
+      "sha256": "85418325c38f33797047ffb640d084bab949e16cc84e7f0d6e27d1b13685d64d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank2.jsonl",
+      "bytes": 6037834,
+      "sha256": "52faced13e8839d0002aadd5fc991669b068300f0409f4597ef15a8b9c867607"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank3.jsonl",
+      "bytes": 6036169,
+      "sha256": "d33006161a25b8c2141a65eb0bb2a831920f8e579d6b94a93ed24d25281dd468"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank4.jsonl",
+      "bytes": 6036438,
+      "sha256": "682c7a9222fb0dce668771b1e0151ba5fa60c41430fde7bbb4407b84d46c9b9e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank5.jsonl",
+      "bytes": 6041046,
+      "sha256": "49b24f6b0759fb59f735a00f1e4de1ffbeb99f5d3f2ebe83338f75d5258d07a4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank6.jsonl",
+      "bytes": 6037884,
+      "sha256": "5ffba34252b8b8e30949528453a4846770daec3ca519f007c1ddcf62a395010e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank7.jsonl",
+      "bytes": 6039907,
+      "sha256": "3df4dd1561afb16ea3e3d6c480eb0238ee537e69948451280331ca52fc54f88e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_cp_loss_training.py",
+      "bytes": 2147,
+      "sha256": "47bfe15b93fba3dc1fba732eac143748a800ebc0b3e31aee1cf8ece169d7381e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_fair_dgrad_training.py",
+      "bytes": 2860,
+      "sha256": "0ee23ecae60977dda9dd7efee91c34de1e809acb428e10da82850dc8b306f97b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_precision_training.py",
+      "bytes": 287,
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank0.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank1.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank2.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank3.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank4.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank5.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank6.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank7.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/config.resolved.json",
+      "bytes": 13153,
+      "sha256": "ac5d8c8f20c27d226fb98e6bf23faefea4d6275eccbdaeca44909af33d74b73b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/config.yaml",
+      "bytes": 5805,
+      "sha256": "e42f9569758436a901d64fd879e8ae76ee714e66b163b5bc33a1dc571ff20a4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp_backward_trace.py",
+      "bytes": 6521,
+      "sha256": "b682fcbfe3067988245d16dcecaf1a32f6232d574ccee923a250d95a7471da32"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank0.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank1.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank2.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank3.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank4.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank5.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank6.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank7.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/EXIT_CODE",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/import-path.txt",
+      "bytes": 53,
+      "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank0.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank1.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank2.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank3.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank4.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank5.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank6.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank7.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/activation_checkpoint.json",
+      "bytes": 35,
+      "sha256": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/findings.json",
+      "bytes": 388,
+      "sha256": "20ca3ae160fb953659e45164929dd0c3c7b4bafcc9763e58479e4a927c054ccd"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/fsdp_units.json",
+      "bytes": 2621,
+      "sha256": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/optimizer_layout_initial.json",
+      "bytes": 46868,
+      "sha256": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/parameter_ownership.csv",
+      "bytes": 3863,
+      "sha256": "2f63402178bfd952812a7ea6483299d1edc6f9451785565e64b15db8d6906ad6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/checkpoint/coverage.json",
+      "bytes": 127,
+      "sha256": "c2c685e1fe5995375393df9abec6fc4807d65ae63768f41818f9fe4cc431ddd6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/data/field_ownership.json",
+      "bytes": 229,
+      "sha256": "41896dc974540373fa01a10a0b7087f543fac3d5df44c4ebe6fe37c6728d6cc3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/data/findings.json",
+      "bytes": 41,
+      "sha256": "ff9c9fad82662fc12754bd8f6714c7d329754d5a483e2aaa948566861f333170"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/environment.json",
+      "bytes": 1338,
+      "sha256": "716a42e92d12f33eb37dccdfb9ed089c52a1854cdd5b110f37ac49cba7c1f267"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/integration_state.json",
+      "bytes": 223,
+      "sha256": "7e3defc6c12dd748ecd2325f6f3fe71f910eff1aed554b80ad3d343a8c50f111"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/inventory/candidate.json",
+      "bytes": 45899,
+      "sha256": "c369274e8e697c77445d33556a60dacb94bf3a8dd58320d96084c39e363794bc"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/trainer_config.resolved.json",
+      "bytes": 13153,
+      "sha256": "092c569425b96282c1f9ef08d921a385c75d15f0c570b1af2d18c666812b9d91"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/launcher.log",
+      "bytes": 220,
+      "sha256": "8295fc6178458ca9e848e833b57ccc311ace668172358c01293efa77b1924c35"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear_dgrad_experiment.py",
+      "bytes": 3514,
+      "sha256": "373b5ed016604a92dbfec9afeb2c76edc8b456cf427ade592dfab2aa8098f925"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear_dgrad_trace_experiment.py",
+      "bytes": 8869,
+      "sha256": "62a18e143b1a8af826cc8ebdaf201e7be442c8179362caa102e02a73bea8ab87"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank0.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank1.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank2.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank3.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank4.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank5.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank6.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank7.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank0.jsonl",
+      "bytes": 157616,
+      "sha256": "e73c9cf83f6126f49e0227f26346a5633262f0d1373ac6e27b536e2925f480fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank1.jsonl",
+      "bytes": 157616,
+      "sha256": "7320d4b931f1a7bd7fb73f3ec59512e9a6a58770a4fa3e344e4491a4c8ce8046"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank2.jsonl",
+      "bytes": 157616,
+      "sha256": "6513d15e99959cc78139b844c08de062012a807335560b1bc97bcb079c3390b4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank3.jsonl",
+      "bytes": 157616,
+      "sha256": "c32673e5d1c2c0a13da0fc845a365e81a64cfdbdd7ac292f4e1e1692fca7c8cc"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank4.jsonl",
+      "bytes": 157616,
+      "sha256": "329ffcdfcdf2ca279c6f344d1f3463767dca16c0eaddc0b670990b793b4af8bc"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank5.jsonl",
+      "bytes": 157616,
+      "sha256": "eb27f34fcf421575243ea23f874a925e11b53939c869e27c5c94f10f1b729790"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank6.jsonl",
+      "bytes": 157616,
+      "sha256": "56fa8704d32a18edd9b7dc2028731403e9fa67d4dd9b095552f5b55a7008a514"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank7.jsonl",
+      "bytes": 157616,
+      "sha256": "e1f121ca81363a8f35cc0beef19e00b768e810f9b92aeaaa71678ddeb82b4372"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank0.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank1.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank2.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank3.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank4.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank5.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank6.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank7.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss_gradient_trace.py",
+      "bytes": 2406,
+      "sha256": "9b57516f6a5800197ca0fddf19a0878e509fb84da556138a0665e66683ef1f60"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank0.jsonl",
+      "bytes": 731,
+      "sha256": "9ae4e2ca6e4ade491b5e51569555163736a99247fda4731168244d35db23a9c3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank1.jsonl",
+      "bytes": 731,
+      "sha256": "8e6c5c831353e8facb76f26a905faf1671675c454a91782cff9d6e88ffcff1ba"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank2.jsonl",
+      "bytes": 730,
+      "sha256": "acbb29c1d86fa198b75f5e035729e646eccbabc785975e15c04fafe104981c78"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank3.jsonl",
+      "bytes": 728,
+      "sha256": "f36a22527656eeb5c6c9a08b2d9c4cfc06e3d106824ea34fb6c460930d8c5ea5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank4.jsonl",
+      "bytes": 731,
+      "sha256": "7225fa5952817f9210e11dfe765101db6fbdfdecbeb12dcf16588e6f2816cd88"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank5.jsonl",
+      "bytes": 732,
+      "sha256": "cff9ca026f5f2706d2c7cb57bc3a9c3e17afd7dd5a485b073bd8eb88a03619b8"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank6.jsonl",
+      "bytes": 730,
+      "sha256": "b171b6f499e0ccbb58d9c9138170b7e2151e5506d6ff4a172256e45e72a1be36"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank7.jsonl",
+      "bytes": 731,
+      "sha256": "d371f04ae0d0014693a638aaf0da0477ffd012daed6f472aadf1c83d34f52d6d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank0.jsonl",
+      "bytes": 2223,
+      "sha256": "03ae80505de28927a9f85990d0b85582fa747e8faee958e840ed347186a284e2"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank1.jsonl",
+      "bytes": 2223,
+      "sha256": "c5d7e209bc7740858d5d736ceef723febb48e040a170bf7f4da55c38e9fdd360"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank2.jsonl",
+      "bytes": 2223,
+      "sha256": "82bd1dddf549ad878806edd2477fa429ca46a5b71a814bbffefd47902d2eeae5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank3.jsonl",
+      "bytes": 2223,
+      "sha256": "4ccef11fdbdec786da5304f7f9dfefb96e6767c3cc631bf181cef8d2c7bba0f3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank4.jsonl",
+      "bytes": 2223,
+      "sha256": "78a4a48dbef91d324bfef7ad831aa5e9db8581ff92da6db96b9c5887eb2d1522"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank5.jsonl",
+      "bytes": 2223,
+      "sha256": "eb692a3d4719b4655e250f59548eaf5116796aba014d0a2186bb9e2945d00f90"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank6.jsonl",
+      "bytes": 2223,
+      "sha256": "0aada981b9242864ec51da1dfa7f0a0eee2fc2e6ef9c1e0587bdff25d722e28c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank7.jsonl",
+      "bytes": 2223,
+      "sha256": "28298cca77144d7243611fd3c1d2012f7f0a22144c3e9bbcf37fc7e3fdca6a27"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/ns_batch_trace.py",
+      "bytes": 1998,
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/source-commit.txt",
+      "bytes": 41,
+      "sha256": "11e1103266493a353af04b3be5136176b9341f77fb898c261b3028070b051334"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/source-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/source.patch",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank0.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank1.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank2.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank3.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank4.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank5.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank6.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank7.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/0/stderr.log",
+      "bytes": 24962,
+      "sha256": "614cd6f163e8dc2f9b63634a7d7734755254d669a815753121d77731aab7ef01"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/0/stdout.log",
+      "bytes": 846,
+      "sha256": "1429acb26696f4171af3b8de17e9b314b8d5234ccca70c64f71202ee19c5285c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/1/stderr.log",
+      "bytes": 2805,
+      "sha256": "563417309c75d6ff276d9ed81eafe41ce451dc85e524734edf96a618055cecaa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/1/stdout.log",
+      "bytes": 186,
+      "sha256": "733c86e8afa39166ce6feeaec02d4a117de454c9020cd2254783ec72ddef09c5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/2/stderr.log",
+      "bytes": 2805,
+      "sha256": "006a0c24d5fbea9ea077b7b19c8a5cd3c12b1c10fde2c7183afd811e82512d6d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/2/stdout.log",
+      "bytes": 186,
+      "sha256": "1aa1b8683b8d10f6732609dc3f5f6a629590040306f18e55ede0f6d3da5a74d0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/3/stderr.log",
+      "bytes": 2805,
+      "sha256": "1a068e39a3bc8a048fe8c7d9c521f9329d063dfc219e2f55af61699b9732037b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/3/stdout.log",
+      "bytes": 186,
+      "sha256": "1edcbcb8b24e8c563a6e5a35cc5ab674bd37efc06e467d7eedbe76af224da76f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/4/stderr.log",
+      "bytes": 2805,
+      "sha256": "de99fdea30b39ebc09a742527cadc67b6e38b687d04d574e5ca554cbea0c8f58"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/4/stdout.log",
+      "bytes": 186,
+      "sha256": "ed8ec72290edb94c682a9e929542683cda670083a00a7dbe9fce99a9b2b6dd27"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/5/stderr.log",
+      "bytes": 2805,
+      "sha256": "7047283fcc9424e1ec0fa8ed8a21b536ac2106e5a815c968faea57fb510a821f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/5/stdout.log",
+      "bytes": 186,
+      "sha256": "1c0c3667b6afcbccc0197335287238fb58003c0ac73fc5e75c7aea788636819f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/6/stderr.log",
+      "bytes": 2805,
+      "sha256": "7a89ddbad5b44fe05fbebb94bcd9d055e931548d7d9b3313addc0f3b72592129"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/6/stdout.log",
+      "bytes": 186,
+      "sha256": "d46510825685976d3251174116d6033b8c4964c659c5eafa1f9e05b4324f688a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/7/stderr.log",
+      "bytes": 2805,
+      "sha256": "cb9ae3b6dc6c533b6123e8aa37d87dc08d5630f6e3450861d7d7ac38212369c1"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/7/stdout.log",
+      "bytes": 186,
+      "sha256": "cb4588036645f403590463d6410747f88c25093e87136e44d9e81c470757c51d"
+    },
+    {
+      "path": "scheduling/r129-f637-dgrad-cp2-native-3.receipt.json",
+      "bytes": 2692,
+      "sha256": "370c7901ded625044df0c1d1db000ee0543d2e484f38e56f1cd4e81805d49e16"
+    },
+    {
+      "path": "scheduling/r129-f637-dgrad-fsdp8-fp32-3.receipt.json",
+      "bytes": 2692,
+      "sha256": "bf824a39141f41ffca024b7eaa344fcdbf4a060f28a4065ebe2530f28fd64a82"
+    },
+    {
+      "path": "scheduling/r129-f637-dgrad-fsdp8-fp32-3.request.json",
+      "bytes": 2136,
+      "sha256": "a4baf9eba20a330df6b0132d95015448111c7dcb81515fe0669d50279626021a"
+    },
+    {
+      "path": "scheduling/r129-f637-dgrad-fsdp8-native-3.receipt.json",
+      "bytes": 2695,
+      "sha256": "d327bff5bc668aef5bdd62556d4a77d375754a999685dd4dc8ed4e5efac2a59e"
+    },
+    {
+      "path": "scheduling/r129-f637-dgrad-fsdp8-native-3.request.json",
+      "bytes": 2140,
+      "sha256": "bcc6defc97bcea6b7e0ab6b47f9fb934226482f9cce62680ff851579d54722ce"
+    },
+    {
+      "path": "tools/capture_cp_loss_training.py",
+      "bytes": 2147,
+      "sha256": "47bfe15b93fba3dc1fba732eac143748a800ebc0b3e31aee1cf8ece169d7381e"
+    },
+    {
+      "path": "tools/capture_fair_dgrad_training.py",
+      "bytes": 2860,
+      "sha256": "0ee23ecae60977dda9dd7efee91c34de1e809acb428e10da82850dc8b306f97b"
+    },
+    {
+      "path": "tools/capture_precision_training.py",
+      "bytes": 287,
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "path": "tools/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "path": "tools/cp_backward_trace.py",
+      "bytes": 6521,
+      "sha256": "b682fcbfe3067988245d16dcecaf1a32f6232d574ccee923a250d95a7471da32"
+    },
+    {
+      "path": "tools/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "path": "tools/fair_resource_guard.py",
+      "bytes": 17912,
+      "sha256": "90fd776c32aff270582ac087ad51deb25d2d6a4521c2e8a615ae6feb2f29f81e"
+    },
+    {
+      "path": "tools/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "path": "tools/linear_dgrad_experiment.py",
+      "bytes": 3514,
+      "sha256": "373b5ed016604a92dbfec9afeb2c76edc8b456cf427ade592dfab2aa8098f925"
+    },
+    {
+      "path": "tools/linear_dgrad_trace_experiment.py",
+      "bytes": 8869,
+      "sha256": "62a18e143b1a8af826cc8ebdaf201e7be442c8179362caa102e02a73bea8ab87"
+    },
+    {
+      "path": "tools/loss_gradient_trace.py",
+      "bytes": 2406,
+      "sha256": "9b57516f6a5800197ca0fddf19a0878e509fb84da556138a0665e66683ef1f60"
+    },
+    {
+      "path": "tools/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "path": "tools/ns_batch_trace.py",
+      "bytes": 1998,
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "path": "tools/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "path": "tools/run_fair_dgrad_case.sh",
+      "bytes": 2101,
+      "sha256": "c2d5a521a91190eaaa7bbfbce10affd5687fde5f8e821e3c3c4735d7bdc99c7c"
+    }
+  ]
+}

@@ -1,0 +1,484 @@
+{
+  "commit": "fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d",
+  "fetched_at": "2026-10-15T21:17:14.454485+00:00",
+  "files": [
+    {
+      "source": "torch_npu/npu/deterministic.py",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/npu/deterministic.py",
+      "sha256": "b37842cb3643384617d6d5b58c830b549c221c2b5af8e04c550d1171f39520d2",
+      "local": "references/torch-npu-fa0f83fe49d3-torch_npu-npu-deterministic.py",
+      "lines": [
+        {
+          "line": 5,
+          "text": "from torch._dynamo.decorators import forbid_in_graph"
+        },
+        {
+          "line": 6,
+          "text": ""
+        },
+        {
+          "line": 7,
+          "text": "__all__ = [\"enable_deterministic_with_backward\", \"disable_deterministic_with_backward\"]"
+        },
+        {
+          "line": 8,
+          "text": ""
+        },
+        {
+          "line": 9,
+          "text": ""
+        },
+        {
+          "line": 10,
+          "text": "class _DeterministicAlgorithmsBeginOp(Function):"
+        },
+        {
+          "line": 11,
+          "text": ""
+        },
+        {
+          "line": 12,
+          "text": "    @staticmethod"
+        },
+        {
+          "line": 13,
+          "text": "    def forward(ctx, tensor):"
+        },
+        {
+          "line": 14,
+          "text": "        with torch.autograd.profiler.record_function(\"deterministic_algorithms_begin_op_forward\"):"
+        },
+        {
+          "line": 15,
+          "text": "            torch.use_deterministic_algorithms(True)"
+        },
+        {
+          "line": 16,
+          "text": "        return tensor"
+        },
+        {
+          "line": 17,
+          "text": ""
+        },
+        {
+          "line": 18,
+          "text": "    @staticmethod"
+        },
+        {
+          "line": 19,
+          "text": "    def backward(ctx, grad_outputs):"
+        },
+        {
+          "line": 20,
+          "text": "        with torch.autograd.profiler.record_function(\"deterministic_algorithms_begin_op_backward\"):"
+        },
+        {
+          "line": 21,
+          "text": "            torch.use_deterministic_algorithms(False)"
+        },
+        {
+          "line": 22,
+          "text": "        return grad_outputs"
+        },
+        {
+          "line": 23,
+          "text": ""
+        },
+        {
+          "line": 24,
+          "text": ""
+        },
+        {
+          "line": 25,
+          "text": "class _DeterministicAlgorithmsEndOp(Function):"
+        },
+        {
+          "line": 26,
+          "text": "    @staticmethod"
+        },
+        {
+          "line": 27,
+          "text": "    def forward(ctx, tensor):"
+        },
+        {
+          "line": 28,
+          "text": "        with torch.autograd.profiler.record_function(\"deterministic_algorithms_end_op_forward\"):"
+        },
+        {
+          "line": 29,
+          "text": "            torch.use_deterministic_algorithms(False)"
+        },
+        {
+          "line": 30,
+          "text": "        return tensor"
+        },
+        {
+          "line": 31,
+          "text": ""
+        },
+        {
+          "line": 32,
+          "text": "    @staticmethod"
+        },
+        {
+          "line": 33,
+          "text": "    def backward(ctx, grad_outputs):"
+        },
+        {
+          "line": 34,
+          "text": "        with torch.autograd.profiler.record_function(\"deterministic_algorithms_end_op_backward\"):"
+        },
+        {
+          "line": 35,
+          "text": "            torch.use_deterministic_algorithms(True)"
+        },
+        {
+          "line": 36,
+          "text": "        return grad_outputs"
+        },
+        {
+          "line": 37,
+          "text": ""
+        },
+        {
+          "line": 38,
+          "text": ""
+        },
+        {
+          "line": 39,
+          "text": "@forbid_in_graph"
+        },
+        {
+          "line": 40,
+          "text": "def enable_deterministic_with_backward(tensor: Tensor):"
+        },
+        {
+          "line": 41,
+          "text": "    return _DeterministicAlgorithmsBeginOp.apply(tensor)"
+        },
+        {
+          "line": 42,
+          "text": ""
+        },
+        {
+          "line": 43,
+          "text": ""
+        },
+        {
+          "line": 44,
+          "text": "@forbid_in_graph"
+        },
+        {
+          "line": 45,
+          "text": "def disable_deterministic_with_backward(tensor: Tensor):"
+        },
+        {
+          "line": 46,
+          "text": "    return _DeterministicAlgorithmsEndOp.apply(tensor)"
+        }
+      ]
+    },
+    {
+      "source": "test/npu/test_deterministic_level.py",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/test/npu/test_deterministic_level.py",
+      "sha256": "4acd8879d95a14be925ae0adb95db271e4a127f1961812bbf381bb207ffd65e9",
+      "local": "references/torch-npu-fa0f83fe49d3-test-npu-test_deterministic_level.py",
+      "lines": [
+        {
+          "line": 10,
+          "text": "@unittest.skip(\"This test is not supported yet\")"
+        },
+        {
+          "line": 11,
+          "text": "class TestCompatibleImpl(TestCase):"
+        },
+        {
+          "line": 12,
+          "text": "    def test__get_deterministic_level(self):"
+        },
+        {
+          "line": 13,
+          "text": "        self.assertEqual(torch_npu.npu._get_deterministic_level(), 2)"
+        },
+        {
+          "line": 14,
+          "text": ""
+        },
+        {
+          "line": 15,
+          "text": "    @SkipIfNotGteCANNVersion(\"9.0.0\")"
+        },
+        {
+          "line": 16,
+          "text": "    def test_npu_matmul(self):"
+        },
+        {
+          "line": 17,
+          "text": "        torch.set_default_device('npu')"
+        },
+        {
+          "line": 18,
+          "text": ""
+        },
+        {
+          "line": 19,
+          "text": "        B = 2048"
+        },
+        {
+          "line": 28,
+          "text": ""
+        },
+        {
+          "line": 29,
+          "text": "if __name__ == \"__main__\":"
+        },
+        {
+          "line": 30,
+          "text": "    torch_npu.npu.set_deterministic_level(2)"
+        },
+        {
+          "line": 31,
+          "text": "    run_tests()"
+        }
+      ]
+    },
+    {
+      "source": "torch_npu/csrc/core/npu/register/OptionsManager.cpp",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/core/npu/register/OptionsManager.cpp",
+      "sha256": "678e808d45e29da1762164ae4c530b45d23d184b849b2870cbe979cface5da70",
+      "local": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-register-OptionsManager.cpp",
+      "lines": []
+    },
+    {
+      "source": "torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp",
+      "sha256": "bbf658668a300ac580aa9bedd009166fb8817e3a508313b5d77191038dfca9f2",
+      "local": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-sys_ctrl-npu_sys_ctrl.cpp",
+      "lines": [
+        {
+          "line": 50,
+          "text": "}"
+        },
+        {
+          "line": 51,
+          "text": ""
+        },
+        {
+          "line": 52,
+          "text": "void SetDeterministicFromLevel()"
+        },
+        {
+          "line": 53,
+          "text": "{"
+        },
+        {
+          "line": 54,
+          "text": "    const static bool isAclStrongConsistencyExist = []() {"
+        },
+        {
+          "line": 55,
+          "text": "        const std::string kMinRuntimeVersion = \"8.5.0\";"
+        },
+        {
+          "line": 56,
+          "text": "        if (IsGteCANNVersion(kMinRuntimeVersion, \"RUNTIME\")) {"
+        },
+        {
+          "line": 57,
+          "text": "            return true;"
+        },
+        {
+          "line": 58,
+          "text": "        }"
+        },
+        {
+          "line": 59,
+          "text": "        return false;"
+        },
+        {
+          "line": 60,
+          "text": "    }();"
+        },
+        {
+          "line": 61,
+          "text": "    if (!isAclStrongConsistencyExist) {"
+        },
+        {
+          "line": 62,
+          "text": "        NPU_CHECK_ERROR(at_npu::native::AclrtCtxSetSysParamOpt(aclSysParamOpt::ACL_OPT_DETERMINISTIC, 0));"
+        },
+        {
+          "line": 63,
+          "text": "        return;"
+        },
+        {
+          "line": 64,
+          "text": "    }"
+        },
+        {
+          "line": 65,
+          "text": ""
+        },
+        {
+          "line": 66,
+          "text": "    uint32_t level = c10_npu::GetDeterministicLevel();"
+        },
+        {
+          "line": 67,
+          "text": "    if (level == 1) {"
+        },
+        {
+          "line": 68,
+          "text": "        NPU_CHECK_ERROR(at_npu::native::AclrtCtxSetSysParamOpt(aclSysParamOpt::ACL_OPT_DETERMINISTIC, 1));"
+        },
+        {
+          "line": 69,
+          "text": "        NPU_CHECK_ERROR(at_npu::native::AclrtCtxSetSysParamOpt(aclSysParamOpt::ACL_OPT_STRONG_CONSISTENCY, 0));"
+        },
+        {
+          "line": 70,
+          "text": "        return;"
+        },
+        {
+          "line": 71,
+          "text": "    } else if (level == 2) {"
+        },
+        {
+          "line": 72,
+          "text": "        NPU_CHECK_ERROR(at_npu::native::AclrtCtxSetSysParamOpt(aclSysParamOpt::ACL_OPT_DETERMINISTIC, 1));"
+        },
+        {
+          "line": 73,
+          "text": "        NPU_CHECK_ERROR(at_npu::native::AclrtCtxSetSysParamOpt(aclSysParamOpt::ACL_OPT_STRONG_CONSISTENCY, 1));"
+        },
+        {
+          "line": 74,
+          "text": "        return;"
+        },
+        {
+          "line": 75,
+          "text": "    } else if (level != 0) {"
+        },
+        {
+          "line": 76,
+          "text": "        TORCH_CHECK(false, \"'torch_npu.npu.set_deterministic_level' currently only supports configuring 0/1/2 !\", PTA_ERROR(ErrCode::VALUE));"
+        },
+        {
+          "line": 77,
+          "text": "    }"
+        },
+        {
+          "line": 78,
+          "text": "    NPU_CHECK_ERROR(at_npu::native::AclrtCtxSetSysParamOpt(aclSysParamOpt::ACL_OPT_DETERMINISTIC, 0));"
+        },
+        {
+          "line": 79,
+          "text": "    NPU_CHECK_ERROR(at_npu::native::AclrtCtxSetSysParamOpt(aclSysParamOpt::ACL_OPT_STRONG_CONSISTENCY, 0));"
+        },
+        {
+          "line": 80,
+          "text": "}"
+        },
+        {
+          "line": 81,
+          "text": ""
+        },
+        {
+          "line": 82,
+          "text": "#ifndef BUILD_LIBTORCH"
+        },
+        {
+          "line": 83,
+          "text": "std::string GetTorchNpuFile()"
+        },
+        {
+          "line": 84,
+          "text": "{"
+        },
+        {
+          "line": 85,
+          "text": "    PyObject *file_attr = nullptr;"
+        },
+        {
+          "line": 225,
+          "text": ""
+        },
+        {
+          "line": 226,
+          "text": "    if (!c10_npu::is_lazy_set_device()) {"
+        },
+        {
+          "line": 227,
+          "text": "        SetDeterministicFromLevel();"
+        },
+        {
+          "line": 228,
+          "text": "        NPU_CHECK_ERROR(c10_npu::acl::AclrtSetOpExecuteTimeOut(kMaxOpExecuteTimeOut));"
+        },
+        {
+          "line": 229,
+          "text": "    }"
+        },
+        {
+          "line": 230,
+          "text": ""
+        },
+        {
+          "line": 231,
+          "text": "    // lazy call for the setoption"
+        },
+        {
+          "line": 232,
+          "text": "    for (const auto &iter: lazy_fn_) {"
+        },
+        {
+          "line": 233,
+          "text": "        ASCEND_LOGD(\"start setoption for the lazy call.\");"
+        },
+        {
+          "line": 272,
+          "text": "    }"
+        },
+        {
+          "line": 273,
+          "text": ""
+        },
+        {
+          "line": 274,
+          "text": "    SetDeterministicFromLevel();"
+        },
+        {
+          "line": 275,
+          "text": "    NPU_CHECK_ERROR(c10_npu::acl::AclrtSetOpExecuteTimeOut(kMaxOpExecuteTimeOut));"
+        },
+        {
+          "line": 276,
+          "text": ""
+        },
+        {
+          "line": 277,
+          "text": "    lazy_init_flag_ = true;"
+        },
+        {
+          "line": 278,
+          "text": "    ASCEND_LOGD(\"Npu sys ctrl Lazyinitialize successfully.\");"
+        },
+        {
+          "line": 279,
+          "text": ""
+        },
+        {
+          "line": 280,
+          "text": "    return INIT_SUCC;"
+        }
+      ]
+    },
+    {
+      "source": "torch_npu/csrc/framework/OpCommand.cpp",
+      "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/framework/OpCommand.cpp",
+      "sha256": "570b1dbe19ce6a039cf768ddc1f89bf4e24f4d2ced8a19ab098acbe015272255",
+      "local": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-framework-OpCommand.cpp",
+      "lines": []
+    }
+  ]
+}

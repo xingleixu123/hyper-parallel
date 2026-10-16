@@ -1,0 +1,1039 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec / 四臂证据发布前轻量检视",
+  "status": "PASS",
+  "findings": [],
+  "conclusion_zh": "PASS。最终README与总报告的四臂标量、C=576/D=1152实际反向分支、前向仅stride128采样、当前整体验收未通过及不据此新增Linear FP32 dgrad生产修复PR的陈述均与独立审核一致。14组issue/PR链接和固定历史快照保留。恢复包与来源映射匹配；模块parser4/4和CPU7方法明确不能替代NPU模块成本测量。 最新资源政策已区分当前无固定间隔与历史1200秒证据。模块入口与guard小增量未发现阻断；不包含正在执行的off40验收。",
+  "closed_minor_correction": {
+    "file": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/README_ZH.md",
+    "line": 52,
+    "original_issue": "把约5.22GiB写作三个主要FP32张量的合计。",
+    "resolution": "最终文案已明确dY+W约5.22GiB，含FP32 dX约5.30GiB，且为静态张量容量估算、非实测峰值。",
+    "independently_calculated_gib": {
+      "dY": 2.3203125,
+      "W": 2.900390625,
+      "dX": 0.078125,
+      "total_three": 5.298828125
+    }
+  },
+  "checked_scope": {
+    "numeric_tables": "README四对六列标量和总报告两行三列还原指标逐项对照原独立报告，允许仅显示舍入；head及MTP decoder关键组计数/最大差一致。",
+    "claim_boundaries": "LM三步最大差缩小与MTP/aux变大分别陈述；观察透明性只适用于A/B；C/D干预、采样、200步不足和非生产性能限制均明确。",
+    "original_evidence_mapping": 77,
+    "restored_package": {
+      "bytes": 32429346,
+      "sha256": "847448eeee007ae513fc9521af499ceb03c4aed58cb0ca6a45755e90e3949231",
+      "files": 554,
+      "uncompressed_bytes": 206589224,
+      "manifest_entries_same_as_prior_independent_inputs": 551,
+      "additional_files_hashed": [
+        "tools/compare_runs.py",
+        "tools/analyze_cp_loss_derivatives.py",
+        "tools/plot_dgrad_four_arm.py"
+      ],
+      "all_tar_member_names_types_sizes_checked": true,
+      "no_extraction_performed_this_review": true
+    },
+    "prior_restoration_receipt": "已读原始恢复凭据：554文件完整SHA、标量输出字节一致；本轮核验凭据与相关SHA，没有再次解包或重算大数据。",
+    "removed_restore_directory_absent": true,
+    "removed_bytes": 206677607,
+    "issue_ids": [
+      "203",
+      "204",
+      "205",
+      "206",
+      "207",
+      "208",
+      "209",
+      "210",
+      "211",
+      "218",
+      "223",
+      "225",
+      "227",
+      "229"
+    ],
+    "pull_request_ids": [
+      "194",
+      "195",
+      "196",
+      "197",
+      "198",
+      "199",
+      "200",
+      "201",
+      "214",
+      "219",
+      "224",
+      "226",
+      "228",
+      "230"
+    ],
+    "history_fixed_url": "https://github.com/xingleixu123/hyper-parallel/blob/cc6c1b3a76c4d6aa5559ad2b12d6b4b47087cdd6/docs/validation/jt-dev-8npu-20261014/REPORT_ZH.md",
+    "history_blob_confirmed_locally": true,
+    "local_markdown_links_existing": 71,
+    "cpu_preflight": {
+      "parser": 4,
+      "test_methods": 7,
+      "devices": [],
+      "accelerators_initialized": false,
+      "npu_cost_not_claimed": true
+    },
+    "attributes": "两个局部.gitattributes仅约束该证据目录及单个生成SVG，保留原始字节；module-cost-preparation只将CRLF作为正常行尾，不屏蔽其他空白类别。",
+    "resource_policy_revision": {
+      "current_policy": "按用户2026-10-16新指示取消固定20分钟等待；空卡复查、释放确认、只停止自有容器及单轮900秒上限保留。",
+      "historical_policy": "四臂实际间隔1222.239/1221.270/1271.974秒保留为历史数据；不再把原06:15:31候选时刻写成后续约束。",
+      "checked_locations": [
+        "REPORT_ZH.md:100",
+        "REPORT_ZH.md:127",
+        "REPORT_ZH.md:171",
+        "REPORT_ZH.md:249",
+        "reports/f637-dgrad-four-arm/README_ZH.md:50"
+      ],
+      "closed_minor_wording": "三处旧前瞻句已改成历史时态，未改原始receipt或训练数值。"
+    }
+  },
+  "restore_tool_static_review": {
+    "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/restore_inputs.py",
+    "checks": [
+      "先核验压缩包字节数和SHA，再创建尚不存在的目标目录。",
+      "清单路径限制为目标目录内相对路径；拒绝已有目标/符号链接、非普通文件、额外/重复成员。",
+      "按成员流式复制并逐一核验长度/SHA，最后确认成员全集。",
+      "文件用xb创建，错误不会覆盖既有用户文件；本次静态检视不等于重新执行任意恶意归档测试。"
+    ],
+    "blocking_findings": []
+  },
+  "boundaries": [
+    "只审核本机最终发布文件和现有凭据，没有进行GitHub网络写入或重新确认线上issue/PR当前状态；14组链接结论指报告中保留的集合。",
+    "压缩包SHA流式重算并检查554个tar成员名称/类型/大小；551个成员清单与先前独立审核指纹一致，另3个新增工具本轮重算SHA。未重新加载数百万采样坐标。",
+    "模块CPU测试日志与无设备receipt已核对；没有启动设备/容器，也未独立运行NPU或模块性能实验。",
+    "本轮按工作区文件审核；最终暂存索引字节与提交由主任务另外核验，本报告不冒称已发布或提交。"
+  ],
+  "input_file_count": 165,
+  "input_files": [
+    {
+      "path": "configs/r129-f637-module-dense1-40-v1.yaml",
+      "bytes": 5806,
+      "sha256": "2e341c8e8f7c2fa76d6d0799dea344249e83eda9206abf2b8521f35b655e33be"
+    },
+    {
+      "path": "configs/r129-f637-module-moe2-40-v1.yaml",
+      "bytes": 5804,
+      "sha256": "9815367189eaffad05c55ee957c34d23071ed9b9b97795a2f11e0dd76861e595"
+    },
+    {
+      "path": "configs/r129-f637-module-norm6-40-v1.yaml",
+      "bytes": 5805,
+      "sha256": "82c0cbf0f9b2c161a84a594bdddf80f25a208c806bffc57a8af868970964bfbf"
+    },
+    {
+      "path": "configs/r129-f637-module-off-40-v1.yaml",
+      "bytes": 5802,
+      "sha256": "d521ddb39d3067318dcfa101e1be5e6dd9f897c84ef77fba0e2949fb97f8fbae"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-fp32-3-audit-v4.json",
+      "bytes": 162325,
+      "sha256": "3407f7325fc43bd2b2f72b8f6b0f79f80fdec7501ef5cb8b62d1c1fe17ec70e8"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-fp32-3-coordinator-state.json",
+      "bytes": 5720,
+      "sha256": "89887123f1f97279cbac659f8a9b500c7ff9c0245995b2efb17056a19d48da92"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-fp32-3-evidence-manifest.json",
+      "bytes": 25478,
+      "sha256": "c0fb1a557ffb324c1834d5f9db66201346e84ed617e6bdabb5f42ee11176a299"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-fp32-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "4470c05d43975003b0661dc4efe688ff1ba28978c571328cab543e250d926275"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-native-3-audit-v4.json",
+      "bytes": 123549,
+      "sha256": "1ac870558e3e99abb343e546e6889cae787f43cbc4975d66ec5efc464bde5488"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-native-3-coordinator-state.json",
+      "bytes": 5730,
+      "sha256": "936d54cfe583004afc5237cf61f856359dfffb1b6c7b8661190d9aab51745280"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-native-3-evidence-manifest.json",
+      "bytes": 25738,
+      "sha256": "667a8d847240a83a684918948f01cfec92c7b95bf190871dee6eb899e347c031"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-native-3-independent-review.json",
+      "bytes": 203666,
+      "sha256": "6a04004937e4fffa2420fc1088fdeb5c7a6405e5fa130760d80c4cc0fd8c5607"
+    },
+    {
+      "path": "evidence/f637-dgrad-cp2-native-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "6062d881c2d80702864912855117c49256307a94ef8263d600f7a1e5a2923e85"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-activation-comparison.json",
+      "bytes": 210812,
+      "sha256": "f53375803d6bf15de0e742bf51172e5eed8ffd73cb41c78615c14a37a906e696"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-config-derivation.json",
+      "bytes": 2501,
+      "sha256": "5ec4fe7323a9d515cc5ec20272660ef43e1d660c3478df1798e03461b9679514"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-figure-source.json",
+      "bytes": 715,
+      "sha256": "cf1683bb98b9f72375b93b89f546225075afe0f95512b82cf1ae073ba3653847"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-independent-review.json",
+      "bytes": 195708,
+      "sha256": "aa3dc44aac5050949b9d7d75a5c292899aab743656aa997aa85c93b3b5b88956"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-preflight.container.log",
+      "bytes": 2125,
+      "sha256": "8bbfc370112b2af35f81a29b299c3b8dd7c305063821d0e3b9b1e0cafeef46c0"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-preflight.json",
+      "bytes": 2086,
+      "sha256": "02a9656056037e391da4cc183fea6045d1944cf196d30b9cd08e01fc7659ff82"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-preflight.receipt.json",
+      "bytes": 791,
+      "sha256": "b6a8d6251988781c9a1ebdaa30b719fdc7d4adfcfc23fbeb6289b6f7dc789654"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-prelaunch-spec-review.md",
+      "bytes": 12947,
+      "sha256": "41b767f9da9b7adcb6266b9680ea21d38ad0cdc90ed303d47bca8cbb73e76065"
+    },
+    {
+      "path": "evidence/f637-dgrad-four-arm-scalar-comparison.json",
+      "bytes": 20597,
+      "sha256": "5bae5ccba33bd2b2f9b1295326f8c265723127e401bc4e4a39d094217bd8c56f"
+    },
+    {
+      "path": "evidence/f637-dgrad-fp32-loss-derivatives.json",
+      "bytes": 9778,
+      "sha256": "58bcc3c2138a9c7de62a1bd286491a19d9d2c7ebd870f13e1c15baa53ba0ac49"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-fp32-3-audit-v4.json",
+      "bytes": 161393,
+      "sha256": "67a3071d775b173f70b4ce2de9605dd984b6da26ab6d6527f5b6317ae6b5108b"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-fp32-3-coordinator-state.json",
+      "bytes": 5543,
+      "sha256": "8bc36827de9d357264e7e4c76a91482a02c0989d028b3adc0525c7c2b9f95d71"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-fp32-3-evidence-manifest.json",
+      "bytes": 25722,
+      "sha256": "94c89c94e84073accacf5e2cfcb575250287b1c08bedcbf129b749c44c4f618b"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-fp32-3-independent-review.json",
+      "bytes": 191615,
+      "sha256": "08a2387d0a2f69d2c6014970fc78019c22a46e4883c132bcbfb01282a15aff0e"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-fp32-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "4822fef898c58c167458dd3cca40608dfc9815169fcb6ab7de0086bf6f4997f6"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-audit-v4.json",
+      "bytes": 122649,
+      "sha256": "75421017a1b09131f00580cd359f3f96641ab0bb63565bdf799b5766138bfd17"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-coordinator-state.json",
+      "bytes": 5737,
+      "sha256": "87a5c21c964c555c4baaaeccff6166aad8e589690f5e5306cd0aba14cd8849ba"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-evidence-manifest.json",
+      "bytes": 25982,
+      "sha256": "1edb511b2732c9bc79b9049256082f30b6de10bd620eb445e8ed8c080cea983f"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-independent-review.json",
+      "bytes": 80251,
+      "sha256": "87933e4ddc592dc71b1fd061450f0393339511d105abbf71e3d8b19c769fe326"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "6836cc433d2b7fd57d29080bc92436d495beeddc3d552c1a7252ab73fe50acc6"
+    },
+    {
+      "path": "evidence/f637-dgrad-guard-boundary-tests.json",
+      "bytes": 444,
+      "sha256": "f8eba9b073a09fe0d13b17722a93457be7f44a9a9bbada7144d81cd3a9a78d1b"
+    },
+    {
+      "path": "evidence/f637-dgrad-native-loss-derivatives.json",
+      "bytes": 9782,
+      "sha256": "60ccbd33fce7b6233dacc5fb6d35d6d7580ddcaeb1d3e2bc0e98ca1d041823e8"
+    },
+    {
+      "path": "evidence/f637-dgrad-package-restoration-verification.json",
+      "bytes": 570,
+      "sha256": "8ea374840fe4a73bab36972db9ccac35b9467b603f474820ad39d2d1df32b4d2"
+    },
+    {
+      "path": "evidence/f637-dgrad-streaming-analyzer-native-crosscheck-v3.json",
+      "bytes": 1605,
+      "sha256": "df416cc0b9165ee0994fc22f77df5bf89125391519d7b7a774c9045769531429"
+    },
+    {
+      "path": "evidence/f637-dgrad-streaming-analyzer-v3-spec-review.json",
+      "bytes": 6271,
+      "sha256": "1196185bb6a47e1cc6a2b55a3e3439a379c99626252ef620ca3a6ed12c78db12"
+    },
+    {
+      "path": "evidence/f637-linear-dgrad-trace-cpu-v2.json",
+      "bytes": 4971,
+      "sha256": "b15a2fe57500c5f5857f3bf71540808968a2f1b1242270839cbf86352fcdcce2"
+    },
+    {
+      "path": "evidence/f637-linear-dgrad-trace-cpu-v2.receipt.json",
+      "bytes": 796,
+      "sha256": "b2c326c79d8925dd6312844f4e74d07972b486f36c5f94001443f4088270b95d"
+    },
+    {
+      "path": "evidence/f637-linear-dgrad-trace-v2-standards-review.md",
+      "bytes": 6617,
+      "sha256": "3300f18ef6659ee03819c76422a44c50ea46adfb271ca849bae89a271ef91b80"
+    },
+    {
+      "path": "evidence/f637-module-cost-cpu-v1.container.log",
+      "bytes": 2698,
+      "sha256": "7ad59b9ffb15398287292ee144d73aeeb7ff7a77b3b11ec189f162e87644206e"
+    },
+    {
+      "path": "evidence/f637-module-cost-cpu-v1.json",
+      "bytes": 1758,
+      "sha256": "6630f581c99234b8ff7ed2f434ab44bd3373ae18ad769f713d1bd3255b015bfd"
+    },
+    {
+      "path": "evidence/f637-module-cost-cpu-v1.receipt.json",
+      "bytes": 817,
+      "sha256": "9da77909011e3b784ec03a74e36d24ee34a62f4c19c51d562f1636de9bb29b0f"
+    },
+    {
+      "path": "evidence/f637-module-cost-parser-v1.json",
+      "bytes": 4475,
+      "sha256": "348d25acfd8a324b6a95e618497b1c479653b760a84388648c382421ceb439f0"
+    },
+    {
+      "path": "evidence/f637-no-gap-module-guard-after.log",
+      "bytes": 3059,
+      "sha256": "121b941dfb4fe05347cbc8e937de8f6430a72c086fba0ee1f5dcf52521cc215d"
+    },
+    {
+      "path": "evidence/f637-no-gap-module-guard-before.log",
+      "bytes": 15332,
+      "sha256": "3339d5b11d5f5f3feaa3aacfb53183494acc9f37bd34ce90d79890ef4162c240"
+    },
+    {
+      "path": "evidence/f637-no-gap-module-guard-tests.json",
+      "bytes": 400,
+      "sha256": "1443fb66776164fb90c7eacf27fb644582cf92b2ce0b3982e9d66dd0b193d3f3"
+    },
+    {
+      "path": "evidence/fair-resource-guard-before-no-gap-module-v1.py",
+      "bytes": 17912,
+      "sha256": "90fd776c32aff270582ac087ad51deb25d2d6a4521c2e8a615ae6feb2f29f81e"
+    },
+    {
+      "path": "evidence/fixed-image-npu-precision-source-inspection.json",
+      "bytes": 913,
+      "sha256": "306a5453b3d0eed36cc1e0cbe3b1917622039350b3579256c000f8f2ab8724c2"
+    },
+    {
+      "path": "evidence/fixed-pta-determinism-implementation.json",
+      "bytes": 13580,
+      "sha256": "d25e21a79795181bc32a5f9da5ae1e6085688e9e04660e02f3b98622254cc2a7"
+    },
+    {
+      "path": "evidence/fixed-pta-determinism-python-contract.json",
+      "bytes": 17674,
+      "sha256": "0ea0c63ece6825aed9451ac781d557beb6bd4f26f20077523ec477ccf471bfd2"
+    },
+    {
+      "path": "evidence/fixed-pta-hccl-determinism-source.json",
+      "bytes": 1859,
+      "sha256": "0dc28c44441d3f279ea01dd34c2a6ad17671f01c74a7babb1a998012035ecc5c"
+    },
+    {
+      "path": "evidence/fixed-pta-precision-candidate-boundaries.md",
+      "bytes": 4965,
+      "sha256": "41cbe92056a39c688d07b49665cd16afec7f8098033678cab0d43ecca42a1b11"
+    },
+    {
+      "path": "evidence/jt-dev-head-recheck-before-dgrad-arm-c.json",
+      "bytes": 258,
+      "sha256": "13917a034b5d900ae99f3b5cf69de06bdd757e5668582f98264c29d52074ad57"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/REPORT_ZH.md",
+      "bytes": 34224,
+      "sha256": "748f99737e8e0d36a50db4c83285f8159bbab3bd55905608005dc9741e1c935e"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/figures/.gitattributes",
+      "bytes": 142,
+      "sha256": "535d285c94484cb575038914b716bfce781a810bbfa5b00c772c87393924407e"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/.gitattributes",
+      "bytes": 338,
+      "sha256": "723ac39f5ff57d142116bd9563bc1faccd637ec5ac112f377c08885d464b5c2c"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/README_ZH.md",
+      "bytes": 8855,
+      "sha256": "a069e74883000ac99cad5615ac3d6cf383e8b579783795919833136c1e27fca5"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-fp32-3-audit-v4.json",
+      "bytes": 162325,
+      "sha256": "3407f7325fc43bd2b2f72b8f6b0f79f80fdec7501ef5cb8b62d1c1fe17ec70e8"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-fp32-3-coordinator-state.json",
+      "bytes": 5720,
+      "sha256": "89887123f1f97279cbac659f8a9b500c7ff9c0245995b2efb17056a19d48da92"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-fp32-3-evidence-manifest.json",
+      "bytes": 25478,
+      "sha256": "c0fb1a557ffb324c1834d5f9db66201346e84ed617e6bdabb5f42ee11176a299"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-fp32-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "4470c05d43975003b0661dc4efe688ff1ba28978c571328cab543e250d926275"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-native-3-audit-v4.json",
+      "bytes": 123549,
+      "sha256": "1ac870558e3e99abb343e546e6889cae787f43cbc4975d66ec5efc464bde5488"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-native-3-coordinator-state.json",
+      "bytes": 5730,
+      "sha256": "936d54cfe583004afc5237cf61f856359dfffb1b6c7b8661190d9aab51745280"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-native-3-evidence-manifest.json",
+      "bytes": 25738,
+      "sha256": "667a8d847240a83a684918948f01cfec92c7b95bf190871dee6eb899e347c031"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-native-3-independent-review.json",
+      "bytes": 203666,
+      "sha256": "6a04004937e4fffa2420fc1088fdeb5c7a6405e5fa130760d80c4cc0fd8c5607"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-cp2-native-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "6062d881c2d80702864912855117c49256307a94ef8263d600f7a1e5a2923e85"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-activation-comparison.json",
+      "bytes": 210812,
+      "sha256": "f53375803d6bf15de0e742bf51172e5eed8ffd73cb41c78615c14a37a906e696"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-config-derivation.json",
+      "bytes": 2501,
+      "sha256": "5ec4fe7323a9d515cc5ec20272660ef43e1d660c3478df1798e03461b9679514"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-figure-source.json",
+      "bytes": 715,
+      "sha256": "cf1683bb98b9f72375b93b89f546225075afe0f95512b82cf1ae073ba3653847"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-independent-review.json",
+      "bytes": 195708,
+      "sha256": "aa3dc44aac5050949b9d7d75a5c292899aab743656aa997aa85c93b3b5b88956"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-preflight.container.log",
+      "bytes": 2125,
+      "sha256": "8bbfc370112b2af35f81a29b299c3b8dd7c305063821d0e3b9b1e0cafeef46c0"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-preflight.json",
+      "bytes": 2086,
+      "sha256": "02a9656056037e391da4cc183fea6045d1944cf196d30b9cd08e01fc7659ff82"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-preflight.receipt.json",
+      "bytes": 791,
+      "sha256": "b6a8d6251988781c9a1ebdaa30b719fdc7d4adfcfc23fbeb6289b6f7dc789654"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-prelaunch-spec-review.md",
+      "bytes": 12947,
+      "sha256": "41b767f9da9b7adcb6266b9680ea21d38ad0cdc90ed303d47bca8cbb73e76065"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-scalar-comparison.json",
+      "bytes": 20597,
+      "sha256": "5bae5ccba33bd2b2f9b1295326f8c265723127e401bc4e4a39d094217bd8c56f"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fp32-loss-derivatives.json",
+      "bytes": 9778,
+      "sha256": "58bcc3c2138a9c7de62a1bd286491a19d9d2c7ebd870f13e1c15baa53ba0ac49"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-fp32-3-audit-v4.json",
+      "bytes": 161393,
+      "sha256": "67a3071d775b173f70b4ce2de9605dd984b6da26ab6d6527f5b6317ae6b5108b"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-fp32-3-coordinator-state.json",
+      "bytes": 5543,
+      "sha256": "8bc36827de9d357264e7e4c76a91482a02c0989d028b3adc0525c7c2b9f95d71"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-fp32-3-evidence-manifest.json",
+      "bytes": 25722,
+      "sha256": "94c89c94e84073accacf5e2cfcb575250287b1c08bedcbf129b749c44c4f618b"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-fp32-3-independent-review.json",
+      "bytes": 191615,
+      "sha256": "08a2387d0a2f69d2c6014970fc78019c22a46e4883c132bcbfb01282a15aff0e"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-fp32-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "4822fef898c58c167458dd3cca40608dfc9815169fcb6ab7de0086bf6f4997f6"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-native-3-audit-v4.json",
+      "bytes": 122649,
+      "sha256": "75421017a1b09131f00580cd359f3f96641ab0bb63565bdf799b5766138bfd17"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-native-3-coordinator-state.json",
+      "bytes": 5737,
+      "sha256": "87a5c21c964c555c4baaaeccff6166aad8e589690f5e5306cd0aba14cd8849ba"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-native-3-evidence-manifest.json",
+      "bytes": 25982,
+      "sha256": "1edb511b2732c9bc79b9049256082f30b6de10bd620eb445e8ed8c080cea983f"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-native-3-independent-review.json",
+      "bytes": 80251,
+      "sha256": "87933e4ddc592dc71b1fd061450f0393339511d105abbf71e3d8b19c769fe326"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-fsdp8-native-3-local-verification.json",
+      "bytes": 211,
+      "sha256": "6836cc433d2b7fd57d29080bc92436d495beeddc3d552c1a7252ab73fe50acc6"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-guard-boundary-tests.json",
+      "bytes": 444,
+      "sha256": "f8eba9b073a09fe0d13b17722a93457be7f44a9a9bbada7144d81cd3a9a78d1b"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-native-loss-derivatives.json",
+      "bytes": 9782,
+      "sha256": "60ccbd33fce7b6233dacc5fb6d35d6d7580ddcaeb1d3e2bc0e98ca1d041823e8"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-package-restoration-verification.json",
+      "bytes": 570,
+      "sha256": "8ea374840fe4a73bab36972db9ccac35b9467b603f474820ad39d2d1df32b4d2"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-streaming-analyzer-native-crosscheck-v3.json",
+      "bytes": 1605,
+      "sha256": "df416cc0b9165ee0994fc22f77df5bf89125391519d7b7a774c9045769531429"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-dgrad-streaming-analyzer-v3-spec-review.json",
+      "bytes": 6271,
+      "sha256": "1196185bb6a47e1cc6a2b55a3e3439a379c99626252ef620ca3a6ed12c78db12"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-linear-dgrad-trace-cpu-v2.json",
+      "bytes": 4971,
+      "sha256": "b15a2fe57500c5f5857f3bf71540808968a2f1b1242270839cbf86352fcdcce2"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-linear-dgrad-trace-cpu-v2.receipt.json",
+      "bytes": 796,
+      "sha256": "b2c326c79d8925dd6312844f4e74d07972b486f36c5f94001443f4088270b95d"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-linear-dgrad-trace-v2-standards-review.md",
+      "bytes": 6617,
+      "sha256": "3300f18ef6659ee03819c76422a44c50ea46adfb271ca849bae89a271ef91b80"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-module-cost-cpu-v1.container.log",
+      "bytes": 2698,
+      "sha256": "7ad59b9ffb15398287292ee144d73aeeb7ff7a77b3b11ec189f162e87644206e"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-module-cost-cpu-v1.json",
+      "bytes": 1758,
+      "sha256": "6630f581c99234b8ff7ed2f434ab44bd3373ae18ad769f713d1bd3255b015bfd"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-module-cost-cpu-v1.receipt.json",
+      "bytes": 817,
+      "sha256": "9da77909011e3b784ec03a74e36d24ee34a62f4c19c51d562f1636de9bb29b0f"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/f637-module-cost-parser-v1.json",
+      "bytes": 4475,
+      "sha256": "348d25acfd8a324b6a95e618497b1c479653b760a84388648c382421ceb439f0"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/fixed-image-npu-precision-source-inspection.json",
+      "bytes": 913,
+      "sha256": "306a5453b3d0eed36cc1e0cbe3b1917622039350b3579256c000f8f2ab8724c2"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/fixed-pta-determinism-implementation.json",
+      "bytes": 13580,
+      "sha256": "d25e21a79795181bc32a5f9da5ae1e6085688e9e04660e02f3b98622254cc2a7"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/fixed-pta-determinism-python-contract.json",
+      "bytes": 17674,
+      "sha256": "0ea0c63ece6825aed9451ac781d557beb6bd4f26f20077523ec477ccf471bfd2"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/fixed-pta-hccl-determinism-source.json",
+      "bytes": 1859,
+      "sha256": "0dc28c44441d3f279ea01dd34c2a6ad17671f01c74a7babb1a998012035ecc5c"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/fixed-pta-precision-candidate-boundaries.md",
+      "bytes": 4965,
+      "sha256": "41cbe92056a39c688d07b49665cd16afec7f8098033678cab0d43ecca42a1b11"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/analysis/jt-dev-head-recheck-before-dgrad-arm-c.json",
+      "bytes": 258,
+      "sha256": "13917a034b5d900ae99f3b5cf69de06bdd757e5668582f98264c29d52074ad57"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/four-arm-inputs-manifest.json",
+      "bytes": 108656,
+      "sha256": "d6df9f22727bc045d3e8d6d93b8ade294fdca1caae190fcb3a6cb1f4cac75322"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/four-arm-inputs.tar.gz",
+      "bytes": 32429346,
+      "sha256": "847448eeee007ae513fc9521af499ceb03c4aed58cb0ca6a45755e90e3949231"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/configs/r129-f637-module-dense1-40-v1.yaml",
+      "bytes": 5806,
+      "sha256": "2e341c8e8f7c2fa76d6d0799dea344249e83eda9206abf2b8521f35b655e33be"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/configs/r129-f637-module-moe2-40-v1.yaml",
+      "bytes": 5804,
+      "sha256": "9815367189eaffad05c55ee957c34d23071ed9b9b97795a2f11e0dd76861e595"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/configs/r129-f637-module-norm6-40-v1.yaml",
+      "bytes": 5805,
+      "sha256": "82c0cbf0f9b2c161a84a594bdddf80f25a208c806bffc57a8af868970964bfbf"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/configs/r129-f637-module-off-40-v1.yaml",
+      "bytes": 5802,
+      "sha256": "d521ddb39d3067318dcfa101e1be5e6dd9f897c84ef77fba0e2949fb97f8fbae"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/scheduling/f637-module-cost-local-checks-v1.json",
+      "bytes": 7003,
+      "sha256": "e8c345c7549c75134789775ce6f4a835f5da30847f2570d4fd02045a639e4c16"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/scheduling/f637-module-cost-v1.manifest.json",
+      "bytes": 5004,
+      "sha256": "fff2c85ba859a0db380d97b6b90f2cdc0273e8b34893640183b82c8f365ce374"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/scheduling/r129-f637-module-dense1-40-v1.request.draft.json",
+      "bytes": 3307,
+      "sha256": "a691d148752be2fac1360f44c316ffb17ca7118c7284e174417930f8424f3872"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/scheduling/r129-f637-module-moe2-40-v1.request.draft.json",
+      "bytes": 3305,
+      "sha256": "b472d8f02b898320722107e40b1437f072ed01ee365f0264f65b40c83e540171"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/scheduling/r129-f637-module-norm6-40-v1.request.draft.json",
+      "bytes": 3306,
+      "sha256": "a283cbcef0f25aa67fea8dc89ae59a7495e236c7633a8214df220bb369fcb454"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/scheduling/r129-f637-module-off-40-v1.request.draft.json",
+      "bytes": 3304,
+      "sha256": "f2ec2f482ab9991acf80bc98fd82d09cc218d08b6719188096069c529bf61eac"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/README_f637_module_cost_v1.md",
+      "bytes": 7316,
+      "sha256": "abbe82927607f798e554d3a8eda274e1920a8ab773e4d5975a4b0e078b902a44"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/capture_f637_module_cost_training.py",
+      "bytes": 5335,
+      "sha256": "ed675d20ed8b4cae9d19cb31d5fe051d5749970826b0aa9f55c53b8f11c7d1b2"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/check_f637_module_cost_cpu.py",
+      "bytes": 15042,
+      "sha256": "2be219730acc15ba6da98244683d589517275ed64e4336047b04528d39c5eed9"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/f637_module_cost_experiment.py",
+      "bytes": 12187,
+      "sha256": "e4a5a575301bcbc43aafb36711cb5b8415a3af982b0fad18fe1e229d6add8bac"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/f637_module_cost_spec.py",
+      "bytes": 3509,
+      "sha256": "71d13b972fa029f3739ea4c1293a1d561a79439b363c601850ce58b5b39f5838"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/preflight_f637_module_cost.py",
+      "bytes": 4834,
+      "sha256": "6d786b2aad1951397a9888f74eb89181713da87652f0e053ddb8e879806912c9"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/run_f637_module_cost_cpu.sh",
+      "bytes": 502,
+      "sha256": "5b6c18e320697bdac5e3045fe4ae09432573ba013d45d2d32de89aa373db96fc"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/module-cost-preparation/tools/run_fair_f637_module_cost.sh",
+      "bytes": 2751,
+      "sha256": "8dbc13df522b943492994ed4e59591c558cd7479ba516dc803751b1359eeeb1e"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/installed-torch-npu-npu-npu_config.py",
+      "bytes": 12007,
+      "sha256": "77144ac4544e21eaaf447548c684832d35f48b4936a0f42b4630333ed820938b"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/installed-torch-npu-version.py",
+      "bytes": 80,
+      "sha256": "9dc0a539f5507b0d9a9d8a91ca21568414aca85900edd0e241994960cfe3fa84"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-ProcessGroupHCCL.cpp",
+      "bytes": 340275,
+      "sha256": "1b3ef01d91cd324bd328aefc118d7e319811571d07a5da5a840596f328b56b37"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-test-npu-test_deterministic_level.py",
+      "bytes": 942,
+      "sha256": "4acd8879d95a14be925ae0adb95db271e4a127f1961812bbf381bb207ffd65e9"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-test-npu-test_torch_deterministicalgorithms.py",
+      "bytes": 1582,
+      "sha256": "e5402e6e4a5b010d2394b05dab15d50d6ada55c94928f60ff8bfeb25480b4c89"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-NpuVariables.cpp",
+      "bytes": 4258,
+      "sha256": "8e2544718cb76b8eb51101d6e75ae47990188af992888c804137e8a9fcd3e042"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-NpuVariables.h",
+      "bytes": 795,
+      "sha256": "d51e961204d462f2b321324c1b8069b127da8334a4c6c1ead7d564f26c4608a1"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-register-OptionsManager.cpp",
+      "bytes": 26921,
+      "sha256": "678e808d45e29da1762164ae4c530b45d23d184b849b2870cbe979cface5da70"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-sys_ctrl-npu_sys_ctrl.cpp",
+      "bytes": 13347,
+      "sha256": "bbf658668a300ac580aa9bedd009166fb8817e3a508313b5d77191038dfca9f2"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-torch_npu-csrc-framework-OpCommand.cpp",
+      "bytes": 17959,
+      "sha256": "570b1dbe19ce6a039cf768ddc1f89bf4e24f4d2ced8a19ab098acbe015272255"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-torch_npu-npu-__init__.py",
+      "bytes": 25023,
+      "sha256": "355df777433fd8c85670db75d8aacf7fa076332092470d59b6ba26202ed7fd2f"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/references/torch-npu-fa0f83fe49d3-torch_npu-npu-deterministic.py",
+      "bytes": 1506,
+      "sha256": "b37842cb3643384617d6d5b58c830b549c221c2b5af8e04c550d1171f39520d2"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/restore_inputs.py",
+      "bytes": 3915,
+      "sha256": "87b2693550e7139eb1af15a447c75e611fd7b244676004e1962605932de775a3"
+    },
+    {
+      "path": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dgrad-four-arm/source-map.json",
+      "bytes": 18894,
+      "sha256": "1457b0f01c6a3805b19ce9d5518f5455ef210ea6237c0bac1c7f319458931b62"
+    },
+    {
+      "path": "references/installed-torch-npu-npu-npu_config.py",
+      "bytes": 12007,
+      "sha256": "77144ac4544e21eaaf447548c684832d35f48b4936a0f42b4630333ed820938b"
+    },
+    {
+      "path": "references/installed-torch-npu-version.py",
+      "bytes": 80,
+      "sha256": "9dc0a539f5507b0d9a9d8a91ca21568414aca85900edd0e241994960cfe3fa84"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-ProcessGroupHCCL.cpp",
+      "bytes": 340275,
+      "sha256": "1b3ef01d91cd324bd328aefc118d7e319811571d07a5da5a840596f328b56b37"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-test-npu-test_deterministic_level.py",
+      "bytes": 942,
+      "sha256": "4acd8879d95a14be925ae0adb95db271e4a127f1961812bbf381bb207ffd65e9"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-test-npu-test_torch_deterministicalgorithms.py",
+      "bytes": 1582,
+      "sha256": "e5402e6e4a5b010d2394b05dab15d50d6ada55c94928f60ff8bfeb25480b4c89"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-NpuVariables.cpp",
+      "bytes": 4258,
+      "sha256": "8e2544718cb76b8eb51101d6e75ae47990188af992888c804137e8a9fcd3e042"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-NpuVariables.h",
+      "bytes": 795,
+      "sha256": "d51e961204d462f2b321324c1b8069b127da8334a4c6c1ead7d564f26c4608a1"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-register-OptionsManager.cpp",
+      "bytes": 26921,
+      "sha256": "678e808d45e29da1762164ae4c530b45d23d184b849b2870cbe979cface5da70"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-core-npu-sys_ctrl-npu_sys_ctrl.cpp",
+      "bytes": 13347,
+      "sha256": "bbf658668a300ac580aa9bedd009166fb8817e3a508313b5d77191038dfca9f2"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-torch_npu-csrc-framework-OpCommand.cpp",
+      "bytes": 17959,
+      "sha256": "570b1dbe19ce6a039cf768ddc1f89bf4e24f4d2ced8a19ab098acbe015272255"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-torch_npu-npu-__init__.py",
+      "bytes": 25023,
+      "sha256": "355df777433fd8c85670db75d8aacf7fa076332092470d59b6ba26202ed7fd2f"
+    },
+    {
+      "path": "references/torch-npu-fa0f83fe49d3-torch_npu-npu-deterministic.py",
+      "bytes": 1506,
+      "sha256": "b37842cb3643384617d6d5b58c830b549c221c2b5af8e04c550d1171f39520d2"
+    },
+    {
+      "path": "scheduling/f637-module-cost-local-checks-v1.json",
+      "bytes": 7003,
+      "sha256": "e8c345c7549c75134789775ce6f4a835f5da30847f2570d4fd02045a639e4c16"
+    },
+    {
+      "path": "scheduling/f637-module-cost-v1.manifest.json",
+      "bytes": 5004,
+      "sha256": "fff2c85ba859a0db380d97b6b90f2cdc0273e8b34893640183b82c8f365ce374"
+    },
+    {
+      "path": "scheduling/r129-f637-module-dense1-40-v1.request.draft.json",
+      "bytes": 3307,
+      "sha256": "a691d148752be2fac1360f44c316ffb17ca7118c7284e174417930f8424f3872"
+    },
+    {
+      "path": "scheduling/r129-f637-module-dense1-40-v1.request.json",
+      "bytes": 3091,
+      "sha256": "fb67ab009e0c1bdc5299e87993738ece7b5fc7cf03514cd345bdd2486ee1306f"
+    },
+    {
+      "path": "scheduling/r129-f637-module-moe2-40-v1.request.draft.json",
+      "bytes": 3305,
+      "sha256": "b472d8f02b898320722107e40b1437f072ed01ee365f0264f65b40c83e540171"
+    },
+    {
+      "path": "scheduling/r129-f637-module-moe2-40-v1.request.json",
+      "bytes": 3089,
+      "sha256": "c4ad5ab40cb8b6b65702976fb37939f30eb22d2aff260faed14cf30284eb5618"
+    },
+    {
+      "path": "scheduling/r129-f637-module-norm6-40-v1.request.draft.json",
+      "bytes": 3306,
+      "sha256": "a283cbcef0f25aa67fea8dc89ae59a7495e236c7633a8214df220bb369fcb454"
+    },
+    {
+      "path": "scheduling/r129-f637-module-norm6-40-v1.request.json",
+      "bytes": 3090,
+      "sha256": "a6ab4a9be057584d02df73fbbd81eaa8df9c1e730d8c45d878deb930d541946f"
+    },
+    {
+      "path": "scheduling/r129-f637-module-off-40-v1.request.draft.json",
+      "bytes": 3304,
+      "sha256": "f2ec2f482ab9991acf80bc98fd82d09cc218d08b6719188096069c529bf61eac"
+    },
+    {
+      "path": "scheduling/r129-f637-module-off-40-v1.request.json",
+      "bytes": 3088,
+      "sha256": "8a05865f7a6daf12cbe72d8b57f04a67f630274a949047e52ce669fe59ec05bd"
+    },
+    {
+      "path": "tools/README_f637_module_cost_v1.md",
+      "bytes": 7316,
+      "sha256": "abbe82927607f798e554d3a8eda274e1920a8ab773e4d5975a4b0e078b902a44"
+    },
+    {
+      "path": "tools/analyze_cp_loss_derivatives.py",
+      "bytes": 2667,
+      "sha256": "de0c57e3ee171e3bb02ab65f715fd1b9e282d90e9103da5c4740c9d9e4547f74"
+    },
+    {
+      "path": "tools/capture_f637_module_cost_training.py",
+      "bytes": 5335,
+      "sha256": "ed675d20ed8b4cae9d19cb31d5fe051d5749970826b0aa9f55c53b8f11c7d1b2"
+    },
+    {
+      "path": "tools/check_f637_module_cost_cpu.py",
+      "bytes": 15042,
+      "sha256": "2be219730acc15ba6da98244683d589517275ed64e4336047b04528d39c5eed9"
+    },
+    {
+      "path": "tools/check_module_cost_guard.py",
+      "bytes": 4455,
+      "sha256": "0976809b514676875dff3e46addefc2e5c9051dcf339b5153ed12f6048c9c261"
+    },
+    {
+      "path": "tools/check_pr214_guard.py",
+      "bytes": 9583,
+      "sha256": "6dcc24cd463737eec420d2dda6b6877de99293e59d8f3571a96a287a14156142"
+    },
+    {
+      "path": "tools/compare_runs.py",
+      "bytes": 7769,
+      "sha256": "e49d2a68272309d39b6cd619e570c0b80e4c7b3caca8217b877f6e921dd6817d"
+    },
+    {
+      "path": "tools/f637_module_cost_experiment.py",
+      "bytes": 12187,
+      "sha256": "e4a5a575301bcbc43aafb36711cb5b8415a3af982b0fad18fe1e229d6add8bac"
+    },
+    {
+      "path": "tools/f637_module_cost_spec.py",
+      "bytes": 3509,
+      "sha256": "71d13b972fa029f3739ea4c1293a1d561a79439b363c601850ce58b5b39f5838"
+    },
+    {
+      "path": "tools/fair_resource_guard.py",
+      "bytes": 18535,
+      "sha256": "8e5b4725f5ea02569375d51e2264eda7ea7a8179ceb6b24bf3b70b5c5598cdfc"
+    },
+    {
+      "path": "tools/plot_dgrad_four_arm.py",
+      "bytes": 5151,
+      "sha256": "9723bad0c97e4bd8d812be65fc63625013de75deb16fe1cafecb3899b2783354"
+    },
+    {
+      "path": "tools/preflight_f637_module_cost.py",
+      "bytes": 4834,
+      "sha256": "6d786b2aad1951397a9888f74eb89181713da87652f0e053ddb8e879806912c9"
+    },
+    {
+      "path": "tools/run_f637_module_cost_cpu.sh",
+      "bytes": 502,
+      "sha256": "5b6c18e320697bdac5e3045fe4ae09432573ba013d45d2d32de89aa373db96fc"
+    },
+    {
+      "path": "tools/run_fair_f637_module_cost.sh",
+      "bytes": 2751,
+      "sha256": "8dbc13df522b943492994ed4e59591c558cd7479ba516dc803751b1359eeeb1e"
+    }
+  ],
+  "module_cost_prelaunch_incremental_review": {
+    "status": "PASS",
+    "scope": "只读入口、固定配置、request、guard增量、现有真实CPU日志及无设备receipt；不包含正在运行的NPU off40验收。",
+    "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "guard_before_sha256": "90fd776c32aff270582ac087ad51deb25d2d6a4521c2e8a615ae6feb2f29f81e",
+    "guard_after_sha256": "8e5b4725f5ea02569375d51e2264eda7ea7a8179ceb6b24bf3b70b5c5598cdfc",
+    "guard_changes": "GAP_SECONDS=0；新增固定module runner映射repo；remote_job限制129/8卡/四个40-v1名称及30371–30374对应端口。",
+    "unchanged_function_ast": [
+      "local_job",
+      "cooldown_remaining",
+      "free_cards",
+      "card_snapshot",
+      "card_observation",
+      "parse_cards",
+      "process_identity",
+      "_save_ownership_event",
+      "save"
+    ],
+    "bundle_sha_checks": {
+      "manifest_files": 22,
+      "formal_requests": 4,
+      "all_pinned_bytes_match": true
+    },
+    "installation_contract": "原builder的activation checkpoint阶段精确选择模块，随后原FSDP流程继续；动态派生wrapper用isinstance身份核对0/6/1/2个目标，不改模型算术实现。",
+    "observer_contract": "九个固定边界仅前3步计数；无Tensor持有或设备同步；第3步移除自有hooks并替换callback列表，保留当前循环余下callback；CPU实测覆盖第4步。",
+    "observed_cpu_evidence": {
+      "parser_cases": 4,
+      "unit_methods": 7,
+      "failures": 0,
+      "errors": 0,
+      "accelerators_initialized": false,
+      "device_mounts": [],
+      "container_exit": 0,
+      "container_removed": true,
+      "guard_tests": 17
+    },
+    "limits": [
+      "CPU专家GMM使用可微替代，expert_fp32_weight_gradients关闭；不能证明NPU专家kernel或性能。",
+      "动态FSDP身份用真实class extension但未初始化FSDP状态/进程组；NPU构造与回放需实际每rank证据。",
+      "off保留独立chunk head/CE checkpoint；full配置仅作精确target入口，不代表整模型完全重算。",
+      "40步候选最终需匹配off40的完整八rank数据/初态/数值及覆盖；不代替200步验收。"
+    ],
+    "findings": []
+  }
+}

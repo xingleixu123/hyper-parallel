@@ -1,0 +1,2136 @@
+{
+  "schema_version": 1,
+  "review_axis": "Spec / independent raw-evidence audit",
+  "reviewed_at_utc": "2026-10-15T20:55:59.172938+00:00",
+  "candidate": "r129-f637-dgrad-fsdp8-native-3",
+  "reference": "r129-f637-fp32-fsdp8-0-200-r4",
+  "observed_execution_and_three_step_transparency": "PASS",
+  "final_200_step_training_acceptance": "INCOMPLETE_THREE_STEPS",
+  "conclusion_zh": "独立复算候选8个rank的1至3步，LM、日志MTP/aux、按实际0.3/0.0001还原分量、total、grad_norm、LR及样本/token计数的24对观测全部绝对差0。输入身份与48项初态摘要一致。native实际调用覆盖、首步观测与执行凭据成立。仅证明本三步窗口观测透明，不构成200步训练精度通过。新短跑审计器v1/v2发现的覆盖P2已关闭，冻结v4及12项内存反例独立复核通过；当前范围无未解决发现。",
+  "methods_zh": [
+    "未导入或调用strict_compare_runs/audit_dgrad_short_run完成数值复算，使用标准库逐文件读取、独立遍历rank与step并直接相减。",
+    "两个采集manifest全部206项逐一核对bytes/SHA256，且run目录实际文件集合加各自receipt恰好对应清单，无重复项。",
+    "从原始resolved配置递归对比实际数值配方，核对receipt、source、source.patch、import、环境与所有start/complete。",
+    "独立核对Linear事件顺序、逐call身份/形状/类型一致性、所有注册Linear实际调用，检查首步loss/activation完整已观测范围、采样坐标和有限性。",
+    "新短跑审计器的反例只用于代码契约检视，与原始A三步数值独立复算分开。"
+  ],
+  "raw_integrity": [
+    {
+      "case": "r129-f637-dgrad-fsdp8-native-3",
+      "files_verified": 130,
+      "manifest": {
+        "path": "evidence/f637-dgrad-fsdp8-native-3-evidence-manifest.json",
+        "bytes": 25982,
+        "sha256": "1edb511b2732c9bc79b9049256082f30b6de10bd620eb445e8ed8c080cea983f"
+      },
+      "exact_file_set_match": true
+    },
+    {
+      "case": "r129-f637-fp32-fsdp8-0-200-r4",
+      "files_verified": 76,
+      "manifest": {
+        "path": "evidence/f637-fsdp8-r4-complete-evidence-manifest.json",
+        "bytes": 15109,
+        "sha256": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11"
+      },
+      "exact_file_set_match": true
+    }
+  ],
+  "matching_config_differences": [
+    {
+      "path": "/checkpoint/checkpoint_dir",
+      "candidate": "/work/checkpoints/r129-f637-dgrad-fsdp8-native-3",
+      "reference": "/work/checkpoints/r129-f637-fp32-fsdp8"
+    },
+    {
+      "path": "/checkpoint/save_ckpt",
+      "candidate": false,
+      "reference": true
+    },
+    {
+      "path": "/training/train_iters",
+      "candidate": 3,
+      "reference": 200
+    }
+  ],
+  "actual_coefficients": {
+    "mtp": 0.3,
+    "aux": 0.0001
+  },
+  "metric_absolute_errors": {
+    "training/foundation_loss/lm": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "training/total_loss": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "training/lr": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "data/step_tokens": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "data/consumed_tokens": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "data/step_samples": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "data/consumed_samples": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    }
+  },
+  "derived_unweighted_absolute_errors": {
+    "mtp": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    },
+    "aux": {
+      "max_abs": 0,
+      "compared_pairs": 24,
+      "nonzero_pairs": 0
+    }
+  },
+  "step_counts_and_inputs": [
+    {
+      "step": 1,
+      "global_input_sha256": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+      "step_tokens": 32573,
+      "consumed_tokens": 32573,
+      "step_samples": 8,
+      "consumed_samples": 8,
+      "lr": 0.0001
+    },
+    {
+      "step": 2,
+      "global_input_sha256": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+      "step_tokens": 21239,
+      "consumed_tokens": 53812,
+      "step_samples": 8,
+      "consumed_samples": 16,
+      "lr": 0.0001
+    },
+    {
+      "step": 3,
+      "global_input_sha256": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25",
+      "step_tokens": 24848,
+      "consumed_tokens": 78660,
+      "step_samples": 8,
+      "consumed_samples": 24,
+      "lr": 0.0001
+    }
+  ],
+  "initialization": {
+    "all_16_rank_snapshots_identical": true,
+    "logical_state_entries_per_snapshot": 48,
+    "start_parameter_entries": 46,
+    "candidate_start_step": 0,
+    "candidate_complete_step": 3,
+    "reference_start_step": 0,
+    "reference_complete_step": 200,
+    "start_epoch": 0,
+    "complete_epoch": 1,
+    "micro_batches": 1
+  },
+  "execution": {
+    "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "different_container_executions": true,
+    "execution_time_windows_nonoverlapping": true,
+    "candidate_duration_seconds": 137.17318773999432,
+    "candidate_exit_code": 0,
+    "candidate_released": true,
+    "remaining_owned_pids_count": 0,
+    "candidate_devices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "pinned_request_files_verified": 16,
+    "copied_python_helpers_verified": 13,
+    "import_path": "/workspace/hyper-parallel/hyper_parallel/__init__.py",
+    "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+    "torch": {
+      "import_path": "/workspace/venv/lib/python3.12/site-packages/torch/__init__.py",
+      "version": "2.12.0+cpu"
+    },
+    "transformers": {
+      "import_path": "/workspace/venv/lib/python3.12/site-packages/transformers/__init__.py",
+      "version": "5.13.1"
+    }
+  },
+  "native_trace_coverage": [
+    {
+      "rank": 0,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "e20e31bcd1c57adc6579e684145dd1b1f4999fb5dc293d1cedc258fc1a983f35",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 0.9580941200256348
+    },
+    {
+      "rank": 1,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "fb30d405ad108876c118d130f88aa2bb4524d989a5d50032e6e00eb360a2bb77",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 1.0059865713119507
+    },
+    {
+      "rank": 2,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "9198beeab1a4f08710373a9d52e65aa32ea9e5b8c0b56362d5125274e7c81d91",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 1.0059865713119507
+    },
+    {
+      "rank": 3,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "1fa441baf1f0a45e5274ae72dcf30ee7d1718255b9328afa7757b192473dc4e9",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 1.0059865713119507
+    },
+    {
+      "rank": 4,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "3ee2b39a7d297087448fae9a8977c56e3e017ecbc7f2a2bed16b54228634447e",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 1.0059865713119507
+    },
+    {
+      "rank": 5,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "acc223d8efc11e945f0ff3c64b609b43175bce3b213b167aed6396d06ca12fde",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 1.0059865713119507
+    },
+    {
+      "rank": 6,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "a65cabedddd55bf59011450b3d4be6aa8225f26c983d803aab6b803a206c2d09",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 1.0059865713119507
+    },
+    {
+      "rank": 7,
+      "linear_records": 246,
+      "registered_linears_observed": 23,
+      "actual_forward_calls": 84,
+      "per_step": [
+        {
+          "step": 1,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 2,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        },
+        {
+          "step": 3,
+          "events": {
+            "forward_enter": 28,
+            "forward_return": 28,
+            "output_gradient_observed": 26
+          }
+        }
+      ],
+      "derivative_calculated": 0,
+      "later_step_stale_batch_count": 0,
+      "first_step_batch_sha256": "670b837c1a3b2aefb26301b4922ef8f6dc8fc5efa0e14b05d527d8b3ffdca616",
+      "eligible_bf16_forward_calls": 78,
+      "native_fp32_functional_router_calls": 6,
+      "activation_records": 142,
+      "activation_modules": 33,
+      "activation_stages": {
+        "output": 37,
+        "input": 35,
+        "output_gradient": 35,
+        "input_gradient": 35
+      },
+      "activation_scalar_samples": 360768,
+      "activation_unique_call_records": 37,
+      "loss_objective_records": 3,
+      "first_step_cross_stream_identity_match": true,
+      "recorded_local_loss_gradient": 1.0059865713119507
+    }
+  ],
+  "local_objective_weighting_cross_check": {
+    "method": "各rank已记录forward_value乘该目标已记录gradient再除world8，用Python float求和；此项是独立舍入敏感性检查，不作为Torch归约逐位oracle。",
+    "results": {
+      "foundation_loss/mtp": {
+        "independent_float64_sum": 3.928363833546598,
+        "logged_step1": 3.928363800048828,
+        "absolute_gap": 3.34977698912553e-08
+      },
+      "foundation_loss/aux": {
+        "independent_float64_sum": 0.00025308559631416613,
+        "logged_step1": 0.0002530855708755553,
+        "absolute_gap": 2.5438610853217858e-11
+      },
+      "foundation_loss/lm": {
+        "independent_float64_sum": 12.881054806216,
+        "logged_step1": 12.881054878234863,
+        "absolute_gap": 7.201886376151378e-08
+      }
+    }
+  },
+  "parent_audit_cross_check": {
+    "scope_and_final_gate_match": true,
+    "all_reported_zero_deltas_match": true,
+    "raw_file_count_matches": true
+  },
+  "boundaries_zh": [
+    "200步要求没有降低；本次仅A臂3步，不推断CP2 native透明性、FP32 dgrad效果、TP/EP200步或性能收益。",
+    "grad_norm一致只证明标量范数；未捕获所有参数逐元素更新与全部梯度，不能宣称它们已逐位相同。",
+    "激活是首步3D边界按序列/特征128间隔采样，全部33个已watch模块都有记录，但不是全张量字节证明，也不覆盖所有算子。",
+    "23个nn.Linear名称均实际出现；每步另外2次FP32函数式router调用原生绕过处理。routed专家GMM与注意力算子不是这项Linear dgrad干预的覆盖范围。",
+    "lm_head每步4次forward、2次output_gradient；其余2次是已记录backward期间的checkpoint重放，非缺失训练步骤。replay输入gradient观测不等价于独立梯度来源。",
+    "首步local batch哈希来自input_ids和shift_labels；已核对三种探针流一致。global input identity是另一种全输入哈希，不能把两个不同算法的SHA直接相等比较，也未保存原始输入张量重新计算哈希。",
+    "还原MTP/aux来自日志加权标量除实际系数，未捕获乘系数之前张量。",
+    "原始采集manifest提供归档一致性，非独立第三方签名/执行证明；独立执行依据不同容器receipt及不重叠时间、源和完整run记录。"
+  ],
+  "input_files": [
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-evidence-manifest.json",
+      "bytes": 25982,
+      "sha256": "1edb511b2732c9bc79b9049256082f30b6de10bd620eb445e8ed8c080cea983f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/EXIT_CODE",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank0.jsonl",
+      "bytes": 5938894,
+      "sha256": "cadf7e3793419ae7cea13c87f7b93551a47381305c600016a58a14332e3d2045"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank1.jsonl",
+      "bytes": 6040770,
+      "sha256": "85418325c38f33797047ffb640d084bab949e16cc84e7f0d6e27d1b13685d64d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank2.jsonl",
+      "bytes": 6037834,
+      "sha256": "52faced13e8839d0002aadd5fc991669b068300f0409f4597ef15a8b9c867607"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank3.jsonl",
+      "bytes": 6036169,
+      "sha256": "d33006161a25b8c2141a65eb0bb2a831920f8e579d6b94a93ed24d25281dd468"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank4.jsonl",
+      "bytes": 6036438,
+      "sha256": "682c7a9222fb0dce668771b1e0151ba5fa60c41430fde7bbb4407b84d46c9b9e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank5.jsonl",
+      "bytes": 6041046,
+      "sha256": "49b24f6b0759fb59f735a00f1e4de1ffbeb99f5d3f2ebe83338f75d5258d07a4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank6.jsonl",
+      "bytes": 6037884,
+      "sha256": "5ffba34252b8b8e30949528453a4846770daec3ca519f007c1ddcf62a395010e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/activations-rank7.jsonl",
+      "bytes": 6039907,
+      "sha256": "3df4dd1561afb16ea3e3d6c480eb0238ee537e69948451280331ca52fc54f88e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_cp_loss_training.py",
+      "bytes": 2147,
+      "sha256": "47bfe15b93fba3dc1fba732eac143748a800ebc0b3e31aee1cf8ece169d7381e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_fair_dgrad_training.py",
+      "bytes": 2860,
+      "sha256": "0ee23ecae60977dda9dd7efee91c34de1e809acb428e10da82850dc8b306f97b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_precision_training.py",
+      "bytes": 287,
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank0.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank1.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank2.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank3.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank4.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank5.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank6.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/complete-rank7.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/config.resolved.json",
+      "bytes": 13153,
+      "sha256": "ac5d8c8f20c27d226fb98e6bf23faefea4d6275eccbdaeca44909af33d74b73b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/config.yaml",
+      "bytes": 5805,
+      "sha256": "e42f9569758436a901d64fd879e8ae76ee714e66b163b5bc33a1dc571ff20a4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank0.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank1.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank2.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank3.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank4.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank5.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank6.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp-backward-probe-rank7.json",
+      "bytes": 3571,
+      "sha256": "52a34186b5bf0eb8f98307f1b10e5efd69b32ec45445b247715396b9f15aab4c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/cp_backward_trace.py",
+      "bytes": 6521,
+      "sha256": "b682fcbfe3067988245d16dcecaf1a32f6232d574ccee923a250d95a7471da32"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/import-path.txt",
+      "bytes": 53,
+      "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank0.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank1.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank2.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank3.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank4.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank5.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank6.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/initial-state-rank7.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/activation_checkpoint.json",
+      "bytes": 35,
+      "sha256": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/findings.json",
+      "bytes": 388,
+      "sha256": "20ca3ae160fb953659e45164929dd0c3c7b4bafcc9763e58479e4a927c054ccd"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/fsdp_units.json",
+      "bytes": 2621,
+      "sha256": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/optimizer_layout_initial.json",
+      "bytes": 46868,
+      "sha256": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/check/parameter_ownership.csv",
+      "bytes": 3863,
+      "sha256": "2f63402178bfd952812a7ea6483299d1edc6f9451785565e64b15db8d6906ad6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/checkpoint/coverage.json",
+      "bytes": 127,
+      "sha256": "c2c685e1fe5995375393df9abec6fc4807d65ae63768f41818f9fe4cc431ddd6"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/data/field_ownership.json",
+      "bytes": 229,
+      "sha256": "41896dc974540373fa01a10a0b7087f543fac3d5df44c4ebe6fe37c6728d6cc3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/data/findings.json",
+      "bytes": 41,
+      "sha256": "ff9c9fad82662fc12754bd8f6714c7d329754d5a483e2aaa948566861f333170"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/environment.json",
+      "bytes": 1338,
+      "sha256": "716a42e92d12f33eb37dccdfb9ed089c52a1854cdd5b110f37ac49cba7c1f267"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/integration_state.json",
+      "bytes": 223,
+      "sha256": "7e3defc6c12dd748ecd2325f6f3fe71f910eff1aed554b80ad3d343a8c50f111"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/inventory/candidate.json",
+      "bytes": 45899,
+      "sha256": "c369274e8e697c77445d33556a60dacb94bf3a8dd58320d96084c39e363794bc"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/integration/trainer_config.resolved.json",
+      "bytes": 13153,
+      "sha256": "092c569425b96282c1f9ef08d921a385c75d15f0c570b1af2d18c666812b9d91"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/launcher.log",
+      "bytes": 220,
+      "sha256": "8295fc6178458ca9e848e833b57ccc311ace668172358c01293efa77b1924c35"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank0.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank1.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank2.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank3.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank4.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank5.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank6.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-coverage-rank7.json",
+      "bytes": 13549,
+      "sha256": "8331c73e64a6f35c7f6af35fb7ae2e5ed92b88d75780999a6626e1d8e23d817a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank0.jsonl",
+      "bytes": 157616,
+      "sha256": "e73c9cf83f6126f49e0227f26346a5633262f0d1373ac6e27b536e2925f480fa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank1.jsonl",
+      "bytes": 157616,
+      "sha256": "7320d4b931f1a7bd7fb73f3ec59512e9a6a58770a4fa3e344e4491a4c8ce8046"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank2.jsonl",
+      "bytes": 157616,
+      "sha256": "6513d15e99959cc78139b844c08de062012a807335560b1bc97bcb079c3390b4"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank3.jsonl",
+      "bytes": 157616,
+      "sha256": "c32673e5d1c2c0a13da0fc845a365e81a64cfdbdd7ac292f4e1e1692fca7c8cc"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank4.jsonl",
+      "bytes": 157616,
+      "sha256": "329ffcdfcdf2ca279c6f344d1f3463767dca16c0eaddc0b670990b793b4af8bc"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank5.jsonl",
+      "bytes": 157616,
+      "sha256": "eb27f34fcf421575243ea23f874a925e11b53939c869e27c5c94f10f1b729790"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank6.jsonl",
+      "bytes": 157616,
+      "sha256": "56fa8704d32a18edd9b7dc2028731403e9fa67d4dd9b095552f5b55a7008a514"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-events-rank7.jsonl",
+      "bytes": 157616,
+      "sha256": "e1f121ca81363a8f35cc0beef19e00b768e810f9b92aeaaa71678ddeb82b4372"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank0.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank1.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank2.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank3.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank4.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank5.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank6.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear-dgrad-experiment-rank7.json",
+      "bytes": 331,
+      "sha256": "26e8b03fbc4fc6c4d83d6e658606f0b5763b8f47f56e3df7cbdb252ed92c2e1f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear_dgrad_experiment.py",
+      "bytes": 3514,
+      "sha256": "373b5ed016604a92dbfec9afeb2c76edc8b456cf427ade592dfab2aa8098f925"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/linear_dgrad_trace_experiment.py",
+      "bytes": 8869,
+      "sha256": "62a18e143b1a8af826cc8ebdaf201e7be442c8179362caa102e02a73bea8ab87"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank0.jsonl",
+      "bytes": 731,
+      "sha256": "9ae4e2ca6e4ade491b5e51569555163736a99247fda4731168244d35db23a9c3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank1.jsonl",
+      "bytes": 731,
+      "sha256": "8e6c5c831353e8facb76f26a905faf1671675c454a91782cff9d6e88ffcff1ba"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank2.jsonl",
+      "bytes": 730,
+      "sha256": "acbb29c1d86fa198b75f5e035729e646eccbabc785975e15c04fafe104981c78"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank3.jsonl",
+      "bytes": 728,
+      "sha256": "f36a22527656eeb5c6c9a08b2d9c4cfc06e3d106824ea34fb6c460930d8c5ea5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank4.jsonl",
+      "bytes": 731,
+      "sha256": "7225fa5952817f9210e11dfe765101db6fbdfdecbeb12dcf16588e6f2816cd88"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank5.jsonl",
+      "bytes": 732,
+      "sha256": "cff9ca026f5f2706d2c7cb57bc3a9c3e17afd7dd5a485b073bd8eb88a03619b8"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank6.jsonl",
+      "bytes": 730,
+      "sha256": "b171b6f499e0ccbb58d9c9138170b7e2151e5506d6ff4a172256e45e72a1be36"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss-gradients-rank7.jsonl",
+      "bytes": 731,
+      "sha256": "d371f04ae0d0014693a638aaf0da0477ffd012daed6f472aadf1c83d34f52d6d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/loss_gradient_trace.py",
+      "bytes": 2406,
+      "sha256": "9b57516f6a5800197ca0fddf19a0878e509fb84da556138a0665e66683ef1f60"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank0.jsonl",
+      "bytes": 2223,
+      "sha256": "03ae80505de28927a9f85990d0b85582fa747e8faee958e840ed347186a284e2"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank1.jsonl",
+      "bytes": 2223,
+      "sha256": "c5d7e209bc7740858d5d736ceef723febb48e040a170bf7f4da55c38e9fdd360"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank2.jsonl",
+      "bytes": 2223,
+      "sha256": "82bd1dddf549ad878806edd2477fa429ca46a5b71a814bbffefd47902d2eeae5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank3.jsonl",
+      "bytes": 2223,
+      "sha256": "4ccef11fdbdec786da5304f7f9dfefb96e6767c3cc631bf181cef8d2c7bba0f3"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank4.jsonl",
+      "bytes": 2223,
+      "sha256": "78a4a48dbef91d324bfef7ad831aa5e9db8581ff92da6db96b9c5887eb2d1522"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank5.jsonl",
+      "bytes": 2223,
+      "sha256": "eb692a3d4719b4655e250f59548eaf5116796aba014d0a2186bb9e2945d00f90"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank6.jsonl",
+      "bytes": 2223,
+      "sha256": "0aada981b9242864ec51da1dfa7f0a0eee2fc2e6ef9c1e0587bdff25d722e28c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/metrics-rank7.jsonl",
+      "bytes": 2223,
+      "sha256": "28298cca77144d7243611fd3c1d2012f7f0a22144c3e9bbcf37fc7e3fdca6a27"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/ns_batch_trace.py",
+      "bytes": 1998,
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/source-commit.txt",
+      "bytes": 41,
+      "sha256": "11e1103266493a353af04b3be5136176b9341f77fb898c261b3028070b051334"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/source-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/source.patch",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank0.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank1.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank2.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank3.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank4.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank5.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank6.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/start-rank7.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/0/stderr.log",
+      "bytes": 24962,
+      "sha256": "614cd6f163e8dc2f9b63634a7d7734755254d669a815753121d77731aab7ef01"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/0/stdout.log",
+      "bytes": 846,
+      "sha256": "1429acb26696f4171af3b8de17e9b314b8d5234ccca70c64f71202ee19c5285c"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/1/stderr.log",
+      "bytes": 2805,
+      "sha256": "563417309c75d6ff276d9ed81eafe41ce451dc85e524734edf96a618055cecaa"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/1/stdout.log",
+      "bytes": 186,
+      "sha256": "733c86e8afa39166ce6feeaec02d4a117de454c9020cd2254783ec72ddef09c5"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/2/stderr.log",
+      "bytes": 2805,
+      "sha256": "006a0c24d5fbea9ea077b7b19c8a5cd3c12b1c10fde2c7183afd811e82512d6d"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/2/stdout.log",
+      "bytes": 186,
+      "sha256": "1aa1b8683b8d10f6732609dc3f5f6a629590040306f18e55ede0f6d3da5a74d0"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/3/stderr.log",
+      "bytes": 2805,
+      "sha256": "1a068e39a3bc8a048fe8c7d9c521f9329d063dfc219e2f55af61699b9732037b"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/3/stdout.log",
+      "bytes": 186,
+      "sha256": "1edcbcb8b24e8c563a6e5a35cc5ab674bd37efc06e467d7eedbe76af224da76f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/4/stderr.log",
+      "bytes": 2805,
+      "sha256": "de99fdea30b39ebc09a742527cadc67b6e38b687d04d574e5ca554cbea0c8f58"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/4/stdout.log",
+      "bytes": 186,
+      "sha256": "ed8ec72290edb94c682a9e929542683cda670083a00a7dbe9fce99a9b2b6dd27"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/5/stderr.log",
+      "bytes": 2805,
+      "sha256": "7047283fcc9424e1ec0fa8ed8a21b536ac2106e5a815c968faea57fb510a821f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/5/stdout.log",
+      "bytes": 186,
+      "sha256": "1c0c3667b6afcbccc0197335287238fb58003c0ac73fc5e75c7aea788636819f"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/6/stderr.log",
+      "bytes": 2805,
+      "sha256": "7a89ddbad5b44fe05fbebb94bcd9d055e931548d7d9b3313addc0f3b72592129"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/6/stdout.log",
+      "bytes": 186,
+      "sha256": "d46510825685976d3251174116d6033b8c4964c659c5eafa1f9e05b4324f688a"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/7/stderr.log",
+      "bytes": 2805,
+      "sha256": "cb9ae3b6dc6c533b6123e8aa37d87dc08d5630f6e3450861d7d7ac38212369c1"
+    },
+    {
+      "path": "runs/r129-f637-dgrad-fsdp8-native-3/worker-logs/none_hik3ee61/attempt_0/7/stdout.log",
+      "bytes": 186,
+      "sha256": "cb4588036645f403590463d6410747f88c25093e87136e44d9e81c470757c51d"
+    },
+    {
+      "path": "scheduling/r129-f637-dgrad-fsdp8-native-3.receipt.json",
+      "bytes": 2695,
+      "sha256": "d327bff5bc668aef5bdd62556d4a77d375754a999685dd4dc8ed4e5efac2a59e"
+    },
+    {
+      "path": "evidence/f637-fsdp8-r4-complete-evidence-manifest.json",
+      "bytes": 15109,
+      "sha256": "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/EXIT_CODE",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/capture_precision_training.py",
+      "bytes": 287,
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank0.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank1.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank2.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank3.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank4.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank5.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank6.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/complete-rank7.json",
+      "bytes": 39,
+      "sha256": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/config.resolved.json",
+      "bytes": 13144,
+      "sha256": "dfb276d6b985e0d6197888d4480c340611bc2ab42a3d58c89121a1319457f782"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/config.yaml",
+      "bytes": 5796,
+      "sha256": "323cd04b618fd138969522095013e0e89afacda5bf38bca2050a1af032212737"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/import-path.txt",
+      "bytes": 53,
+      "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank0.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank1.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank2.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank3.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank4.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank5.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank6.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/initial-state-rank7.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/check/activation_checkpoint.json",
+      "bytes": 35,
+      "sha256": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/check/findings.json",
+      "bytes": 388,
+      "sha256": "20ca3ae160fb953659e45164929dd0c3c7b4bafcc9763e58479e4a927c054ccd"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/check/fsdp_units.json",
+      "bytes": 2621,
+      "sha256": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/check/optimizer_layout_initial.json",
+      "bytes": 46868,
+      "sha256": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/check/parameter_ownership.csv",
+      "bytes": 3863,
+      "sha256": "2f63402178bfd952812a7ea6483299d1edc6f9451785565e64b15db8d6906ad6"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/checkpoint/coverage.json",
+      "bytes": 127,
+      "sha256": "c2c685e1fe5995375393df9abec6fc4807d65ae63768f41818f9fe4cc431ddd6"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/data/field_ownership.json",
+      "bytes": 229,
+      "sha256": "41896dc974540373fa01a10a0b7087f543fac3d5df44c4ebe6fe37c6728d6cc3"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/data/findings.json",
+      "bytes": 41,
+      "sha256": "ff9c9fad82662fc12754bd8f6714c7d329754d5a483e2aaa948566861f333170"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/environment.json",
+      "bytes": 1337,
+      "sha256": "1b9af33b75466da09db382bed56c8cd438d2269f0e7ca265616cc1d7901abe24"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/integration_state.json",
+      "bytes": 223,
+      "sha256": "7e3defc6c12dd748ecd2325f6f3fe71f910eff1aed554b80ad3d343a8c50f111"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/inventory/candidate.json",
+      "bytes": 45899,
+      "sha256": "c369274e8e697c77445d33556a60dacb94bf3a8dd58320d96084c39e363794bc"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/integration/trainer_config.resolved.json",
+      "bytes": 13144,
+      "sha256": "4c4c6cec50936ea185d5ca42ca3176d215d7008eef4d8ad14440d174fb3aae6e"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/launcher.log",
+      "bytes": 220,
+      "sha256": "8295fc6178458ca9e848e833b57ccc311ace668172358c01293efa77b1924c35"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank0.jsonl",
+      "bytes": 148356,
+      "sha256": "4f35ac8c015ceb0b825d0dff1b9622f2a606f90972c5750f7dd437eabc9e020d"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank1.jsonl",
+      "bytes": 148356,
+      "sha256": "25605caf8c644034f47bc3a54cc5e90e6f990579320318385e9a18ee690268ec"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank2.jsonl",
+      "bytes": 148356,
+      "sha256": "0739690e07918e6ff4a248136581376ef323adabd9aef0b780ded900150771a7"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank3.jsonl",
+      "bytes": 148356,
+      "sha256": "5a7420f75ffd05a3c5add5d145a1748958d5b00c88fc52bbf225642765e896ee"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank4.jsonl",
+      "bytes": 148356,
+      "sha256": "a982af002a3b8549312fd269adc468014e9b43507563ad00f89dba17e7f183e7"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank5.jsonl",
+      "bytes": 148356,
+      "sha256": "acdacc90cb0ec46e2f349cbe1ad791b5e1f83d284b3392da2806ab8e6d69cf40"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank6.jsonl",
+      "bytes": 148356,
+      "sha256": "75e0756cd21aa85b90d3604937d1924a9393d11bf667ce4b21aae73960403e13"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/metrics-rank7.jsonl",
+      "bytes": 148356,
+      "sha256": "dac61b2cb5ea0b86214fa5dfa231160acfb7585680bcfcefc3b84ef88887bbf5"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/ns_batch_trace.py",
+      "bytes": 1998,
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/source-commit.txt",
+      "bytes": 41,
+      "sha256": "11e1103266493a353af04b3be5136176b9341f77fb898c261b3028070b051334"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/source-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/source.patch",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank0.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank1.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank2.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank3.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank4.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank5.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank6.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/start-rank7.json",
+      "bytes": 8932,
+      "sha256": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/0/stderr.log",
+      "bytes": 162264,
+      "sha256": "803adcf63cb870596f2074edbab4078ec5592e39b4f471c003346adeea5a2321"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/0/stdout.log",
+      "bytes": 1635,
+      "sha256": "296db260bb8e33fc814951f9570c15b92691a210c911a4e7876490b713a565d2"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/1/stderr.log",
+      "bytes": 2944,
+      "sha256": "929f2f62f2067ec207dd126c5bf7eaf5f2596547f53eb5e53c136394bdb54581"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/1/stdout.log",
+      "bytes": 975,
+      "sha256": "01816b720c0f709e9ade9fc2129297db05edcbb1a4350a59ccd005b61337f60f"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/2/stderr.log",
+      "bytes": 2944,
+      "sha256": "5251bc1f1113cd0f2428757417e91b551ebe8e8dd90bcef28232c505c45ecab7"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/2/stdout.log",
+      "bytes": 975,
+      "sha256": "bdcbf7232dae17eda2b7e805eaf17edc6e9603acd81d554fb732ecf8e5bbfc3b"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/3/stderr.log",
+      "bytes": 2944,
+      "sha256": "75917bf455840bf7c2d6c1aa50c5f5857060e73560e62ae656a145e1001ee729"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/3/stdout.log",
+      "bytes": 975,
+      "sha256": "254e5023661428557e9c3f29bf78d4f375ceda09dac42f04eb735cf6554b9ccf"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/4/stderr.log",
+      "bytes": 2944,
+      "sha256": "7e011058484619ef1b8fc45d9d3ea26cddb0ebbc5f1b6b47f1dc3d76fc076fa8"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/4/stdout.log",
+      "bytes": 975,
+      "sha256": "19f6f7ba8ecbd8c84726a88bd8bcde39fd8af5adbbacc60628090c69bea7dc21"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/5/stderr.log",
+      "bytes": 2944,
+      "sha256": "29493683284cce9cfb4fdef9f1770e3fd5d3b1dc2f47d5652aa800dd2ced2765"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/5/stdout.log",
+      "bytes": 975,
+      "sha256": "f9719e3f830a1ca6ddbfa7d53648d1259566d9bcc2f091901cf78067f49ac058"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/6/stderr.log",
+      "bytes": 2944,
+      "sha256": "fd669b5caf8b9edb6289360a2f89414c45dc1956156f900ac104edefdff9ce5d"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/6/stdout.log",
+      "bytes": 975,
+      "sha256": "593f394c44f4a9e39f9f0cf4207bc6b6883f54e0f52d7d523619d5c3122c6f7d"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/7/stderr.log",
+      "bytes": 2944,
+      "sha256": "df839c423df6bd8e9e8e9d286729f96a42aa9f30c7ecba411b3005a84f3ae0d2"
+    },
+    {
+      "path": "runs/r129-f637-fp32-fsdp8-0-200-r4/worker-logs/none_jyfk2t0f/attempt_0/7/stdout.log",
+      "bytes": 975,
+      "sha256": "7c86d5e77cfacd8743d1cdabb2cdfe58ac8707c5c5bfbbc330abb5311d780fed"
+    },
+    {
+      "path": "scheduling/r129-f637-fp32-fsdp8-0-200-r4.receipt.json",
+      "bytes": 2692,
+      "sha256": "c2f98e781b44fccec74b59200e8262ee2d5beb74c8aa596cdea03226910d43e0"
+    },
+    {
+      "path": "scheduling/r129-f637-dgrad-fsdp8-native-3.request.json",
+      "bytes": 2140,
+      "sha256": "bcc6defc97bcea6b7e0ab6b47f9fb934226482f9cce62680ff851579d54722ce"
+    },
+    {
+      "path": "tools/capture_precision_training.py",
+      "bytes": 287,
+      "sha256": "dad38bef57ef4b1f9b3ed81eafffff2735ad229b1b29dbed4a13fc7a339f72f6"
+    },
+    {
+      "path": "tools/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "path": "tools/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "path": "tools/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "path": "tools/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "path": "tools/ns_batch_trace.py",
+      "bytes": 1998,
+      "sha256": "bcb698b5b26bbb2ef3df29c23b75c1a0b7d2995d47a25174972035be9a73de3e"
+    },
+    {
+      "path": "tools/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "path": "tools/fair_resource_guard.py",
+      "bytes": 17912,
+      "sha256": "90fd776c32aff270582ac087ad51deb25d2d6a4521c2e8a615ae6feb2f29f81e"
+    },
+    {
+      "path": "tools/run_fair_dgrad_case.sh",
+      "bytes": 2101,
+      "sha256": "c2d5a521a91190eaaa7bbfbce10affd5687fde5f8e821e3c3c4735d7bdc99c7c"
+    },
+    {
+      "path": "tools/capture_fair_dgrad_training.py",
+      "bytes": 2860,
+      "sha256": "0ee23ecae60977dda9dd7efee91c34de1e809acb428e10da82850dc8b306f97b"
+    },
+    {
+      "path": "tools/capture_cp_loss_training.py",
+      "bytes": 2147,
+      "sha256": "47bfe15b93fba3dc1fba732eac143748a800ebc0b3e31aee1cf8ece169d7381e"
+    },
+    {
+      "path": "tools/cp_backward_trace.py",
+      "bytes": 6521,
+      "sha256": "b682fcbfe3067988245d16dcecaf1a32f6232d574ccee923a250d95a7471da32"
+    },
+    {
+      "path": "tools/loss_gradient_trace.py",
+      "bytes": 2406,
+      "sha256": "9b57516f6a5800197ca0fddf19a0878e509fb84da556138a0665e66683ef1f60"
+    },
+    {
+      "path": "tools/linear_dgrad_trace_experiment.py",
+      "bytes": 8869,
+      "sha256": "62a18e143b1a8af826cc8ebdaf201e7be442c8179362caa102e02a73bea8ab87"
+    },
+    {
+      "path": "tools/linear_dgrad_experiment.py",
+      "bytes": 3514,
+      "sha256": "373b5ed016604a92dbfec9afeb2c76edc8b456cf427ade592dfab2aa8098f925"
+    },
+    {
+      "path": "configs/r129-f637-dgrad-fsdp8-native-3.yaml",
+      "bytes": 5805,
+      "sha256": "e42f9569758436a901d64fd879e8ae76ee714e66b163b5bc33a1dc571ff20a4c"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-audit.json",
+      "bytes": 117305,
+      "sha256": "9f45dbf122063438ebff215736880bdce430c4133caf5802604a0da7f83881fd"
+    },
+    {
+      "path": "evidence/dgrad-short-auditor-v1.py",
+      "sha256": "be0e31114685af67e48b3da1d2ce255aa494e5a8eee903884cff0132e1765ecf",
+      "bytes": 7279
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-audit-v2.json",
+      "sha256": "39501c026d7e9c8d82db42f8093dc51868c8682d7eebe94e279ab81c79e64668",
+      "bytes": 120169
+    },
+    {
+      "path": "tools/strict_compare_runs.py",
+      "sha256": "086b969fa8f114748322c163bc307b2af880ccdb1093deabb08cdb1b820739fc",
+      "bytes": 15591
+    },
+    {
+      "path": "evidence/dgrad-short-auditor-v2.py",
+      "bytes": 12713,
+      "sha256": "eaffb966840fd643ffdc24a37b5b756f2909473b0c9eab9b193aa0d9c7ecdd25"
+    },
+    {
+      "path": "evidence/dgrad-short-auditor-v3.py",
+      "bytes": 15167,
+      "sha256": "75a6d35d1cc073536f5ec3c3c5e9afb67d6f39e3848f02219b511449cd1420da"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-audit-v3.json",
+      "bytes": 122649,
+      "sha256": "4dff1a60c9b0890da6b0a46273f9855277dc46416f40d79c66fbc9db0d12061e"
+    },
+    {
+      "path": "tools/audit_dgrad_short_run.py",
+      "bytes": 16023,
+      "sha256": "4a15d6c12dd8eae8da7e11db6d27ef5dee34b983ba929d9eecaaf6c125825cf2"
+    },
+    {
+      "path": "evidence/f637-dgrad-fsdp8-native-3-audit-v4.json",
+      "bytes": 122649,
+      "sha256": "75421017a1b09131f00580cd359f3f96641ab0bb63565bdf799b5766138bfd17"
+    }
+  ],
+  "actual_configuration": {
+    "restore_from": null,
+    "activation_checkpoint": "off",
+    "model_integration": "build",
+    "topology": "FSDP8/TP1/CP1/EP1/PP1/SPoff"
+  },
+  "short_run_auditor_review": {
+    "status": "PASS_ON_FROZEN_V4",
+    "original_v1": {
+      "path": "evidence/dgrad-short-auditor-v1.py",
+      "sha256": "be0e31114685af67e48b3da1d2ce255aa494e5a8eee903884cff0132e1765ecf"
+    },
+    "reviewed_v2": {
+      "source_path": "evidence/dgrad-short-auditor-v2.py",
+      "sha256": "eaffb966840fd643ffdc24a37b5b756f2909473b0c9eab9b193aa0d9c7ecdd25"
+    },
+    "v1_finding_status": "RESOLVED_BY_V2",
+    "v1_finding_zh": "原审计器只验收Linear三文件与已列manifest的SHA，未要求loss/activation存在、非空和身份对应。仅内存执行原coverage函数证实无这两类流或错误但格式合法的首步SHA仍能通过。",
+    "v2_verified_fixes_zh": "v2已要求六类观测在manifest中，首次边界流非空、有限值、模块与梯度覆盖、CP1/CP2 objective stages及批次身份对应，start=0/complete=3；真实A通过，空activation/缺文件/错误Linear SHA被拒绝。",
+    "v2_residual_finding": {
+      "priority": "P2",
+      "file": "tools/audit_dgrad_short_run.py",
+      "lines": "78-90",
+      "title_zh": "模块级集合不能验收输出头的多次调用和重复记录",
+      "requirement_zh": "需要检查首步loss/activation覆盖；当前四臂定位须能分辨共享输出头的LM、MTP及重放调用。",
+      "evidence_zh": "v2按(batch,module)汇总forward/backward，call仅检查非负整数；从真实A的内存副本删除lm_head call=1/2/3的10条activation，142变132条仍通过。再独立测试重复首条activation，142变143条仍通过。Linear源事件仍明确显示首步4次lm_head forward。",
+      "action_zh": "拒绝重复(batch,module,call,stage)；对两个观测器均记录的Linear核对首步forward调用数与连续call，至少覆盖共享lm_head。非Linear调用数明确仅模块级覆盖。",
+      "impact_zh": "不影响实际A：已独立验证142条唯一记录、head0至3及其预期阶段均存在；该P2只针对可复用审计器对未来不完整观测的误接收。",
+      "status": "RESOLVED_BY_V3"
+    },
+    "in_memory_counterexamples": [
+      {
+        "version": "v1",
+        "mutation": "仅提供Linear三文件，无loss/activation流",
+        "accepted": true
+      },
+      {
+        "version": "v1",
+        "mutation": "首步Linear批次SHA全改为64个0",
+        "accepted": true
+      },
+      {
+        "version": "v2",
+        "mutation": "真实原始数据",
+        "accepted": true
+      },
+      {
+        "version": "v2",
+        "mutation": "activation空流",
+        "accepted": false
+      },
+      {
+        "version": "v2",
+        "mutation": "缺activation流",
+        "accepted": false
+      },
+      {
+        "version": "v2",
+        "mutation": "首步Linear批次SHA全改为64个0",
+        "accepted": false
+      },
+      {
+        "version": "v2",
+        "mutation": "删除lm_head call1至3的10条activation",
+        "accepted": true,
+        "records": 132
+      },
+      {
+        "version": "v2",
+        "mutation": "重复首条activation",
+        "accepted": true,
+        "records": 143
+      }
+    ],
+    "reproduction_method_zh": "从固定SHA源AST仅提取read_json/read_rows/check_sample/first_step_coverage/coverage原函数；用只读真实rank0数据构造内存VirtualPath，覆盖单一流内容，直接调用原coverage。不启动CLI/训练，不写临时或原始证据。上述是函数语义反例，不声称跑过完整CLI合成测试。脚本和结果仅在本次工具会话执行，本报告保存步骤与结果。 v3同样从固定SHA源AST提取原函数，真实八rank直接读取执行、8个反例仅在VirtualPath内存副本执行。",
+    "parent_notified": true,
+    "reviewed_v3": {
+      "source_path": "evidence/dgrad-short-auditor-v3.py",
+      "sha256": "75a6d35d1cc073536f5ec3c3c5e9afb67d6f39e3848f02219b511449cd1420da"
+    },
+    "v3_results": {
+      "actual_ranks_passed": 8,
+      "each_rank_first_step_boundaries": [
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        },
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        },
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        },
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        },
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        },
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        },
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        },
+        {
+          "activation_records": 142,
+          "objective_records": 3,
+          "watched_modules": 33,
+          "first_step_batches": 1,
+          "objective_stages": [
+            "after_model_forward"
+          ],
+          "call_coverage": {
+            "watched_linear_batch_modules": 5,
+            "watched_linear_calls": 8,
+            "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+          },
+          "scope": "Nonempty finite stride samples with matching identities; not full-tensor equality."
+        }
+      ],
+      "counterexamples": [
+        {
+          "case": "empty_activation",
+          "rejected": true,
+          "reason": "Empty required observation stream: activations-rank0.jsonl"
+        },
+        {
+          "case": "missing_activation",
+          "rejected": true,
+          "reason": "'activations-rank0.jsonl'"
+        },
+        {
+          "case": "empty_loss",
+          "rejected": true,
+          "reason": "Empty required observation stream: loss-gradients-rank0.jsonl"
+        },
+        {
+          "case": "wrong_linear_identity",
+          "rejected": true,
+          "reason": "Invalid activation identity, module, rank or call"
+        },
+        {
+          "case": "drop_head_calls_1_to_3",
+          "rejected": true,
+          "reason": "Activation Linear calls differ from functional call coverage"
+        },
+        {
+          "case": "duplicate_activation_row",
+          "rejected": true,
+          "reason": "Duplicated activation call/stage"
+        },
+        {
+          "case": "wrong_complete_step",
+          "rejected": true,
+          "reason": "Short-run start/completion markers are not exactly zero/three"
+        },
+        {
+          "case": "drop_head_output_gradient",
+          "rejected": true,
+          "reason": "Functional Linear event differs from activation stage coverage"
+        }
+      ],
+      "report_matches_direct_function_outputs": true,
+      "conclusion_zh": "v3对原先两项反例均拒绝，同时真实A全部8rank通过。8个内存反例全部被拒绝。共有5个同时被activation与functional Linear观察的模块、8次首步调用可逐调用交叉核验；其余模块明确仅模块级覆盖，未声称有完整调用oracle。"
+    },
+    "version_boundary_zh": "最终工具复核锁定4a15d6c12dd8eae8da7e11db6d27ef5dee34b983ba929d9eecaaf6c125825cf2；v1/v2/v3原稿均另存。原始A和基线206项证据始终只读。",
+    "reviewed_v4": {
+      "source_path": "tools/audit_dgrad_short_run.py",
+      "sha256": "4a15d6c12dd8eae8da7e11db6d27ef5dee34b983ba929d9eecaaf6c125825cf2"
+    },
+    "v4_results": {
+      "actual_ranks_passed": 8,
+      "counterexamples": [
+        {
+          "case": "empty_activation",
+          "rejected": true,
+          "reason": "Empty required observation stream: activations-rank0.jsonl"
+        },
+        {
+          "case": "missing_activation",
+          "rejected": true,
+          "reason": "'activations-rank0.jsonl'"
+        },
+        {
+          "case": "empty_loss",
+          "rejected": true,
+          "reason": "Empty required observation stream: loss-gradients-rank0.jsonl"
+        },
+        {
+          "case": "wrong_linear_identity",
+          "rejected": true,
+          "reason": "Invalid activation identity, module, rank or call"
+        },
+        {
+          "case": "drop_head_calls_1_to_3",
+          "rejected": true,
+          "reason": "Activation Linear calls differ from functional call coverage"
+        },
+        {
+          "case": "duplicate_activation_row",
+          "rejected": true,
+          "reason": "Duplicated activation call/stage"
+        },
+        {
+          "case": "wrong_complete_step",
+          "rejected": true,
+          "reason": "Short-run start/completion markers are not exactly zero/three"
+        },
+        {
+          "case": "drop_head_output_gradient",
+          "rejected": true,
+          "reason": "Functional Linear event differs from activation stage coverage"
+        },
+        {
+          "case": "missing_head_first_step_linear_events",
+          "rejected": true,
+          "reason": "Missing watched Linear first-step batch coverage"
+        },
+        {
+          "case": "boolean_activation_call",
+          "rejected": true,
+          "reason": "Invalid activation identity, module, rank or call"
+        },
+        {
+          "case": "boolean_activation_coordinate",
+          "rejected": true,
+          "reason": "Invalid activation coordinate"
+        },
+        {
+          "case": "boolean_activation_shape",
+          "rejected": true,
+          "reason": "Invalid activation or sample shape"
+        }
+      ],
+      "report_matches_direct_function_outputs": true,
+      "each_rank_linear_call_crosscheck": {
+        "watched_linear_batch_modules": 5,
+        "watched_linear_calls": 8,
+        "scope": "Linear input/output/output-gradient calls cross-checked; other modules have module-level coverage and unique contiguous observed calls, not a complete call oracle."
+      },
+      "conclusion_zh": "固定v4独立复核通过：真实8rank均通过，12项内存反例均拒绝（包括原两反例、首步Linear整个模块流缺失、bool伪整数）。相对v3的helper拆分保持原判定，新增首步Linear/batch保护有效。"
+    }
+  },
+  "audit_findings": [],
+  "review_completed_at_utc": "2026-10-15T21:04:32.330529+00:00"
+}

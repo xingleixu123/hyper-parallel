@@ -1,0 +1,179 @@
+{
+  "status": "LOCAL_STATIC_PASS_FRAMEWORK_NOT_RUN",
+  "created_at_utc": "2026-10-15T21:55:45.222678+00:00",
+  "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+  "source_tree": "825a2bbc68e5d72f2ebaa4af85ae0066d61cce97",
+  "source_status": "",
+  "python": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+  "torch_installed_locally": false,
+  "python_syntax": [
+    {
+      "path": "tools\\f637_module_cost_spec.py",
+      "status": "PASS"
+    },
+    {
+      "path": "tools\\f637_module_cost_experiment.py",
+      "status": "PASS"
+    },
+    {
+      "path": "tools\\capture_f637_module_cost_training.py",
+      "status": "PASS"
+    },
+    {
+      "path": "tools\\preflight_f637_module_cost.py",
+      "status": "PASS"
+    },
+    {
+      "path": "tools\\check_f637_module_cost_cpu.py",
+      "status": "PASS"
+    }
+  ],
+  "bash_syntax": [
+    {
+      "path": "tools\\run_fair_f637_module_cost.sh",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "path": "tools\\run_f637_module_cost_cpu.sh",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "pylint": {
+    "command": [
+      "D:\\Users\\90803\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+      "-m",
+      "pylint",
+      "--rcfile=.pylintrc",
+      "--output-format=json",
+      "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\tools\\f637_module_cost_spec.py",
+      "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\tools\\f637_module_cost_experiment.py",
+      "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\tools\\capture_f637_module_cost_training.py",
+      "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\tools\\preflight_f637_module_cost.py",
+      "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\tools\\check_f637_module_cost_cpu.py"
+    ],
+    "cwd": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\fixes\\latest-jt-validation-f637",
+    "version": "pylint 3.3.7\nastroid 3.3.11\nPython 3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+    "exit_code": 0,
+    "messages": [],
+    "stderr": "",
+    "exceptions": [
+      "Inherited .pylintrc disables import-error and no-name-in-module; no extra command-line diagnostic suppression.",
+      "Four Torch-dependent files explicitly disable obsolete forbidden-backend-import; current code-style requires top-level Torch imports.",
+      "One TestCase.enterContext TemporaryDirectory expression has consider-using-with suppression because cleanup is registered by unittest."
+    ]
+  },
+  "yaml_version": "6.0.3",
+  "yaml_configs": [
+    {
+      "path": "configs\\r129-f637-module-dense1-40-v1.yaml",
+      "raw_allowed_difference_status": "PASS",
+      "numeric_types": {
+        "rms_norm_eps": "float",
+        "ns_epsilon": "float",
+        "adamw_eps": "float"
+      },
+      "values": {
+        "rms_norm_eps": 1e-06,
+        "ns_epsilon": 1e-07,
+        "adamw_eps": 1e-08
+      }
+    },
+    {
+      "path": "configs\\r129-f637-module-moe2-40-v1.yaml",
+      "raw_allowed_difference_status": "PASS",
+      "numeric_types": {
+        "rms_norm_eps": "float",
+        "ns_epsilon": "float",
+        "adamw_eps": "float"
+      },
+      "values": {
+        "rms_norm_eps": 1e-06,
+        "ns_epsilon": 1e-07,
+        "adamw_eps": 1e-08
+      }
+    },
+    {
+      "path": "configs\\r129-f637-module-norm6-40-v1.yaml",
+      "raw_allowed_difference_status": "PASS",
+      "numeric_types": {
+        "rms_norm_eps": "float",
+        "ns_epsilon": "float",
+        "adamw_eps": "float"
+      },
+      "values": {
+        "rms_norm_eps": 1e-06,
+        "ns_epsilon": 1e-07,
+        "adamw_eps": 1e-08
+      }
+    },
+    {
+      "path": "configs\\r129-f637-module-off-40-v1.yaml",
+      "raw_allowed_difference_status": "PASS",
+      "numeric_types": {
+        "rms_norm_eps": "float",
+        "ns_epsilon": "float",
+        "adamw_eps": "float"
+      },
+      "values": {
+        "rms_norm_eps": 1e-06,
+        "ns_epsilon": 1e-07,
+        "adamw_eps": 1e-08
+      }
+    }
+  ],
+  "static_target_cardinality": {
+    "off": 0,
+    "norm6": 6,
+    "dense1": 1,
+    "moe2": 2
+  },
+  "static_targets": {
+    "off": [],
+    "norm6": [
+      "model.layers.0.input_layernorm",
+      "model.layers.0.post_attention_layernorm",
+      "model.layers.1.input_layernorm",
+      "model.layers.1.post_attention_layernorm",
+      "mtp.layers.0.transformer_layer.input_layernorm",
+      "mtp.layers.0.transformer_layer.post_attention_layernorm"
+    ],
+    "dense1": [
+      "model.layers.0.mlp"
+    ],
+    "moe2": [
+      "model.layers.1.mlp",
+      "mtp.layers.0.transformer_layer.mlp"
+    ]
+  },
+  "distinct_observed_boundaries": 9,
+  "checked_file_sha256": {
+    "tools/f637_module_cost_spec.py": "71d13b972fa029f3739ea4c1293a1d561a79439b363c601850ce58b5b39f5838",
+    "tools/f637_module_cost_experiment.py": "e4a5a575301bcbc43aafb36711cb5b8415a3af982b0fad18fe1e229d6add8bac",
+    "tools/capture_f637_module_cost_training.py": "ed675d20ed8b4cae9d19cb31d5fe051d5749970826b0aa9f55c53b8f11c7d1b2",
+    "tools/preflight_f637_module_cost.py": "6d786b2aad1951397a9888f74eb89181713da87652f0e053ddb8e879806912c9",
+    "tools/check_f637_module_cost_cpu.py": "2be219730acc15ba6da98244683d589517275ed64e4336047b04528d39c5eed9",
+    "tools/run_fair_f637_module_cost.sh": "8dbc13df522b943492994ed4e59591c558cd7479ba516dc803751b1359eeeb1e",
+    "tools/run_f637_module_cost_cpu.sh": "5b6c18e320697bdac5e3045fe4ae09432573ba013d45d2d32de89aa373db96fc",
+    "configs/r129-f637-module-dense1-40-v1.yaml": "2e341c8e8f7c2fa76d6d0799dea344249e83eda9206abf2b8521f35b655e33be",
+    "configs/r129-f637-module-moe2-40-v1.yaml": "9815367189eaffad05c55ee957c34d23071ed9b9b97795a2f11e0dd76861e595",
+    "configs/r129-f637-module-norm6-40-v1.yaml": "82c0cbf0f9b2c161a84a594bdddf80f25a208c806bffc57a8af868970964bfbf",
+    "configs/r129-f637-module-off-40-v1.yaml": "d521ddb39d3067318dcfa101e1be5e6dd9f897c84ef77fba0e2949fb97f8fbae",
+    "tools/README_f637_module_cost_v1.md": "abbe82927607f798e554d3a8eda274e1920a8ab773e4d5975a4b0e078b902a44",
+    "configs/r129-f637-fp32-fsdp8-0-200-r4.yaml": "323cd04b618fd138969522095013e0e89afacda5bf38bca2050a1af032212737",
+    "fixes/latest-jt-validation-f637/.pylintrc": "f23557a429d0ccde5386695160ad7f56233621a413da695fe2f35b8d75463383"
+  },
+  "scope": "仅本机静态语法/lint、raw YAML 类型/精确差异和静态目标集合。没有导入或运行 Torch 模型。真实 FSDP 后命中、loss/gradient/router/callback 行为仍待无设备镜像内执行。",
+  "not_run": [
+    "real parse_training_args/JT config preflight",
+    "7 unittest methods including 4 arms x aux/total real JT CPU contracts",
+    "container creation",
+    "NPU execution",
+    "remote ports/device/cooldown inspection",
+    "guard allowlist change or enqueue"
+  ],
+  "first_probe_note": "最初临时 YAML 检查误用 optimizer.params 路径而 KeyError；按实际 muon_config/adamw_config 结构修正后完成此检查。"
+}

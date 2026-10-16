@@ -1,0 +1,22 @@
+{
+  "fetched_at": "2026-10-15T21:16:37.553343+00:00",
+  "url": "https://raw.githubusercontent.com/Ascend/pytorch/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/distributed/ProcessGroupHCCL.cpp",
+  "commit": "fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d",
+  "sha256": "1b3ef01d91cd324bd328aefc118d7e319811571d07a5da5a840596f328b56b37",
+  "bytes": 340275,
+  "local": "references/torch-npu-fa0f83fe49d3-ProcessGroupHCCL.cpp",
+  "hits": [
+    {
+      "line": 286,
+      "context": "    }\n}\n\nbool getDeterministicState()\n{\n    static bool cachedDeterministicState = []() {\n        // The env variable has a higher priority.\n        const char* envValue = std::getenv(\"HCCL_DETERMINISTIC\");\n        if (envValue != nullptr) {\n            TORCH_NPU_ENV_LOGI(\"get env HCCL_DETERMINISTIC = %s\", envValue);"
+    },
+    {
+      "line": 322,
+      "context": "        return IsGteCANNVersion(baseCannversion, baseCannModule);\n    }();\n    if (isCannVersionGteBase) {\n        config->hcclDeterministic = 0xffffffff;\n    } else {\n        config->hcclDeterministic = getDeterministicState() ? 1 : 0;\n    }\n\n    // Compatible with the size check of the old version of HCCL, forcibly convert\n    // the config object to a size_t=32 object, and retain the N ± 2 version"
+    },
+    {
+      "line": 324,
+      "context": "    if (isCannVersionGteBase) {\n        config->hcclDeterministic = 0xffffffff;\n    } else {\n        config->hcclDeterministic = getDeterministicState() ? 1 : 0;\n    }\n\n    // Compatible with the size check of the old version of HCCL, forcibly convert\n    // the config object to a size_t=32 object, and retain the N ± 2 version\n    if (!isHcclFeatureSupported(HcclCommConfigCapability::HCCL_COMM_CONFIG_COMM_NAME)) {\n        size_t *configSize = reinterpret_cast<size_t *>(config);"
+    }
+  ]
+}

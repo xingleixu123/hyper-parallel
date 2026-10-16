@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "tool_sha256": "250eaa92852ed7c596e2dda514e833aa00b43f08922ab8c48205bbf689e6637b",
+  "real_native_groups": 142,
+  "summary": {
+    "forward": {
+      "groups": 72,
+      "different_groups": 0,
+      "coordinates": 1747200,
+      "different_coordinates": 0,
+      "max_abs": 0.0
+    },
+    "gradient": {
+      "groups": 70,
+      "different_groups": 66,
+      "coordinates": 1138944,
+      "different_coordinates": 193767,
+      "max_abs": 3.4332275390625e-05
+    }
+  },
+  "negative_cases": [
+    {
+      "name": "duplicate_reference",
+      "rejected": true
+    },
+    {
+      "name": "duplicate_candidate",
+      "rejected": true
+    },
+    {
+      "name": "missing_candidate",
+      "rejected": true
+    },
+    {
+      "name": "wrong_call",
+      "rejected": true
+    },
+    {
+      "name": "wrong_position",
+      "rejected": true
+    },
+    {
+      "name": "dtype_mismatch",
+      "rejected": true
+    },
+    {
+      "name": "global_sequence_mismatch",
+      "rejected": true
+    },
+    {
+      "name": "feature_width_mismatch",
+      "rejected": true
+    },
+    {
+      "name": "reference_partition_signature_mismatch",
+      "rejected": true
+    }
+  ],
+  "positive_cp_partition": {
+    "local_sequence": [
+      4096,
+      2048
+    ],
+    "global_sequence": 4096,
+    "count": 4,
+    "max_abs": 0
+  },
+  "scope": "逐batch工具修复逻辑签名P2；真实A/B全部max/count/different同旧已审计结果，relativeL2同至1e-12；九个负例拒绝，CP局部序长差异允许。非200步验收。"
+}
