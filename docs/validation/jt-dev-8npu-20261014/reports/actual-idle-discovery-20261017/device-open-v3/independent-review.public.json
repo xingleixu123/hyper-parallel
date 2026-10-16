@@ -1,0 +1,116 @@
+{
+  "schema": "actual-selected-device-open-v3-public-review-v1",
+  "case": "r129-a1e6-device-open-v3",
+  "created_utc": "2026-10-16T17:24:42.966712+00:00",
+  "review_status": "PASS_EVIDENCE_REVIEW_WITH_REAL_PRODUCTION_FAIL_AND_OPEN_EBUSY",
+  "experiment_verdict": "FAIL_DEVICE_DISCOVERY_WITH_SUPPLEMENTAL_OPEN_ERRNO16_EBUSY",
+  "conclusion_zh": "12 个采集文件全部核对通过。原始三条 JSON 与分别保存的结果相等；原生产结果与 v2 完全一致且仍 FAIL/exit1。事后 HAL87/out-1/C0，唯一选中 /dev/davinci0 的补充 open 返回 EBUSY，memory cgroup statvfs 显示只读。guard 已释放，自有容器正确复查为0。审阅通过不表示设备、训练、精度或迁移通过。",
+  "meaning_zh": "独立复核通过仅指证据一致性；设备发现实际仍失败，不表示训练、精度或迁移通过。",
+  "collection": {
+    "files_verified": 12,
+    "run_directory_files": 11,
+    "receipt_outside_run_directory": true,
+    "total_bytes_verified": 40065,
+    "all_bytes_and_sha256_match": true
+  },
+  "raw_log_binding": {
+    "json_records": 3,
+    "order": [
+      "production",
+      "diagnostics",
+      "device_open"
+    ],
+    "all_records_equal_saved_json": true,
+    "production_semantically_and_byte_equal_v2": true,
+    "second_saved_json_also_byte_equal_v2": true,
+    "exit_code": 1,
+    "production_status": "FAIL",
+    "device_type": "cpu",
+    "device_index_type": "str",
+    "device_index": "'cpu'",
+    "error_type": "TypeError",
+    "npu_available": false,
+    "device_count": 0
+  },
+  "post_production": {
+    "hal_rc": 87,
+    "hal_out": -1,
+    "c_fallback": 0,
+    "cached_device_count_before_after": null,
+    "initialized_before_after": false,
+    "no_success_reclassification": true
+  },
+  "selected_open": {
+    "status": "OPEN_ERROR",
+    "attempted": true,
+    "selected_environment": "0",
+    "mapped_physical_davinci_nodes": 1,
+    "node_path": "/dev/davinci0",
+    "resolved_path": "/dev/davinci0",
+    "mode": "0o20660",
+    "rdev": 60416,
+    "major": 236,
+    "minor": 0,
+    "flags": {
+      "value": 32768,
+      "names": [
+        "O_RDONLY",
+        "O_NOFOLLOW"
+      ]
+    },
+    "errno": 16,
+    "errno_name": "EBUSY",
+    "returned_fd": false,
+    "close_attempted": false,
+    "close_closed": null,
+    "monotonic_order_valid": true,
+    "release_requires_container_exit_and_removal": true,
+    "memory_mount": {
+      "path": "/sys/fs/cgroup/memory",
+      "f_flag": 4111,
+      "ST_RDONLY": 1,
+      "read_only": true
+    },
+    "flags_note_zh": "32768 是此次目标环境实测 flags 值；候选使用原生 os.O_RDONLY|os.O_NOFOLLOW，不能用本机 mock 的数值替代目标环境。"
+  },
+  "resources": {
+    "duration_seconds": 18.558484740002314,
+    "released": true,
+    "devices": [
+      0
+    ],
+    "remaining_owned_process_count": 0,
+    "owned_containers_after": 0,
+    "before_after": {
+      "before": {
+        "cards": 8,
+        "all_compute_pids_empty": true,
+        "all_healthy_and_empty": true,
+        "all_core_zero": true,
+        "min_hbm_mb": 3408,
+        "max_hbm_mb": 3422,
+        "selected_hbm_mb": 3422
+      },
+      "after": {
+        "cards": 8,
+        "all_compute_pids_empty": true,
+        "all_healthy_and_empty": true,
+        "all_core_zero": true,
+        "min_hbm_mb": 3409,
+        "max_hbm_mb": 3421,
+        "selected_hbm_mb": 3421
+      }
+    },
+    "sampled_hbm_max_mb": 3422,
+    "hbm_sample_count": 3,
+    "next_shared_not_before_utc": "2026-10-16T17:41:08.344891+00:00",
+    "correct_readback_returncode": 0
+  },
+  "diagnostic_boundary_zh": [
+    "EBUSY 证明补充 open 在本次时刻失败，没有返回 fd，因此未执行 close 是符合控制流的记录；容器退出/移除另由 guard 与正确 ps -a -q 读回确认。",
+    "本次同时观察到 HAL87、补充 open EBUSY 和 memory cgroup 只读，构成继续定位的事实；不能仅据此证明已装 B231 必然命中官方参考源码的某一分支或确定权限/namespace根因。",
+    "原日志 DrvMngGetConsoleLogLevel 的 ret=4 不属于 drvGetDevNum 的返回码。",
+    "前后空卡及运行期有界采样未记录冲突；不能宣称采样间隔内绝无短暂活动。第二次实际 npu-smi 完整快照未另存，只由固定 guard 控制流与 attempted 佐证。"
+  ],
+  "selection_zh": "保留结论、采集一致性、三条结果及有限资源/释放观测；删除 reviewer、真实自身 PID/namespace 标识、完整执行关系、协调器状态、owner 标识与完整命令。"
+}
