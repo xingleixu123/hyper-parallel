@@ -1,0 +1,54 @@
+{
+  "checked_at": "2026-10-16T16:26:26.799513+00:00",
+  "case": "r129-a1e6-device-discovery-1npu-v1",
+  "verdict": "FAIL_REAL_DEVICE_DISCOVERY_WHILE_ACTUAL_CARDS_IDLE",
+  "attempted": true,
+  "released": true,
+  "owned_containers_after": 0,
+  "exit_code": 1,
+  "duration_seconds": 18.559700729994802,
+  "selected_devices": [
+    0
+  ],
+  "before_has_no_compute_pids": true,
+  "after_has_no_compute_pids": true,
+  "namespace_diagnostics_did_not_block": true,
+  "probe_records": 1,
+  "observed_device_facts": {
+    "source_file": "/workspace/hyper-parallel/hyper_parallel/models/build_options.py",
+    "torch_file": "/workspace/venv/lib/python3.12/site-packages/torch/__init__.py",
+    "torch_version": "2.12.0+cpu",
+    "cached_npu_available": false,
+    "cached_cuda_available": false,
+    "device_type": "cpu",
+    "npu_device_count": 0,
+    "npu_available_now": false,
+    "environment": {
+      "ASCEND_RT_VISIBLE_DEVICES": "0",
+      "ASCEND_VISIBLE_DEVICES": null,
+      "ASCEND_HOME_PATH": "/usr/local/Ascend/cann-9.2.0-beta.2",
+      "LD_LIBRARY_PATH": "/usr/local/Ascend/cann-9.2.0-beta.2/lib64:/usr/local/Ascend/cann-9.2.0-beta.2/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.2.0-beta.2/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.2.0-beta.2/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/python3.12.14/lib:/usr/local/python3.12.14/lib",
+      "TORCH_DEVICE_BACKEND_AUTOLOAD": "1",
+      "CLOSE_MATMUL_K_SHIFT": null
+    },
+    "scope": "Device discovery and torch.device construction only; no model, tensors or training",
+    "device_index": "'cpu'",
+    "device_index_type": "str",
+    "status": "FAIL",
+    "error_type": "TypeError",
+    "error": "device(): argument 'index' (position 2) must be int, not str",
+    "loaded_driver_libraries": [
+      "/usr/local/Ascend/driver/lib64/driver/libascend_hal.so"
+    ]
+  },
+  "raw_hal_drvGetDevNum_return": "NOT_CAPTURED; ret=4 only refers to DrvMngGetConsoleLogLevel and must not be relabelled",
+  "no_foreign_job_abort": true,
+  "probe_log_sha256": "2f321a623dc3c33e0dfa8e3f781425bdf96cf7c33b067cfada6e6bb83b9ff04e",
+  "receipt_sha256": "dc0f0b85ca5fd4a048e05130169d49f82eba1e9e377c05f7ae626fb32571bb2f",
+  "source_and_import_path_verified": true,
+  "collection": "evidence/r129-a1e6-discovery-idle-v1-local-verification.json",
+  "not_a_training_result": true,
+  "next_shared_not_before_utc": "2026-10-16T16:43:23.335420+00:00",
+  "next_shared_not_before_plus08": "2026-10-17T00:43:23.335420+08:00",
+  "next_action": "Single-variable container/driver discovery diagnosis; no repeat of same failed input and no namespace-only idle refusal."
+}
