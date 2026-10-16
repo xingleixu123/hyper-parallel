@@ -1,0 +1,90 @@
+{
+  "created_utc": "2026-10-16T18:17:45.164658+00:00",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "upstream": "a1e6c222eab097c9609d6e744a3c5f98aeed6bdc",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "reference": "r129-a1e6-fsdp8-0-200-v3",
+  "candidate": "r201-a1e6-fsdp8-0-200-v1",
+  "evidence_status": "PASS",
+  "main_lm_status": "FAIL",
+  "migration_admitted": false,
+  "steps": [
+    1,
+    200
+  ],
+  "ranks": 8,
+  "absolute_tolerance": 0.005,
+  "main_lm_max_abs": 0.009525299072265625,
+  "max_error_step": 189,
+  "first_over_tolerance": 125,
+  "steps_over_tolerance": [
+    125,
+    130,
+    142,
+    146,
+    148,
+    156,
+    188,
+    189
+  ],
+  "input_mismatch_count": 0,
+  "initial_mismatch_count": 0,
+  "weighted_errors": {
+    "training/total_loss": {
+      "max_abs": 0.009107589721679688,
+      "step": 189,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.009525299072265625,
+      "step": 189,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.004807829856872559,
+      "step": 188,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 8.92611569724977e-06,
+      "step": 191,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.6833925247192383,
+      "step": 148,
+      "rank": 0
+    }
+  },
+  "unweighted_errors": {
+    "lm": 0.009525299072265625,
+    "mtp": 0.01602609952290853,
+    "aux": 0.0892611569724977
+  },
+  "resources": [
+    {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "median_step_seconds_after20_allrank_max": 1.156256079673767,
+      "supervised_tokens_per_second_after20": 15990.50334593064,
+      "allocated_gib_logged": 22.032196044921875,
+      "reserved_gib_logged": 27.25
+    },
+    {
+      "case": "r201-a1e6-fsdp8-0-200-v1",
+      "median_step_seconds_after20_allrank_max": 1.7298421263694763,
+      "supervised_tokens_per_second_after20": 10666.020321687194,
+      "allocated_gib_logged": 22.032196044921875,
+      "reserved_gib_logged": 26.78125
+    }
+  ],
+  "resource_scope": "All8rank MAX perstep, first20 excluded for timing; allocator lifetime maxima include initialization and warmup. Different host/chip/driver; not parallel-strategy benefit. 129 full-run physical HBM was not sampled.",
+  "original_files_verified": 193,
+  "raw_129_collection_files": 91,
+  "joint_129_files": 95,
+  "joint_201_files": 98,
+  "audit": {
+    "path": "evidence/a1e6-129-v3-vs201-cross-host-admission.json",
+    "sha256": "b549cdd9d58d9bf3403df996dfced58ee1e3be4412f44fab32d9b60ae689b84b"
+  },
+  "follow_up": "Continue125129 original recipe; first129step200 restore201-400, then independent0-400. No201migration, noMTPauxspecialwork, no new product rootcause claimed."
+}

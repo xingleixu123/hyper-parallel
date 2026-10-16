@@ -1,0 +1,710 @@
+{
+  "schema": "jt-129-v3-vs201-independent-actual-review-v1",
+  "reviewed_utc": "2026-10-16T18:22:43.688012+00:00",
+  "reviewer": "/root/review_shared_ready_v2",
+  "review_status": "PASS_INDEPENDENT_REVIEW_CONFIRMS_NUMERICAL_GATE_FAIL",
+  "evidence_status": "PASS",
+  "main_lm_status": "FAIL",
+  "migration_admitted": false,
+  "summary_zh": "两侧完整200步证据可信，主LM跨机精度未达标：最大差0.009525299072265625（第189步），首次第125步超过0.005，共8步/64个rank-step超阈值。不能据此准入201。",
+  "reference": "r129-a1e6-fsdp8-0-200-v3",
+  "candidate": "r201-a1e6-fsdp8-0-200-v1",
+  "steps": [
+    1,
+    200
+  ],
+  "ranks": 8,
+  "tolerance_absolute": 0.005,
+  "blocking_evidence_findings": [],
+  "manifest_verification": [
+    {
+      "path": "evidence/129-a1e6-fsdp8-200-v3-joint-audit-manifest.json",
+      "bytes": 33455,
+      "sha256": "550f03b4d19bd1c9678efddb8a7703e426c7a7b4ef14bfa7d814c3d1eb3b35fd",
+      "files": 95,
+      "content_bytes": 1745758,
+      "sha_and_sizes_pass": true,
+      "exact_run_file_set": true,
+      "original_collection": {
+        "path": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+        "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+        "files": 91,
+        "archive_sha256": "9a891331d43757af96dc636ecf700e686c0ca8bcdf2070eb6e74010a2e9cf6cf",
+        "unchanged": true
+      }
+    },
+    {
+      "path": "evidence/201-a1e6-fsdp8-200-v1-joint-audit-manifest.json",
+      "bytes": 21359,
+      "sha256": "ea154ebe0511cc2b51b142e6bf75581e50f75e9a8055d7afb281794f9071326f",
+      "files": 98,
+      "content_bytes": 1814887,
+      "sha_and_sizes_pass": true,
+      "exact_run_file_set": true,
+      "original_collection": {
+        "path": "evidence/201-a1e6-fsdp8-200-v1-evidence-manifest.json",
+        "sha256": "0f5787ac734e47aac93b00166d5b56a06a7926d6bcfe632ff460908dcb32e85c",
+        "files": 92,
+        "archive_sha256": "3ecd5e4c923184bc930f656bed33d6abc6ff6aca765677442aba6c1795e450bb",
+        "unchanged": true
+      }
+    }
+  ],
+  "request_and_receipt_provenance": [
+    {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "remote_request": {
+        "path": "evidence/supplemental-r129-a1e6-fsdp8-0-200-v3-1b765b916806701791c229dfc8641451eb5a701570f0b4ebe41eb33b71b0eac2.request.json",
+        "bytes": 4239,
+        "sha256": "1b765b916806701791c229dfc8641451eb5a701570f0b4ebe41eb33b71b0eac2"
+      },
+      "local_request": {
+        "path": "scheduling/r129-a1e6-fsdp8-0-200-v3.request.json",
+        "bytes": 4286,
+        "sha256": "279ac6b171b15b57fb67b0202a662198329b81edb6048e6a3cd6fac8240eb349"
+      },
+      "receipt": {
+        "path": "scheduling/r129-a1e6-fsdp8-0-200-v3.receipt.json",
+        "bytes": 9580,
+        "sha256": "6b5b9bcfa9aa0fbfb1fe1b74324397f3ffc1b1a1a8dbeaeff42e09754dea968b"
+      },
+      "frozen_coordinator": {
+        "path": "evidence/global-resource-state-after-r129-a1e6-fsdp8-0-200-v3-e004894f7738f0f50701ba43bd8e3bf09647001eeb2331f884b1b7e406118561.json",
+        "bytes": 16150,
+        "sha256": "e004894f7738f0f50701ba43bd8e3bf09647001eeb2331f884b1b7e406118561"
+      },
+      "json_request_and_receipt_match": true,
+      "remote_local_request_bytes_equal": false
+    },
+    {
+      "case": "r201-a1e6-fsdp8-0-200-v1",
+      "remote_request": {
+        "path": "evidence/supplemental-r201-a1e6-fsdp8-0-200-v1-464c0a7adc2bcdb13f10a67661148a30fb4d542ba1ea07d99840d32cedafba76.request.json",
+        "bytes": 4106,
+        "sha256": "464c0a7adc2bcdb13f10a67661148a30fb4d542ba1ea07d99840d32cedafba76"
+      },
+      "local_request": {
+        "path": "scheduling/r201-a1e6-fsdp8-0-200-v1.request.json",
+        "bytes": 4152,
+        "sha256": "18e82b77edc4eb4beeec49a8c132c89777f30b0518b4039238ce9b8534f4fca6"
+      },
+      "receipt": {
+        "path": "scheduling/r201-a1e6-fsdp8-0-200-v1.receipt.json",
+        "bytes": 4689,
+        "sha256": "2de80ce4640804bbe3d3a2eedeedf042dd852b8ec6bc41dad38c78ca05f415c6"
+      },
+      "frozen_coordinator": {
+        "path": "evidence/201-resource-state-after-r201-a1e6-fsdp8-0-200-v1-2f4c1874715361f0bdf5a45c21662c61214d2acd7b6c5471a5914abea1c1aa95.json",
+        "bytes": 9785,
+        "sha256": "2f4c1874715361f0bdf5a45c21662c61214d2acd7b6c5471a5914abea1c1aa95"
+      },
+      "json_request_and_receipt_match": true,
+      "remote_local_request_bytes_equal": false
+    }
+  ],
+  "execution_identity": {
+    "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+    "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "distinct_owned_container_ids": true,
+    "clean_source_both": true,
+    "correct_editable_import_both": true,
+    "exit0_guard_released_both": true,
+    "complete_200_markers": 16,
+    "raw_metric_rows_per_run": 1600,
+    "finite_metrics_exact_steps_rank_labels": true
+  },
+  "numeric_identity": {
+    "configs_equal_except_checkpoint_directory": true,
+    "fsdp_shard_size": 8,
+    "tp": 1,
+    "cp": 1,
+    "ep": 1,
+    "pp": 1,
+    "recompute": "off",
+    "seed": 42,
+    "initial_state_full_tensor_hash_records": 48,
+    "all_16_initial_state_records_match": true,
+    "all_16_step_zero_start_records_match": true,
+    "optimizer_layout_and_parameter_ownership_equal": true,
+    "all_16_runtime_flags_match": true,
+    "runtime_flags": {
+      "before_trainer": {
+        "environment": {
+          "CLOSE_MATMUL_K_SHIFT": null,
+          "NCCL_DETERMINISTIC": null,
+          "FLASH_ATTENTION_DETERMINISTIC": null,
+          "CUBLAS_WORKSPACE_CONFIG": null,
+          "PYTHONHASHSEED": "42",
+          "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+        },
+        "scope": "Environment only; no backend queries"
+      },
+      "training": {
+        "environment": {
+          "CLOSE_MATMUL_K_SHIFT": null,
+          "NCCL_DETERMINISTIC": "true",
+          "FLASH_ATTENTION_DETERMINISTIC": "1",
+          "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+          "PYTHONHASHSEED": "42",
+          "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+        },
+        "deterministic_algorithms": true,
+        "deterministic_warn_only": false,
+        "npu_matmul": {
+          "allow_tf32": null,
+          "allow_hf32": false,
+          "allow_bf16_reduced_precision_reduction": null
+        }
+      }
+    },
+    "capture_helper_sha256": {
+      "capture_a1e6_training.py": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df",
+      "capture_training.py": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+      "module_profile.py": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c",
+      "expert_probe.py": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f",
+      "precision_experiments.py": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659",
+      "fp32_wgrad_experiment.py": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    "data_sha256_pins": {
+      "data/sft_data_4k/SOURCE_INDEX.jsonl": "34978f670d9b9cca68eea5935f96b2e46e8876473e77970fe0bbc18a84e3660b",
+      "data/sft_data_4k/data-00000-of-00001.arrow": "cb7e146388ff5de09cafe50bb57c060265038ecabd2f343fa9114c05f3b678f1",
+      "data/sft_data_4k/dataset_info.json": "5a36710bc182d24a0b3a03c391ad41cfed859fff8dd774b2fa30ebfc897129a0",
+      "data/sft_data_4k/state.json": "6d32594943adceeef6fd2dba11c02e679c85f73e32aeea9d176c3fc12d63ccbb"
+    },
+    "data_rehashed_in_review": false,
+    "data_scope_zh": "两侧固定request含相同四项data pin，训练前guard逐项验证；200×8真实输入全局SHA、微批次、LR及数据计数一致。未重新读取远端数据。",
+    "input_mismatches": 0,
+    "counter_mismatches": 0,
+    "learning_rate_mismatches": 0,
+    "final_consumed_tokens": 3713791.0,
+    "final_consumed_samples": 1600.0
+  },
+  "independent_metrics": {
+    "training/total_loss": {
+      "max_abs": 0.009107589721679688,
+      "max_step": 189,
+      "max_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_nonzero_step": 2,
+      "first_over_0_005_step": 81,
+      "over_0_005_step_count": 12,
+      "over_0_005_rank_step_count": 96,
+      "over_0_005_steps": [
+        81,
+        111,
+        130,
+        142,
+        146,
+        148,
+        156,
+        172,
+        189,
+        191,
+        192,
+        193
+      ],
+      "status": "FAIL"
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.009525299072265625,
+      "max_step": 189,
+      "max_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_nonzero_step": 2,
+      "first_over_0_005_step": 125,
+      "over_0_005_step_count": 8,
+      "over_0_005_rank_step_count": 64,
+      "over_0_005_steps": [
+        125,
+        130,
+        142,
+        146,
+        148,
+        156,
+        188,
+        189
+      ],
+      "status": "FAIL",
+      "derived_unweighted": {
+        "coefficient": 1,
+        "max_abs": 0.009525299072265625,
+        "max_step": 189,
+        "first_over_0_005_step": 125,
+        "over_0_005_step_count": 8,
+        "over_0_005_rank_step_count": 64,
+        "status": "FAIL",
+        "method": "absolute difference of logged weighted scalar / recorded coefficient"
+      }
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.004807829856872559,
+      "max_step": 188,
+      "max_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_nonzero_step": 2,
+      "first_over_0_005_step": null,
+      "over_0_005_step_count": 0,
+      "over_0_005_rank_step_count": 0,
+      "over_0_005_steps": [],
+      "status": "PASS",
+      "derived_unweighted": {
+        "coefficient": 0.3,
+        "max_abs": 0.01602609952290853,
+        "max_step": 188,
+        "first_over_0_005_step": 81,
+        "over_0_005_step_count": 16,
+        "over_0_005_rank_step_count": 128,
+        "status": "FAIL",
+        "method": "absolute difference of logged weighted scalar / recorded coefficient"
+      }
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 8.92611569724977e-06,
+      "max_step": 191,
+      "max_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_nonzero_step": 2,
+      "first_over_0_005_step": null,
+      "over_0_005_step_count": 0,
+      "over_0_005_rank_step_count": 0,
+      "over_0_005_steps": [],
+      "status": "PASS",
+      "derived_unweighted": {
+        "coefficient": 0.0001,
+        "max_abs": 0.0892611569724977,
+        "max_step": 191,
+        "first_over_0_005_step": 18,
+        "over_0_005_step_count": 144,
+        "over_0_005_rank_step_count": 1152,
+        "status": "FAIL",
+        "method": "absolute difference of logged weighted scalar / recorded coefficient"
+      }
+    },
+    "training/grad_norm": {
+      "max_abs": 0.6833925247192383,
+      "max_step": 148,
+      "max_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "first_nonzero_step": 2,
+      "first_over_0_005_step": 4,
+      "over_0_005_step_count": 157,
+      "over_0_005_rank_step_count": 1256,
+      "over_0_005_steps": [
+        4,
+        6,
+        10,
+        14,
+        15,
+        18,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        32,
+        33,
+        34,
+        37,
+        38,
+        39,
+        40,
+        42,
+        44,
+        45,
+        46,
+        48,
+        49,
+        50,
+        51,
+        54,
+        55,
+        56,
+        57,
+        59,
+        60,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        69,
+        70,
+        71,
+        72,
+        73,
+        75,
+        76,
+        78,
+        81,
+        82,
+        83,
+        84,
+        85,
+        87,
+        89,
+        90,
+        91,
+        92,
+        94,
+        95,
+        96,
+        97,
+        98,
+        100,
+        101,
+        102,
+        103,
+        105,
+        106,
+        108,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        119,
+        120,
+        122,
+        124,
+        125,
+        126,
+        128,
+        129,
+        130,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        198,
+        199,
+        200
+      ],
+      "status": "FAIL"
+    }
+  },
+  "auditor_crosscheck": {
+    "admission": {
+      "path": "evidence/a1e6-129-v3-vs201-cross-host-admission.json",
+      "bytes": 61724,
+      "sha256": "b549cdd9d58d9bf3403df996dfced58ee1e3be4412f44fab32d9b60ae689b84b"
+    },
+    "all_five_maxima_and_locations_match": true,
+    "all_800_loss_step_errors_match": true,
+    "unweighted_diagnostics_match": true,
+    "policy_inputs_verified": [
+      {
+        "path": "evidence/201-fsdp8-reference-config.json",
+        "bytes": 13144,
+        "sha256": "dfb276d6b985e0d6197888d4480c340611bc2ab42a3d58c89121a1319457f782"
+      },
+      {
+        "path": "evidence/201-data-source-manifest.json",
+        "bytes": 697,
+        "sha256": "4438e20fb2e95251a9358eadcc1dc2b435f58a4528d604a5b2a32e9965105e21"
+      },
+      {
+        "path": "tools/audit_201_cross_host_admission.py",
+        "bytes": 20798,
+        "sha256": "d6517bb19cd215d439fd14c63921ebc58250fc5c1df1a716b29c7d3eb0340d4d"
+      },
+      {
+        "path": "tools/strict_compare_runs.py",
+        "bytes": 15591,
+        "sha256": "086b969fa8f114748322c163bc307b2af880ccdb1093deabb08cdb1b820739fc"
+      },
+      {
+        "path": "tools/compare_runs.py",
+        "bytes": 7769,
+        "sha256": "e49d2a68272309d39b6cd619e570c0b80e4c7b3caca8217b877f6e921dd6817d"
+      }
+    ],
+    "existing_auditor_or_comparator_not_imported_or_called": true,
+    "original_exit1_meaning_zh": "数值门槛失败，非证据采集或独立审阅失败。"
+  },
+  "resource_observations": [
+    {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "hardware": [
+        {
+          "chip": "910B3",
+          "hbm_total_mib": 65536
+        }
+      ],
+      "host_kernel": "Linux-5.10.0-136.108.0.188.oe2203sp1.aarch64-aarch64-with-glibc2.35",
+      "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+      "torch": {
+        "import_path": "/workspace/venv/lib/python3.12/site-packages/torch/__init__.py",
+        "version": "2.12.0+cpu"
+      },
+      "transformers": {
+        "import_path": "/workspace/venv/lib/python3.12/site-packages/transformers/__init__.py",
+        "version": "5.13.1"
+      },
+      "guard_duration_seconds": 383.04995921999216,
+      "rank0_steps21_200": {
+        "count": 180,
+        "median_seconds": 1.156256079673767,
+        "min_seconds": 1.111963152885437,
+        "max_seconds": 1.1692445278167725,
+        "supervised_tokens_per_total_step_seconds": 15990.50334593064
+      },
+      "allocator_end_ranges": {
+        "allocated_bytes": {
+          "min_bytes": 3496637952,
+          "max_bytes": 3496637952,
+          "min_gib": 3.256497859954834,
+          "max_gib": 3.256497859954834
+        },
+        "reserved_bytes": {
+          "min_bytes": 3779067904,
+          "max_bytes": 3821010944,
+          "min_gib": 3.51953125,
+          "max_gib": 3.55859375
+        },
+        "max_allocated_bytes": {
+          "min_bytes": 23656889344,
+          "max_bytes": 23656889344,
+          "min_gib": 22.03219509124756,
+          "max_gib": 22.03219509124756
+        },
+        "max_reserved_bytes": {
+          "min_bytes": 28735176704,
+          "max_bytes": 29259464704,
+          "min_gib": 26.76171875,
+          "max_gib": 27.25
+        }
+      },
+      "per_step_logged_allocator_peak_gib": {
+        "memory/device_max_allocated_gb": 22.032196044921875,
+        "memory/device_max_reserved_gb": 27.25
+      },
+      "sampled_hbm_max_mib_by_card": null,
+      "sampled_cgroup_peak_bytes": null
+    },
+    {
+      "case": "r201-a1e6-fsdp8-0-200-v1",
+      "hardware": [
+        {
+          "chip": "910B4",
+          "hbm_total_mib": 32768
+        }
+      ],
+      "host_kernel": "Linux-5.10.0-136.12.0.86.r1526_92.hce2.aarch64-aarch64-with-glibc2.35",
+      "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+      "torch": {
+        "import_path": "/workspace/venv/lib/python3.12/site-packages/torch/__init__.py",
+        "version": "2.12.0+cpu"
+      },
+      "transformers": {
+        "import_path": "/workspace/venv/lib/python3.12/site-packages/transformers/__init__.py",
+        "version": "5.13.1"
+      },
+      "guard_duration_seconds": 574.0920872970019,
+      "rank0_steps21_200": {
+        "count": 180,
+        "median_seconds": 1.7298421263694763,
+        "min_seconds": 1.6119290590286255,
+        "max_seconds": 2.4781222343444824,
+        "supervised_tokens_per_total_step_seconds": 10666.020321687194
+      },
+      "allocator_end_ranges": {
+        "allocated_bytes": {
+          "min_bytes": 3496637952,
+          "max_bytes": 3496637952,
+          "min_gib": 3.256497859954834,
+          "max_gib": 3.256497859954834
+        },
+        "reserved_bytes": {
+          "min_bytes": 3821010944,
+          "max_bytes": 3821010944,
+          "min_gib": 3.55859375,
+          "max_gib": 3.55859375
+        },
+        "max_allocated_bytes": {
+          "min_bytes": 23656889344,
+          "max_bytes": 23656889344,
+          "min_gib": 22.03219509124756,
+          "max_gib": 22.03219509124756
+        },
+        "max_reserved_bytes": {
+          "min_bytes": 28735176704,
+          "max_bytes": 28756148224,
+          "min_gib": 26.76171875,
+          "max_gib": 26.78125
+        }
+      },
+      "per_step_logged_allocator_peak_gib": {
+        "memory/device_max_allocated_gb": 22.032196044921875,
+        "memory/device_max_reserved_gb": 26.78125
+      },
+      "sampled_hbm_max_mib_by_card": {
+        "0": 31374,
+        "1": 31373,
+        "2": 31373,
+        "3": 31373,
+        "4": 31391,
+        "5": 31371,
+        "6": 31373,
+        "7": 31393
+      },
+      "sampled_cgroup_peak_bytes": 99737739264,
+      "sample_count": 82,
+      "sample_interval_seconds": 5
+    }
+  ],
+  "129_actual_resource_and_release": {
+    "two_all_eight_idle_snapshots_and_after_release_pass": true,
+    "host_available_memory_twice_at_least_384gib": true,
+    "disk_at_least_64gib": true,
+    "actual_hostconfig": {
+      "Privileged": true,
+      "Runtime": "runc",
+      "NetworkMode": "host",
+      "PidMode": "",
+      "IpcMode": "private",
+      "Memory": 343597383680,
+      "ShmSize": 34359738368,
+      "NanoCpus": 0,
+      "CpuPeriod": 0,
+      "CpuQuota": 0,
+      "CpusetCpus": "",
+      "CpusetMems": "",
+      "PidsLimit": 4096
+    },
+    "privileged_exposes_all_host_devices": true,
+    "no_recorded_conflict_abort": true,
+    "duration_seconds": 383.04995921999216,
+    "postrun_owned_container_count": 0,
+    "frozen_guard_sha256": "efd917a24fe082001313601efc78b329647d1bea9bbe8cc43e16333c35371e0c",
+    "prior_1200_second_cooldown_respected": true,
+    "next_shared_not_before_from_frozen_coordinator_utc": "2026-10-16T18:32:28.836688+00:00"
+  },
+  "129_checkpoint": {
+    "retained_inventory_files": 25,
+    "bytes": 27973262840,
+    "safetensors_files": 8,
+    "rank_extra_state_files": 8,
+    "scope_zh": "核验事后只读库存路径/大小、同步step200保存配置与完成记录。未读回129的28GB权重内容、逐文件SHA或NPU恢复，不代表续训通过。"
+  },
+  "limits_zh": [
+    "129为910B3/64GiB，201为910B4/32GiB，宿主内核及容器权限环境也不同。同源码、镜像、数值配置、初态和确定性开关不是跨硬件逐步数值相同的保证；当前未定位具体算子或唯一根因。",
+    "当前主LM独立判FAIL。MTP、aux日志加权误差均<0.005；分别除0.3、0.0001后的还原误差超阈值，是日志标量派生诊断，不是重新计算高精度未加权损失。",
+    "grad_norm只作诊断，其0.005计数不构成新增验收规则。按step超阈计数先取8rank最大误差，另列rank-step数；全局归约loss的多rank日志不是8次独立实验。",
+    "步时取rank0第21–200步，带输入SHA和标量采集开销；总墙钟还包含初始化、checkpoint等。跨硬件快慢不能归因为并行优化收益。",
+    "最终allocator峰值为各进程生命周期整数byte，逐步GiB标量存在浮点舍入，均不等于物理HBM峰值。201有82次/约5秒间隔的物理HBM与容器内存采样；129缺少同口径运行期峰值，不做收益比较。",
+    "两侧联合清单包含原远端采集和后续只读补采。本轮验证解包文件哈希，没有重新验证已清理归档、远端数据内容或checkpoint张量。",
+    "本机只读复核并新建回执，未SSH、部署、启动容器/NPU、清理、修改原始证据/canonical或触碰被拒公开草稿/hal方案。"
+  ],
+  "cross_hardware_parallel_performance_claim": false,
+  "resumed_training_pass": false,
+  "parallel_accuracy_pass": false
+}
