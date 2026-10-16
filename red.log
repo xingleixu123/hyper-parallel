@@ -1,0 +1,188 @@
+F.                                                               [100%]
+=================================== FAILURES ===================================
+__ TestCompleteModel.test_mla_head_chunk_options_fail_early (chunk_size=True) __
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_mla_head_chunk_options_fail_early>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_mla_head_chunk_options_fail_early(self):
+        """Feature: Head-chunk configuration contract.
+    
+        Description: Supply invalid block sizes and a nonzero dropout probability.
+        Expectation: Reject unsupported settings when constructing the replacement.
+        """
+        config = small_config()
+        for value in (True, -1, 1.5, config.num_attention_heads + 1):
+            with self.subTest(chunk_size=value):
+                config.attention_head_chunk_size = value
+>               with self.assertRaisesRegex(ValueError, "attention_head_chunk_size"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:145: AssertionError
+___ TestCompleteModel.test_mla_head_chunk_options_fail_early (chunk_size=-1) ___
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_mla_head_chunk_options_fail_early>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_mla_head_chunk_options_fail_early(self):
+        """Feature: Head-chunk configuration contract.
+    
+        Description: Supply invalid block sizes and a nonzero dropout probability.
+        Expectation: Reject unsupported settings when constructing the replacement.
+        """
+        config = small_config()
+        for value in (True, -1, 1.5, config.num_attention_heads + 1):
+            with self.subTest(chunk_size=value):
+                config.attention_head_chunk_size = value
+>               with self.assertRaisesRegex(ValueError, "attention_head_chunk_size"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:145: AssertionError
+__ TestCompleteModel.test_mla_head_chunk_options_fail_early (chunk_size=1.5) ___
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_mla_head_chunk_options_fail_early>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_mla_head_chunk_options_fail_early(self):
+        """Feature: Head-chunk configuration contract.
+    
+        Description: Supply invalid block sizes and a nonzero dropout probability.
+        Expectation: Reject unsupported settings when constructing the replacement.
+        """
+        config = small_config()
+        for value in (True, -1, 1.5, config.num_attention_heads + 1):
+            with self.subTest(chunk_size=value):
+                config.attention_head_chunk_size = value
+>               with self.assertRaisesRegex(ValueError, "attention_head_chunk_size"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:145: AssertionError
+___ TestCompleteModel.test_mla_head_chunk_options_fail_early (chunk_size=3) ____
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_mla_head_chunk_options_fail_early>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_mla_head_chunk_options_fail_early(self):
+        """Feature: Head-chunk configuration contract.
+    
+        Description: Supply invalid block sizes and a nonzero dropout probability.
+        Expectation: Reject unsupported settings when constructing the replacement.
+        """
+        config = small_config()
+        for value in (True, -1, 1.5, config.num_attention_heads + 1):
+            with self.subTest(chunk_size=value):
+                config.attention_head_chunk_size = value
+>               with self.assertRaisesRegex(ValueError, "attention_head_chunk_size"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:145: AssertionError
+___________ TestCompleteModel.test_mla_head_chunk_options_fail_early ___________
+
+self = <test_modeling_jt_deepseek_v3.TestCompleteModel testMethod=test_mla_head_chunk_options_fail_early>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_mla_head_chunk_options_fail_early(self):
+        """Feature: Head-chunk configuration contract.
+    
+        Description: Supply invalid block sizes and a nonzero dropout probability.
+        Expectation: Reject unsupported settings when constructing the replacement.
+        """
+        config = small_config()
+        for value in (True, -1, 1.5, config.num_attention_heads + 1):
+            with self.subTest(chunk_size=value):
+                config.attention_head_chunk_size = value
+                with self.assertRaisesRegex(ValueError, "attention_head_chunk_size"):
+                    JTDeepseekV3ForCausalLM(config)
+                with self.assertRaisesRegex(ValueError, "attention_head_chunk_size"):
+                    JTDeepseekV3MLAAttention(module=JTDeepseekV3Attention(config, 0))
+        config.attention_head_chunk_size, config.attention_dropout = 1, 0.1
+>       with self.assertRaisesRegex(ValueError, "attention_dropout=0"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: ValueError not raised
+
+tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py:150: AssertionError
+----------------------------- Captured stdout call -----------------------------
+uuuu
+_ TestJTBuilder.test_head_chunks_require_complete_mla_replacement (missing='model.layers.0.self_attn') _
+
+self = <test_jt_builder.TestJTBuilder testMethod=test_head_chunks_require_complete_mla_replacement>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_head_chunks_require_complete_mla_replacement(self) -> None:
+        """Reject unsupported topology or missing trunk/MTP replacements before materializing weights."""
+        self.config["attention_head_chunk_size"] = 8
+        rules = entries_to_module_replacements(jt_test_config().plan_overrides)
+        for replacements, missing in (
+                ((), "model.layers.0.self_attn"),
+                ((replace(rules[0], match=("model.layers.*.self_attn",)),),
+                 "mtp.layers.0.transformer_layer.self_attn")):
+            with self.subTest(missing=missing):
+                self.setup.module_replacements = replacements
+>               with self.assertRaisesRegex(ValueError, missing):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:96: AssertionError
+_ TestJTBuilder.test_head_chunks_require_complete_mla_replacement (missing='mtp.layers.0.transformer_layer.self_attn') _
+
+self = <test_jt_builder.TestJTBuilder testMethod=test_head_chunks_require_complete_mla_replacement>
+
+    @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="onecard", essential_mark="essential")
+    def test_head_chunks_require_complete_mla_replacement(self) -> None:
+        """Reject unsupported topology or missing trunk/MTP replacements before materializing weights."""
+        self.config["attention_head_chunk_size"] = 8
+        rules = entries_to_module_replacements(jt_test_config().plan_overrides)
+        for replacements, missing in (
+                ((), "model.layers.0.self_attn"),
+                ((replace(rules[0], match=("model.layers.*.self_attn",)),),
+                 "mtp.layers.0.transformer_layer.self_attn")):
+            with self.subTest(missing=missing):
+                self.setup.module_replacements = replacements
+>               with self.assertRaisesRegex(ValueError, missing):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: ValueError not raised
+
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py:96: AssertionError
+=============================== warnings summary ===============================
+../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_head_chunks_require_complete_mla_replacement
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_head_chunks_require_complete_mla_replacement
+tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_head_chunks_require_complete_mla_replacement
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+tests/common/mark_utils.py:38
+  /work/src/tests/common/mark_utils.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.cpu_linux - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, plat_mark)(func)
+
+tests/common/mark_utils.py:39
+  /work/src/tests/common/mark_utils.py:39: PytestUnknownMarkWarning: Unknown pytest.mark.level0 - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, level_mark)(func)
+
+tests/common/mark_utils.py:40
+  /work/src/tests/common/mark_utils.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.onecard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, card_mark)(func)
+
+tests/common/mark_utils.py:41
+  /work/src/tests/common/mark_utils.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.essential - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    func = getattr(pytest.mark, essential_mark)(func)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SUBFAILED(chunk_size=True) tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_mla_head_chunk_options_fail_early
+SUBFAILED(chunk_size=-1) tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_mla_head_chunk_options_fail_early
+SUBFAILED(chunk_size=1.5) tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_mla_head_chunk_options_fail_early
+SUBFAILED(chunk_size=3) tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_mla_head_chunk_options_fail_early
+FAILED tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py::TestCompleteModel::test_mla_head_chunk_options_fail_early
+SUBFAILED(missing='model.layers.0.self_attn') tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_head_chunks_require_complete_mla_replacement
+SUBFAILED(missing='mtp.layers.0.transformer_layer.self_attn') tests/ut/models/jt_deepseek_v3/test_jt_builder.py::TestJTBuilder::test_head_chunks_require_complete_mla_replacement
+7 failed, 1 passed, 18 deselected, 23 warnings, 2 subtests passed in 30.22s

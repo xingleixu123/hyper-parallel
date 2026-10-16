@@ -1,0 +1,70 @@
+{
+  "base": "521d3a8a9aa62353327093ab1258ca2c22006e8b",
+  "previous_head": "27b4d9d3d0eef5a64f22b4312aae4faac68f8e59",
+  "head": "0b11a299f182841591151f223481e9d54fd3b73a",
+  "tree": "3e5b0e4fd1ce7d129bc591c2af2005ba00a4178f",
+  "branch": "xxl-dev/jt-head-chunk-attention",
+  "backup_branch": "xxl-dev/backup-pr178-before-config-guard-20261016",
+  "lease": "27b4d9d3d0eef5a64f22b4312aae4faac68f8e59",
+  "files": [
+    {
+      "path": "hyper_parallel/core/activation_memory/sac.py",
+      "sha256": "03d4a50dbb1ee51f1104d36243ffb41cf0b7299565d66d88f2185342c9574325",
+      "tested_raw_sha256": "11fcf7cdd6a5a3c61fb776c3acfa1e541cab18d0aed2bc8da2595cfd6f403ddd",
+      "normalization": "CRLF to LF only; AST identical"
+    },
+    {
+      "path": "hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py",
+      "sha256": "5106fd0e26c3ab57855b4aa8127ab1bec4fc843264df9dae9c165b8deba5f35f",
+      "tested_raw_sha256": "596878292c50df3802f3796359583b507351624bd6968eb4171e7f508b6607b2",
+      "normalization": "CRLF to LF only; AST identical"
+    },
+    {
+      "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+      "sha256": "c828d4ee4bc62780c3e3bbd4f2c16ff3811e84125e117c6bb3c393c88073527d",
+      "tested_raw_sha256": "d7728fca4c80752abfee5d3f1e1658356dbf8f8983ef35d1c4267e30df715815",
+      "normalization": "CRLF to LF only; AST identical"
+    },
+    {
+      "path": "tests/ut/core/activation_memory/test_sac.py",
+      "sha256": "f8ae112ed3349a9cbf7f3199b2e8753f57c7e64879bdc9c463c764d45e284e22",
+      "tested_raw_sha256": "65848c9b141b3ab972f1be7df7191359d1a84b0c307f53cf3f5381a32ca95b9b",
+      "normalization": "CRLF to LF only; AST identical"
+    },
+    {
+      "path": "tests/ut/models/jt_deepseek_v3/test_context_parallel.py",
+      "sha256": "b0230e3d102d509e88bb2aed59211c4de3e3a2fa91df4a27756a39addc671c94",
+      "tested_raw_sha256": "9c2c508341c439685dd22bba6d65b18af85835305878a6bcea4425f07b146058",
+      "normalization": "CRLF to LF only; AST identical"
+    },
+    {
+      "path": "tests/ut/models/jt_deepseek_v3/test_jt_builder.py",
+      "sha256": "c0f45cfa3ce3c096ec09c0f6c49803e59c9805c397ddaffe5ab773a596824de6",
+      "tested_raw_sha256": "dcd283603b202f9a1e8db615d4273005c2b85cdef471221040800fb31fe3dba7",
+      "normalization": "CRLF to LF only; AST identical"
+    },
+    {
+      "path": "tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py",
+      "sha256": "39d801f501b648b4ea52ab84344d4bfbfbc8efae43e252df50c8a46b14ddb72e",
+      "tested_raw_sha256": "20b66ae6d7f643990ac870722fd08590f5435a21d11cb533fbc2a66b81727b84",
+      "normalization": "CRLF to LF only; AST identical"
+    }
+  ],
+  "added_tests": {
+    "tests/ut/core/activation_memory/test_sac.py": [
+      "test_nested_checkpoint_owns_its_selective_cache"
+    ],
+    "tests/ut/models/jt_deepseek_v3/test_context_parallel.py": [],
+    "tests/ut/models/jt_deepseek_v3/test_jt_builder.py": [
+      "test_head_chunks_require_complete_mla_replacement"
+    ],
+    "tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py": [
+      "test_mla_head_chunk_options_fail_early",
+      "test_mla_head_chunks_use_trainer_hyper_checkpoint_wrappers",
+      "test_mla_head_chunks_preserve_outputs_and_gradients"
+    ]
+  },
+  "new_test_files": 0,
+  "commit_count": 1,
+  "stat": "hyper_parallel/core/activation_memory/sac.py       |  23 +++-\n .../models/jt_deepseek_v3/adapter/jt_builder.py    |  14 +++\n .../jt_deepseek_v3/modeling_jt_deepseek_v3.py      | 118 +++++++++++++++++++-\n tests/ut/core/activation_memory/test_sac.py        |  49 +++++++-\n .../models/jt_deepseek_v3/test_context_parallel.py |   7 ++\n tests/ut/models/jt_deepseek_v3/test_jt_builder.py  |  23 ++++\n .../jt_deepseek_v3/test_modeling_jt_deepseek_v3.py | 124 ++++++++++++++++++++-\n 7 files changed, 347 insertions(+), 11 deletions(-)"
+}
