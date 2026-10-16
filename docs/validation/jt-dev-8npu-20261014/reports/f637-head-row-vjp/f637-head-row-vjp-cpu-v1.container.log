@@ -1,0 +1,111 @@
+DrvMngGetConsoleLogLevel failed. (ret=4)
+test_bound_and_nondifferentiable_calls_fail_before_capture (__main__.HeadRowVJPTests.test_bound_and_nondifferentiable_calls_fail_before_capture)
+Oversized or nondifferentiable calls cannot silently count as observed derivatives. ... /workspace/venv/lib/python3.12/site-packages/torch/nn/modules/linear.py:134: UserWarning: mkldnn_matmul failed, switching to BLAS gemm:mkldnn_matmul: mkldnn_matmul bf16 path needs a cpu with bf16 support
+Exception raised from mkldnn_matmul at /pytorch/aten/src/ATen/native/mkldnn/Matmul.cpp:338 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffff7894a988 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, char const*) + 0x6c (0xffff788e9018 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #2: at::native::mkldnn_matmul(at::Tensor const&, at::Tensor const&, at::Tensor const&, float, float) + 0x8f0 (0xffff7a61ef70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x19cf658 (0xffff79fdf658 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: at::native::structured_mm_out_cpu::impl(at::Tensor const&, at::Tensor const&, at::Tensor const&) + 0xb0 (0xffff79fe01f0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: <unknown function> + 0x28774ac (0xffff7ae874ac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: at::_ops::mm::redispatch(c10::DispatchKeySet, at::Tensor const&, at::Tensor const&) + 0x104 (0xffff799ee894 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #7: <unknown function> + 0x13fd978 (0xffff79a0d978 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: <unknown function> + 0x13fe1d0 (0xffff79a0e1d0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #9: at::_ops::mm::call(at::Tensor const&, at::Tensor const&) + 0x174 (0xffff799f0624 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #10: <unknown function> + 0x13b36cc (0xffff799c36cc in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #11: at::native::matmul(at::Tensor const&, at::Tensor const&) + 0x48 (0xffff799c41a8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #12: <unknown function> + 0x13eb4ac (0xffff799fb4ac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #13: at::_ops::matmul::call(at::Tensor const&, at::Tensor const&) + 0x174 (0xffff799f69d4 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #14: at::native::linear(at::Tensor const&, at::Tensor const&, std::optional<at::Tensor> const&) + 0x128 (0xffff799c09e8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #15: <unknown function> + 0x13eb660 (0xffff799fb660 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #16: at::_ops::linear::call(at::Tensor const&, at::Tensor const&, std::optional<at::Tensor> const&) + 0x198 (0xffff799e7538 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #17: <unknown function> + 0x5e38a8 (0xffff833538a8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+<omitting python frames>
+frame #51: <unknown function> + 0x27400 (0xffff858c7400 in /lib/aarch64-linux-gnu/libc.so.6)
+frame #52: __libc_start_main + 0x98 (0xffff858c74d8 in /lib/aarch64-linux-gnu/libc.so.6)
+ (Triggered internally at /pytorch/aten/src/ATen/native/LinearAlgebra.cpp:1531.)
+  return F.linear(input, self.weight, self.bias)
+ok
+test_failed_measurement_drops_private_snapshots (__main__.HeadRowVJPTests.test_failed_measurement_drops_private_snapshots)
+An observer failure cannot keep the cloned head weight or leave hooks installed. ... ok
+test_real_shared_checkpoint_head_is_observational (__main__.HeadRowVJPTests.test_real_shared_checkpoint_head_is_observational)
+The selected call fires once, replays do not overwrite it, and all training gradients stay exact. ... ERROR
+test_real_vjp_and_partition_coordinates (__main__.HeadRowVJPTests.test_real_vjp_and_partition_coordinates)
+Full row coverage and the independent FP64 sample oracle agree on an exact small fixture. ... ERROR
+
+======================================================================
+ERROR: test_real_shared_checkpoint_head_is_observational (__main__.HeadRowVJPTests.test_real_shared_checkpoint_head_is_observational)
+The selected call fires once, replays do not overwrite it, and all training gradients stay exact.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/tools/check_head_row_vjp_cpu.py", line 71, in test_real_shared_checkpoint_head_is_observational
+    expected, actual = loss(plain, original), loss(watched, candidate)
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/work/tools/check_head_row_vjp_cpu.py", line 62, in loss
+    total = projected_cross_entropy(states, labels, head=head, loss_fn=self.score,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/hyper-parallel/hyper_parallel/components/losses/chunked_cross_entropy.py", line 297, in projected_cross_entropy
+    total = total + checkpoint(project_and_score, states, labels, use_reentrant=False)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1298, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 518, in checkpoint
+    ret = function(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/hyper-parallel/hyper_parallel/components/losses/chunked_cross_entropy.py", line 284, in project_and_score
+    return loss_fn(logits=logits, labels=None, vocab_size=vocab_size, shift_labels=labels,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/tools/check_head_row_vjp_cpu.py", line 48, in score
+    return functional.cross_entropy(logits.reshape(-1, logits.shape[-1]).float(), labels.reshape(-1),
+                                                                                  ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reshape'
+
+======================================================================
+ERROR: test_real_vjp_and_partition_coordinates (__main__.HeadRowVJPTests.test_real_vjp_and_partition_coordinates)
+Full row coverage and the independent FP64 sample oracle agree on an exact small fixture.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/tools/check_head_row_vjp_cpu.py", line 92, in test_real_vjp_and_partition_coordinates
+    result = measure(values, weight, gradient)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/tools/head_row_vjp_probe.py", line 55, in measure
+    reference = native_vjp(inputs, weight, gradient).cpu()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/tools/head_row_vjp_probe.py", line 35, in native_vjp
+    result, = torch.autograd.grad(output, values, grad_outputs=gradient.detach())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 530, in grad
+    result = _engine_run_backward(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 882, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1167, in unpack_hook
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+  File "/workspace/venv/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1298, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1134, in _run_fn_with_dynamo_disabled
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1634, in recompute_fn
+    fn(*args, **kwargs)
+  File "/workspace/hyper-parallel/hyper_parallel/components/losses/chunked_cross_entropy.py", line 284, in project_and_score
+    return loss_fn(logits=logits, labels=None, vocab_size=vocab_size, shift_labels=labels,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/tools/check_head_row_vjp_cpu.py", line 48, in score
+    return functional.cross_entropy(logits.reshape(-1, logits.shape[-1]).float(), labels.reshape(-1),
+                                                                                  ^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'reshape'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.058s
+
+FAILED (errors=2)

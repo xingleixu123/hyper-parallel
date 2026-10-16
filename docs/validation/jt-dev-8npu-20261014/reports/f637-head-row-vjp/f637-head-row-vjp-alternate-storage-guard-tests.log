@@ -1,0 +1,54 @@
+test_changed_runner_is_rejected_before_device_observation (check_pr214_guard.GuardRegressionBoundaryTests.test_changed_runner_is_rejected_before_device_observation) ... ok
+test_changed_source_is_rejected_before_device_observation (check_pr214_guard.GuardRegressionBoundaryTests.test_changed_source_is_rejected_before_device_observation) ... ok
+test_cooldown_uses_the_more_conservative_clock (check_pr214_guard.GuardRegressionBoundaryTests.test_cooldown_uses_the_more_conservative_clock) ... ok
+test_dgrad_does_not_launch_with_only_seven_idle_devices (check_pr214_guard.GuardRegressionBoundaryTests.test_dgrad_does_not_launch_with_only_seven_idle_devices) ... ok
+test_dgrad_recheck_leaves_new_external_work_alone (check_pr214_guard.GuardRegressionBoundaryTests.test_dgrad_recheck_leaves_new_external_work_alone) ... ok
+test_dgrad_rejects_ambiguous_mode_before_external_calls (check_pr214_guard.GuardRegressionBoundaryTests.test_dgrad_rejects_ambiguous_mode_before_external_calls) ... ok
+test_dgrad_rejects_wrong_card_counts_before_external_calls (check_pr214_guard.GuardRegressionBoundaryTests.test_dgrad_rejects_wrong_card_counts_before_external_calls) ... ok
+test_existing_run_is_not_replaced (check_pr214_guard.GuardRegressionBoundaryTests.test_existing_run_is_not_replaced) ... ok
+test_latest_user_policy_restores_twenty_minute_cooldown (check_pr214_guard.GuardRegressionBoundaryTests.test_latest_user_policy_restores_twenty_minute_cooldown)
+A later explicit user instruction restores the release-to-launch waiting time. ... ok
+test_partial_availability_returns_without_creating_container (check_pr214_guard.GuardRegressionBoundaryTests.test_partial_availability_returns_without_creating_container) ... ok
+test_rejects_wrong_card_counts_before_source_or_device_calls (check_pr214_guard.GuardRegressionBoundaryTests.test_rejects_wrong_card_counts_before_source_or_device_calls) ... ok
+test_timeout_cap_is_enforced_before_source_or_devices (check_pr214_guard.GuardRegressionBoundaryTests.test_timeout_cap_is_enforced_before_source_or_devices) ... ok
+test_unknown_runner_cannot_reach_source_or_devices (check_pr214_guard.GuardRegressionBoundaryTests.test_unknown_runner_cannot_reach_source_or_devices) ... ok
+test_unverified_image_cannot_reach_source_or_devices (check_pr214_guard.GuardRegressionBoundaryTests.test_unverified_image_cannot_reach_source_or_devices) ... ok
+test_all_four_cases_keep_insufficient_device_boundary (check_module_cost_guard.ModuleCostGuardTests.test_all_four_cases_keep_insufficient_device_boundary)
+四种正确请求仍不能在只有七张空卡时创建容器。 ... ok
+test_external_job_on_second_check_prevents_launch (check_module_cost_guard.ModuleCostGuardTests.test_external_job_on_second_check_prevents_launch)
+空卡复查发现其他任务时退出，绝不发停止命令。 ... ok
+test_invalid_requests_never_reach_source_or_devices (check_module_cost_guard.ModuleCostGuardTests.test_invalid_requests_never_reach_source_or_devices)
+逐项错误必须在任何外部调用前被拒绝。 ... ok
+test_invalid_request_never_calls_external_commands (check_fixed_pta_probe_guard.ProbeGuardTests.test_invalid_request_never_calls_external_commands)
+Reject expanded resources, another host, or an unreviewed run identity. ... ok
+test_level2_retry_keeps_runner_case_port_and_resource_contract (check_fixed_pta_probe_guard.ProbeGuardTests.test_level2_retry_keeps_runner_case_port_and_resource_contract)
+A retry cannot exchange launchers or expand its one-card reservation. ... ok
+test_memory_samples_are_bounded_and_not_instantaneous_peak_claims (check_fixed_pta_probe_guard.ProbeGuardTests.test_memory_samples_are_bounded_and_not_instantaneous_peak_claims)
+Retain the maximum observed sample and reject absent or invalid observations. ... ok
+test_memory_threshold_stops_and_removes_only_owned_container (check_fixed_pta_probe_guard.ProbeGuardTests.test_memory_threshold_stops_and_removes_only_owned_container)
+Exercise create/start/threshold/owned-stop/release on physical card 5 only. ... ok
+test_no_free_card_does_not_create_container (check_fixed_pta_probe_guard.ProbeGuardTests.test_no_free_card_does_not_create_container)
+Busy cards never trigger a stop or creation operation. ... ok
+test_both_arms_require_all_eight_idle_cards (check_dgrad_long_guard.LongDgradGuardTests.test_both_arms_require_all_eight_idle_cards)
+Seven free cards cannot launch either requested eight-card experiment. ... ok
+test_job_appearing_at_recheck_prevents_our_launch (check_dgrad_long_guard.LongDgradGuardTests.test_job_appearing_at_recheck_prevents_our_launch)
+Do not stop another job that starts after the first empty-device snapshot. ... ok
+test_retry_ports_and_case_names_are_not_interchangeable (check_dgrad_long_guard.LongDgradGuardTests.test_retry_ports_and_case_names_are_not_interchangeable)
+Keep retries independent and reject unprepared future attempt names. ... ok
+test_unpinned_cases_are_rejected_before_external_commands (check_dgrad_long_guard.LongDgradGuardTests.test_unpinned_cases_are_rejected_before_external_commands)
+Neither topology, host, deadline nor port can be silently substituted. ... ok
+test_both_arms_wait_if_fewer_than_eight_cards_are_free (check_dense_wgrad_long_guard.DenseWgradGuardTests.test_both_arms_wait_if_fewer_than_eight_cards_are_free)
+No container may start when the original eight-device requirement is unavailable. ... ok
+test_unprepared_reservations_fail_before_external_commands (check_dense_wgrad_long_guard.DenseWgradGuardTests.test_unprepared_reservations_fail_before_external_commands)
+Reject smaller runs, another host, a longer hold, swapped ports and unprepared retries. ... ok
+test_only_recorded_alternate_storage_is_allowed (check_head_row_vjp_guard.HeadRowVJPGuardTests.test_only_recorded_alternate_storage_is_allowed)
+Do not follow arbitrary paths, another host's path or a disguised traversal. ... ok
+test_seven_free_cards_do_not_start_a_container (check_head_row_vjp_guard.HeadRowVJPGuardTests.test_seven_free_cards_do_not_start_a_container)
+A foreign process on any selected device means waiting for eight free devices. ... ok
+test_unprepared_reservations_fail_before_external_commands (check_head_row_vjp_guard.HeadRowVJPGuardTests.test_unprepared_reservations_fail_before_external_commands)
+Do not silently reduce cards, switch host, extend the hold, or reuse another case/port. ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.151s
+
+OK

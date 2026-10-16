@@ -1,0 +1,269 @@
+{
+  "execution_and_observation_audit": "PASS",
+  "case": "r129-f637-head-row-vjp-fsdp8-3-v1",
+  "native_three_step_transparency": "EXACT",
+  "final_training_acceptance": "NOT_EVALUATED_THREE_STEPS",
+  "local_row_variants_exact": false,
+  "observed": {
+    "input_shape": [
+      1,
+      4096,
+      5120
+    ],
+    "weight_shape": [
+      152064,
+      5120
+    ],
+    "gradient_shape": [
+      1,
+      4096,
+      152064
+    ],
+    "dtype": "torch.bfloat16",
+    "input_sha256": "60819190aee0f029596413915084ddbc93c2f1e92c6ceee62266e1ea06d4cb8d",
+    "reference_vjp_sha256": "57c67ac01fcd98927603ba2a734c75cc8b4fbb6fff01cb641d4e41bea0e2115d",
+    "reference_vjp_elements": 20971520,
+    "variants": {
+      "repeat": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "halves": {
+        "count": 20971520,
+        "nonzero_count": 2029,
+        "max_abs": 1.1920928955078125e-07,
+        "absolute_sum": 4.1452849734113784e-05,
+        "squared_sum": 1.5081339889247264e-12,
+        "mean_abs": 1.976625906663598e-12,
+        "rms_abs": 2.681667998594177e-10
+      },
+      "tiles128": {
+        "count": 20971520,
+        "nonzero_count": 1546,
+        "max_abs": 1.1920928955078125e-07,
+        "absolute_sum": 3.148867197388938e-05,
+        "squared_sum": 1.1139824675920801e-12,
+        "mean_abs": 1.5014968859619799e-12,
+        "rms_abs": 2.3047521214540888e-10
+      },
+      "padded_halves": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    "sampled_fp64_oracle": {
+      "rows": [
+        0,
+        1,
+        1024,
+        2047,
+        2048,
+        3072,
+        4094,
+        4095
+      ],
+      "columns": [
+        0,
+        1,
+        1280,
+        2559,
+        2560,
+        3840,
+        5118,
+        5119
+      ],
+      "difference": {
+        "count": 64,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0,
+        "actual_dtype": "torch.bfloat16",
+        "reference_dtype": "torch.bfloat16"
+      },
+      "gradient_rows_sha256": "26aff5df74b0ec676a87b0e4b95980d72ed740fc76eaccdfdc77de876bb04515",
+      "weight_columns_sha256": "6d74191f88ccd7095b3711af51390add6aade280505e5a039b68b0b381247da6"
+    },
+    "scope": "Local Linear VJP on identical real operands only. Full derivative comparisons, sampled FP64 oracle. No claim about actual upstream tensor equality, weight gradients, communications, whole-training causality or 200-step acceptance.",
+    "training_gradient_replaced": false,
+    "production_performance_claim": false,
+    "identity": {
+      "step": 1,
+      "rank": 0,
+      "fields": {
+        "input_ids": {
+          "shape": [
+            1,
+            4096
+          ],
+          "dtype": "torch.int64",
+          "sha256": "3a135762183ffdef9401ba263ad880ef2a798cc871f2e6c07f391c6bd6a4be72"
+        },
+        "shift_labels": {
+          "shape": [
+            1,
+            4096
+          ],
+          "dtype": "torch.int64",
+          "sha256": "038a44e08b0a744228139f2d071b2ed2b279893e34000b30b1d08ce170cb3eb7"
+        }
+      },
+      "module": "lm_head",
+      "selected_call": 0
+    },
+    "private_snapshot_bytes": 1599078400
+  },
+  "strict_200_step_audit": {
+    "reference": "r129-f637-fp32-fsdp8-0-200-r4",
+    "candidate": "r129-f637-head-row-vjp-fsdp8-3-v1",
+    "steps": [
+      1,
+      3
+    ],
+    "ranks": 8,
+    "tolerance_absolute": 0.005,
+    "status": "FAIL",
+    "findings": [
+      "Final acceptance requires exactly 200 consecutive steps"
+    ],
+    "errors": {
+      "training/total_loss": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/lm": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/mtp": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/aux": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/grad_norm": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      }
+    },
+    "input_mismatch_count": 0,
+    "input_mismatch_examples": [],
+    "initial_mismatches": [],
+    "step_errors": {
+      "training/total_loss": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "training/foundation_loss/lm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "training/foundation_loss/mtp": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "training/foundation_loss/aux": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "measurement_context": {
+      "model_integration_modes": {
+        "r129-f637-fp32-fsdp8-0-200-r4": "build",
+        "r129-f637-head-row-vjp-fsdp8-3-v1": "build"
+      },
+      "eligible_for_matching_build_mode_performance_comparison": false,
+      "excluded_reasons": [
+        "The complete fixed-recipe execution audit failed"
+      ],
+      "common_observations": "Per-step scalar metrics and input identity capture, including NPU-to-CPU copies/hash work.",
+      "scope": "Build-mode comparisons retain matching input evidence overhead; they are not raw uninstrumented Trainer latency. Numerical gates are independent."
+    },
+    "loss_units": {
+      "lm": "unweighted",
+      "mtp": "weighted by 0.3",
+      "aux": "weighted by 0.0001"
+    },
+    "unweighted_error_diagnostics": {
+      "lm": 0.0,
+      "mtp": 0.0,
+      "aux": 0.0
+    },
+    "performance": {
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": null,
+      "processed_tokens_per_second": null,
+      "supervised_tokens_per_second": null,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.171875
+    },
+    "collection_manifest_sha256": [
+      "c3954b3699e7ffe6341f7fdbdf37eaa1933807ac774a10651bda852f3d031f11",
+      "962897a81ba5d8dbaff0239340115e5af11f2478626edb229c3bc8989cc3562c"
+    ],
+    "weighted_status": "PASS",
+    "sources": {
+      "reference": {
+        "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate": {
+        "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "recipe_sha256": [
+      "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5",
+      "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5"
+    ],
+    "execution_identities": [
+      {
+        "case": "r129-f637-fp32-fsdp8-0-200-r4",
+        "container_id": "d41078daf90e05af851ddd097afbd8995b7e7eafce8d08c21292839642315b40",
+        "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+        "exit_code": 0,
+        "reason": null
+      },
+      {
+        "case": "r129-f637-head-row-vjp-fsdp8-3-v1",
+        "container_id": "bbbce4f6eaa9958d76768b354cb130eb929d0e46a0a089a68d2599bd513ad335",
+        "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+        "exit_code": 0,
+        "reason": null
+      }
+    ],
+    "loss_coefficients": {
+      "mtp_loss_factor": 0.3,
+      "moe_aux_loss_coeff": 0.0001
+    },
+    "unweighted_derivation": "Absolute difference of logged weighted scalars divided by the recorded coefficient",
+    "unweighted_tolerance_absolute": 0.005,
+    "unweighted_status": "UNVERIFIED"
+  },
+  "raw_files_verified": 86,
+  "auditor_sha256": "e30a7c80493693ee26b803b325ed9a716474896777ca9f980fa2838329530a66",
+  "scope": "Only the selected real rank0 main-LM head local input derivative; not upstream equality or root cause."
+}
