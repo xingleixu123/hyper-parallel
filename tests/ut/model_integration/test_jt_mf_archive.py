@@ -29,7 +29,9 @@ from hyper_parallel.models.jt_deepseek_v3.mf_archive.layers import (
     RoutingNormalization, ArithmeticSigmoid, SharedKeyHalfTree,
 )
 from hyper_parallel.models.jt_deepseek_v3.mf_archive.optimizer import ArchivedMuon, archived_adamw
-from hyper_parallel.models.jt_deepseek_v3.mf_archive.reductions import half_tree, adjacent_tree, tiled_square_sum
+from hyper_parallel.models.jt_deepseek_v3.mf_archive.reductions import (
+    half_tree, adjacent_tree, tiled_square_sum, normalize_ns,
+)
 from hyper_parallel.trainer.base import BaseTrainer
 from hyper_parallel.trainer.text_trainer import TextTrainer
 from tests.common.mark_utils import arg_mark
@@ -78,6 +80,15 @@ class TestArchivedArithmetic(unittest.TestCase):
         self.assertEqual(tiled_square_sum(ones, 8144, 16), np.float32(ones.numel()))
         ones[-1] = 2
         self.assertEqual(tiled_square_sum(ones, 8144, 16), np.float32(ones.numel() + 3))
+
+    def test_expert_denominator_rounds_norm_and_epsilon_together(self):
+        """An independent FP64 reference detects premature BF16 norm rounding."""
+        values = torch.tensor([1., .125, .375, 2.25], dtype=torch.bfloat16).reshape(1, 2, 2) * 2.**-18
+        reference_norm = values.double().square().sum().sqrt()
+        expected = (values / (reference_norm + 1e-7).bfloat16()).bfloat16()
+        early_rounded = values / (values.norm(dim=(-2, -1), keepdim=True) + 1e-7)
+        self.assertFalse(torch.equal(expected, early_rounded))
+        torch.testing.assert_close(normalize_ns(values), expected, rtol=0, atol=0)
 
     def test_adamw_matches_double_precision_mathematical_step(self):
         """A changed accumulation order must preserve AdamW's state and step meaning."""

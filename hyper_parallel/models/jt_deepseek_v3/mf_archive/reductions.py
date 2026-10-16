@@ -124,9 +124,9 @@ def normalize_ns(value: torch.Tensor) -> torch.Tensor:
             totals = np.asarray([core_sum(row, 5) for row in partials], dtype=np.float32)
             norm = torch.from_numpy(totals).to(value.device).sqrt().reshape(8, 1, 1)
         else:
-            # The archived gate/up path rounds the norm before adding epsilon;
-            # expert-down's compiled path above instead adds in FP32 first.
-            norm = current.norm(dim=(-2, -1), keepdim=True)
+            # The compiled archive adds epsilon before its one BF16 conversion;
+            # rounding the norm earlier changes values near a BF16 midpoint.
+            norm = current.float().norm(dim=(-2, -1), keepdim=True)
         return (current / (norm + 1e-7).bfloat16()).bfloat16()
     if value.ndim != 2 or value.dtype != torch.float32:
         raise ValueError("Archived matrix NS requires FP32 two-dimensional input")
