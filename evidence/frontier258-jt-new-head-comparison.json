@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "status": "ahead",
+  "ahead_by": 2,
+  "behind_by": 0,
+  "commits": [
+    {
+      "sha": "85b091b9100141ebc161a68a5c4bed5932d44509",
+      "message": "fix(integration): 通过基类识别 FSDP 重算 wrapper",
+      "date": "2026-10-16T05:08:14Z"
+    },
+    {
+      "sha": "e21302f9e7b47d41b61f5f4987fc34c000f7c978",
+      "message": "Merge pull request #230 from xingleixu123/xxl-dev/fix-checkpoint-wrapper-inventory\n\nfix(integration): 统计 FSDP 动态派生的重算 wrapper",
+      "date": "2026-10-16T06:28:40Z"
+    }
+  ],
+  "files": [
+    {
+      "path": "hyper_parallel/tools/model_integration/integration_validator.py",
+      "status": "modified",
+      "changes": 5,
+      "patch": "@@ -21,6 +21,7 @@\n from dataclasses import dataclass\n from typing import Any, Iterable, Mapping, Optional\n \n+from hyper_parallel.core.activation_memory.wrapper import CheckpointWrapper\n from hyper_parallel.tools.model_integration.structure_inventory import build_model_inventory\n from hyper_parallel.tools.model_integration.checkpoint_coverage import build_checkpoint_coverage\n from hyper_parallel.tools.model_integration.schemas import (\n@@ -451,10 +452,10 @@ def inventory_final_model(model: Any, source: Optional[dict[str, Any]] = None) -\n \n \n def collect_activation_checkpoint_wrappers(model: Any) -> dict[str, Any]:\n-    \"\"\"List final activation-checkpoint wrappers without backend imports.\"\"\"\n+    \"\"\"List final activation-checkpoint wrappers, including FSDP-derived wrappers.\"\"\"\n     wrappers = []\n     for module_fqn, module in model.named_modules(remove_duplicate=False):\n-        if type(module).__name__ != \"CheckpointWrapper\":\n+        if not isinstance(module, CheckpointWrapper):\n             continue\n         wrapped = getattr(module, \"_wrapped_module\", None)\n         wrappers.append("
+    },
+    {
+      "path": "tests/ut/model_integration/test_model_integration.py",
+      "status": "modified",
+      "changes": 26,
+      "patch": "@@ -30,6 +30,8 @@\n import torch\n from torch import nn\n \n+from hyper_parallel.core.activation_memory.api import checkpoint_wrapper\n+from hyper_parallel.core.fully_shard import api as fully_shard_api\n from hyper_parallel.components.modules.shared_compressed_dsa_attention import (\n     SharedCompressedAttentionState,\n )\n@@ -72,6 +74,7 @@\n     ModelIntegrationFinding,\n )\n from hyper_parallel.tools.model_integration.integration_validator import (\n+    collect_activation_checkpoint_wrappers,\n     validate_final_model,\n     validate_state_invariants,\n )\n@@ -213,6 +216,29 @@ def full_tensor() -> torch.Tensor:\n class TestModelIntegrationContracts(unittest.TestCase):\n     \"\"\"Exercise hardware-independent framework contracts.\"\"\"\n \n+    def test_activation_checkpoint_inventory_handles_fsdp_wrapper(self) -> None:\n+        \"\"\"Count real wrappers after FSDP composition and reject a same-named class.\"\"\"\n+        unrelated = type(\n+            \"CheckpointWrapper\", (nn.Module,),\n+            {\"__module__\": \"hyper_parallel.core.activation_memory.wrapper\"},\n+        )()\n+        model = nn.ModuleList([\n+            checkpoint_wrapper(nn.Linear(3, 3)),\n+            checkpoint_wrapper(nn.Linear(3, 3)),\n+            nn.Linear(3, 3),\n+            unrelated,\n+        ])\n+        with mock.patch.dict(fully_shard_api.origin_class_to_extend_class, clear=True):\n+            fully_shard_api._extend_module_with_hsdp_interface(model[0])\n+            actual = collect_activation_checkpoint_wrappers(model)\n+        self.assertEqual(actual, {\n+            \"count\": 2,\n+            \"wrappers\": [\n+                {\"fqn\": \"0\", \"wrapped_type\": \"torch.nn.modules.linear.Linear\"},\n+                {\"fqn\": \"1\", \"wrapped_type\": \"torch.nn.modules.linear.Linear\"},\n+            ],\n+        })\n+\n     def test_trainer_config_exposes_only_validation_scope(self) -> None:\n         \"\"\"Keep probe selection and output policy out of the user YAML schema.\"\"\"\n         self.assertEqual("
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "source_sha256": "50407198615279c5c9607afbc6c9287d115189a138b0b70590a8ba365122e903",
+  "base_source_sha256": "6cf107df6198e123fe20a2a3c2579a5bc7a6a692fd4ee8fb297371327b727699",
+  "teacher_values_used": false,
+  "step_specific_behavior": false,
+  "validated_shape": [
+    4096,
+    152064
+  ],
+  "vector_dispatch_group": 40,
+  "ordinary_join": "22 tiles accumulated sequentially",
+  "incomplete_group_join": "even and odd tiles separately accumulated, then added",
+  "classification": "Archived MF graph/CANN8.5/910B3 compatibility experiment; not a universal default",
+  "original_source": "def tiled_sum(exponent: torch.Tensor) -> torch.Tensor:\n    \"\"\"Use the audited 22x6912, 108x64 tree; every add remains FP32 on the same device.\"\"\"\n    if exponent.ndim != 2 or exponent.shape[-1] != 152064 or exponent.dtype != torch.float32:\n        raise ValueError('Measured DVM compatibility tree requires FP32 vocabulary152064')\n    values = exponent.reshape(exponent.shape[0], 22, 108, 64)\n    while values.shape[-2] > 1:\n        count = values.shape[-2]\n        half = count // 2\n        result = values[..., :half, :] + values[..., half:half * 2, :]\n        if count % 2:\n            first = result[..., :1, :] + values[..., -1:, :]\n            result = torch.cat((first, result[..., 1:, :]), dim=-2) if half > 1 else first\n        values = result\n    values = values.squeeze(-2)\n    while values.shape[-1] > 1:\n        values = values[..., 0::2] + values[..., 1::2]\n    total = values[:, 0, :]\n    for tile in range(1, 22):\n        total = total + values[:, tile, :]\n    return total\n",
+  "instrumented_source": "def tiled_sum(exponent: torch.Tensor) -> torch.Tensor:\n    \"\"\"Use the audited 22x6912, 108x64 tree; every add remains FP32 on the same device.\"\"\"\n    if exponent.ndim != 2 or exponent.shape[-1] != 152064 or exponent.dtype != torch.float32:\n        raise ValueError('Measured DVM compatibility tree requires FP32 vocabulary152064')\n    values = exponent.reshape(exponent.shape[0], 22, 108, 64)\n    while values.shape[-2] > 1:\n        count = values.shape[-2]\n        half = count // 2\n        result = values[..., :half, :] + values[..., half:half * 2, :]\n        if count % 2:\n            first = result[..., :1, :] + values[..., -1:, :]\n            result = torch.cat((first, result[..., 1:, :]), dim=-2) if half > 1 else first\n        values = result\n    values = values.squeeze(-2)\n    while values.shape[-1] > 1:\n        values = values[..., 0::2] + values[..., 1::2]\n    total = values[:, 0, :]\n    for tile in range(1, 22):\n        total = total + values[:, tile, :]\n    return ce_tail226_join(values, total)\n"
+}

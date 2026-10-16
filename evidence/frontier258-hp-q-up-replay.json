@@ -1,0 +1,89 @@
+{
+  "complete": true,
+  "diagnostic_only": true,
+  "checks": [
+    {
+      "label": "main1_q_up",
+      "weight_exact_training": false,
+      "momentum_exact_training": true,
+      "weight_sha256": "d7728fb57df06bfc10cfdc44ed0c08d670bdbf0b0b1e71845d05dfdf1b11087e",
+      "expected_weight_sha256": "ae4f2d61298f340aed708e94da874ac34618479c151a0a7bd1bb5246e4709d25",
+      "momentum_sha256": "0cbf5518e8807eabaf1187d69951a75e061f918bec9b9953f5a1cb2095c78f4e",
+      "optimizer_step": 258,
+      "weight_exact_mf_training": true,
+      "mf_weight_sha256": "d7728fb57df06bfc10cfdc44ed0c08d670bdbf0b0b1e71845d05dfdf1b11087e"
+    }
+  ],
+  "records": [
+    {
+      "piece": 0,
+      "policy": {
+        "source_sha256": "7fe6eee5bbd173d61e912456560eb49a5aae9ffc16344f93cabe1239faf760cf",
+        "scope": "nope",
+        "tile_elements": 9776,
+        "tile_rows": 611,
+        "lanes": 16,
+        "vector_cores": 40,
+        "reduction": "half-tree rows with odd-tail fold, adjacent lanes, strided cores, sequential core join",
+        "sqrt": "device FP32",
+        "epsilon": 1.0011717677116394e-07,
+        "teacher_values_used": false,
+        "step_specific_behavior": false,
+        "classification": "Archived compiled-kernel compatibility experiment; not a product correctness claim."
+      },
+      "scalars": {
+        "square_sum": 2.532902726670727e-05,
+        "norm": 0.005032795015722513,
+        "denominator": 0.005032895132899284
+      },
+      "normalized_exact_mf": true,
+      "normalized_different": 0,
+      "normalized_sha256": "df3f17b64fa86c59b718895c32b1db7eac517fd12b523e081ec2ba17ec09c29c"
+    },
+    {
+      "piece": 1,
+      "policy": {
+        "source_sha256": "7fe6eee5bbd173d61e912456560eb49a5aae9ffc16344f93cabe1239faf760cf",
+        "scope": "nope",
+        "tile_elements": 9776,
+        "tile_rows": 611,
+        "lanes": 16,
+        "vector_cores": 40,
+        "reduction": "half-tree rows with odd-tail fold, adjacent lanes, strided cores, sequential core join",
+        "sqrt": "device FP32",
+        "epsilon": 1.0011717677116394e-07,
+        "teacher_values_used": false,
+        "step_specific_behavior": false,
+        "classification": "Archived compiled-kernel compatibility experiment; not a product correctness claim."
+      },
+      "scalars": {
+        "square_sum": 0.00015634222654625773,
+        "norm": 0.012503688223659992,
+        "denominator": 0.012503787875175476
+      },
+      "normalized_exact_mf": true,
+      "normalized_different": 0,
+      "normalized_sha256": "68ffad2cc039dce9f98fca7157e5debd7aac7a5d906a2c6a3927355f77d1daca"
+    }
+  ],
+  "broadcast_policy": {
+    "scope": "single-card diagnostic only",
+    "teacher_values_used": false,
+    "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa",
+    "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca",
+    "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"
+  },
+  "epsilon_policy": {
+    "source_sha256": "2db8db5bdfa09b96c643b38a492d60f8c7de64c583518ce762e04cdaef99cbdf",
+    "base_source_sha256": "8da09ca9a816488a62c4d64c15f11108041ea737bc56ed9b00a01b971b887267",
+    "original_source": "def graph_jit_ns(value: torch.Tensor, steps: int, normalized: torch.Tensor | None = None) -> torch.Tensor:\n    \"\"\"Use a contiguous Gram RHS; keep all observed scalar and cast boundaries.\"\"\"\n    transposed = value.shape[-2] > value.shape[-1]\n    current = value.mT if transposed else value\n    current = ((current / (current.norm(dim=(-2, -1), keepdim=True) + 1e-7)).bfloat16()\n               if normalized is None else normalized)\n    for _ in range(steps):\n        gram = current @ current.mT.contiguous()\n        if current.ndim == 2:\n            square = (gram * 2.03125) @ gram\n            polynomial = (gram.float() * -4.78125 + square.float()).bfloat16()\n        else:\n            square = gram @ gram\n            polynomial = (gram.float() * -4.78125 + square.float() * 2.03125).bfloat16()\n        product = polynomial @ current\n        current = (current.float() * 3.4375 + product.float()).bfloat16()\n    return (current.mT if transposed else current).float()\n",
+    "candidate_source": "def graph_jit_ns(value: torch.Tensor, steps: int, normalized: torch.Tensor | None = None) -> torch.Tensor:\n    \"\"\"Use a contiguous Gram RHS; keep all observed scalar and cast boundaries.\"\"\"\n    transposed = value.shape[-2] > value.shape[-1]\n    current = value.mT if transposed else value\n    current = ((current / (current.norm(dim=(-2, -1), keepdim=True) + (P12_EPSILON229 if current.ndim == 2 else 1e-7))).bfloat16()\n               if normalized is None else normalized)\n    for _ in range(steps):\n        gram = current @ current.mT.contiguous()\n        if current.ndim == 2:\n            square = (gram * 2.03125) @ gram\n            polynomial = (gram.float() * -4.78125 + square.float()).bfloat16()\n        else:\n            square = gram @ gram\n            polynomial = (gram.float() * -4.78125 + square.float() * 2.03125).bfloat16()\n        product = polynomial @ current\n        current = (current.float() * 3.4375 + product.float()).bfloat16()\n    return (current.mT if transposed else current).float()\n",
+    "epsilon": 1.0011717677116394e-07,
+    "scope": "Only2D default normalization; externally normalized inputs and3D retain prior behavior.",
+    "teacher_values_used": false,
+    "step_specific_behavior": false,
+    "classification": "Archived MF compiled scalar-type compatibility; not a generic HP correctness claim."
+  },
+  "source_sha256": "2d34034fb3e1705d223bf8ed3aafeec326d4f50100f9edefebed48f8ddb5d4bc",
+  "warning": "Only full weight and momentum fidelity establishes a replay of actual training."
+}
