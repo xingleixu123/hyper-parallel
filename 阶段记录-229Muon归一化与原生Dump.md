@@ -43,7 +43,7 @@ CE尾部兼容因素后，227/228全部48项模型精确，229只有MTP `q_b_pro
 
 [原生Dump完整边界审计](evidence/frontier229-builtin-boundaries.json)、[最终执行IR](evidence/frontier229-builtin-ms_output_trace_code_graph_0.ir)、[实际算子执行序](evidence/frontier229-builtin-ms_execution_order_graph_0.csv)、[统计数据](evidence/frontier229-builtin-statistic.csv)。
 
-统计＋SHA1能力也在当前MindSpore2.7.2原生重放上实际验证：同样两个算子的6条输入/输出记录，CSV仅1412字节，包含SHA1、Max/Min和L2Norm，没有NPY/NPZ；连同IR/PB/执行序总共251826字节。完整模型更新与实际MF仍精确一致。这是能力验证而非235训练结果，见[能力凭据](evidence/frontier235-stat-hash-capability.json)和[原始统计表](evidence/frontier235-stat-hash-probe.csv)。统计字段打印精度有限，逐位判断用SHA1，确需坐标和误差分布时再选择完整张量。
+统计＋SHA1能力也在当前MindSpore2.7.2原生重放上实际验证：同样两个算子的6条输入/输出记录，CSV仅1412字节，包含SHA1、Max/Min和L2Norm，没有NPY/NPZ；连同IR/PB/执行序总共251826字节。完整模型更新与实际MF仍精确一致。这是能力验证而非235训练结果，见[能力凭据](evidence/frontier235-stat-hash-capability.json)和[原始统计表](evidence/frontier235-stat-hash-probe.csv)。统计字段打印精度有限；SHA1需使用同一算法口径，当前MindSpore对超过20480元素的张量使用分块组合哈希，不能直接与Python整块SHA1比较，详见[235阶段](阶段记录-235全局范数与统计哈希.md)。确需坐标和误差分布时再选择完整张量。
 
 **观测边界限制：** Sqrt和epsilon相加仍在融合内部；CPU对原生平方和开方不是原生DVM内部标量的直接观测。早期源码TensorDump额外cast出来的BF16 norm/denominator也不能当作真实融合FP32分母，因此不能用它们对范数算子做精度排名。本结论依据原生融合IR、完整边界一致和独立单因素干预；不把一个标量的观测解释扩大成所有归约实现都已一致。
 
