@@ -1,0 +1,101 @@
+{
+  "cases": [
+    "r129-f637-fp32-fsdp8-0-200-r4",
+    "r129-e213-native-cp2-3-v1",
+    "r129-e213-head-pad-dx-cp2-3-v1"
+  ],
+  "ranks": 8,
+  "steps": [
+    {
+      "step": 1,
+      "metrics": {
+        "training/foundation_loss/lm": {
+          "native_vs_fsdp_max": 0.0,
+          "padded_vs_fsdp_max": 0.0,
+          "padded_vs_native_max": 0.0
+        },
+        "training/foundation_loss/mtp": {
+          "native_vs_fsdp_max": 4.76837158203125e-07,
+          "padded_vs_fsdp_max": 4.76837158203125e-07,
+          "padded_vs_native_max": 0.0
+        },
+        "training/foundation_loss/aux": {
+          "native_vs_fsdp_max": 0.0,
+          "padded_vs_fsdp_max": 0.0,
+          "padded_vs_native_max": 0.0
+        },
+        "training/total_loss": {
+          "native_vs_fsdp_max": 1.9073486328125e-06,
+          "padded_vs_fsdp_max": 1.9073486328125e-06,
+          "padded_vs_native_max": 0.0
+        },
+        "training/grad_norm": {
+          "native_vs_fsdp_max": 0.0001125335693359375,
+          "padded_vs_fsdp_max": 0.0001659393310546875,
+          "padded_vs_native_max": 0.000278472900390625
+        }
+      }
+    },
+    {
+      "step": 2,
+      "metrics": {
+        "training/foundation_loss/lm": {
+          "native_vs_fsdp_max": 5.340576171875e-05,
+          "padded_vs_fsdp_max": 8.20159912109375e-05,
+          "padded_vs_native_max": 0.0001354217529296875
+        },
+        "training/foundation_loss/mtp": {
+          "native_vs_fsdp_max": 0.00012755393981933594,
+          "padded_vs_fsdp_max": 9.226799011230469e-05,
+          "padded_vs_native_max": 0.00021982192993164062
+        },
+        "training/foundation_loss/aux": {
+          "native_vs_fsdp_max": 1.1990778148174286e-08,
+          "padded_vs_fsdp_max": 2.537854015827179e-08,
+          "padded_vs_native_max": 1.3387762010097504e-08
+        },
+        "training/total_loss": {
+          "native_vs_fsdp_max": 0.0001811981201171875,
+          "padded_vs_fsdp_max": 0.00017547607421875,
+          "padded_vs_native_max": 0.0003566741943359375
+        },
+        "training/grad_norm": {
+          "native_vs_fsdp_max": 0.000965118408203125,
+          "padded_vs_fsdp_max": 0.0014467239379882812,
+          "padded_vs_native_max": 0.00048160552978515625
+        }
+      }
+    },
+    {
+      "step": 3,
+      "metrics": {
+        "training/foundation_loss/lm": {
+          "native_vs_fsdp_max": 0.0003986358642578125,
+          "padded_vs_fsdp_max": 0.00014495849609375,
+          "padded_vs_native_max": 0.0002536773681640625
+        },
+        "training/foundation_loss/mtp": {
+          "native_vs_fsdp_max": 5.1021575927734375e-05,
+          "padded_vs_fsdp_max": 0.00039768218994140625,
+          "padded_vs_native_max": 0.0003466606140136719
+        },
+        "training/foundation_loss/aux": {
+          "native_vs_fsdp_max": 4.774483386427164e-08,
+          "padded_vs_fsdp_max": 4.292814992368221e-09,
+          "padded_vs_native_max": 4.345201887190342e-08
+        },
+        "training/total_loss": {
+          "native_vs_fsdp_max": 0.0003490447998046875,
+          "padded_vs_fsdp_max": 0.00025177001953125,
+          "padded_vs_native_max": 0.0006008148193359375
+        },
+        "training/grad_norm": {
+          "native_vs_fsdp_max": 0.0044384002685546875,
+          "padded_vs_fsdp_max": 0.0019674301147460938,
+          "padded_vs_native_max": 0.0024709701538085938
+        }
+      }
+    }
+  ],
+  "scope": "Observed three-step diagnosis only; historical FSDP source18602c4, bothCP source558eff5. Not final200 acceptance."
+}

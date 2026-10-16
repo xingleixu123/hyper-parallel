@@ -1,0 +1,150 @@
+{
+  "control": {
+    "case": "r129-e213-native-cp2-3-v1",
+    "files_verified": 74,
+    "container_id": "a9aa3ba7de37329ec976be2a70570b499d6424dfdfcb561a062c59c15ed7b5a1",
+    "duration_seconds": 142.49766014999477,
+    "released": true
+  },
+  "source_migration_observed": "EXACT_THREE_STEP_PREFIX",
+  "migration_strict_gate": {
+    "reference": "r129-f637-fp32-cp2-200",
+    "candidate": "r129-e213-native-cp2-3-v1",
+    "steps": [
+      1,
+      3
+    ],
+    "ranks": 8,
+    "tolerance_absolute": 0.005,
+    "status": "FAIL",
+    "findings": [
+      "Final acceptance requires exactly 200 consecutive steps",
+      "Final acceptance requires matching source commit and patch"
+    ],
+    "errors": {
+      "training/total_loss": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/lm": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/mtp": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/foundation_loss/aux": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      },
+      "training/grad_norm": {
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0
+      }
+    },
+    "input_mismatch_count": 0,
+    "input_mismatch_examples": [],
+    "initial_mismatches": [],
+    "step_errors": {
+      "training/total_loss": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "training/foundation_loss/lm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "training/foundation_loss/mtp": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "training/foundation_loss/aux": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "measurement_context": {
+      "model_integration_modes": {
+        "r129-f637-fp32-cp2-200": "build",
+        "r129-e213-native-cp2-3-v1": "build"
+      },
+      "eligible_for_matching_build_mode_performance_comparison": false,
+      "excluded_reasons": [
+        "The complete fixed-recipe execution audit failed"
+      ],
+      "common_observations": "Per-step scalar metrics and input identity capture, including NPU-to-CPU copies/hash work.",
+      "scope": "Build-mode comparisons retain matching input evidence overhead; they are not raw uninstrumented Trainer latency. Numerical gates are independent."
+    },
+    "loss_units": {
+      "lm": "unweighted",
+      "mtp": "weighted by 0.3",
+      "aux": "weighted by 0.0001"
+    },
+    "unweighted_error_diagnostics": {
+      "lm": 0.0,
+      "mtp": 0.0,
+      "aux": 0.0
+    },
+    "performance": {
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": null,
+      "processed_tokens_per_second": null,
+      "supervised_tokens_per_second": null,
+      "allocated_gib": 20.706645965576172,
+      "reserved_gib": 25.806640625
+    },
+    "collection_manifest_sha256": [
+      "37fe7d5d2bd1165c44f3a17bbb0e9c89751ae7033f832c8125c1ceba519c04b3",
+      "d71408a860747eaab5acceef8398606c044a25d9eb4b0e19c07d39b5ca893ea2"
+    ],
+    "weighted_status": "PASS",
+    "sources": {
+      "reference": {
+        "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidate": {
+        "commit": "558eff53571498538048015ae3a7e3e57ba74fb9",
+        "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "recipe_sha256": [
+      "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5",
+      "c51ed8ff345759c96f9dce13c47f2531b4a5cdb0c487bc5164d01ba926919af5"
+    ],
+    "execution_identities": [
+      {
+        "case": "r129-f637-fp32-cp2-200",
+        "container_id": "8811f2b326be0d11e5f44f0133f5a2431ec8def5a9945211f4467aa719abf102",
+        "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+        "exit_code": 0,
+        "reason": null
+      },
+      {
+        "case": "r129-e213-native-cp2-3-v1",
+        "container_id": "a9aa3ba7de37329ec976be2a70570b499d6424dfdfcb561a062c59c15ed7b5a1",
+        "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+        "exit_code": 0,
+        "reason": null
+      }
+    ],
+    "loss_coefficients": {
+      "mtp_loss_factor": 0.3,
+      "moe_aux_loss_coeff": 0.0001
+    },
+    "unweighted_derivation": "Absolute difference of logged weighted scalars divided by the recorded coefficient",
+    "unweighted_tolerance_absolute": 0.005,
+    "unweighted_status": "UNVERIFIED"
+  },
+  "final_training_acceptance": "NOT_EVALUATED_THREE_STEPS"
+}
