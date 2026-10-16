@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/alignment/phase12/tools/compare_frontier306_state.py", line 124, in <module>
+    main()
+  File "/alignment/phase12/tools/compare_frontier306_state.py", line 70, in main
+    models = {family: {row['step']: {item['name']: item for item in row['records']} for row in read_rows(
+                                                                                               ^^^^^^^^^^
+  File "/alignment/phase12/tools/compare_vocab_optimizer_trace.py", line 32, in read_rows
+    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+                                         ^^^^^^^^^^^^^^^^
+  File "/usr/local/python3.12.14/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python3.12.14/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/alignment/phase12/runs/hp-jte213-fc1norm-state306/MODEL_HASHES.jsonl'

@@ -1,0 +1,925 @@
+<frozen runpy>:128: RuntimeWarning: 'torch.distributed.run' found in sys.modules after import of package 'torch.distributed', but prior to execution of 'torch.distributed.run'; this may result in unpredictable behaviour
+[W1016 07:21:42.680041010 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[P12-BROADCAST-FP32] {"scope": "single-card diagnostic only", "teacher_values_used": false, "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa", "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca", "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"}
+[P12-NS-EAGER] active target=muon_jit_probe.graph_jit_ns scope=all
+[P12-THREE-NATIVE-ADJACENT-NPU-SQRT] actual live values; no recorded norm used
+[P12-Q-NATIVE-TILE] live tiled normalization; no recorded values used
+[P12-DENSE-NATIVE-TILE] actual live values; no recorded norm used
+[P12-EXPERT-BMM-EAGER] 3D explicit bmm Gram with RHS view; square/product unchanged
+[P12-DENSE-ADJACENT-TILE] actual live values; no recorded norm used
+2026-10-16 07:21:53,824 [INFO] torch_npu.env: get env LOCAL_RANK = 0
+2026-10-16 07:21:54,766 [INFO] torch_npu.env: get env RANK = 0
+2026-10-16 07:21:54,766 [INFO] torch_npu.env: get env WORLD_SIZE = 1
+2026-10-16 07:21:54,766 [INFO] torch_npu.env: get env MASTER_ADDR = 127.0.0.1
+2026-10-16 07:21:54,766 [INFO] torch_npu.env: get env MASTER_PORT = 31677
+2026-10-16 07:21:54,766 [INFO] torch_npu.env: get env TORCHELASTIC_USE_AGENT_STORE = True
+[W1016 07:21:54.185784960 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+2026-10-16 07:21:54,771 [INFO] hyper_parallel.trainer.base: Trainer config:
+{
+  "model": {
+    "_target_": "vocabulary_both_builder.build_jt_model",
+    "config": {
+      "architectures": [
+        "JTDeepseekV3ForCausalLM"
+      ],
+      "vocab_size": 152064,
+      "hidden_size": 5120,
+      "intermediate_size": 12288,
+      "moe_intermediate_size": 1536,
+      "num_hidden_layers": 2,
+      "num_attention_heads": 128,
+      "num_key_value_heads": 128,
+      "n_shared_experts": 2,
+      "n_routed_experts": 8,
+      "routed_scaling_factor": 2.827,
+      "kv_lora_rank": 512,
+      "q_lora_rank": 1536,
+      "qk_rope_head_dim": 64,
+      "v_head_dim": 128,
+      "qk_nope_head_dim": 128,
+      "n_group": 1,
+      "topk_group": 1,
+      "num_experts_per_tok": 2,
+      "norm_topk_prob": true,
+      "hidden_act": "silu",
+      "max_position_embeddings": 262400,
+      "initializer_range": 0.02,
+      "rms_norm_eps": 1e-06,
+      "first_k_dense_replace": 1,
+      "mlp_layer_types": [
+        "dense",
+        "sparse"
+      ],
+      "layer_types": [
+        "full_attention",
+        "full_attention"
+      ],
+      "attention_dropout": 0.0,
+      "rope_parameters": {
+        "rope_type": "default",
+        "rope_theta": 5000000
+      },
+      "rope_interleave": true,
+      "tie_word_embeddings": false,
+      "use_cache": false,
+      "attention_bias": false,
+      "mlp_bias": false,
+      "num_nextn_predict_layers": 1,
+      "mtp_loss_factor": 0.3,
+      "use_pad_tokens": true,
+      "moe_aux_loss_coeff": 0.0001,
+      "moe_router_enable_expert_bias": true,
+      "moe_router_bias_update_rate": 0.001,
+      "enable_chunk_loss": true,
+      "chunk_loss_size": 4096
+    },
+    "reference_weights": "/state/jt-recipe-20261014/hp-offline-step200",
+    "factor": "norm-swiglu-both-router",
+    "moe_backward_factor": "archive-measured-join-backward"
+  },
+  "optimizer": {
+    "_target_": "muon_all_casts_probe.build_optimizer",
+    "muon_config": {
+      "lr": 0.0001,
+      "weight_decay": 0.1,
+      "momentum": 0.95,
+      "nesterov": true,
+      "ns_steps": 5,
+      "ns_variant": "legacy",
+      "ns_epsilon": 1e-07,
+      "matched_adamw_rms": 0.2,
+      "apply_lr_in_update": true
+    },
+    "adamw_config": {
+      "adamw_lr": 0.0001,
+      "adamw_weight_decay": 0.1,
+      "adamw_betas": [
+        0.9,
+        0.95
+      ],
+      "adamw_eps": 1e-08
+    },
+    "qk_clip_threshold": 100.0,
+    "fp32_main_params": true
+  },
+  "lr_scheduler": {
+    "_target_": "hyper_parallel.components.optim.lr_scheduler.MultiLRScheduler",
+    "lr_decay_style": "constant",
+    "lr_config": {
+      "lr": 0.0001,
+      "min_lr": 0.0001,
+      "lr_warmup_steps": 0,
+      "lr_decay_ratio": 1.0
+    }
+  },
+  "loss_fn": {
+    "_target_": "hyper_parallel.components.losses.ModelOutputLoss"
+  },
+  "model_init_dtype": "float32",
+  "training": {
+    "train_iters": 307,
+    "train_samples": null,
+    "lr_scheduler_iters": 1000,
+    "eval_iters": 0,
+    "global_batch_size": 1,
+    "micro_batch_size": 1,
+    "backend": "hccl",
+    "max_grad_norm": 1.0,
+    "init_device": "meta",
+    "loss_aggregation": "token_weighted",
+    "seed": 42,
+    "enable_full_determinism": true,
+    "close_matmul_k_shift": false,
+    "gc_steps": 0,
+    "empty_cache_steps": 0,
+    "empty_cache_before_backward": false,
+    "eval_steps": 0,
+    "eval_epochs": 0,
+    "logging_steps": 1,
+    "low_precision": {
+      "enabled": false,
+      "format": "mxfp8_e4m3",
+      "scaling": "mx_block"
+    }
+  },
+  "accelerator": {
+    "tp_size": 1,
+    "cp_size": 1,
+    "ep_size": 1,
+    "pp_size": 1,
+    "sequence_parallel": false,
+    "loss_parallel": false
+  },
+  "fsdp_config": {
+    "dp_shard_size": 1,
+    "edp_shard_size": 1,
+    "replicate_params": [],
+    "mix_precision": {
+      "param_dtype": "bfloat16",
+      "reduce_dtype": "float32",
+      "output_dtype": null,
+      "cast_forward_inputs": false
+    },
+    "enable_offload": false,
+    "reshard_after_forward": true,
+    "reshard_after_backward": true,
+    "requires_grad_sync": true,
+    "backward_prefetch_depth": 1,
+    "forward_prefetch_depth": 1,
+    "comm_fusion": false,
+    "comm_fusion_zero_copy": null
+  },
+  "plan_overrides": [
+    {
+      "match": [
+        "model.layers.*.self_attn",
+        "mtp.layers.*.transformer_layer.self_attn"
+      ],
+      "when": null,
+      "module_type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Attention",
+      "exact_type": true,
+      "replace_module": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3MLAAttention",
+        "module_fqn": "",
+        "context": null
+      },
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": {
+        "linear_qkv.weight": {
+          "tp": "replicate"
+        },
+        "q_b_proj.weight": {
+          "tp": "shard(0)"
+        },
+        "kv_b_proj.weight": {
+          "tp": "shard(0)"
+        },
+        "o_proj.weight": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn.*_layernorm",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "hidden_states": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "replicate"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.self_attn.key_rope_gather",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": null,
+      "in_src": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "replicate"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "*.mlp.shared_experts",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": {
+        "gate_proj.weight": {
+          "tp": "replicate"
+        },
+        "up_proj.weight": {
+          "tp": "replicate"
+        },
+        "down_proj.weight": {
+          "tp": "replicate"
+        }
+      },
+      "in_src": {
+        "x": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "x": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "mtp.layers.*.eh_proj",
+      "when": null,
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": null,
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": null,
+      "params": {
+        "weight": {
+          "tp": "replicate"
+        }
+      },
+      "in_src": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "in_dst": {
+        "input": {
+          "tp": "shard(1)"
+        }
+      },
+      "out_src": {
+        "tp": "shard(1)"
+      },
+      "out_dst": {
+        "tp": "shard(1)"
+      },
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "model.layers.[123456789]*.mlp",
+      "when": "ep",
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn"
+      },
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    },
+    {
+      "match": "mtp.layers.*.transformer_layer.mlp",
+      "when": "ep",
+      "module_type": null,
+      "exact_type": false,
+      "replace_module": null,
+      "local_compute_fn": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.distributed.ep_compute.jt_deepseek_v3_ep_compute_fn"
+      },
+      "inner_target": null,
+      "inner_wrapper": null,
+      "inner_out_src": null,
+      "region_dispatch": false,
+      "params": null,
+      "in_src": null,
+      "in_dst": null,
+      "out_src": null,
+      "out_dst": null,
+      "tp_divide_attrs": null
+    }
+  ],
+  "mixed_precision": {
+    "enabled": false
+  },
+  "activation_checkpoint": {
+    "mode": "off",
+    "swap_inputs": false,
+    "selection": {
+      "source": "default",
+      "layer_count": null,
+      "layer_indices": null
+    }
+  },
+  "activation_swap": "none",
+  "compile": {
+    "enabled": false,
+    "mode": "default",
+    "fullgraph": false,
+    "dynamic": false,
+    "backend": null,
+    "options": null,
+    "dynamo_cache_size_limit": 256
+  },
+  "dataset": {
+    "_target_": "hyper_parallel.data.online.mapping.MappingTransformDataset",
+    "source_dataset": {
+      "_target_": "datasets.load_from_disk",
+      "dataset_path": "/aligned-data/sft_data_4k_from_256k",
+      "keep_in_memory": null,
+      "storage_options": null
+    },
+    "model_assets": {
+      "chat_template": null,
+      "tokenizer": null
+    },
+    "data_transform": {
+      "_target_": "hyper_parallel.data.text.text_transform.PreTokenizedSFTTransform",
+      "input_ids_key": "input_ids",
+      "labels_key": "labels",
+      "boundaries_key": "cu_seqlens",
+      "loss_mask_key": "loss_mask"
+    }
+  },
+  "dataloader": {
+    "_target_": "hyper_parallel.data.batching.FixedBatchDataLoader",
+    "drop_last": true,
+    "num_workers": 0,
+    "batch_sampler": null,
+    "collate_fn": {
+      "_target_": "hyper_parallel.data.batching.build_online_text_collate_fn",
+      "mesh_context": null
+    },
+    "batch_size": null,
+    "sampler_type": "single",
+    "seed": 1234,
+    "pin_memory": false,
+    "prefetch_factor": null,
+    "get_batch": {
+      "_target_": "hyper_parallel.data.batching.TextParallelBatch",
+      "source_type": "online",
+      "attention_mode": "compressed",
+      "reset_position_ids": true,
+      "runtime_input_adapter": {
+        "_target_": "hyper_parallel.models.jt_deepseek_v3.adapter.data.runtime.JTSequenceRuntime"
+      },
+      "causal": true,
+      "sliding_window": null,
+      "reset_attention_mask": false,
+      "eod_mask_loss": false
+    },
+    "data_rearrange_map": null,
+    "data_sharding": false,
+    "use_background_prefetcher": false
+  },
+  "packed_sequence": null,
+  "checkpoint": {
+    "save_ckpt": false,
+    "checkpoint_dir": "/state/jt-recipe-20261014/hp-jte213-fc1norm-preclip307-checkpoints",
+    "save_steps": 0,
+    "save_epochs": 1,
+    "is_async": false,
+    "is_peft": false,
+    "save_optimizer": true,
+    "save_train_state": true,
+    "save_extra_state_per_rank": true,
+    "restore_from": "/state/jt-recipe-20261014/hp-native-step200/global_step_200",
+    "restore_optimizer": true,
+    "restore_train_state": true,
+    "restore_dataloader_state": true,
+    "model_save_format": "safetensors",
+    "save_consolidated": "final",
+    "staging_dir": null,
+    "best_metric_key": "default"
+  },
+  "debug": {
+    "check_dataset": null,
+    "check_nan_inf": false,
+    "check_fsdp_runtime": false
+  },
+  "model_integration": {
+    "mode": "off"
+  },
+  "memory": {
+    "enable": false,
+    "start_step": 1,
+    "end_step": 2,
+    "save_path": "./memory_snapshot",
+    "dump_ranks": [
+      0
+    ],
+    "stacks": "all",
+    "max_entries": null,
+    "mem_info": false
+  },
+  "wandb": {
+    "enabled": false,
+    "project": "",
+    "entity": null
+  },
+  "profiler": {
+    "enabled": false,
+    "start_step": 1,
+    "stop_step": 10,
+    "start_on_init": false,
+    "memory": true,
+    "rank_ids": null,
+    "pipeline_stage_leaders": false,
+    "output_path": null,
+    "level": 1,
+    "with_stack": false,
+    "data_simplification": false,
+    "mstx": false,
+    "trace_handler": {
+      "analyse_flag": true,
+      "async_mode": false
+    }
+  },
+  "magi": null,
+  "peft": null
+}
+2026-10-16 07:21:54,771 [INFO] hyper_parallel.trainer.base: Process rank: 0, world size: 1
+2026-10-16 07:21:54,774 [INFO] hyper_parallel.distributed.mesh: Built device mesh (1, 1, 1), dense FSDP mesh (1, 1, 1) and expert FSDP mesh None
+2026-10-16 07:21:54,774 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='model.layers.[123456789]*.mlp' skipped because condition 'ep' is inactive
+2026-10-16 07:21:54,774 [INFO] hyper_parallel.trainer.config.parallelism: plan_overrides: match='mtp.layers.*.transformer_layer.mlp' skipped because condition 'ep' is inactive
+2026-10-16 07:21:54,785 [INFO] hyper_parallel.models._transformers.model_builder: FSDP2Manager instantiated with FSDP2Config
+[INFO|configuration_utils.py:1104] 2026-10-16 07:21:54,787 >> Generate config GenerationConfig {
+  "bos_token_id": 0,
+  "eos_token_id": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "use_cache": false
+}
+
+[P12-FACTOR] norm-fp32 changed_modules 16
+[P12-ACTIVATION-FACTOR] norm-swiglu ['model.layers.0.mlp', 'model.layers.1.mlp.shared_experts', 'mtp.layers.0.transformer_layer.mlp.shared_experts']
+[P12-FACTOR] router-fp32 changed_modules 2
+[P12-MOE-PRECISION] norm-swiglu-both-router ['model.layers.1.mlp', 'mtp.layers.0.transformer_layer.mlp']
+[P12-NORM-RESIDUAL-JOIN] ['model.layers.0', 'model.layers.1', 'mtp.layers.0.transformer_layer']
+[P12-VOCABULARY-BOTH] FP32 embedding and shared-head gradients
+[P12-COMBINED-NORM-JOIN] Added shared LM/MTP join to residual-join control
+[P12-FORWARD-FACTOR] qkv-forward ['model.layers.0.self_attn.linear_qkv', 'model.layers.1.self_attn.linear_qkv', 'mtp.layers.0.transformer_layer.self_attn.linear_qkv']
+[P12-MOE-BACKWARD-FACTOR] archive-measured-join-backward ['model.layers.0.mlp', 'model.layers.1.mlp', 'model.layers.1.mlp.shared_experts', 'mtp.layers.0.transformer_layer.mlp', 'mtp.layers.0.transformer_layer.mlp.shared_experts']
+[P12-MAPPED-REFERENCE] model.npz 48 arrays SHA256 verified
+/alignment/phase12/tools-f637/moe_precision_builder.py:68: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:213.)
+  if torch.from_numpy(value).dtype != expected[name].dtype:
+[rank0]:[W1016 07:22:13.711989350 NPUCachingAllocator.cpp:201] Warning: The current CANN and Soc versions require processing for 32 padding size, with memory allocation. (function operator())
+2026-10-16 07:22:14,201 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Adapter-declared FSDP child units: ['mtp.layers.0.transformer_layer']
+/workspace/venv/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+  if self.device.type != 'cpu':
+2026-10-16 07:22:14,841 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: Applied FSDP2 to 23 child units and the root module
+2026-10-16 07:22:14,841 [INFO] hyper_parallel.distributed._builder.fsdp_adapter: FSDP2 wrap applied
+2026-10-16 07:22:14,869 [INFO] hyper_parallel.models._transformers.model_builder: Model moved to npu:0
+2026-10-16 07:22:14,908 [INFO] hyper_parallel.trainer.base: Model config:
+{
+  "transformers_version": "5.13.1",
+  "architectures": [
+    "JTDeepseekV3ForCausalLM"
+  ],
+  "output_hidden_states": false,
+  "return_dict": true,
+  "dtype": null,
+  "chunk_size_feed_forward": 0,
+  "is_encoder_decoder": false,
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1"
+  },
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1
+  },
+  "problem_type": null,
+  "vocab_size": 152064,
+  "hidden_size": 5120,
+  "intermediate_size": 12288,
+  "moe_intermediate_size": 1536,
+  "num_hidden_layers": 2,
+  "num_attention_heads": 128,
+  "num_key_value_heads": 128,
+  "n_shared_experts": 2,
+  "n_routed_experts": 8,
+  "routed_scaling_factor": 2.827,
+  "kv_lora_rank": 512,
+  "q_lora_rank": 1536,
+  "qk_rope_head_dim": 64,
+  "v_head_dim": 128,
+  "qk_nope_head_dim": 128,
+  "n_group": 1,
+  "topk_group": 1,
+  "num_experts_per_tok": 2,
+  "norm_topk_prob": true,
+  "hidden_act": "silu",
+  "max_position_embeddings": 262400,
+  "initializer_range": 0.02,
+  "rms_norm_eps": 1e-06,
+  "use_cache": false,
+  "pad_token_id": null,
+  "bos_token_id": 0,
+  "eos_token_id": 1,
+  "tie_word_embeddings": false,
+  "rope_parameters": {
+    "rope_type": "default",
+    "rope_theta": 5000000
+  },
+  "mlp_layer_types": [
+    "dense",
+    "sparse"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "index_topk": 2048,
+  "index_head_dim": 128,
+  "index_n_heads": 64,
+  "mlp_bias": false,
+  "head_dim": 64,
+  "first_k_dense_replace": 1,
+  "layer_types": [
+    "full_attention",
+    "full_attention"
+  ],
+  "qk_head_dim": 192,
+  "_name_or_path": "",
+  "rope_interleave": true,
+  "num_nextn_predict_layers": 1,
+  "mtp_loss_factor": 0.3,
+  "use_pad_tokens": true,
+  "moe_aux_loss_coeff": 0.0001,
+  "moe_router_enable_expert_bias": true,
+  "moe_router_bias_update_rate": 0.001,
+  "enable_chunk_loss": true,
+  "chunk_loss_size": 4096,
+  "model_type": "jt_deepseek_v3",
+  "output_attentions": false
+}
+/workspace/venv/lib/python3.12/site-packages/torchdata/stateful_dataloader/stateful_dataloader.py:379: UserWarning: 'set_vital' is deprecated, please do not call
+  torch.set_vital("Dataloader", "enabled", "True")  # type: ignore[attr-defined]
+[P12-MUON-LAYOUT-COMPOSITION] qkv q-up kv-up expert-gate-up
+2026-10-16 07:22:15,012 [INFO] hyper_parallel.components.optim.parameter_groups: Parameters without weight decay: ['model.layers.0.self_attn.q_a_layernorm.weight', 'model.layers.0.self_attn.kv_a_layernorm.weight', 'model.layers.0.input_layernorm.weight', 'model.layers.0.post_attention_layernorm.weight', 'model.layers.1.self_attn.q_a_layernorm.weight', 'model.layers.1.self_attn.kv_a_layernorm.weight', 'model.layers.1.input_layernorm.weight', 'model.layers.1.post_attention_layernorm.weight', 'model.norm.weight', 'mtp.layers.0.enorm.weight', 'mtp.layers.0.hnorm.weight', 'mtp.layers.0.transformer_layer.self_attn.q_a_layernorm.weight', 'mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm.weight', 'mtp.layers.0.transformer_layer.input_layernorm.weight', 'mtp.layers.0.transformer_layer.post_attention_layernorm.weight', 'mtp.layers.0.final_layernorm.weight']
+2026-10-16 07:22:15,012 [INFO] hyper_parallel.components.optim.builders: Muon optimizer split: 28 Muon parameters, 18 AdamW parameters
+2026-10-16 07:22:15,012 [INFO] hyper_parallel.components.optim.builders: Muon parameters (first 5): ['model.layers.0.self_attn.linear_qkv.weight', 'model.layers.0.self_attn.q_b_proj.weight', 'model.layers.0.self_attn.kv_b_proj.weight', 'model.layers.0.self_attn.o_proj.weight', 'model.layers.0.mlp.gate_proj.weight']
+2026-10-16 07:22:15,012 [INFO] hyper_parallel.components.optim.builders: AdamW parameters (first 5): ['model.embed_tokens.weight', 'model.layers.0.self_attn.q_a_layernorm.weight', 'model.layers.0.self_attn.kv_a_layernorm.weight', 'model.layers.0.input_layernorm.weight', 'model.layers.0.post_attention_layernorm.weight']
+2026-10-16 07:22:15,012 [INFO] hyper_parallel.core.optimizer.dtensor_compat: Detected DTensor backend: 'hyper'.
+2026-10-16 07:22:15,013 [INFO] hyper_parallel.core.optimizer: Effective adamw config: {'lr': 0.0001, 'betas': [0.9, 0.95], 'eps': 1e-08, 'weight_decay': 0.1, 'amsgrad': False, 'maximize': False}
+2026-10-16 07:22:15,017 [INFO] hyper_parallel.core.optimizer.optimizer: [HSDP Batch] group_key=0, num_hsdp_groups=2, num_batch_groups=2, total_sub_batches=3, group_numels=[783302656, 377487360], max_batch_numel=536870912
+2026-10-16 07:22:15,018 [INFO] hyper_parallel.core.optimizer: Effective muon config: {'lr': 0.0001, 'weight_decay': 0.1, 'matched_adamw_rms': 0.2, 'momentum': (0.95, 0.95), 'nesterov': True, 'ns_steps': 5, 'ns_variant': 'legacy', 'hsdp_replica_count': None, 'ns_epsilon': 1e-07, 'apply_lr_in_update': True, 'ns_transform_fn': <function build_optimizer.<locals>.transform at 0xffff3de8e660>, 'ns_coefficients': None, 'zero_rms_scale_mode': 'zero'}
+[P12-MUON-COMPOSITION] layouts plus graph arithmetic; modern per-piece scale
+[P12-LEGACY-COMPOSITION] last-piece scale; graph_arithmetic= True
+[P12-ALL-CASTS] split/transpose casts plus expert BF16 norm
+2026-10-16 07:22:15,023 [INFO] hyper_parallel.core.optimizer.optimizer: [HSDP Batch] group_key=0, num_hsdp_groups=2, num_batch_groups=2, total_sub_batches=3, group_numels=[783302656, 377487360], max_batch_numel=536870912
+2026-10-16 07:22:15,025 [INFO] torch_npu.env: get env CLOSE_MATMUL_K_SHIFT = 0
+[INFO|/alignment/phase12/hp-jt-e213-pr192/hyper_parallel/trainer/callbacks/checkpoint_callback.py:123] 10/16/2026 07:22:15 >> Checkpoint configuration: checkpoint_dir=/state/jt-recipe-20261014/hp-jte213-fc1norm-preclip307-checkpoints, save_ckpt=False, save_steps=0, save_epochs=0, is_async=False, is_peft=False, save_extra_state_per_rank=True, restore_from=/state/jt-recipe-20261014/hp-native-step200/global_step_200
+[INFO|/alignment/phase12/hp-jt-e213-pr192/hyper_parallel/trainer/callbacks/checkpoint_callback.py:326] 10/16/2026 07:22:15 >> Loading checkpoint from /state/jt-recipe-20261014/hp-native-step200/global_step_200
+2026-10-16 07:22:20,139 [INFO] hyper_parallel.components.checkpoint.dcp_checkpointer: Reading extra_state from /state/jt-recipe-20261014/hp-native-step200/global_step_200/extra_state/extra_state_rank_0.pt
+/workspace/venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[INFO|/alignment/phase12/hp-jt-e213-pr192/hyper_parallel/trainer/callbacks/checkpoint_callback.py:395] 10/16/2026 07:22:20 >> Checkpoint loaded successfully: path=/state/jt-recipe-20261014/hp-native-step200/global_step_200, global_step=200, start_epoch=0, start_step=200
+[P12-MAPPED-REFERENCE] optimizer.npz 138 arrays SHA256 verified
+[P12-RESTORE] {"step": 200, "model": 48, "optimizer": 64, "all_exact": true}
+[P12-LR-FOLDING] {"single_factor": "Existing apply_lr_in_update=True; preserve original scalar precision", "teacher_values_used": false, "groups": [{"group": 0, "restored_apply_lr_in_update": false, "effective_apply_lr_in_update": true, "lr": 0.0001}], "source_sha256": "8f25308314fe0c348948a0e32ceeac0ff5cc083341e1d8c7e4a3468aca540012"}
+[P12-MUON-SCALAR-FP32] {"single_factor": "Scalar sqrt(dimension), RMS product and LR product each evaluated in FP32", "teacher_values_used": false, "learning_rate_folding_unchanged": true, "source_sha256": "e28c479215d0c7527c5e4344e14107110b62b9aea08fea5744a19327b28828d4"}
+[P12-CE-SUM-TREE] independent measured FP32 addition tree
+[P12-SILU-GATE] independent arithmetic factor all ['model.layers.0.mlp', 'model.layers.1.mlp.shared_experts', 'mtp.layers.0.transformer_layer.mlp.shared_experts']
+[P12-DENSE-UP] FP32 SiLU then upstream product model.layers.0.mlp
+[P12-EXPERT-ORDER] {"modules": ["model.layers.1.mlp", "mtp.layers.0.transformer_layer.mlp"], "reference_values_used": false, "factor": "K-major FP32 sorting twice, mapped back to N-major ordinal", "classification": "Archive token order compatibility; not a mathematical correctness claim"}
+[P12-SHARED-UP-FP32] {"module": "model.layers.1.mlp.shared_experts", "formula": "BF16(dy.float()*silu(gate.float()))", "teacher_values_used": false, "changed_steps": "all resumed steps, no step or coordinate special case", "forward_and_gate_formula_unchanged": true, "mtp_unchanged": true, "source_sha256": "aa17475ca1a873b7e845f83152e7022a3e372ae4cf3ae248a3e8e9cf3bdb0011", "classification": "Independent single-factor archive-compatibility ablation; no universal correctness claim"}
+[INFO|/alignment/phase12/hp-jt-e213-pr192/hyper_parallel/trainer/text_trainer.py:312] 10/16/2026 07:22:59 >> Rank0 Start training. Global step: 200. Train iters: 307. Start epoch: 0. Train epochs: 1.
+/workspace/venv/lib/python3.12/site-packages/torch/autograd/function.py:596: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:423.)
+  return super().apply(*args, **kwargs)  # type: ignore[misc]
+2026-10-16 07:23:02,508 [INFO] torch_npu.env: get env LD_LIBRARY_PATH = /usr/local/Ascend/cann-9.2.0-beta.2/lib64:/usr/local/Ascend/cann-9.2.0-beta.2/lib64/plugin/opskernel:/usr/local/Ascend/cann-9.2.0-beta.2/lib64/plugin/nnengine:/usr/local/Ascend/cann-9.2.0-beta.2/opp/built-in/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64:/usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/usr/local/python3.12.14/lib:/usr/local/python3.12.14/lib
+2026-10-16 07:23:02,508 [INFO] torch_npu.env: get env PATH = /workspace/venv/bin:/usr/local/python3.12.14/bin:/usr/local/sbin:/usr/local/Ascend/cann-9.2.0-beta.2/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/ccec_compiler/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/profiler/bin:/usr/local/Ascend/cann-9.2.0-beta.2/tools/ascend_system_advisor/asys:/usr/local/Ascend/cann-9.2.0-beta.2/tools/show_kernel_debug_data:/usr/local/Ascend/cann-9.2.0-beta.2/tools/msobjdump:/workspace/venv/bin:/usr/local/python3.12.14/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-10-16 07:23:03,298 [INFO] torch_npu.env: get env ASCEND_OPP_PATH = /usr/local/Ascend/cann-9.2.0-beta.2/opp
+2026-10-16 07:23:04,165 [INFO] torch_npu.env: get env HOME = /root
+2026-10-16 07:23:04,264 [INFO] torch_npu.env: get env TE_AUTO_RESTART_COUNTER = 0
+2026-10-16 07:23:05,934 [INFO] torch_npu.env: get env PYTHONPATH = /alignment/phase12/tools-e213:/alignment/phase12/tools-f637:/workspace:/workspace:/usr/local/Ascend/cann-9.2.0-beta.2/python/site-packages:/usr/local/Ascend/cann-9.2.0-beta.2/opp/built-in/op_impl/ai_core/tbe:
+..Training:  65%|██████▌   | 201/307 [01:17<00:40,  2.61step/s, loss=8.81245, grad_norm=17.9907, lr=1.000e-04, foundation_loss/aux=0.000494624, foundation_loss/lm=6.80484, foundation_loss/mtp=2.00711, tokens/s=10.025, step_time=32.119s] | step=201 epoch=0 data/consumed_samples=1 data/consumed_tokens=322 data/step_samples=1 data/step_tokens=322 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=32.1186 performance/tokens_per_second=10.0253 training/foundation_loss/aux=0.000494624 training/foundation_loss/lm=6.80484 training/foundation_loss/mtp=2.00711 training/grad_norm=17.9907 training/lr=0.0001 training/total_loss=8.81245
+[P12-HP] {"step": 201, "loss": 8.812447547912598, "components": {"foundation_loss/lm": 6.804838180541992, "foundation_loss/mtp": 2.007114887237549, "foundation_loss/aux": 0.0004946244298480451}, "grad_norm": 17.990650177001953}
+Training:  66%|██████▌   | 202/307 [01:20<00:42,  2.50step/s, loss=7.76483, grad_norm=17.6372, lr=1.000e-04, foundation_loss/aux=0.000490978, foundation_loss/lm=5.97626, foundation_loss/mtp=1.78808, tokens/s=79.095, step_time=3.780s] | step=202 epoch=0 data/consumed_samples=2 data/consumed_tokens=621 data/step_samples=1 data/step_tokens=299 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.78024 performance/tokens_per_second=79.0955 training/foundation_loss/aux=0.000490978 training/foundation_loss/lm=5.97626 training/foundation_loss/mtp=1.78808 training/grad_norm=17.6372 training/lr=0.0001 training/total_loss=7.76483
+[P12-HP] {"step": 202, "loss": 7.764829158782959, "components": {"foundation_loss/lm": 5.976261138916016, "foundation_loss/mtp": 1.7880767583847046, "foundation_loss/aux": 0.00049097795272246}, "grad_norm": 17.63715171813965}
+Training:  66%|██████▌   | 203/307 [01:24<00:43,  2.40step/s, loss=6.05982, grad_norm=24.0495, lr=1.000e-04, foundation_loss/aux=0.000492758, foundation_loss/lm=4.6129, foundation_loss/mtp=1.44643, tokens/s=14.316, step_time=3.632s] | step=203 epoch=0 data/consumed_samples=3 data/consumed_tokens=673 data/step_samples=1 data/step_tokens=52 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63237 performance/tokens_per_second=14.3157 training/foundation_loss/aux=0.000492758 training/foundation_loss/lm=4.6129 training/foundation_loss/mtp=1.44643 training/grad_norm=24.0495 training/lr=0.0001 training/total_loss=6.05982
+[P12-HP] {"step": 203, "loss": 6.0598249435424805, "components": {"foundation_loss/lm": 4.6129021644592285, "foundation_loss/mtp": 1.4464300870895386, "foundation_loss/aux": 0.000492757884785533}, "grad_norm": 24.04949378967285}
+Training:  66%|██████▋   | 204/307 [01:28<00:44,  2.32step/s, loss=5.89634, grad_norm=24.4357, lr=1.000e-04, foundation_loss/aux=0.000497898, foundation_loss/lm=4.53319, foundation_loss/mtp=1.36265, tokens/s=16.239, step_time=3.633s] | step=204 epoch=0 data/consumed_samples=4 data/consumed_tokens=732 data/step_samples=1 data/step_tokens=59 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63332 performance/tokens_per_second=16.2386 training/foundation_loss/aux=0.000497898 training/foundation_loss/lm=4.53319 training/foundation_loss/mtp=1.36265 training/grad_norm=24.4357 training/lr=0.0001 training/total_loss=5.89634
+[P12-HP] {"step": 204, "loss": 5.896337509155273, "components": {"foundation_loss/lm": 4.533186435699463, "foundation_loss/mtp": 1.3626532554626465, "foundation_loss/aux": 0.0004978983197361231}, "grad_norm": 24.435726165771484}
+Training:  67%|██████▋   | 205/307 [01:31<00:45,  2.23step/s, loss=8.76388, grad_norm=15.7466, lr=1.000e-04, foundation_loss/aux=0.000489097, foundation_loss/lm=6.67326, foundation_loss/mtp=2.09014, tokens/s=94.452, step_time=3.631s] | step=205 epoch=0 data/consumed_samples=5 data/consumed_tokens=1075 data/step_samples=1 data/step_tokens=343 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63149 performance/tokens_per_second=94.4517 training/foundation_loss/aux=0.000489097 training/foundation_loss/lm=6.67326 training/foundation_loss/mtp=2.09014 training/grad_norm=15.7466 training/lr=0.0001 training/total_loss=8.76388
+[P12-HP] {"step": 205, "loss": 8.763884544372559, "components": {"foundation_loss/lm": 6.673255920410156, "foundation_loss/mtp": 2.090139150619507, "foundation_loss/aux": 0.0004890967393293977}, "grad_norm": 15.746615409851074}
+Training:  67%|██████▋   | 206/307 [01:35<00:46,  2.16step/s, loss=9.13299, grad_norm=40.6688, lr=1.000e-04, foundation_loss/aux=0.000480813, foundation_loss/lm=7.10203, foundation_loss/mtp=2.03048, tokens/s=9.056, step_time=3.644s] | step=206 epoch=0 data/consumed_samples=6 data/consumed_tokens=1108 data/step_samples=1 data/step_tokens=33 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6439 performance/tokens_per_second=9.05622 training/foundation_loss/aux=0.000480813 training/foundation_loss/lm=7.10203 training/foundation_loss/mtp=2.03048 training/grad_norm=40.6688 training/lr=0.0001 training/total_loss=9.13299
+[P12-HP] {"step": 206, "loss": 9.132991790771484, "components": {"foundation_loss/lm": 7.102030277252197, "foundation_loss/mtp": 2.0304808616638184, "foundation_loss/aux": 0.00048081279965117574}, "grad_norm": 40.668846130371094}
+Training:  67%|██████▋   | 207/307 [01:39<00:47,  2.09step/s, loss=10.2708, grad_norm=14.3067, lr=1.000e-04, foundation_loss/aux=0.000473142, foundation_loss/lm=7.88302, foundation_loss/mtp=2.3873, tokens/s=335.610, step_time=3.647s] | step=207 epoch=0 data/consumed_samples=7 data/consumed_tokens=2332 data/step_samples=1 data/step_tokens=1224 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64709 performance/tokens_per_second=335.61 training/foundation_loss/aux=0.000473142 training/foundation_loss/lm=7.88302 training/foundation_loss/mtp=2.3873 training/grad_norm=14.3067 training/lr=0.0001 training/total_loss=10.2708
+[P12-HP] {"step": 207, "loss": 10.270795822143555, "components": {"foundation_loss/lm": 7.883023738861084, "foundation_loss/mtp": 2.3872995376586914, "foundation_loss/aux": 0.00047314161201938987}, "grad_norm": 14.30665111541748}
+Training:  68%|██████▊   | 208/307 [01:42<00:48,  2.03step/s, loss=4.83304, grad_norm=37.8288, lr=1.000e-04, foundation_loss/aux=0.00050703, foundation_loss/lm=3.98454, foundation_loss/mtp=0.847996, tokens/s=8.480, step_time=3.656s] | step=208 epoch=0 data/consumed_samples=8 data/consumed_tokens=2363 data/step_samples=1 data/step_tokens=31 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65585 performance/tokens_per_second=8.47955 training/foundation_loss/aux=0.00050703 training/foundation_loss/lm=3.98454 training/foundation_loss/mtp=0.847996 training/grad_norm=37.8288 training/lr=0.0001 training/total_loss=4.83304
+[P12-HP] {"step": 208, "loss": 4.833038806915283, "components": {"foundation_loss/lm": 3.9845364093780518, "foundation_loss/mtp": 0.8479955196380615, "foundation_loss/aux": 0.0005070297047495842}, "grad_norm": 37.828792572021484}
+Training:  68%|██████▊   | 209/307 [01:46<00:49,  1.97step/s, loss=6.52391, grad_norm=15.708, lr=1.000e-04, foundation_loss/aux=0.00047743, foundation_loss/lm=5.04094, foundation_loss/mtp=1.48249, tokens/s=90.721, step_time=3.638s] | step=209 epoch=0 data/consumed_samples=9 data/consumed_tokens=2693 data/step_samples=1 data/step_tokens=330 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63753 performance/tokens_per_second=90.7208 training/foundation_loss/aux=0.00047743 training/foundation_loss/lm=5.04094 training/foundation_loss/mtp=1.48249 training/grad_norm=15.708 training/lr=0.0001 training/total_loss=6.52391
+[P12-HP] {"step": 209, "loss": 6.523906707763672, "components": {"foundation_loss/lm": 5.040939807891846, "foundation_loss/mtp": 1.4824894666671753, "foundation_loss/aux": 0.0004774296539835632}, "grad_norm": 15.707980155944824}
+Training:  68%|██████▊   | 210/307 [01:49<00:50,  1.91step/s, loss=8.69144, grad_norm=11.8821, lr=1.000e-04, foundation_loss/aux=0.000493552, foundation_loss/lm=6.6236, foundation_loss/mtp=2.06735, tokens/s=426.703, step_time=3.651s] | step=210 epoch=0 data/consumed_samples=10 data/consumed_tokens=4251 data/step_samples=1 data/step_tokens=1558 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65125 performance/tokens_per_second=426.703 training/foundation_loss/aux=0.000493552 training/foundation_loss/lm=6.6236 training/foundation_loss/mtp=2.06735 training/grad_norm=11.8821 training/lr=0.0001 training/total_loss=8.69144
+[P12-HP] {"step": 210, "loss": 8.691436767578125, "components": {"foundation_loss/lm": 6.623596668243408, "foundation_loss/mtp": 2.0673458576202393, "foundation_loss/aux": 0.0004935517790727317}, "grad_norm": 11.8821439743042}
+Training:  69%|██████▊   | 211/307 [01:53<00:51,  1.86step/s, loss=9.24827, grad_norm=8.67188, lr=1.000e-04, foundation_loss/aux=0.000484228, foundation_loss/lm=7.02916, foundation_loss/mtp=2.21863, tokens/s=819.340, step_time=3.682s] | step=211 epoch=0 data/consumed_samples=11 data/consumed_tokens=7268 data/step_samples=1 data/step_tokens=3017 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.68223 performance/tokens_per_second=819.34 training/foundation_loss/aux=0.000484228 training/foundation_loss/lm=7.02916 training/foundation_loss/mtp=2.21863 training/grad_norm=8.67188 training/lr=0.0001 training/total_loss=9.24827
+[P12-HP] {"step": 211, "loss": 9.248274803161621, "components": {"foundation_loss/lm": 7.029160499572754, "foundation_loss/mtp": 2.218630075454712, "foundation_loss/aux": 0.0004842281632591039}, "grad_norm": 8.671879768371582}
+Training:  69%|██████▉   | 212/307 [01:57<00:52,  1.81step/s, loss=9.95683, grad_norm=10.8372, lr=1.000e-04, foundation_loss/aux=0.000479961, foundation_loss/lm=7.59116, foundation_loss/mtp=2.36519, tokens/s=520.913, step_time=3.688s] | step=212 epoch=0 data/consumed_samples=12 data/consumed_tokens=9189 data/step_samples=1 data/step_tokens=1921 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.68776 performance/tokens_per_second=520.913 training/foundation_loss/aux=0.000479961 training/foundation_loss/lm=7.59116 training/foundation_loss/mtp=2.36519 training/grad_norm=10.8372 training/lr=0.0001 training/total_loss=9.95683
+[P12-HP] {"step": 212, "loss": 9.956830978393555, "components": {"foundation_loss/lm": 7.591161727905273, "foundation_loss/mtp": 2.365189790725708, "foundation_loss/aux": 0.000479961367091164}, "grad_norm": 10.837157249450684}
+Training:  69%|██████▉   | 213/307 [02:01<00:53,  1.76step/s, loss=9.60721, grad_norm=11.7616, lr=1.000e-04, foundation_loss/aux=0.000483745, foundation_loss/lm=7.28888, foundation_loss/mtp=2.31785, tokens/s=517.371, step_time=3.688s] | step=213 epoch=0 data/consumed_samples=13 data/consumed_tokens=11097 data/step_samples=1 data/step_tokens=1908 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.68788 performance/tokens_per_second=517.371 training/foundation_loss/aux=0.000483745 training/foundation_loss/lm=7.28888 training/foundation_loss/mtp=2.31785 training/grad_norm=11.7616 training/lr=0.0001 training/total_loss=9.60721
+[P12-HP] {"step": 213, "loss": 9.607213973999023, "components": {"foundation_loss/lm": 7.288879871368408, "foundation_loss/mtp": 2.317850351333618, "foundation_loss/aux": 0.00048374547623097897}, "grad_norm": 11.76156234741211}
+Training:  70%|██████▉   | 214/307 [02:04<00:54,  1.72step/s, loss=8.87636, grad_norm=8.11754, lr=1.000e-04, foundation_loss/aux=0.000491958, foundation_loss/lm=6.72119, foundation_loss/mtp=2.15467, tokens/s=558.289, step_time=3.677s] | step=214 epoch=0 data/consumed_samples=14 data/consumed_tokens=13150 data/step_samples=1 data/step_tokens=2053 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.67731 performance/tokens_per_second=558.289 training/foundation_loss/aux=0.000491958 training/foundation_loss/lm=6.72119 training/foundation_loss/mtp=2.15467 training/grad_norm=8.11754 training/lr=0.0001 training/total_loss=8.87636
+[P12-HP] {"step": 214, "loss": 8.87635612487793, "components": {"foundation_loss/lm": 6.721190929412842, "foundation_loss/mtp": 2.154672622680664, "foundation_loss/aux": 0.0004919578204862773}, "grad_norm": 8.117535591125488}
+Training:  70%|███████   | 215/307 [02:08<00:54,  1.67step/s, loss=9.09087, grad_norm=9.62024, lr=1.000e-04, foundation_loss/aux=0.000478279, foundation_loss/lm=6.8472, foundation_loss/mtp=2.2432, tokens/s=616.352, step_time=3.670s] | step=215 epoch=0 data/consumed_samples=15 data/consumed_tokens=15412 data/step_samples=1 data/step_tokens=2262 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.66998 performance/tokens_per_second=616.352 training/foundation_loss/aux=0.000478279 training/foundation_loss/lm=6.8472 training/foundation_loss/mtp=2.2432 training/grad_norm=9.62024 training/lr=0.0001 training/total_loss=9.09087
+[P12-HP] {"step": 215, "loss": 9.090874671936035, "components": {"foundation_loss/lm": 6.847200393676758, "foundation_loss/mtp": 2.2431952953338623, "foundation_loss/aux": 0.0004782790783792734}, "grad_norm": 9.62024211883545}
+Training:  70%|███████   | 216/307 [02:12<00:55,  1.63step/s, loss=8.04595, grad_norm=9.11891, lr=1.000e-04, foundation_loss/aux=0.000482833, foundation_loss/lm=6.02391, foundation_loss/mtp=2.02156, tokens/s=510.808, step_time=3.786s] | step=216 epoch=0 data/consumed_samples=16 data/consumed_tokens=17346 data/step_samples=1 data/step_tokens=1934 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.78616 performance/tokens_per_second=510.808 training/foundation_loss/aux=0.000482833 training/foundation_loss/lm=6.02391 training/foundation_loss/mtp=2.02156 training/grad_norm=9.11891 training/lr=0.0001 training/total_loss=8.04595
+[P12-HP] {"step": 216, "loss": 8.045950889587402, "components": {"foundation_loss/lm": 6.023907661437988, "foundation_loss/mtp": 2.0215606689453125, "foundation_loss/aux": 0.0004828328965231776}, "grad_norm": 9.118908882141113}
+Training:  71%|███████   | 217/307 [02:15<00:56,  1.60step/s, loss=9.78484, grad_norm=29.8208, lr=1.000e-04, foundation_loss/aux=0.000472497, foundation_loss/lm=7.61305, foundation_loss/mtp=2.17132, tokens/s=1045.607, step_time=3.635s] | step=217 epoch=0 data/consumed_samples=17 data/consumed_tokens=21147 data/step_samples=1 data/step_tokens=3801 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63521 performance/tokens_per_second=1045.61 training/foundation_loss/aux=0.000472497 training/foundation_loss/lm=7.61305 training/foundation_loss/mtp=2.17132 training/grad_norm=29.8208 training/lr=0.0001 training/total_loss=9.78484
+[P12-HP] {"step": 217, "loss": 9.78483772277832, "components": {"foundation_loss/lm": 7.613049030303955, "foundation_loss/mtp": 2.171316385269165, "foundation_loss/aux": 0.0004724973114207387}, "grad_norm": 29.820796966552734}
+Training:  71%|███████   | 218/307 [02:19<00:56,  1.56step/s, loss=10.3829, grad_norm=12.8772, lr=1.000e-04, foundation_loss/aux=0.000472337, foundation_loss/lm=8.00535, foundation_loss/mtp=2.37703, tokens/s=457.087, step_time=3.557s] | step=218 epoch=0 data/consumed_samples=18 data/consumed_tokens=22773 data/step_samples=1 data/step_tokens=1626 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.55731 performance/tokens_per_second=457.087 training/foundation_loss/aux=0.000472337 training/foundation_loss/lm=8.00535 training/foundation_loss/mtp=2.37703 training/grad_norm=12.8772 training/lr=0.0001 training/total_loss=10.3829
+[P12-HP] {"step": 218, "loss": 10.382855415344238, "components": {"foundation_loss/lm": 8.005350112915039, "foundation_loss/mtp": 2.37703275680542, "foundation_loss/aux": 0.0004723370948340744}, "grad_norm": 12.877197265625}
+Training:  71%|███████▏  | 219/307 [02:23<00:57,  1.53step/s, loss=7.17848, grad_norm=18.4899, lr=1.000e-04, foundation_loss/aux=0.000537517, foundation_loss/lm=5.54208, foundation_loss/mtp=1.63587, tokens/s=1131.296, step_time=3.621s] | step=219 epoch=0 data/consumed_samples=19 data/consumed_tokens=26869 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62063 performance/tokens_per_second=1131.3 training/foundation_loss/aux=0.000537517 training/foundation_loss/lm=5.54208 training/foundation_loss/mtp=1.63587 training/grad_norm=18.4899 training/lr=0.0001 training/total_loss=7.17848
+[P12-HP] {"step": 219, "loss": 7.178481578826904, "components": {"foundation_loss/lm": 5.5420756340026855, "foundation_loss/mtp": 1.6358684301376343, "foundation_loss/aux": 0.0005375169566832483}, "grad_norm": 18.489858627319336}
+Training:  72%|███████▏  | 220/307 [02:26<00:57,  1.50step/s, loss=8.71179, grad_norm=11.8021, lr=1.000e-04, foundation_loss/aux=0.000465415, foundation_loss/lm=6.73837, foundation_loss/mtp=1.97296, tokens/s=648.638, step_time=3.569s] | step=220 epoch=0 data/consumed_samples=20 data/consumed_tokens=29184 data/step_samples=1 data/step_tokens=2315 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.56902 performance/tokens_per_second=648.638 training/foundation_loss/aux=0.000465415 training/foundation_loss/lm=6.73837 training/foundation_loss/mtp=1.97296 training/grad_norm=11.8021 training/lr=0.0001 training/total_loss=8.71179
+[P12-HP] {"step": 220, "loss": 8.711790084838867, "components": {"foundation_loss/lm": 6.738369464874268, "foundation_loss/mtp": 1.972955584526062, "foundation_loss/aux": 0.00046541541814804077}, "grad_norm": 11.802133560180664}
+Training:  72%|███████▏  | 221/307 [02:30<00:58,  1.47step/s, loss=10.1548, grad_norm=10.7589, lr=1.000e-04, foundation_loss/aux=0.000464193, foundation_loss/lm=7.83788, foundation_loss/mtp=2.31645, tokens/s=889.519, step_time=3.522s] | step=221 epoch=0 data/consumed_samples=21 data/consumed_tokens=32317 data/step_samples=1 data/step_tokens=3133 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.52213 performance/tokens_per_second=889.519 training/foundation_loss/aux=0.000464193 training/foundation_loss/lm=7.83788 training/foundation_loss/mtp=2.31645 training/grad_norm=10.7589 training/lr=0.0001 training/total_loss=10.1548
+[P12-HP] {"step": 221, "loss": 10.154789924621582, "components": {"foundation_loss/lm": 7.837876319885254, "foundation_loss/mtp": 2.3164491653442383, "foundation_loss/aux": 0.00046419311547651887}, "grad_norm": 10.758891105651855}
+Training:  72%|███████▏  | 222/307 [02:33<00:58,  1.44step/s, loss=7.09939, grad_norm=15.5765, lr=1.000e-04, foundation_loss/aux=0.000464257, foundation_loss/lm=5.48578, foundation_loss/mtp=1.61315, tokens/s=634.008, step_time=3.565s] | step=222 epoch=0 data/consumed_samples=22 data/consumed_tokens=34577 data/step_samples=1 data/step_tokens=2260 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.56462 performance/tokens_per_second=634.008 training/foundation_loss/aux=0.000464257 training/foundation_loss/lm=5.48578 training/foundation_loss/mtp=1.61315 training/grad_norm=15.5765 training/lr=0.0001 training/total_loss=7.09939
+[P12-HP] {"step": 222, "loss": 7.099389553070068, "components": {"foundation_loss/lm": 5.485779762268066, "foundation_loss/mtp": 1.6131454706192017, "foundation_loss/aux": 0.00046425662003457546}, "grad_norm": 15.576457977294922}
+Training:  73%|███████▎  | 223/307 [02:37<00:59,  1.42step/s, loss=5.46824, grad_norm=17.195, lr=1.000e-04, foundation_loss/aux=0.000517574, foundation_loss/lm=4.17391, foundation_loss/mtp=1.29381, tokens/s=1137.790, step_time=3.600s] | step=223 epoch=0 data/consumed_samples=23 data/consumed_tokens=38673 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.59996 performance/tokens_per_second=1137.79 training/foundation_loss/aux=0.000517574 training/foundation_loss/lm=4.17391 training/foundation_loss/mtp=1.29381 training/grad_norm=17.195 training/lr=0.0001 training/total_loss=5.46824
+[P12-HP] {"step": 223, "loss": 5.468240737915039, "components": {"foundation_loss/lm": 4.173913478851318, "foundation_loss/mtp": 1.2938098907470703, "foundation_loss/aux": 0.000517573906108737}, "grad_norm": 17.195009231567383}
+Training:  73%|███████▎  | 224/307 [02:40<00:59,  1.39step/s, loss=7.05707, grad_norm=14.3608, lr=1.000e-04, foundation_loss/aux=0.000458745, foundation_loss/lm=5.37715, foundation_loss/mtp=1.67945, tokens/s=985.188, step_time=3.576s] | step=224 epoch=0 data/consumed_samples=24 data/consumed_tokens=42196 data/step_samples=1 data/step_tokens=3523 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.57597 performance/tokens_per_second=985.188 training/foundation_loss/aux=0.000458745 training/foundation_loss/lm=5.37715 training/foundation_loss/mtp=1.67945 training/grad_norm=14.3608 training/lr=0.0001 training/total_loss=7.05707
+[P12-HP] {"step": 224, "loss": 7.057065963745117, "components": {"foundation_loss/lm": 5.377153396606445, "foundation_loss/mtp": 1.6794538497924805, "foundation_loss/aux": 0.00045874519855715334}, "grad_norm": 14.360762596130371}
+Training:  73%|███████▎  | 225/307 [02:44<00:59,  1.37step/s, loss=11.6971, grad_norm=11.4307, lr=1.000e-04, foundation_loss/aux=0.000452058, foundation_loss/lm=9.00467, foundation_loss/mtp=2.69198, tokens/s=662.160, step_time=3.555s] | step=225 epoch=0 data/consumed_samples=25 data/consumed_tokens=44550 data/step_samples=1 data/step_tokens=2354 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.55503 performance/tokens_per_second=662.16 training/foundation_loss/aux=0.000452058 training/foundation_loss/lm=9.00467 training/foundation_loss/mtp=2.69198 training/grad_norm=11.4307 training/lr=0.0001 training/total_loss=11.6971
+[P12-HP] {"step": 225, "loss": 11.697100639343262, "components": {"foundation_loss/lm": 9.004667282104492, "foundation_loss/mtp": 2.691981315612793, "foundation_loss/aux": 0.00045205774949863553}, "grad_norm": 11.430726051330566}
+Training:  74%|███████▎  | 226/307 [02:48<01:00,  1.35step/s, loss=10.3282, grad_norm=9.55229, lr=1.000e-04, foundation_loss/aux=0.00045373, foundation_loss/lm=7.94527, foundation_loss/mtp=2.38246, tokens/s=502.383, step_time=3.571s] | step=226 epoch=0 data/consumed_samples=26 data/consumed_tokens=46344 data/step_samples=1 data/step_tokens=1794 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.57098 performance/tokens_per_second=502.383 training/foundation_loss/aux=0.00045373 training/foundation_loss/lm=7.94527 training/foundation_loss/mtp=2.38246 training/grad_norm=9.55229 training/lr=0.0001 training/total_loss=10.3282
+[P12-HP] {"step": 226, "loss": 10.328178405761719, "components": {"foundation_loss/lm": 7.945265293121338, "foundation_loss/mtp": 2.3824596405029297, "foundation_loss/aux": 0.00045372964814305305}, "grad_norm": 9.55229377746582}
+Training:  74%|███████▍  | 227/307 [02:51<01:00,  1.32step/s, loss=11.0399, grad_norm=14.97, lr=1.000e-04, foundation_loss/aux=0.000433068, foundation_loss/lm=8.44374, foundation_loss/mtp=2.59571, tokens/s=89.829, step_time=3.618s] | step=227 epoch=0 data/consumed_samples=27 data/consumed_tokens=46669 data/step_samples=1 data/step_tokens=325 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.61797 performance/tokens_per_second=89.8294 training/foundation_loss/aux=0.000433068 training/foundation_loss/lm=8.44374 training/foundation_loss/mtp=2.59571 training/grad_norm=14.97 training/lr=0.0001 training/total_loss=11.0399
+[P12-HP] {"step": 227, "loss": 11.03989028930664, "components": {"foundation_loss/lm": 8.443744659423828, "foundation_loss/mtp": 2.595712423324585, "foundation_loss/aux": 0.0004330675583332777}, "grad_norm": 14.96997356414795}
+Training:  74%|███████▍  | 228/307 [02:55<01:00,  1.30step/s, loss=11.0572, grad_norm=27.8638, lr=1.000e-04, foundation_loss/aux=0.000481031, foundation_loss/lm=8.53133, foundation_loss/mtp=2.52538, tokens/s=541.976, step_time=3.609s] | step=228 epoch=0 data/consumed_samples=28 data/consumed_tokens=48625 data/step_samples=1 data/step_tokens=1956 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.60901 performance/tokens_per_second=541.976 training/foundation_loss/aux=0.000481031 training/foundation_loss/lm=8.53133 training/foundation_loss/mtp=2.52538 training/grad_norm=27.8638 training/lr=0.0001 training/total_loss=11.0572
+[P12-HP] {"step": 228, "loss": 11.057186126708984, "components": {"foundation_loss/lm": 8.531328201293945, "foundation_loss/mtp": 2.5253775119781494, "foundation_loss/aux": 0.00048103107837960124}, "grad_norm": 27.86384391784668}
+Training:  75%|███████▍  | 229/307 [02:58<01:00,  1.28step/s, loss=10.5874, grad_norm=6.2771, lr=1.000e-04, foundation_loss/aux=0.00049359, foundation_loss/lm=8.12633, foundation_loss/mtp=2.46053, tokens/s=1049.377, step_time=3.637s] | step=229 epoch=0 data/consumed_samples=29 data/consumed_tokens=52442 data/step_samples=1 data/step_tokens=3817 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6374 performance/tokens_per_second=1049.38 training/foundation_loss/aux=0.00049359 training/foundation_loss/lm=8.12633 training/foundation_loss/mtp=2.46053 training/grad_norm=6.2771 training/lr=0.0001 training/total_loss=10.5874
+[P12-HP] {"step": 229, "loss": 10.58735466003418, "components": {"foundation_loss/lm": 8.126331329345703, "foundation_loss/mtp": 2.4605298042297363, "foundation_loss/aux": 0.0004935898468829691}, "grad_norm": 6.277099609375}
+Training:  75%|███████▍  | 230/307 [03:02<01:01,  1.26step/s, loss=10.2336, grad_norm=6.48538, lr=1.000e-04, foundation_loss/aux=0.000498359, foundation_loss/lm=7.8367, foundation_loss/mtp=2.39639, tokens/s=1054.169, step_time=3.645s] | step=230 epoch=0 data/consumed_samples=30 data/consumed_tokens=56284 data/step_samples=1 data/step_tokens=3842 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64458 performance/tokens_per_second=1054.17 training/foundation_loss/aux=0.000498359 training/foundation_loss/lm=7.8367 training/foundation_loss/mtp=2.39639 training/grad_norm=6.48538 training/lr=0.0001 training/total_loss=10.2336
+[P12-HP] {"step": 230, "loss": 10.2335844039917, "components": {"foundation_loss/lm": 7.836696147918701, "foundation_loss/mtp": 2.3963897228240967, "foundation_loss/aux": 0.000498358509503305}, "grad_norm": 6.4853835105896}
+Training:  75%|███████▌  | 231/307 [03:06<01:01,  1.24step/s, loss=10.2644, grad_norm=9.11717, lr=1.000e-04, foundation_loss/aux=0.000507343, foundation_loss/lm=7.85864, foundation_loss/mtp=2.40524, tokens/s=1058.532, step_time=3.666s] | step=231 epoch=0 data/consumed_samples=31 data/consumed_tokens=60165 data/step_samples=1 data/step_tokens=3881 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6664 performance/tokens_per_second=1058.53 training/foundation_loss/aux=0.000507343 training/foundation_loss/lm=7.85864 training/foundation_loss/mtp=2.40524 training/grad_norm=9.11717 training/lr=0.0001 training/total_loss=10.2644
+[P12-HP] {"step": 231, "loss": 10.264389038085938, "components": {"foundation_loss/lm": 7.85863733291626, "foundation_loss/mtp": 2.405244827270508, "foundation_loss/aux": 0.0005073427455499768}, "grad_norm": 9.117168426513672}
+Training:  76%|███████▌  | 232/307 [03:09<01:01,  1.22step/s, loss=9.61307, grad_norm=8.96019, lr=1.000e-04, foundation_loss/aux=0.000510408, foundation_loss/lm=7.38449, foundation_loss/mtp=2.22806, tokens/s=1099.605, step_time=3.639s] | step=232 epoch=0 data/consumed_samples=32 data/consumed_tokens=64166 data/step_samples=1 data/step_tokens=4001 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63858 performance/tokens_per_second=1099.61 training/foundation_loss/aux=0.000510408 training/foundation_loss/lm=7.38449 training/foundation_loss/mtp=2.22806 training/grad_norm=8.96019 training/lr=0.0001 training/total_loss=9.61307
+[P12-HP] {"step": 232, "loss": 9.613066673278809, "components": {"foundation_loss/lm": 7.384493350982666, "foundation_loss/mtp": 2.228062868118286, "foundation_loss/aux": 0.0005104080191813409}, "grad_norm": 8.960190773010254}
+Training:  76%|███████▌  | 233/307 [03:13<01:01,  1.20step/s, loss=9.28961, grad_norm=9.39733, lr=1.000e-04, foundation_loss/aux=0.000513664, foundation_loss/lm=7.11026, foundation_loss/mtp=2.17883, tokens/s=1083.407, step_time=3.646s] | step=233 epoch=0 data/consumed_samples=33 data/consumed_tokens=68116 data/step_samples=1 data/step_tokens=3950 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6459 performance/tokens_per_second=1083.41 training/foundation_loss/aux=0.000513664 training/foundation_loss/lm=7.11026 training/foundation_loss/mtp=2.17883 training/grad_norm=9.39733 training/lr=0.0001 training/total_loss=9.28961
+[P12-HP] {"step": 233, "loss": 9.289605140686035, "components": {"foundation_loss/lm": 7.110260009765625, "foundation_loss/mtp": 2.1788313388824463, "foundation_loss/aux": 0.0005136642139405012}, "grad_norm": 9.397331237792969}
+Training:  76%|███████▌  | 234/307 [03:17<01:01,  1.19step/s, loss=8.12834, grad_norm=16.2415, lr=1.000e-04, foundation_loss/aux=0.000487843, foundation_loss/lm=6.23041, foundation_loss/mtp=1.89744, tokens/s=1070.120, step_time=3.615s] | step=234 epoch=0 data/consumed_samples=34 data/consumed_tokens=71985 data/step_samples=1 data/step_tokens=3869 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.61548 performance/tokens_per_second=1070.12 training/foundation_loss/aux=0.000487843 training/foundation_loss/lm=6.23041 training/foundation_loss/mtp=1.89744 training/grad_norm=16.2415 training/lr=0.0001 training/total_loss=8.12834
+[P12-HP] {"step": 234, "loss": 8.128337860107422, "components": {"foundation_loss/lm": 6.230410099029541, "foundation_loss/mtp": 1.8974394798278809, "foundation_loss/aux": 0.000487842655275017}, "grad_norm": 16.241464614868164}
+Training:  77%|███████▋  | 235/307 [03:20<01:01,  1.17step/s, loss=8.90902, grad_norm=9.25268, lr=1.000e-04, foundation_loss/aux=0.000509762, foundation_loss/lm=6.79117, foundation_loss/mtp=2.11734, tokens/s=1096.430, step_time=3.646s] | step=235 epoch=0 data/consumed_samples=35 data/consumed_tokens=75983 data/step_samples=1 data/step_tokens=3998 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64638 performance/tokens_per_second=1096.43 training/foundation_loss/aux=0.000509762 training/foundation_loss/lm=6.79117 training/foundation_loss/mtp=2.11734 training/grad_norm=9.25268 training/lr=0.0001 training/total_loss=8.90902
+[P12-HP] {"step": 235, "loss": 8.909019470214844, "components": {"foundation_loss/lm": 6.791168212890625, "foundation_loss/mtp": 2.1173412799835205, "foundation_loss/aux": 0.0005097620887681842}, "grad_norm": 9.252680778503418}
+Training:  77%|███████▋  | 236/307 [03:24<01:01,  1.15step/s, loss=9.86388, grad_norm=9.31844, lr=1.000e-04, foundation_loss/aux=0.000523613, foundation_loss/lm=7.52772, foundation_loss/mtp=2.33564, tokens/s=1035.039, step_time=3.635s] | step=236 epoch=0 data/consumed_samples=36 data/consumed_tokens=79745 data/step_samples=1 data/step_tokens=3762 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63465 performance/tokens_per_second=1035.04 training/foundation_loss/aux=0.000523613 training/foundation_loss/lm=7.52772 training/foundation_loss/mtp=2.33564 training/grad_norm=9.31844 training/lr=0.0001 training/total_loss=9.86388
+[P12-HP] {"step": 236, "loss": 9.86388111114502, "components": {"foundation_loss/lm": 7.527719020843506, "foundation_loss/mtp": 2.3356380462646484, "foundation_loss/aux": 0.0005236130091361701}, "grad_norm": 9.318437576293945}
+Training:  77%|███████▋  | 237/307 [03:28<01:01,  1.14step/s, loss=9.28842, grad_norm=11.2722, lr=1.000e-04, foundation_loss/aux=0.000526378, foundation_loss/lm=7.09267, foundation_loss/mtp=2.19522, tokens/s=1087.355, step_time=3.647s] | step=237 epoch=0 data/consumed_samples=37 data/consumed_tokens=83711 data/step_samples=1 data/step_tokens=3966 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64738 performance/tokens_per_second=1087.36 training/foundation_loss/aux=0.000526378 training/foundation_loss/lm=7.09267 training/foundation_loss/mtp=2.19522 training/grad_norm=11.2722 training/lr=0.0001 training/total_loss=9.28842
+[P12-HP] {"step": 237, "loss": 9.288415908813477, "components": {"foundation_loss/lm": 7.092665672302246, "foundation_loss/mtp": 2.195223331451416, "foundation_loss/aux": 0.0005263780476525426}, "grad_norm": 11.272218704223633}
+Training:  78%|███████▊  | 238/307 [03:31<01:01,  1.12step/s, loss=9.70357, grad_norm=20.5657, lr=1.000e-04, foundation_loss/aux=0.00050923, foundation_loss/lm=7.41328, foundation_loss/mtp=2.28978, tokens/s=1098.561, step_time=3.643s] | step=238 epoch=0 data/consumed_samples=38 data/consumed_tokens=87713 data/step_samples=1 data/step_tokens=4002 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64295 performance/tokens_per_second=1098.56 training/foundation_loss/aux=0.00050923 training/foundation_loss/lm=7.41328 training/foundation_loss/mtp=2.28978 training/grad_norm=20.5657 training/lr=0.0001 training/total_loss=9.70357
+[P12-HP] {"step": 238, "loss": 9.703569412231445, "components": {"foundation_loss/lm": 7.413276672363281, "foundation_loss/mtp": 2.289783239364624, "foundation_loss/aux": 0.0005092296050861478}, "grad_norm": 20.565710067749023}
+Training:  78%|███████▊  | 239/307 [03:35<01:01,  1.11step/s, loss=10.2986, grad_norm=13.1622, lr=1.000e-04, foundation_loss/aux=0.000473209, foundation_loss/lm=7.89823, foundation_loss/mtp=2.39992, tokens/s=295.615, step_time=3.589s] | step=239 epoch=0 data/consumed_samples=39 data/consumed_tokens=88774 data/step_samples=1 data/step_tokens=1061 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58913 performance/tokens_per_second=295.615 training/foundation_loss/aux=0.000473209 training/foundation_loss/lm=7.89823 training/foundation_loss/mtp=2.39992 training/grad_norm=13.1622 training/lr=0.0001 training/total_loss=10.2986
+[P12-HP] {"step": 239, "loss": 10.298627853393555, "components": {"foundation_loss/lm": 7.898232936859131, "foundation_loss/mtp": 2.3999216556549072, "foundation_loss/aux": 0.00047320922021754086}, "grad_norm": 13.162165641784668}
+Training:  78%|███████▊  | 240/307 [03:38<01:01,  1.10step/s, loss=9.59703, grad_norm=15.799, lr=1.000e-04, foundation_loss/aux=0.000484204, foundation_loss/lm=7.46942, foundation_loss/mtp=2.12713, tokens/s=260.150, step_time=3.586s] | step=240 epoch=0 data/consumed_samples=40 data/consumed_tokens=89707 data/step_samples=1 data/step_tokens=933 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58639 performance/tokens_per_second=260.15 training/foundation_loss/aux=0.000484204 training/foundation_loss/lm=7.46942 training/foundation_loss/mtp=2.12713 training/grad_norm=15.799 training/lr=0.0001 training/total_loss=9.59703
+[P12-HP] {"step": 240, "loss": 9.597034454345703, "components": {"foundation_loss/lm": 7.469424247741699, "foundation_loss/mtp": 2.1271252632141113, "foundation_loss/aux": 0.0004842042690142989}, "grad_norm": 15.798994064331055}
+Training:  79%|███████▊  | 241/307 [03:42<01:00,  1.08step/s, loss=7.09754, grad_norm=16.6026, lr=1.000e-04, foundation_loss/aux=0.00051188, foundation_loss/lm=5.49693, foundation_loss/mtp=1.6001, tokens/s=1095.577, step_time=3.592s] | step=241 epoch=0 data/consumed_samples=41 data/consumed_tokens=93642 data/step_samples=1 data/step_tokens=3935 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.59171 performance/tokens_per_second=1095.58 training/foundation_loss/aux=0.00051188 training/foundation_loss/lm=5.49693 training/foundation_loss/mtp=1.6001 training/grad_norm=16.6026 training/lr=0.0001 training/total_loss=7.09754
+[P12-HP] {"step": 241, "loss": 7.097541809082031, "components": {"foundation_loss/lm": 5.496931552886963, "foundation_loss/mtp": 1.6000984907150269, "foundation_loss/aux": 0.0005118798580951989}, "grad_norm": 16.60262107849121}
+Training:  79%|███████▉  | 242/307 [03:46<01:00,  1.07step/s, loss=8.63414, grad_norm=10.3456, lr=1.000e-04, foundation_loss/aux=0.000480836, foundation_loss/lm=6.63809, foundation_loss/mtp=1.99556, tokens/s=1089.092, step_time=3.586s] | step=242 epoch=0 data/consumed_samples=42 data/consumed_tokens=97548 data/step_samples=1 data/step_tokens=3906 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58647 performance/tokens_per_second=1089.09 training/foundation_loss/aux=0.000480836 training/foundation_loss/lm=6.63809 training/foundation_loss/mtp=1.99556 training/grad_norm=10.3456 training/lr=0.0001 training/total_loss=8.63414
+[P12-HP] {"step": 242, "loss": 8.634137153625488, "components": {"foundation_loss/lm": 6.6380934715271, "foundation_loss/mtp": 1.995563268661499, "foundation_loss/aux": 0.0004808356170542538}, "grad_norm": 10.345608711242676}
+Training:  79%|███████▉  | 243/307 [03:49<01:00,  1.06step/s, loss=7.49402, grad_norm=11.4002, lr=1.000e-04, foundation_loss/aux=0.000461045, foundation_loss/lm=5.78179, foundation_loss/mtp=1.71177, tokens/s=766.177, step_time=3.561s] | step=243 epoch=0 data/consumed_samples=43 data/consumed_tokens=100276 data/step_samples=1 data/step_tokens=2728 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.56054 performance/tokens_per_second=766.177 training/foundation_loss/aux=0.000461045 training/foundation_loss/lm=5.78179 training/foundation_loss/mtp=1.71177 training/grad_norm=11.4002 training/lr=0.0001 training/total_loss=7.49402
+[P12-HP] {"step": 243, "loss": 7.494017124176025, "components": {"foundation_loss/lm": 5.7817864418029785, "foundation_loss/mtp": 1.7117695808410645, "foundation_loss/aux": 0.0004610445466823876}, "grad_norm": 11.400177955627441}
+Training:  79%|███████▉  | 244/307 [03:53<01:00,  1.05step/s, loss=8.56238, grad_norm=20.1534, lr=1.000e-04, foundation_loss/aux=0.000451607, foundation_loss/lm=6.7856, foundation_loss/mtp=1.77632, tokens/s=513.217, step_time=3.657s] | step=244 epoch=0 data/consumed_samples=44 data/consumed_tokens=102153 data/step_samples=1 data/step_tokens=1877 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65733 performance/tokens_per_second=513.217 training/foundation_loss/aux=0.000451607 training/foundation_loss/lm=6.7856 training/foundation_loss/mtp=1.77632 training/grad_norm=20.1534 training/lr=0.0001 training/total_loss=8.56238
+[P12-HP] {"step": 244, "loss": 8.562376022338867, "components": {"foundation_loss/lm": 6.785599708557129, "foundation_loss/mtp": 1.7763245105743408, "foundation_loss/aux": 0.0004516073386184871}, "grad_norm": 20.153400421142578}
+Training:  80%|███████▉  | 245/307 [03:56<00:59,  1.03step/s, loss=6.85932, grad_norm=11.863, lr=1.000e-04, foundation_loss/aux=0.000529824, foundation_loss/lm=5.24969, foundation_loss/mtp=1.60911, tokens/s=1088.790, step_time=3.656s] | step=245 epoch=0 data/consumed_samples=45 data/consumed_tokens=106134 data/step_samples=1 data/step_tokens=3981 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65635 performance/tokens_per_second=1088.79 training/foundation_loss/aux=0.000529824 training/foundation_loss/lm=5.24969 training/foundation_loss/mtp=1.60911 training/grad_norm=11.863 training/lr=0.0001 training/total_loss=6.85932
+[P12-HP] {"step": 245, "loss": 6.8593244552612305, "components": {"foundation_loss/lm": 5.249688148498535, "foundation_loss/mtp": 1.6091066598892212, "foundation_loss/aux": 0.0005298237083479762}, "grad_norm": 11.862957954406738}
+Training:  80%|████████  | 246/307 [04:00<00:59,  1.02step/s, loss=6.091, grad_norm=13.1041, lr=1.000e-04, foundation_loss/aux=0.000541478, foundation_loss/lm=4.68668, foundation_loss/mtp=1.40377, tokens/s=1125.532, step_time=3.639s] | step=246 epoch=0 data/consumed_samples=46 data/consumed_tokens=110230 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63917 performance/tokens_per_second=1125.53 training/foundation_loss/aux=0.000541478 training/foundation_loss/lm=4.68668 training/foundation_loss/mtp=1.40377 training/grad_norm=13.1041 training/lr=0.0001 training/total_loss=6.091
+[P12-HP] {"step": 246, "loss": 6.090998649597168, "components": {"foundation_loss/lm": 4.6866841316223145, "foundation_loss/mtp": 1.4037730693817139, "foundation_loss/aux": 0.0005414779880084097}, "grad_norm": 13.104106903076172}
+Training:  80%|████████  | 247/307 [04:04<00:59,  1.01step/s, loss=7.54549, grad_norm=11.139, lr=1.000e-04, foundation_loss/aux=0.000536585, foundation_loss/lm=5.75774, foundation_loss/mtp=1.78721, tokens/s=1123.304, step_time=3.646s] | step=247 epoch=0 data/consumed_samples=47 data/consumed_tokens=114326 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64639 performance/tokens_per_second=1123.3 training/foundation_loss/aux=0.000536585 training/foundation_loss/lm=5.75774 training/foundation_loss/mtp=1.78721 training/grad_norm=11.139 training/lr=0.0001 training/total_loss=7.54549
+[P12-HP] {"step": 247, "loss": 7.545485973358154, "components": {"foundation_loss/lm": 5.757742881774902, "foundation_loss/mtp": 1.7872068881988525, "foundation_loss/aux": 0.0005365854594856501}, "grad_norm": 11.138968467712402}
+Training:  81%|████████  | 248/307 [04:07<00:58,  1.00step/s, loss=7.87921, grad_norm=12.8438, lr=1.000e-04, foundation_loss/aux=0.000522594, foundation_loss/lm=5.9836, foundation_loss/mtp=1.89509, tokens/s=1130.161, step_time=3.624s] | step=248 epoch=0 data/consumed_samples=48 data/consumed_tokens=118422 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62426 performance/tokens_per_second=1130.16 training/foundation_loss/aux=0.000522594 training/foundation_loss/lm=5.9836 training/foundation_loss/mtp=1.89509 training/grad_norm=12.8438 training/lr=0.0001 training/total_loss=7.87921
+[P12-HP] {"step": 248, "loss": 7.879213333129883, "components": {"foundation_loss/lm": 5.983604907989502, "foundation_loss/mtp": 1.8950860500335693, "foundation_loss/aux": 0.0005225944914855063}, "grad_norm": 12.843832015991211}
+Training:  81%|████████  | 249/307 [04:11<00:58,  1.01s/step, loss=7.02787, grad_norm=19.1584, lr=1.000e-04, foundation_loss/aux=0.000532328, foundation_loss/lm=5.35114, foundation_loss/mtp=1.6762, tokens/s=1125.593, step_time=3.639s] | step=249 epoch=0 data/consumed_samples=49 data/consumed_tokens=122518 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63897 performance/tokens_per_second=1125.59 training/foundation_loss/aux=0.000532328 training/foundation_loss/lm=5.35114 training/foundation_loss/mtp=1.6762 training/grad_norm=19.1584 training/lr=0.0001 training/total_loss=7.02787
+[P12-HP] {"step": 249, "loss": 7.027867794036865, "components": {"foundation_loss/lm": 5.35113525390625, "foundation_loss/mtp": 1.67620050907135, "foundation_loss/aux": 0.0005323278601281345}, "grad_norm": 19.158363342285156}
+Training:  81%|████████▏ | 250/307 [04:15<00:58,  1.02s/step, loss=6.24995, grad_norm=14.6095, lr=1.000e-04, foundation_loss/aux=0.000379364, foundation_loss/lm=4.7359, foundation_loss/mtp=1.51367, tokens/s=265.824, step_time=3.630s] | step=250 epoch=0 data/consumed_samples=50 data/consumed_tokens=123483 data/step_samples=1 data/step_tokens=965 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63022 performance/tokens_per_second=265.824 training/foundation_loss/aux=0.000379364 training/foundation_loss/lm=4.7359 training/foundation_loss/mtp=1.51367 training/grad_norm=14.6095 training/lr=0.0001 training/total_loss=6.24995
+[P12-HP] {"step": 250, "loss": 6.249948024749756, "components": {"foundation_loss/lm": 4.735896587371826, "foundation_loss/mtp": 1.5136717557907104, "foundation_loss/aux": 0.0003793644718825817}, "grad_norm": 14.60949993133545}
+Training:  82%|████████▏ | 251/307 [04:18<00:57,  1.03s/step, loss=7.84696, grad_norm=12.252, lr=1.000e-04, foundation_loss/aux=0.000491672, foundation_loss/lm=6.13802, foundation_loss/mtp=1.70845, tokens/s=518.888, step_time=3.623s] | step=251 epoch=0 data/consumed_samples=51 data/consumed_tokens=125363 data/step_samples=1 data/step_tokens=1880 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62314 performance/tokens_per_second=518.888 training/foundation_loss/aux=0.000491672 training/foundation_loss/lm=6.13802 training/foundation_loss/mtp=1.70845 training/grad_norm=12.252 training/lr=0.0001 training/total_loss=7.84696
+[P12-HP] {"step": 251, "loss": 7.846964359283447, "components": {"foundation_loss/lm": 6.138023376464844, "foundation_loss/mtp": 1.7084496021270752, "foundation_loss/aux": 0.0004916723119094968}, "grad_norm": 12.251993179321289}
+Training:  82%|████████▏ | 252/307 [04:22<00:57,  1.04s/step, loss=9.2799, grad_norm=12.2011, lr=1.000e-04, foundation_loss/aux=0.000441432, foundation_loss/lm=7.22378, foundation_loss/mtp=2.05568, tokens/s=772.992, step_time=3.554s] | step=252 epoch=0 data/consumed_samples=52 data/consumed_tokens=128110 data/step_samples=1 data/step_tokens=2747 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.55372 performance/tokens_per_second=772.992 training/foundation_loss/aux=0.000441432 training/foundation_loss/lm=7.22378 training/foundation_loss/mtp=2.05568 training/grad_norm=12.2011 training/lr=0.0001 training/total_loss=9.2799
+[P12-HP] {"step": 252, "loss": 9.27989673614502, "components": {"foundation_loss/lm": 7.223775386810303, "foundation_loss/mtp": 2.0556797981262207, "foundation_loss/aux": 0.0004414321156218648}, "grad_norm": 12.201066970825195}
+Training:  82%|████████▏ | 253/307 [04:25<00:56,  1.05s/step, loss=12.844, grad_norm=22.7787, lr=1.000e-04, foundation_loss/aux=0.000472217, foundation_loss/lm=9.9039, foundation_loss/mtp=2.9396, tokens/s=921.997, step_time=3.582s] | step=253 epoch=0 data/consumed_samples=53 data/consumed_tokens=131413 data/step_samples=1 data/step_tokens=3303 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58244 performance/tokens_per_second=921.997 training/foundation_loss/aux=0.000472217 training/foundation_loss/lm=9.9039 training/foundation_loss/mtp=2.9396 training/grad_norm=22.7787 training/lr=0.0001 training/total_loss=12.844
+[P12-HP] {"step": 253, "loss": 12.843968391418457, "components": {"foundation_loss/lm": 9.903897285461426, "foundation_loss/mtp": 2.939598798751831, "foundation_loss/aux": 0.0004722171288449317}, "grad_norm": 22.778749465942383}
+Training:  83%|████████▎ | 254/307 [04:29<00:56,  1.06s/step, loss=12.1434, grad_norm=16.823, lr=1.000e-04, foundation_loss/aux=0.00044972, foundation_loss/lm=9.39126, foundation_loss/mtp=2.75171, tokens/s=849.016, step_time=3.583s] | step=254 epoch=0 data/consumed_samples=54 data/consumed_tokens=134455 data/step_samples=1 data/step_tokens=3042 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58297 performance/tokens_per_second=849.016 training/foundation_loss/aux=0.00044972 training/foundation_loss/lm=9.39126 training/foundation_loss/mtp=2.75171 training/grad_norm=16.823 training/lr=0.0001 training/total_loss=12.1434
+[P12-HP] {"step": 254, "loss": 12.143415451049805, "components": {"foundation_loss/lm": 9.39125919342041, "foundation_loss/mtp": 2.751706123352051, "foundation_loss/aux": 0.00044971960596740246}, "grad_norm": 16.82296371459961}
+Training:  83%|████████▎ | 255/307 [04:33<00:55,  1.07s/step, loss=9.59405, grad_norm=13.9272, lr=1.000e-04, foundation_loss/aux=0.000426347, foundation_loss/lm=7.38406, foundation_loss/mtp=2.20956, tokens/s=271.905, step_time=3.545s] | step=255 epoch=0 data/consumed_samples=55 data/consumed_tokens=135419 data/step_samples=1 data/step_tokens=964 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.54535 performance/tokens_per_second=271.905 training/foundation_loss/aux=0.000426347 training/foundation_loss/lm=7.38406 training/foundation_loss/mtp=2.20956 training/grad_norm=13.9272 training/lr=0.0001 training/total_loss=9.59405
+[P12-HP] {"step": 255, "loss": 9.594051361083984, "components": {"foundation_loss/lm": 7.384063243865967, "foundation_loss/mtp": 2.209561824798584, "foundation_loss/aux": 0.00042634675628505647}, "grad_norm": 13.927207946777344}
+Training:  83%|████████▎ | 256/307 [04:36<00:55,  1.08s/step, loss=9.50563, grad_norm=7.65162, lr=1.000e-04, foundation_loss/aux=0.000469242, foundation_loss/lm=7.35633, foundation_loss/mtp=2.14884, tokens/s=985.226, step_time=3.535s] | step=256 epoch=0 data/consumed_samples=56 data/consumed_tokens=138902 data/step_samples=1 data/step_tokens=3483 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.53523 performance/tokens_per_second=985.226 training/foundation_loss/aux=0.000469242 training/foundation_loss/lm=7.35633 training/foundation_loss/mtp=2.14884 training/grad_norm=7.65162 training/lr=0.0001 training/total_loss=9.50563
+[P12-HP] {"step": 256, "loss": 9.505631446838379, "components": {"foundation_loss/lm": 7.356326103210449, "foundation_loss/mtp": 2.148836135864258, "foundation_loss/aux": 0.00046924216439947486}, "grad_norm": 7.651615619659424}
+Training:  84%|████████▎ | 257/307 [04:40<00:54,  1.09s/step, loss=5.60921, grad_norm=13.3148, lr=1.000e-04, foundation_loss/aux=0.000477382, foundation_loss/lm=4.3559, foundation_loss/mtp=1.25283, tokens/s=484.375, step_time=3.549s] | step=257 epoch=0 data/consumed_samples=57 data/consumed_tokens=140621 data/step_samples=1 data/step_tokens=1719 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.54891 performance/tokens_per_second=484.375 training/foundation_loss/aux=0.000477382 training/foundation_loss/lm=4.3559 training/foundation_loss/mtp=1.25283 training/grad_norm=13.3148 training/lr=0.0001 training/total_loss=5.60921
+[P12-HP] {"step": 257, "loss": 5.609206676483154, "components": {"foundation_loss/lm": 4.355900287628174, "foundation_loss/mtp": 1.2528290748596191, "foundation_loss/aux": 0.00047738244757056236}, "grad_norm": 13.314834594726562}
+Training:  84%|████████▍ | 258/307 [04:43<00:53,  1.10s/step, loss=9.72193, grad_norm=9.08984, lr=1.000e-04, foundation_loss/aux=0.000467344, foundation_loss/lm=7.50174, foundation_loss/mtp=2.21972, tokens/s=542.081, step_time=3.542s] | step=258 epoch=0 data/consumed_samples=58 data/consumed_tokens=142541 data/step_samples=1 data/step_tokens=1920 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.5419 performance/tokens_per_second=542.081 training/foundation_loss/aux=0.000467344 training/foundation_loss/lm=7.50174 training/foundation_loss/mtp=2.21972 training/grad_norm=9.08984 training/lr=0.0001 training/total_loss=9.72193
+[P12-HP] {"step": 258, "loss": 9.721930503845215, "components": {"foundation_loss/lm": 7.5017409324646, "foundation_loss/mtp": 2.219722270965576, "foundation_loss/aux": 0.0004673439252655953}, "grad_norm": 9.089842796325684}
+Training:  84%|████████▍ | 259/307 [04:47<00:53,  1.11s/step, loss=9.94186, grad_norm=12.5616, lr=1.000e-04, foundation_loss/aux=0.000496601, foundation_loss/lm=7.76365, foundation_loss/mtp=2.17772, tokens/s=1090.164, step_time=3.581s] | step=259 epoch=0 data/consumed_samples=59 data/consumed_tokens=146445 data/step_samples=1 data/step_tokens=3904 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58111 performance/tokens_per_second=1090.16 training/foundation_loss/aux=0.000496601 training/foundation_loss/lm=7.76365 training/foundation_loss/mtp=2.17772 training/grad_norm=12.5616 training/lr=0.0001 training/total_loss=9.94186
+[P12-HP] {"step": 259, "loss": 9.941862106323242, "components": {"foundation_loss/lm": 7.763645648956299, "foundation_loss/mtp": 2.1777193546295166, "foundation_loss/aux": 0.0004966009873896837}, "grad_norm": 12.561626434326172}
+Training:  85%|████████▍ | 260/307 [04:50<00:52,  1.12s/step, loss=9.93122, grad_norm=19.4962, lr=1.000e-04, foundation_loss/aux=0.000497219, foundation_loss/lm=7.60155, foundation_loss/mtp=2.32917, tokens/s=135.671, step_time=3.626s] | step=260 epoch=0 data/consumed_samples=60 data/consumed_tokens=146937 data/step_samples=1 data/step_tokens=492 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62643 performance/tokens_per_second=135.671 training/foundation_loss/aux=0.000497219 training/foundation_loss/lm=7.60155 training/foundation_loss/mtp=2.32917 training/grad_norm=19.4962 training/lr=0.0001 training/total_loss=9.93122
+[P12-HP] {"step": 260, "loss": 9.931219100952148, "components": {"foundation_loss/lm": 7.6015543937683105, "foundation_loss/mtp": 2.3291680812835693, "foundation_loss/aux": 0.0004972190945409238}, "grad_norm": 19.496185302734375}
+Training:  85%|████████▌ | 261/307 [04:54<00:51,  1.13s/step, loss=7.5156, grad_norm=13.8607, lr=1.000e-04, foundation_loss/aux=0.000496304, foundation_loss/lm=5.75727, foundation_loss/mtp=1.75784, tokens/s=1014.193, step_time=3.595s] | step=261 epoch=0 data/consumed_samples=61 data/consumed_tokens=150583 data/step_samples=1 data/step_tokens=3646 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.59498 performance/tokens_per_second=1014.19 training/foundation_loss/aux=0.000496304 training/foundation_loss/lm=5.75727 training/foundation_loss/mtp=1.75784 training/grad_norm=13.8607 training/lr=0.0001 training/total_loss=7.5156
+[P12-HP] {"step": 261, "loss": 7.515600681304932, "components": {"foundation_loss/lm": 5.75726842880249, "foundation_loss/mtp": 1.7578356266021729, "foundation_loss/aux": 0.0004963037208653986}, "grad_norm": 13.860664367675781}
+Training:  85%|████████▌ | 262/307 [04:58<00:51,  1.14s/step, loss=10.2561, grad_norm=10.6207, lr=1.000e-04, foundation_loss/aux=0.000435515, foundation_loss/lm=7.83636, foundation_loss/mtp=2.41935, tokens/s=512.772, step_time=3.577s] | step=262 epoch=0 data/consumed_samples=62 data/consumed_tokens=152417 data/step_samples=1 data/step_tokens=1834 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.57664 performance/tokens_per_second=512.772 training/foundation_loss/aux=0.000435515 training/foundation_loss/lm=7.83636 training/foundation_loss/mtp=2.41935 training/grad_norm=10.6207 training/lr=0.0001 training/total_loss=10.2561
+[P12-HP] {"step": 262, "loss": 10.256149291992188, "components": {"foundation_loss/lm": 7.836359024047852, "foundation_loss/mtp": 2.4193544387817383, "foundation_loss/aux": 0.0004355148412287235}, "grad_norm": 10.620654106140137}
+Training:  86%|████████▌ | 263/307 [05:01<00:50,  1.15s/step, loss=9.05389, grad_norm=13.3245, lr=1.000e-04, foundation_loss/aux=0.000449491, foundation_loss/lm=7.06916, foundation_loss/mtp=1.98429, tokens/s=497.226, step_time=3.638s] | step=263 epoch=0 data/consumed_samples=63 data/consumed_tokens=154226 data/step_samples=1 data/step_tokens=1809 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63819 performance/tokens_per_second=497.226 training/foundation_loss/aux=0.000449491 training/foundation_loss/lm=7.06916 training/foundation_loss/mtp=1.98429 training/grad_norm=13.3245 training/lr=0.0001 training/total_loss=9.05389
+[P12-HP] {"step": 263, "loss": 9.053893089294434, "components": {"foundation_loss/lm": 7.069156169891357, "foundation_loss/mtp": 1.9842872619628906, "foundation_loss/aux": 0.00044949090806767344}, "grad_norm": 13.324498176574707}
+Training:  86%|████████▌ | 264/307 [05:05<00:49,  1.16s/step, loss=11.6652, grad_norm=23.2707, lr=1.000e-04, foundation_loss/aux=0.000466778, foundation_loss/lm=8.93262, foundation_loss/mtp=2.73214, tokens/s=540.788, step_time=3.639s] | step=264 epoch=0 data/consumed_samples=64 data/consumed_tokens=156194 data/step_samples=1 data/step_tokens=1968 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63913 performance/tokens_per_second=540.788 training/foundation_loss/aux=0.000466778 training/foundation_loss/lm=8.93262 training/foundation_loss/mtp=2.73214 training/grad_norm=23.2707 training/lr=0.0001 training/total_loss=11.6652
+[P12-HP] {"step": 264, "loss": 11.665225982666016, "components": {"foundation_loss/lm": 8.932619094848633, "foundation_loss/mtp": 2.73214054107666, "foundation_loss/aux": 0.00046677837963216007}, "grad_norm": 23.27065086364746}
+Training:  86%|████████▋ | 265/307 [05:08<00:48,  1.17s/step, loss=10.3653, grad_norm=12.4806, lr=1.000e-04, foundation_loss/aux=0.000471459, foundation_loss/lm=7.93345, foundation_loss/mtp=2.43133, tokens/s=774.275, step_time=3.659s] | step=265 epoch=0 data/consumed_samples=65 data/consumed_tokens=159027 data/step_samples=1 data/step_tokens=2833 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65891 performance/tokens_per_second=774.275 training/foundation_loss/aux=0.000471459 training/foundation_loss/lm=7.93345 training/foundation_loss/mtp=2.43133 training/grad_norm=12.4806 training/lr=0.0001 training/total_loss=10.3653
+[P12-HP] {"step": 265, "loss": 10.365251541137695, "components": {"foundation_loss/lm": 7.933452606201172, "foundation_loss/mtp": 2.431328058242798, "foundation_loss/aux": 0.0004714589740615338}, "grad_norm": 12.480610847473145}
+Training:  87%|████████▋ | 266/307 [05:12<00:48,  1.18s/step, loss=8.02308, grad_norm=13.7013, lr=1.000e-04, foundation_loss/aux=0.000453404, foundation_loss/lm=6.15057, foundation_loss/mtp=1.87206, tokens/s=176.621, step_time=3.658s] | step=266 epoch=0 data/consumed_samples=66 data/consumed_tokens=159673 data/step_samples=1 data/step_tokens=646 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65755 performance/tokens_per_second=176.621 training/foundation_loss/aux=0.000453404 training/foundation_loss/lm=6.15057 training/foundation_loss/mtp=1.87206 training/grad_norm=13.7013 training/lr=0.0001 training/total_loss=8.02308
+[P12-HP] {"step": 266, "loss": 8.02308177947998, "components": {"foundation_loss/lm": 6.150570392608643, "foundation_loss/mtp": 1.872058629989624, "foundation_loss/aux": 0.00045340374344959855}, "grad_norm": 13.701269149780273}
+Training:  87%|████████▋ | 267/307 [05:16<00:47,  1.18s/step, loss=8.6022, grad_norm=9.29935, lr=1.000e-04, foundation_loss/aux=0.00044365, foundation_loss/lm=6.63107, foundation_loss/mtp=1.97069, tokens/s=468.563, step_time=3.603s] | step=267 epoch=0 data/consumed_samples=67 data/consumed_tokens=161361 data/step_samples=1 data/step_tokens=1688 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6025 performance/tokens_per_second=468.563 training/foundation_loss/aux=0.00044365 training/foundation_loss/lm=6.63107 training/foundation_loss/mtp=1.97069 training/grad_norm=9.29935 training/lr=0.0001 training/total_loss=8.6022
+[P12-HP] {"step": 267, "loss": 8.602201461791992, "components": {"foundation_loss/lm": 6.63106632232666, "foundation_loss/mtp": 1.9706916809082031, "foundation_loss/aux": 0.00044364959467202425}, "grad_norm": 9.29935073852539}
+Training:  87%|████████▋ | 268/307 [05:19<00:46,  1.19s/step, loss=6.87171, grad_norm=9.26902, lr=1.000e-04, foundation_loss/aux=0.000478724, foundation_loss/lm=5.26506, foundation_loss/mtp=1.60617, tokens/s=1069.074, step_time=3.634s] | step=268 epoch=0 data/consumed_samples=68 data/consumed_tokens=165246 data/step_samples=1 data/step_tokens=3885 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63399 performance/tokens_per_second=1069.07 training/foundation_loss/aux=0.000478724 training/foundation_loss/lm=5.26506 training/foundation_loss/mtp=1.60617 training/grad_norm=9.26902 training/lr=0.0001 training/total_loss=6.87171
+[P12-HP] {"step": 268, "loss": 6.871710777282715, "components": {"foundation_loss/lm": 5.265063285827637, "foundation_loss/mtp": 1.606168508529663, "foundation_loss/aux": 0.0004787236684933305}, "grad_norm": 9.269018173217773}
+Training:  88%|████████▊ | 269/307 [05:23<00:45,  1.20s/step, loss=5.5209, grad_norm=13.3649, lr=1.000e-04, foundation_loss/aux=0.000492478, foundation_loss/lm=4.2772, foundation_loss/mtp=1.24321, tokens/s=181.968, step_time=3.627s] | step=269 epoch=0 data/consumed_samples=69 data/consumed_tokens=165906 data/step_samples=1 data/step_tokens=660 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62701 performance/tokens_per_second=181.968 training/foundation_loss/aux=0.000492478 training/foundation_loss/lm=4.2772 training/foundation_loss/mtp=1.24321 training/grad_norm=13.3649 training/lr=0.0001 training/total_loss=5.5209
+[P12-HP] {"step": 269, "loss": 5.520899772644043, "components": {"foundation_loss/lm": 4.277200698852539, "foundation_loss/mtp": 1.24320650100708, "foundation_loss/aux": 0.0004924784880131483}, "grad_norm": 13.364869117736816}
+Training:  88%|████████▊ | 270/307 [05:27<00:44,  1.21s/step, loss=10.485, grad_norm=16.5417, lr=1.000e-04, foundation_loss/aux=0.000450002, foundation_loss/lm=7.99904, foundation_loss/mtp=2.48553, tokens/s=438.326, step_time=3.595s] | step=270 epoch=0 data/consumed_samples=70 data/consumed_tokens=167482 data/step_samples=1 data/step_tokens=1576 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.5955 performance/tokens_per_second=438.326 training/foundation_loss/aux=0.000450002 training/foundation_loss/lm=7.99904 training/foundation_loss/mtp=2.48553 training/grad_norm=16.5417 training/lr=0.0001 training/total_loss=10.485
+[P12-HP] {"step": 270, "loss": 10.485021591186523, "components": {"foundation_loss/lm": 7.999041557312012, "foundation_loss/mtp": 2.4855294227600098, "foundation_loss/aux": 0.0004500019713304937}, "grad_norm": 16.54170799255371}
+Training:  88%|████████▊ | 271/307 [05:30<00:43,  1.22s/step, loss=10.0142, grad_norm=10.5112, lr=1.000e-04, foundation_loss/aux=0.000422545, foundation_loss/lm=7.66525, foundation_loss/mtp=2.34849, tokens/s=348.141, step_time=3.605s] | step=271 epoch=0 data/consumed_samples=71 data/consumed_tokens=168737 data/step_samples=1 data/step_tokens=1255 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.60486 performance/tokens_per_second=348.141 training/foundation_loss/aux=0.000422545 training/foundation_loss/lm=7.66525 training/foundation_loss/mtp=2.34849 training/grad_norm=10.5112 training/lr=0.0001 training/total_loss=10.0142
+[P12-HP] {"step": 271, "loss": 10.01417064666748, "components": {"foundation_loss/lm": 7.665253162384033, "foundation_loss/mtp": 2.348494529724121, "foundation_loss/aux": 0.00042254506843164563}, "grad_norm": 10.511162757873535}
+Training:  89%|████████▊ | 272/307 [05:34<00:43,  1.23s/step, loss=10.8149, grad_norm=13.9118, lr=1.000e-04, foundation_loss/aux=0.000438285, foundation_loss/lm=8.37954, foundation_loss/mtp=2.43492, tokens/s=148.303, step_time=3.661s] | step=272 epoch=0 data/consumed_samples=72 data/consumed_tokens=169280 data/step_samples=1 data/step_tokens=543 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.66143 performance/tokens_per_second=148.303 training/foundation_loss/aux=0.000438285 training/foundation_loss/lm=8.37954 training/foundation_loss/mtp=2.43492 training/grad_norm=13.9118 training/lr=0.0001 training/total_loss=10.8149
+[P12-HP] {"step": 272, "loss": 10.814901351928711, "components": {"foundation_loss/lm": 8.379539489746094, "foundation_loss/mtp": 2.434922695159912, "foundation_loss/aux": 0.0004382850311230868}, "grad_norm": 13.911786079406738}
+Training:  89%|████████▉ | 273/307 [05:38<00:42,  1.24s/step, loss=10.1412, grad_norm=15.6475, lr=1.000e-04, foundation_loss/aux=0.000452672, foundation_loss/lm=7.80715, foundation_loss/mtp=2.33362, tokens/s=168.406, step_time=3.664s] | step=273 epoch=0 data/consumed_samples=73 data/consumed_tokens=169897 data/step_samples=1 data/step_tokens=617 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.66377 performance/tokens_per_second=168.406 training/foundation_loss/aux=0.000452672 training/foundation_loss/lm=7.80715 training/foundation_loss/mtp=2.33362 training/grad_norm=15.6475 training/lr=0.0001 training/total_loss=10.1412
+[P12-HP] {"step": 273, "loss": 10.141223907470703, "components": {"foundation_loss/lm": 7.807151794433594, "foundation_loss/mtp": 2.3336193561553955, "foundation_loss/aux": 0.0004526721022557467}, "grad_norm": 15.647461891174316}
+Training:  89%|████████▉ | 274/307 [05:41<00:41,  1.25s/step, loss=9.42638, grad_norm=16.619, lr=1.000e-04, foundation_loss/aux=0.000457168, foundation_loss/lm=7.17531, foundation_loss/mtp=2.25061, tokens/s=153.923, step_time=3.658s] | step=274 epoch=0 data/consumed_samples=74 data/consumed_tokens=170460 data/step_samples=1 data/step_tokens=563 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65767 performance/tokens_per_second=153.923 training/foundation_loss/aux=0.000457168 training/foundation_loss/lm=7.17531 training/foundation_loss/mtp=2.25061 training/grad_norm=16.619 training/lr=0.0001 training/total_loss=9.42638
+[P12-HP] {"step": 274, "loss": 9.426377296447754, "components": {"foundation_loss/lm": 7.175311088562012, "foundation_loss/mtp": 2.2506089210510254, "foundation_loss/aux": 0.00045716838212683797}, "grad_norm": 16.618953704833984}
+Training:  90%|████████▉ | 275/307 [05:45<00:40,  1.26s/step, loss=9.10065, grad_norm=14.4668, lr=1.000e-04, foundation_loss/aux=0.000445366, foundation_loss/lm=6.92006, foundation_loss/mtp=2.18015, tokens/s=168.222, step_time=3.668s] | step=275 epoch=0 data/consumed_samples=75 data/consumed_tokens=171077 data/step_samples=1 data/step_tokens=617 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.66777 performance/tokens_per_second=168.222 training/foundation_loss/aux=0.000445366 training/foundation_loss/lm=6.92006 training/foundation_loss/mtp=2.18015 training/grad_norm=14.4668 training/lr=0.0001 training/total_loss=9.10065
+[P12-HP] {"step": 275, "loss": 9.10064697265625, "components": {"foundation_loss/lm": 6.920056343078613, "foundation_loss/mtp": 2.180145263671875, "foundation_loss/aux": 0.0004453661385923624}, "grad_norm": 14.466846466064453}
+Training:  90%|████████▉ | 276/307 [05:49<00:39,  1.26s/step, loss=8.19999, grad_norm=14.4247, lr=1.000e-04, foundation_loss/aux=0.000464549, foundation_loss/lm=6.18594, foundation_loss/mtp=2.01358, tokens/s=166.005, step_time=3.657s] | step=276 epoch=0 data/consumed_samples=76 data/consumed_tokens=171684 data/step_samples=1 data/step_tokens=607 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65652 performance/tokens_per_second=166.005 training/foundation_loss/aux=0.000464549 training/foundation_loss/lm=6.18594 training/foundation_loss/mtp=2.01358 training/grad_norm=14.4247 training/lr=0.0001 training/total_loss=8.19999
+[P12-HP] {"step": 276, "loss": 8.19998836517334, "components": {"foundation_loss/lm": 6.185939788818359, "foundation_loss/mtp": 2.0135836601257324, "foundation_loss/aux": 0.00046454876428470016}, "grad_norm": 14.424721717834473}
+Training:  90%|█████████ | 277/307 [05:52<00:38,  1.27s/step, loss=7.89314, grad_norm=12.2342, lr=1.000e-04, foundation_loss/aux=0.000457231, foundation_loss/lm=5.90242, foundation_loss/mtp=1.99026, tokens/s=192.706, step_time=3.679s] | step=277 epoch=0 data/consumed_samples=77 data/consumed_tokens=172393 data/step_samples=1 data/step_tokens=709 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.67917 performance/tokens_per_second=192.706 training/foundation_loss/aux=0.000457231 training/foundation_loss/lm=5.90242 training/foundation_loss/mtp=1.99026 training/grad_norm=12.2342 training/lr=0.0001 training/total_loss=7.89314
+[P12-HP] {"step": 277, "loss": 7.893139839172363, "components": {"foundation_loss/lm": 5.902420997619629, "foundation_loss/mtp": 1.9902615547180176, "foundation_loss/aux": 0.00045723110088147223}, "grad_norm": 12.234169006347656}
+Training:  91%|█████████ | 278/307 [05:56<00:37,  1.28s/step, loss=7.13207, grad_norm=14.3327, lr=1.000e-04, foundation_loss/aux=0.000445648, foundation_loss/lm=5.27408, foundation_loss/mtp=1.85755, tokens/s=196.691, step_time=3.666s] | step=278 epoch=0 data/consumed_samples=78 data/consumed_tokens=173114 data/step_samples=1 data/step_tokens=721 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.66564 performance/tokens_per_second=196.691 training/foundation_loss/aux=0.000445648 training/foundation_loss/lm=5.27408 training/foundation_loss/mtp=1.85755 training/grad_norm=14.3327 training/lr=0.0001 training/total_loss=7.13207
+[P12-HP] {"step": 278, "loss": 7.1320719718933105, "components": {"foundation_loss/lm": 5.274079322814941, "foundation_loss/mtp": 1.8575466871261597, "foundation_loss/aux": 0.00044564809650182724}, "grad_norm": 14.33273983001709}
+Training:  91%|█████████ | 279/307 [06:00<00:36,  1.29s/step, loss=7.75775, grad_norm=12.443, lr=1.000e-04, foundation_loss/aux=0.000480913, foundation_loss/lm=5.7783, foundation_loss/mtp=1.97897, tokens/s=185.272, step_time=3.654s] | step=279 epoch=0 data/consumed_samples=79 data/consumed_tokens=173791 data/step_samples=1 data/step_tokens=677 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65409 performance/tokens_per_second=185.272 training/foundation_loss/aux=0.000480913 training/foundation_loss/lm=5.7783 training/foundation_loss/mtp=1.97897 training/grad_norm=12.443 training/lr=0.0001 training/total_loss=7.75775
+[P12-HP] {"step": 279, "loss": 7.757745265960693, "components": {"foundation_loss/lm": 5.778295040130615, "foundation_loss/mtp": 1.9789693355560303, "foundation_loss/aux": 0.000480912858620286}, "grad_norm": 12.442951202392578}
+Training:  91%|█████████ | 280/307 [06:03<00:35,  1.30s/step, loss=7.89202, grad_norm=10.7692, lr=1.000e-04, foundation_loss/aux=0.000449844, foundation_loss/lm=5.85415, foundation_loss/mtp=2.03742, tokens/s=380.645, step_time=3.625s] | step=280 epoch=0 data/consumed_samples=80 data/consumed_tokens=175171 data/step_samples=1 data/step_tokens=1380 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62543 performance/tokens_per_second=380.645 training/foundation_loss/aux=0.000449844 training/foundation_loss/lm=5.85415 training/foundation_loss/mtp=2.03742 training/grad_norm=10.7692 training/lr=0.0001 training/total_loss=7.89202
+[P12-HP] {"step": 280, "loss": 7.892018795013428, "components": {"foundation_loss/lm": 5.8541460037231445, "foundation_loss/mtp": 2.0374228954315186, "foundation_loss/aux": 0.00044984399573877454}, "grad_norm": 10.769179344177246}
+Training:  92%|█████████▏| 281/307 [06:07<00:33,  1.31s/step, loss=6.38801, grad_norm=15.0341, lr=1.000e-04, foundation_loss/aux=0.000418853, foundation_loss/lm=4.63062, foundation_loss/mtp=1.75698, tokens/s=133.048, step_time=3.630s] | step=281 epoch=0 data/consumed_samples=81 data/consumed_tokens=175654 data/step_samples=1 data/step_tokens=483 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.63027 performance/tokens_per_second=133.048 training/foundation_loss/aux=0.000418853 training/foundation_loss/lm=4.63062 training/foundation_loss/mtp=1.75698 training/grad_norm=15.0341 training/lr=0.0001 training/total_loss=6.38801
+[P12-HP] {"step": 281, "loss": 6.38801383972168, "components": {"foundation_loss/lm": 4.630618572235107, "foundation_loss/mtp": 1.75697660446167, "foundation_loss/aux": 0.0004188531020190567}, "grad_norm": 15.034137725830078}
+Training:  92%|█████████▏| 282/307 [06:10<00:32,  1.32s/step, loss=6.5637, grad_norm=13.363, lr=1.000e-04, foundation_loss/aux=0.000377289, foundation_loss/lm=4.88064, foundation_loss/mtp=1.68268, tokens/s=204.921, step_time=3.621s] | step=282 epoch=0 data/consumed_samples=82 data/consumed_tokens=176396 data/step_samples=1 data/step_tokens=742 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62091 performance/tokens_per_second=204.921 training/foundation_loss/aux=0.000377289 training/foundation_loss/lm=4.88064 training/foundation_loss/mtp=1.68268 training/grad_norm=13.363 training/lr=0.0001 training/total_loss=6.5637
+[P12-HP] {"step": 282, "loss": 6.56370210647583, "components": {"foundation_loss/lm": 4.880641937255859, "foundation_loss/mtp": 1.6826831102371216, "foundation_loss/aux": 0.00037728852475993335}, "grad_norm": 13.36301326751709}
+Training:  92%|█████████▏| 283/307 [06:14<00:31,  1.32s/step, loss=5.70265, grad_norm=15.1346, lr=1.000e-04, foundation_loss/aux=0.00035702, foundation_loss/lm=4.10976, foundation_loss/mtp=1.59254, tokens/s=156.309, step_time=3.679s] | step=283 epoch=0 data/consumed_samples=83 data/consumed_tokens=176971 data/step_samples=1 data/step_tokens=575 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6786 performance/tokens_per_second=156.309 training/foundation_loss/aux=0.00035702 training/foundation_loss/lm=4.10976 training/foundation_loss/mtp=1.59254 training/grad_norm=15.1346 training/lr=0.0001 training/total_loss=5.70265
+[P12-HP] {"step": 283, "loss": 5.702652931213379, "components": {"foundation_loss/lm": 4.109760761260986, "foundation_loss/mtp": 1.5925350189208984, "foundation_loss/aux": 0.0003570200933609158}, "grad_norm": 15.134583473205566}
+Training:  93%|█████████▎| 284/307 [06:18<00:30,  1.33s/step, loss=4.68069, grad_norm=12.5777, lr=1.000e-04, foundation_loss/aux=0.000409214, foundation_loss/lm=3.30886, foundation_loss/mtp=1.37142, tokens/s=175.571, step_time=3.651s] | step=284 epoch=0 data/consumed_samples=84 data/consumed_tokens=177612 data/step_samples=1 data/step_tokens=641 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.65094 performance/tokens_per_second=175.571 training/foundation_loss/aux=0.000409214 training/foundation_loss/lm=3.30886 training/foundation_loss/mtp=1.37142 training/grad_norm=12.5777 training/lr=0.0001 training/total_loss=4.68069
+[P12-HP] {"step": 284, "loss": 4.68068790435791, "components": {"foundation_loss/lm": 3.308859348297119, "foundation_loss/mtp": 1.3714196681976318, "foundation_loss/aux": 0.00040921440813690424}, "grad_norm": 12.57773494720459}
+Training:  93%|█████████▎| 285/307 [06:21<00:29,  1.34s/step, loss=4.38102, grad_norm=12.0258, lr=1.000e-04, foundation_loss/aux=0.000386388, foundation_loss/lm=3.07728, foundation_loss/mtp=1.30335, tokens/s=338.715, step_time=3.661s] | step=285 epoch=0 data/consumed_samples=85 data/consumed_tokens=178852 data/step_samples=1 data/step_tokens=1240 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6609 performance/tokens_per_second=338.715 training/foundation_loss/aux=0.000386388 training/foundation_loss/lm=3.07728 training/foundation_loss/mtp=1.30335 training/grad_norm=12.0258 training/lr=0.0001 training/total_loss=4.38102
+[P12-HP] {"step": 285, "loss": 4.381018161773682, "components": {"foundation_loss/lm": 3.0772783756256104, "foundation_loss/mtp": 1.3033535480499268, "foundation_loss/aux": 0.0003863881865981966}, "grad_norm": 12.025764465332031}
+Training:  93%|█████████▎| 286/307 [06:25<00:28,  1.35s/step, loss=5.14542, grad_norm=13.5043, lr=1.000e-04, foundation_loss/aux=0.000381428, foundation_loss/lm=3.77485, foundation_loss/mtp=1.37018, tokens/s=185.135, step_time=3.651s] | step=286 epoch=0 data/consumed_samples=86 data/consumed_tokens=179528 data/step_samples=1 data/step_tokens=676 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6514 performance/tokens_per_second=185.135 training/foundation_loss/aux=0.000381428 training/foundation_loss/lm=3.77485 training/foundation_loss/mtp=1.37018 training/grad_norm=13.5043 training/lr=0.0001 training/total_loss=5.14542
+[P12-HP] {"step": 286, "loss": 5.145416259765625, "components": {"foundation_loss/lm": 3.774850368499756, "foundation_loss/mtp": 1.3701844215393066, "foundation_loss/aux": 0.0003814282827079296}, "grad_norm": 13.504254341125488}
+Training:  93%|█████████▎| 287/307 [06:29<00:27,  1.36s/step, loss=7.94011, grad_norm=14.2458, lr=1.000e-04, foundation_loss/aux=0.000405443, foundation_loss/lm=5.97543, foundation_loss/mtp=1.96427, tokens/s=188.140, step_time=3.646s] | step=287 epoch=0 data/consumed_samples=87 data/consumed_tokens=180214 data/step_samples=1 data/step_tokens=686 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64622 performance/tokens_per_second=188.14 training/foundation_loss/aux=0.000405443 training/foundation_loss/lm=5.97543 training/foundation_loss/mtp=1.96427 training/grad_norm=14.2458 training/lr=0.0001 training/total_loss=7.94011
+[P12-HP] {"step": 287, "loss": 7.940105438232422, "components": {"foundation_loss/lm": 5.975425720214844, "foundation_loss/mtp": 1.9642744064331055, "foundation_loss/aux": 0.00040544316289015114}, "grad_norm": 14.245833396911621}
+Training:  94%|█████████▍| 288/307 [06:32<00:25,  1.36s/step, loss=10.3371, grad_norm=9.01162, lr=1.000e-04, foundation_loss/aux=0.000503298, foundation_loss/lm=7.9269, foundation_loss/mtp=2.40968, tokens/s=569.482, step_time=3.594s] | step=288 epoch=0 data/consumed_samples=88 data/consumed_tokens=182261 data/step_samples=1 data/step_tokens=2047 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.5945 performance/tokens_per_second=569.482 training/foundation_loss/aux=0.000503298 training/foundation_loss/lm=7.9269 training/foundation_loss/mtp=2.40968 training/grad_norm=9.01162 training/lr=0.0001 training/total_loss=10.3371
+[P12-HP] {"step": 288, "loss": 10.337075233459473, "components": {"foundation_loss/lm": 7.926895618438721, "foundation_loss/mtp": 2.4096758365631104, "foundation_loss/aux": 0.0005032982444390655}, "grad_norm": 9.011617660522461}
+Training:  94%|█████████▍| 289/307 [06:36<00:24,  1.37s/step, loss=6.541, grad_norm=23.0486, lr=1.000e-04, foundation_loss/aux=0.000524636, foundation_loss/lm=5.13307, foundation_loss/mtp=1.40741, tokens/s=1119.004, step_time=3.660s] | step=289 epoch=0 data/consumed_samples=89 data/consumed_tokens=186357 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6604 performance/tokens_per_second=1119 training/foundation_loss/aux=0.000524636 training/foundation_loss/lm=5.13307 training/foundation_loss/mtp=1.40741 training/grad_norm=23.0486 training/lr=0.0001 training/total_loss=6.541
+[P12-HP] {"step": 289, "loss": 6.540999889373779, "components": {"foundation_loss/lm": 5.133067607879639, "foundation_loss/mtp": 1.4074076414108276, "foundation_loss/aux": 0.0005246361251920462}, "grad_norm": 23.04863929748535}
+Training:  94%|█████████▍| 290/307 [06:40<00:23,  1.38s/step, loss=10.2232, grad_norm=10.6536, lr=1.000e-04, foundation_loss/aux=0.000439629, foundation_loss/lm=7.93028, foundation_loss/mtp=2.2925, tokens/s=997.379, step_time=3.600s] | step=290 epoch=0 data/consumed_samples=90 data/consumed_tokens=189948 data/step_samples=1 data/step_tokens=3591 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.60044 performance/tokens_per_second=997.379 training/foundation_loss/aux=0.000439629 training/foundation_loss/lm=7.93028 training/foundation_loss/mtp=2.2925 training/grad_norm=10.6536 training/lr=0.0001 training/total_loss=10.2232
+[P12-HP] {"step": 290, "loss": 10.223221778869629, "components": {"foundation_loss/lm": 7.930284023284912, "foundation_loss/mtp": 2.2924985885620117, "foundation_loss/aux": 0.0004396290169097483}, "grad_norm": 10.65355110168457}
+Training:  95%|█████████▍| 291/307 [06:43<00:22,  1.39s/step, loss=7.01605, grad_norm=16.2834, lr=1.000e-04, foundation_loss/aux=0.000445788, foundation_loss/lm=5.48481, foundation_loss/mtp=1.53079, tokens/s=652.231, step_time=3.608s] | step=291 epoch=0 data/consumed_samples=91 data/consumed_tokens=192301 data/step_samples=1 data/step_tokens=2353 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.60762 performance/tokens_per_second=652.231 training/foundation_loss/aux=0.000445788 training/foundation_loss/lm=5.48481 training/foundation_loss/mtp=1.53079 training/grad_norm=16.2834 training/lr=0.0001 training/total_loss=7.01605
+[P12-HP] {"step": 291, "loss": 7.016049385070801, "components": {"foundation_loss/lm": 5.484814167022705, "foundation_loss/mtp": 1.5307894945144653, "foundation_loss/aux": 0.0004457880277186632}, "grad_norm": 16.283382415771484}
+Training:  95%|█████████▌| 292/307 [06:47<00:20,  1.40s/step, loss=13.5175, grad_norm=32.9676, lr=1.000e-04, foundation_loss/aux=0.000509845, foundation_loss/lm=10.3083, foundation_loss/mtp=3.20874, tokens/s=6.548, step_time=3.665s] | step=292 epoch=0 data/consumed_samples=92 data/consumed_tokens=192325 data/step_samples=1 data/step_tokens=24 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.66511 performance/tokens_per_second=6.54824 training/foundation_loss/aux=0.000509845 training/foundation_loss/lm=10.3083 training/foundation_loss/mtp=3.20874 training/grad_norm=32.9676 training/lr=0.0001 training/total_loss=13.5175
+[P12-HP] {"step": 292, "loss": 13.517524719238281, "components": {"foundation_loss/lm": 10.308274269104004, "foundation_loss/mtp": 3.208740472793579, "foundation_loss/aux": 0.0005098453839309514}, "grad_norm": 32.9676399230957}
+Training:  95%|█████████▌| 293/307 [06:51<00:19,  1.40s/step, loss=9.91478, grad_norm=11.4268, lr=1.000e-04, foundation_loss/aux=0.000451536, foundation_loss/lm=7.60196, foundation_loss/mtp=2.31237, tokens/s=1002.661, step_time=3.624s] | step=293 epoch=0 data/consumed_samples=93 data/consumed_tokens=195959 data/step_samples=1 data/step_tokens=3634 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.62436 performance/tokens_per_second=1002.66 training/foundation_loss/aux=0.000451536 training/foundation_loss/lm=7.60196 training/foundation_loss/mtp=2.31237 training/grad_norm=11.4268 training/lr=0.0001 training/total_loss=9.91478
+[P12-HP] {"step": 293, "loss": 9.914780616760254, "components": {"foundation_loss/lm": 7.601956844329834, "foundation_loss/mtp": 2.3123722076416016, "foundation_loss/aux": 0.0004515355103649199}, "grad_norm": 11.4267578125}
+Training:  96%|█████████▌| 294/307 [06:54<00:18,  1.41s/step, loss=8.96978, grad_norm=14.0293, lr=1.000e-04, foundation_loss/aux=0.00048285, foundation_loss/lm=6.86638, foundation_loss/mtp=2.10291, tokens/s=1113.016, step_time=3.680s] | step=294 epoch=0 data/consumed_samples=94 data/consumed_tokens=200055 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.68009 performance/tokens_per_second=1113.02 training/foundation_loss/aux=0.00048285 training/foundation_loss/lm=6.86638 training/foundation_loss/mtp=2.10291 training/grad_norm=14.0293 training/lr=0.0001 training/total_loss=8.96978
+[P12-HP] {"step": 294, "loss": 8.969776153564453, "components": {"foundation_loss/lm": 6.866384506225586, "foundation_loss/mtp": 2.1029088497161865, "foundation_loss/aux": 0.00048284995136782527}, "grad_norm": 14.029330253601074}
+Training:  96%|█████████▌| 295/307 [06:58<00:17,  1.42s/step, loss=7.89984, grad_norm=14.1247, lr=1.000e-04, foundation_loss/aux=0.000508411, foundation_loss/lm=6.00995, foundation_loss/mtp=1.88937, tokens/s=1115.361, step_time=3.672s] | step=295 epoch=0 data/consumed_samples=95 data/consumed_tokens=204151 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.67235 performance/tokens_per_second=1115.36 training/foundation_loss/aux=0.000508411 training/foundation_loss/lm=6.00995 training/foundation_loss/mtp=1.88937 training/grad_norm=14.1247 training/lr=0.0001 training/total_loss=7.89984
+[P12-HP] {"step": 295, "loss": 7.899837017059326, "components": {"foundation_loss/lm": 6.00995397567749, "foundation_loss/mtp": 1.889374852180481, "foundation_loss/aux": 0.0005084107397124171}, "grad_norm": 14.124664306640625}
+Training:  96%|█████████▋| 296/307 [07:02<00:15,  1.43s/step, loss=8.21683, grad_norm=13.166, lr=1.000e-04, foundation_loss/aux=0.000481866, foundation_loss/lm=6.2374, foundation_loss/mtp=1.97895, tokens/s=1122.647, step_time=3.649s] | step=296 epoch=0 data/consumed_samples=96 data/consumed_tokens=208247 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64852 performance/tokens_per_second=1122.65 training/foundation_loss/aux=0.000481866 training/foundation_loss/lm=6.2374 training/foundation_loss/mtp=1.97895 training/grad_norm=13.166 training/lr=0.0001 training/total_loss=8.21683
+[P12-HP] {"step": 296, "loss": 8.216830253601074, "components": {"foundation_loss/lm": 6.237401962280273, "foundation_loss/mtp": 1.9789470434188843, "foundation_loss/aux": 0.0004818658053409308}, "grad_norm": 13.165987968444824}
+Training:  97%|█████████▋| 297/307 [07:05<00:14,  1.43s/step, loss=8.37785, grad_norm=9.42124, lr=1.000e-04, foundation_loss/aux=0.00045195, foundation_loss/lm=6.42871, foundation_loss/mtp=1.94868, tokens/s=943.104, step_time=3.585s] | step=297 epoch=0 data/consumed_samples=97 data/consumed_tokens=211628 data/step_samples=1 data/step_tokens=3381 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58497 performance/tokens_per_second=943.104 training/foundation_loss/aux=0.00045195 training/foundation_loss/lm=6.42871 training/foundation_loss/mtp=1.94868 training/grad_norm=9.42124 training/lr=0.0001 training/total_loss=8.37785
+[P12-HP] {"step": 297, "loss": 8.377847671508789, "components": {"foundation_loss/lm": 6.428710460662842, "foundation_loss/mtp": 1.948684811592102, "foundation_loss/aux": 0.00045195023994892836}, "grad_norm": 9.421239852905273}
+Training:  97%|█████████▋| 298/307 [07:09<00:12,  1.44s/step, loss=6.12598, grad_norm=12.2885, lr=1.000e-04, foundation_loss/aux=0.000526765, foundation_loss/lm=4.6923, foundation_loss/mtp=1.43315, tokens/s=1123.046, step_time=3.647s] | step=298 epoch=0 data/consumed_samples=98 data/consumed_tokens=215724 data/step_samples=1 data/step_tokens=4096 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.64722 performance/tokens_per_second=1123.05 training/foundation_loss/aux=0.000526765 training/foundation_loss/lm=4.6923 training/foundation_loss/mtp=1.43315 training/grad_norm=12.2885 training/lr=0.0001 training/total_loss=6.12598
+[P12-HP] {"step": 298, "loss": 6.125982761383057, "components": {"foundation_loss/lm": 4.6923017501831055, "foundation_loss/mtp": 1.4331543445587158, "foundation_loss/aux": 0.0005267651285976171}, "grad_norm": 12.288540840148926}
+Training:  97%|█████████▋| 299/307 [07:12<00:11,  1.45s/step, loss=8.15398, grad_norm=10.2998, lr=1.000e-04, foundation_loss/aux=0.000478432, foundation_loss/lm=6.24653, foundation_loss/mtp=1.90697, tokens/s=777.419, step_time=3.611s] | step=299 epoch=0 data/consumed_samples=99 data/consumed_tokens=218531 data/step_samples=1 data/step_tokens=2807 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.61066 performance/tokens_per_second=777.419 training/foundation_loss/aux=0.000478432 training/foundation_loss/lm=6.24653 training/foundation_loss/mtp=1.90697 training/grad_norm=10.2998 training/lr=0.0001 training/total_loss=8.15398
+[P12-HP] {"step": 299, "loss": 8.15398120880127, "components": {"foundation_loss/lm": 6.2465291023254395, "foundation_loss/mtp": 1.906973123550415, "foundation_loss/aux": 0.0004784315242432058}, "grad_norm": 10.29980754852295}
+Training:  98%|█████████▊| 300/307 [07:16<00:10,  1.45s/step, loss=9.1916, grad_norm=14.1975, lr=1.000e-04, foundation_loss/aux=0.000475667, foundation_loss/lm=7.03775, foundation_loss/mtp=2.15337, tokens/s=670.184, step_time=3.559s] | step=300 epoch=0 data/consumed_samples=100 data/consumed_tokens=220916 data/step_samples=1 data/step_tokens=2385 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.55872 performance/tokens_per_second=670.184 training/foundation_loss/aux=0.000475667 training/foundation_loss/lm=7.03775 training/foundation_loss/mtp=2.15337 training/grad_norm=14.1975 training/lr=0.0001 training/total_loss=9.1916
+[P12-HP] {"step": 300, "loss": 9.191597938537598, "components": {"foundation_loss/lm": 7.037749767303467, "foundation_loss/mtp": 2.1533725261688232, "foundation_loss/aux": 0.0004756665730383247}, "grad_norm": 14.197519302368164}
+Training:  98%|█████████▊| 301/307 [07:20<00:08,  1.46s/step, loss=7.93317, grad_norm=8.90196, lr=1.000e-04, foundation_loss/aux=0.000492355, foundation_loss/lm=6.07828, foundation_loss/mtp=1.8544, tokens/s=1075.526, step_time=3.600s] | step=301 epoch=0 data/consumed_samples=101 data/consumed_tokens=224788 data/step_samples=1 data/step_tokens=3872 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.6001 performance/tokens_per_second=1075.53 training/foundation_loss/aux=0.000492355 training/foundation_loss/lm=6.07828 training/foundation_loss/mtp=1.8544 training/grad_norm=8.90196 training/lr=0.0001 training/total_loss=7.93317
+[P12-HP] {"step": 301, "loss": 7.933173179626465, "components": {"foundation_loss/lm": 6.078282833099365, "foundation_loss/mtp": 1.8543978929519653, "foundation_loss/aux": 0.0004923554370179772}, "grad_norm": 8.901959419250488}
+Training:  98%|█████████▊| 302/307 [07:23<00:07,  1.47s/step, loss=7.59157, grad_norm=11.0721, lr=1.000e-04, foundation_loss/aux=0.000494347, foundation_loss/lm=5.82374, foundation_loss/mtp=1.76733, tokens/s=802.793, step_time=3.589s] | step=302 epoch=0 data/consumed_samples=102 data/consumed_tokens=227669 data/step_samples=1 data/step_tokens=2881 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.58872 performance/tokens_per_second=802.793 training/foundation_loss/aux=0.000494347 training/foundation_loss/lm=5.82374 training/foundation_loss/mtp=1.76733 training/grad_norm=11.0721 training/lr=0.0001 training/total_loss=7.59157
+[P12-HP] {"step": 302, "loss": 7.591566562652588, "components": {"foundation_loss/lm": 5.823742866516113, "foundation_loss/mtp": 1.767329216003418, "foundation_loss/aux": 0.0004943468375131488}, "grad_norm": 11.072108268737793}
+Training:  99%|█████████▊| 303/307 [07:27<00:05,  1.48s/step, loss=11.9788, grad_norm=25.5581, lr=1.000e-04, foundation_loss/aux=0.000499359, foundation_loss/lm=9.27613, foundation_loss/mtp=2.70213, tokens/s=45.591, step_time=3.597s] | step=303 epoch=0 data/consumed_samples=103 data/consumed_tokens=227833 data/step_samples=1 data/step_tokens=164 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.59717 performance/tokens_per_second=45.5914 training/foundation_loss/aux=0.000499359 training/foundation_loss/lm=9.27613 training/foundation_loss/mtp=2.70213 training/grad_norm=25.5581 training/lr=0.0001 training/total_loss=11.9788
+[P12-HP] {"step": 303, "loss": 11.978761672973633, "components": {"foundation_loss/lm": 9.276127815246582, "foundation_loss/mtp": 2.7021336555480957, "foundation_loss/aux": 0.0004993586917407811}, "grad_norm": 25.558141708374023}
+Training:  99%|█████████▉| 304/307 [07:30<00:04,  1.48s/step, loss=9.44424, grad_norm=20.9304, lr=1.000e-04, foundation_loss/aux=0.000491495, foundation_loss/lm=7.25286, foundation_loss/mtp=2.19089, tokens/s=344.584, step_time=3.604s] | step=304 epoch=0 data/consumed_samples=104 data/consumed_tokens=229075 data/step_samples=1 data/step_tokens=1242 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.60434 performance/tokens_per_second=344.584 training/foundation_loss/aux=0.000491495 training/foundation_loss/lm=7.25286 training/foundation_loss/mtp=2.19089 training/grad_norm=20.9304 training/lr=0.0001 training/total_loss=9.44424
+[P12-HP] {"step": 304, "loss": 9.444244384765625, "components": {"foundation_loss/lm": 7.252861499786377, "foundation_loss/mtp": 2.190891981124878, "foundation_loss/aux": 0.000491495244204998}, "grad_norm": 20.93035125732422}
+Training:  99%|█████████▉| 305/307 [07:34<00:02,  1.49s/step, loss=7.95299, grad_norm=9.84942, lr=1.000e-04, foundation_loss/aux=0.000456433, foundation_loss/lm=6.10333, foundation_loss/mtp=1.8492, tokens/s=566.097, step_time=3.565s] | step=305 epoch=0 data/consumed_samples=105 data/consumed_tokens=231093 data/step_samples=1 data/step_tokens=2018 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=3.56476 performance/tokens_per_second=566.097 training/foundation_loss/aux=0.000456433 training/foundation_loss/lm=6.10333 training/foundation_loss/mtp=1.8492 training/grad_norm=9.84942 training/lr=0.0001 training/total_loss=7.95299
+[P12-HP] {"step": 305, "loss": 7.952988147735596, "components": {"foundation_loss/lm": 6.103328704833984, "foundation_loss/mtp": 1.849203109741211, "foundation_loss/aux": 0.0004564333357848227}, "grad_norm": 9.849421501159668}
+[P12-PRECLIP307] 306 46 live gradients observed
+Training: 100%|█████████▉| 306/307 [08:08<00:01,  1.60s/step, loss=9.57535, grad_norm=16.19, lr=1.000e-04, foundation_loss/aux=0.000444764, foundation_loss/lm=7.54984, foundation_loss/mtp=2.02507, tokens/s=48.953, step_time=34.339s] | step=306 epoch=0 data/consumed_samples=106 data/consumed_tokens=232774 data/step_samples=1 data/step_tokens=1681 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=34.339 performance/tokens_per_second=48.9531 training/foundation_loss/aux=0.000444764 training/foundation_loss/lm=7.54984 training/foundation_loss/mtp=2.02507 training/grad_norm=16.19 training/lr=0.0001 training/total_loss=9.57535
+[P12-HP] {"step": 306, "loss": 9.575349807739258, "components": {"foundation_loss/lm": 7.549839019775391, "foundation_loss/mtp": 2.0250661373138428, "foundation_loss/aux": 0.00044476366019807756}, "grad_norm": 16.19000816345215}
+[P12-MODEL-HASH] 306 48
+[P12-PRECLIP307] 307 46 live gradients observed
+Training: 100%|██████████| 307/307 [09:04<00:00,  1.78s/step, loss=12.4631, grad_norm=12.9384, lr=1.000e-04, foundation_loss/aux=0.000481408, foundation_loss/lm=9.58732, foundation_loss/mtp=2.87528, tokens/s=113.631, step_time=33.776s] | step=307 epoch=0 data/consumed_samples=107 data/consumed_tokens=236612 data/step_samples=1 data/step_tokens=3838 memory/device_max_allocated_gb=50.3596 memory/device_max_reserved_gb=58.0703 performance/step_time=33.7761 performance/tokens_per_second=113.631 training/foundation_loss/aux=0.000481408 training/foundation_loss/lm=9.58732 training/foundation_loss/mtp=2.87528 training/grad_norm=12.9384 training/lr=0.0001 training/total_loss=12.4631
+[P12-HP] {"step": 307, "loss": 12.463086128234863, "components": {"foundation_loss/lm": 9.587324142456055, "foundation_loss/mtp": 2.8752801418304443, "foundation_loss/aux": 0.0004814082640223205}, "grad_norm": 12.938406944274902}
+[P12-MODEL-HASH] 307 48
+2026-10-16 07:31:42,372 [INFO] hyper_parallel.trainer.runtime.logging: VRAM usage after epoch 1: cur 26.06GB, max 50.36GB.
+/workspace/venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)

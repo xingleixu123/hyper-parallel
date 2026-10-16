@@ -1,5 +1,5 @@
 {
-  "complete_runs": 96,
+  "complete_runs": 98,
   "excluded": [
     {
       "run": "hp-cann92-jt81-best-mf-bias-diag",
@@ -10148,6 +10148,156 @@
       "numerical_passed": false,
       "total_loss_passed": false,
       "scope": "新JT_dev e21302f9的独立完整200步复跑；全部指标、范数、输入和恢复与原版本一致；无新算术因素。"
+    },
+    {
+      "run": "hp-jte213-fc1norm400",
+      "source_revision": {
+        "commit": "181fab5f5c31ceeb2e385c1267aa586d5c6c8835",
+        "upstream_commit": "e21302f9e7b47d41b61f5f4987fc34c000f7c978",
+        "included_prs": [
+          180,
+          186,
+          192,
+          230
+        ],
+        "manifest": "evidence/jt-e213-pr192-source-manifest.json"
+      },
+      "metrics_sha256": "7149eff08882cdc4cd373c5e4050e9f46fb7b3737c3b071230fc8cdd1683e148",
+      "comparison": "evidence/frontier293-fc1-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.021615982055664062,
+          "max_step": 376,
+          "mean": 0.001157287359237671,
+          "last": 0.009406089782714844,
+          "passed": false,
+          "over_window_tolerance": 8
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.017912864685058594,
+          "max_step": 373,
+          "mean": 0.0008418667316436768,
+          "last": 0.009454727172851562,
+          "passed": false,
+          "over_window_tolerance": 6
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.0074024200439453125,
+          "max_step": 376,
+          "mean": 0.0006207263469696045,
+          "last": 4.8160552978515625e-05,
+          "passed": false,
+          "over_window_tolerance": 3
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.024674733479817412,
+          "max_step": 376,
+          "mean": 0.0020690878232320162,
+          "last": 0.0001605351765956442,
+          "passed": false,
+          "over_window_tolerance": 29
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 6.003269646316753e-06,
+          "max_step": 392,
+          "mean": 3.5715676052495714e-07,
+          "last": 1.2039096094668177e-06,
+          "passed": true,
+          "over_window_tolerance": 0
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 0.06003269646316767,
+          "max_step": 392,
+          "mean": 0.003571567605249584,
+          "last": 0.012039096094667912,
+          "passed": false,
+          "over_window_tolerance": 40
+        }
+      },
+      "numerical_passed": false,
+      "total_loss_passed": false,
+      "scope": "独立dense fc1归一化兼容消融；相对最新JT_dev Q-up对照仅改变12288×5120归一化实时归约；当前仅验收总loss。"
+    },
+    {
+      "run": "hp-jte213-fc1norm-qupboth400",
+      "source_revision": {
+        "commit": "181fab5f5c31ceeb2e385c1267aa586d5c6c8835",
+        "upstream_commit": "e21302f9e7b47d41b61f5f4987fc34c000f7c978",
+        "included_prs": [
+          180,
+          186,
+          192,
+          230
+        ],
+        "manifest": "evidence/jt-e213-pr192-source-manifest.json"
+      },
+      "metrics_sha256": "f02ba208a3a871f434996c24df02a52fe00d0bd2712d76a7655a7821683dc6f6",
+      "comparison": "evidence/frontier306-qup-both-independent200-audit.json",
+      "losses": {
+        "total_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.022772789001464844,
+          "max_step": 398,
+          "mean": 0.0006631982326507569,
+          "last": 0.0038747787475585938,
+          "passed": false,
+          "over_window_tolerance": 3
+        },
+        "lm_loss": {
+          "first": 9.5367431640625e-07,
+          "max": 0.022550582885742188,
+          "max_step": 398,
+          "mean": 0.00041863560676574707,
+          "last": 0.0001201629638671875,
+          "passed": false,
+          "over_window_tolerance": 2
+        },
+        "mtp_weighted": {
+          "first": 2.384185791015625e-07,
+          "max": 0.0060787200927734375,
+          "max_step": 376,
+          "mean": 0.0003941139578819275,
+          "last": 0.003996610641479492,
+          "passed": false,
+          "over_window_tolerance": 1
+        },
+        "mtp_raw": {
+          "first": 7.947285975973273e-07,
+          "max": 0.020262400309245088,
+          "max_step": 376,
+          "mean": 0.0013137131929397583,
+          "last": 0.013322035471597715,
+          "passed": false,
+          "over_window_tolerance": 15
+        },
+        "aux_weighted": {
+          "first": 5.867332227710298e-12,
+          "max": 1.05498047545552e-05,
+          "max_step": 399,
+          "mean": 2.934896126389496e-07,
+          "last": 9.186327457427713e-07,
+          "passed": true,
+          "over_window_tolerance": 0
+        },
+        "aux_raw": {
+          "first": 5.8673322200775146e-08,
+          "max": 0.10549804754555225,
+          "max_step": 399,
+          "mean": 0.0029348961263895037,
+          "last": 0.009186327457427979,
+          "passed": false,
+          "over_window_tolerance": 30
+        }
+      },
+      "numerical_passed": false,
+      "total_loss_passed": false,
+      "scope": "dense fc1背景下只增加Q-up RoPE实时归约兼容；配置及既有因素不变；当前仅验收总loss。"
     }
   ],
   "current_acceptance": "仅总loss：201首步<=0.001且201-400每步<=0.005；numerical_passed保留历史六指标口径，不作为当前门槛。"

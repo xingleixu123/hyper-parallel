@@ -1,0 +1,147 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "only_window_and_paths": true,
+      "config_sha": true,
+      "launcher_sha": true,
+      "entry_sha": true,
+      "unchanged_SOURCE_REVISION.json": true,
+      "unchanged_PROBE_SOURCE_MANIFEST.json": true,
+      "unchanged_HEAD_GEMM_ROUTE.json": true,
+      "unchanged_SHARED_UP_FP32_FACTOR.json": true,
+      "unchanged_ADAMW_ARCHIVE_ARITHMETIC.json": true,
+      "unchanged_Q_NS_ADJACENT_FACTOR.json": true,
+      "unchanged_ROUTER_NS_NPU_SQRT_FACTOR.json": true,
+      "unchanged_WEIGHTED_DVM_FACTOR.json": true,
+      "unchanged_PACKED_SEMANTICS_FACTOR.json": true,
+      "unchanged_NORM219_FACTOR.json": true,
+      "unchanged_Q_NPU_SQRT222_FACTOR.json": true,
+      "unchanged_CE_TAIL226_FACTOR.json": true,
+      "unchanged_NS_EPSILON229_FACTOR.json": true,
+      "unchanged_GLOBAL_NPU_SQRT235_FACTOR.json": true,
+      "unchanged_QUP258_FACTOR.json": true,
+      "unchanged_FC1293_FACTOR.json": true,
+      "same106_HEAD_GEMM_ROUTE_CALLS.jsonl": true,
+      "same106_Q_NS_ADJACENT_CALLS.jsonl": true,
+      "same106_ROUTER_NS_NPU_SQRT_CALLS.jsonl": true,
+      "same106_WEIGHTED_DVM_CALLS.jsonl": true,
+      "same106_PACKED_SEMANTICS_CALLS.jsonl": true,
+      "same106_NORM219_CALLS.jsonl": true,
+      "same106_CLIP_REDUCTION.jsonl": true,
+      "same106_CE_TAIL226_CALLS.jsonl": true,
+      "same106_QUP258_CALLS.jsonl": true,
+      "same106_FC1293_CALLS.jsonl": true,
+      "49_frozen_sources": true,
+      "independent306_model_complete": true,
+      "recorded_empty_observer_window": true,
+      "missing_model_observer_recorded": true,
+      "independent_boundary_fidelity": true,
+      "source_305": true,
+      "readonly_305": true,
+      "two_states_305": true,
+      "source_306": true,
+      "readonly_306": true,
+      "two_states_306": true,
+      "gradient_source": true,
+      "two_gradient_boundaries": true
+    },
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "only_window_and_paths": true,
+      "config_sha": true,
+      "launcher_sha": true,
+      "entry_sha": true,
+      "independent306_model_complete": true,
+      "recorded_empty_observer_window": true,
+      "missing_model_observer_recorded": true,
+      "source_305": true,
+      "readonly_305": true,
+      "two_states_305": true,
+      "optimizer_step_305": true,
+      "source_306": true,
+      "readonly_306": true,
+      "two_states_306": true,
+      "optimizer_step_306": true,
+      "one_native_gradient": true
+    }
+  },
+  "model_hash_links": {
+    "hp_306": true,
+    "mf_306": true
+  },
+  "states": {
+    "305": {
+      "weight": {
+        "elements": 37748736,
+        "fp32_bitwise_different": 0,
+        "bf16_different": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "l2_error_squared": 0.0,
+        "relative_l2": 0.0
+      },
+      "muon_m": {
+        "elements": 37748736,
+        "fp32_bitwise_different": 0,
+        "bf16_different": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "l2_error_squared": 0.0,
+        "relative_l2": 0.0
+      }
+    },
+    "306": {
+      "weight": {
+        "elements": 37748736,
+        "fp32_bitwise_different": 7966424,
+        "bf16_different": 67544,
+        "max_abs": 6.85080885887146e-06,
+        "mean_abs": 3.402184784109316e-08,
+        "l2_error_squared": 4.005556476792203e-07,
+        "relative_l2": 5.153300866602193e-06
+      },
+      "muon_m": {
+        "elements": 37748736,
+        "fp32_bitwise_different": 0,
+        "bf16_different": 0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "l2_error_squared": 0.0,
+        "relative_l2": 0.0
+      }
+    }
+  },
+  "clipped_gradient": {
+    "elements": 37748736,
+    "fp32_bitwise_different": 0,
+    "bf16_different": 0,
+    "max_abs": 0.0,
+    "mean_abs": 0.0,
+    "l2_error_squared": 0.0,
+    "relative_l2": 0.0
+  },
+  "full_model_comparisons": [
+    {
+      "step": 306,
+      "different": {
+        "fp32_sha256": [
+          "model.layers.0.self_attn.q_b_proj.weight"
+        ],
+        "bf16_as_fp32_sha256": [
+          "model.layers.0.self_attn.q_b_proj.weight"
+        ]
+      }
+    }
+  ],
+  "observation_limitation": "Full-model305 not captured; empty range(305,259) retained with original failure log.",
+  "source_sha256": "b3d5e0010147448a21b9a1ed1764347e0f007e0784b7f03133b9f2b735e566cd",
+  "scope": "One entire main-layer0 Q-up tensor; exact independent model links at305 and306; full-model305 was not captured because its observer range was empty. Selected305 states are compared directly;306 model links come from the independent native boundary run. No conclusion on other optimizer states."
+}

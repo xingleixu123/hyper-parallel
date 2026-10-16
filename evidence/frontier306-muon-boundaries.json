@@ -1,0 +1,119 @@
+{
+  "complete": true,
+  "fidelity": {
+    "state_observation_fidelity": true,
+    "control_full_state_exact": true,
+    "candidate_full_state_exact_mf": true,
+    "native_full_state_exact": true,
+    "same_actual_inputs_and_trace": true,
+    "two_partitions": true,
+    "native_source_unchanged": true,
+    "control_exit_zero": true,
+    "control_source_hash": true,
+    "control_launcher_hash": true,
+    "control_explicit_normalization_exact": true,
+    "both_exit_zero": true,
+    "both_source_hash": true,
+    "both_launcher_hash": true,
+    "both_explicit_normalization_exact": true,
+    "mf_exit_zero": true,
+    "mf_source_hash": true,
+    "mf_launcher_hash": true,
+    "mf_dump_config_hash": true,
+    "six_native_records": true,
+    "statistics_only": true,
+    "all_native_inputs_and_candidates_exact": true
+  },
+  "comparisons": [
+    {
+      "piece": 0,
+      "scope": "nope",
+      "shape": [
+        1536,
+        16384
+      ],
+      "pre_norm_exact_native": true,
+      "square_sum_exact_native": true,
+      "candidate_normalized_exact_native": true,
+      "control_normalized_exact_native": true,
+      "control_candidate_ns_exact": true,
+      "control_scalar": {
+        "norm": 0.14628328382968903,
+        "denominator": 0.14628338813781738
+      },
+      "candidate_scalar": {
+        "square_sum": 0.02139880135655403,
+        "norm": 0.14628329873085022,
+        "denominator": 0.14628340303897858
+      },
+      "native_input_sha1": "90ae51ee0976c3433c12155d5bda9ee4f66ce65a",
+      "native_square_sum_sha1": "796ad30dd9d6de99cc71d0b0b5b6ee4bf774b410",
+      "native_output_sha1": "02d5e5a0a29d029b2900a5f84633d4ee6752e9f9",
+      "precision": {
+        "elements": 25165824,
+        "different": 0,
+        "hp_closer": 0,
+        "mf_closer": 0,
+        "equal_distance": 0,
+        "norm_fp64": 0.14628328869000606,
+        "epsilon_same_archive_value": 1.0011717677116394e-07,
+        "all_element_mean_abs": {
+          "hp": 2.1296796958410577e-07,
+          "mf": 2.1296796958410577e-07
+        },
+        "all_element_max_abs": {
+          "hp": 7.605120846995543e-06,
+          "mf": 7.605120846995543e-06
+        }
+      }
+    },
+    {
+      "piece": 1,
+      "scope": "rope",
+      "shape": [
+        1536,
+        8192
+      ],
+      "pre_norm_exact_native": true,
+      "square_sum_exact_native": true,
+      "candidate_normalized_exact_native": true,
+      "control_normalized_exact_native": false,
+      "control_candidate_ns_exact": false,
+      "control_scalar": {
+        "norm": 0.49498993158340454,
+        "denominator": 0.4949900209903717
+      },
+      "candidate_scalar": {
+        "square_sum": 0.2450150102376938,
+        "norm": 0.49498990178108215,
+        "denominator": 0.4949899911880493
+      },
+      "native_input_sha1": "29133d577bcf7e10fed10850d4214ccb06d78970",
+      "native_square_sum_sha1": "ec442294eedfbdd5289a49687a66932e7d512d45",
+      "native_output_sha1": "fc217179162d2f331017a8c25e7fbfc89a4e20f3",
+      "precision": {
+        "elements": 12582912,
+        "different": 73348,
+        "hp_closer": 73348,
+        "mf_closer": 0,
+        "equal_distance": 0,
+        "norm_fp64": 0.49498993770475036,
+        "epsilon_same_archive_value": 1.0011717677116394e-07,
+        "all_element_mean_abs": {
+          "hp": 2.998691715222499e-07,
+          "mf": 2.9986941147593493e-07
+        },
+        "all_element_max_abs": {
+          "hp": 1.5196479275263013e-05,
+          "mf": 1.5196479275263013e-05
+        }
+      }
+    }
+  ],
+  "native_statistics_sha256": "8ddd2390e1491c50cc929b6fb56318915b1d4f26f2edf07b160e50b68ff4de15",
+  "native_graph_sha256": "e65ac4addc25839916db9114d89954283c6b4fc07c93e55b53ad5f6186f323d6",
+  "native_dvm_sha256": "e9712da8249350af96635d5174f97f7aa70be9dd5af3dcfca9909f043be72116",
+  "source_sha256": "69655999061caf66ec57d0d9c2b76bc14ce98e379468c4d81f4e7769f5c52324",
+  "observation_limitation": "Full-model305 not captured; empty range(305,259) retained with original failure log.",
+  "scope": "Original HP and MF replays reproduce their entire target weight/momentum. Candidate uses only its own live input, and reproduces MF target state. Native normalization is compared through full composed hashes; no tensor arrays saved."
+}
