@@ -1,0 +1,108 @@
+{
+  "schema": "independent-real-detail-probe-public-excerpt-v1",
+  "source_artifact": {
+    "name": "r129-a1e6-discovery-detail-v2-independent-review.json",
+    "bytes": 11005,
+    "sha256": "c1f84e3cfff2eb2623953040c17073abc78b351f97a716ba96d75d2eebcf1984"
+  },
+  "created_utc": "2026-10-16T16:53:52.857381+00:00",
+  "case": "r129-a1e6-device-discovery-detail-v2",
+  "review_status": "PASS_EVIDENCE_REVIEW_WITH_REAL_PRODUCTION_FAIL",
+  "experiment_verdict": "FAIL_DEVICE_DISCOVERY_WHILE_ACTUAL_CARDS_IDLE",
+  "blocking_evidence_inconsistencies": [],
+  "conclusion_zh": "11 个采集文件的实际字节与 SHA 全部一致。原始日志两 JSON 与分别保存的结果逐项相等；设备发现真实失败，事后 HAL rc=87/out=-1、C fallback=0。来源/结构 PASS 不改变生产 FAIL，不能进入 full200 或据此迁移 201。",
+  "original_log": {
+    "json_record_count": 2,
+    "record_line_numbers": [
+      8,
+      9
+    ],
+    "record_order": [
+      "production",
+      "diagnostics"
+    ],
+    "records_equal_saved_json": true,
+    "production_status": "FAIL",
+    "probe_and_receipt_exit_code": 1,
+    "device_type": "cpu",
+    "device_index": "'cpu'",
+    "device_index_type": "str",
+    "cached_npu_available": false,
+    "device_count": 0,
+    "npu_available_now": false,
+    "error_type": "TypeError"
+  },
+  "parser": {
+    "status": "PASS",
+    "meaning_zh": "只核验导入来源与两条日志记录的完整性/顺序，不表示设备可用、训练成功或精度对齐。"
+  },
+  "collection": {
+    "manifest": {
+      "path": "evidence/r129-a1e6-discovery-detail-v2-evidence-manifest.json",
+      "bytes": 2271,
+      "sha256": "a8208475cbafa5b07e6eb22aaaa193b174902e4d901fe8f130dbc70c28f09ab4"
+    },
+    "local_verification": {
+      "path": "evidence/r129-a1e6-discovery-detail-v2-local-verification.json",
+      "bytes": 286,
+      "sha256": "b0416b2babb050d698baf6c7fc7e5ccc35570d95ba4857bb66e3fa3da8cfdffe"
+    },
+    "verified_files": 11,
+    "verified_total_bytes": 30374,
+    "all_hashes_match": true,
+    "archive_hash_not_independently_recomputed_after_documented_duplicate_cleanup": true
+  },
+  "post_production_observations": {
+    "hal_return_code": 87,
+    "hal_initial_out": -1,
+    "hal_out": -1,
+    "c_fallback_return": 0,
+    "c_fallback_return_type": "int",
+    "initialized_before": false,
+    "initialized_after": false,
+    "cached_device_count_before": null,
+    "cached_device_count_after": null
+  },
+  "resource_lifecycle": {
+    "attempted": true,
+    "released": true,
+    "selected_devices": [
+      0
+    ],
+    "before_after": {
+      "before": {
+        "cards": 8,
+        "all_healthy": true,
+        "all_compute_pids_empty": true,
+        "all_core_zero": true,
+        "hbm_min_mb": 3408,
+        "hbm_max_mb": 3422,
+        "selected_device_hbm_mb": 3422
+      },
+      "after": {
+        "cards": 8,
+        "all_healthy": true,
+        "all_compute_pids_empty": true,
+        "all_core_zero": true,
+        "hbm_min_mb": 3409,
+        "hbm_max_mb": 3422,
+        "selected_device_hbm_mb": 3422
+      }
+    },
+    "sampled_hbm_max_mb": 3422,
+    "hbm_sample_count": 3,
+    "sampled_hbm_threshold_mb": 16384,
+    "duration_seconds": 18.529753520007944,
+    "foreign_timeout_or_memory_abort_reason_absent": true,
+    "no_observed_conflict_zh": "前后快照无计算 PID，receipt 未记录 foreign PID/ownership_event/中止原因；这表示有界采样内未发现冲突，不声称连续无采样盲区。",
+    "namespace_did_not_deny_actual_idle_admission": true,
+    "five_second_recheck_zh": "已冻结 guard 必须通过第二次实际空卡检查才可创建；本 receipt 保留两次 namespace 诊断，未单独保存第二次实际 npu-smi 完整快照。",
+    "minimum_gap_seconds": 1200
+  },
+  "scope_zh": "此摘录保留实际文件一致性、生产失败与有限采样的复核结果，删除内部审阅身份、请求/协调器细节等无关信息。枚举名称另由已安装头文件摘录证明，不归入本复核的原始结论。",
+  "not_established_zh": [
+    "未证明生产调用在此前必然走过事后查询的同一 C fallback 分支。",
+    "未证明驱动返回 87 的具体触发链；可见字符设备和 cgroup 规则也不排除所有权限、驱动、命名空间或运行时因素。",
+    "未执行训练，未产生 loss 精度结果，未获得 full200 或 201 跨机迁移准入。"
+  ]
+}
