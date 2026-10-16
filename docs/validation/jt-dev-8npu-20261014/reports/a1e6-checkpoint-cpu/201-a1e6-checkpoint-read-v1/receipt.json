@@ -1,0 +1,150 @@
+{
+  "case": "201-a1e6-checkpoint-read-v1",
+  "owner": "01a13aa4-a553-7e22-a1c1-ebd16b083bb9",
+  "started_epoch": 1792160730.4050467,
+  "preflight": {
+    "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+    "inputs": {
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "case": "201-a1e6-checkpoint-read-v1",
+      "files": {
+        "read_checkpoint_cpu.py": {
+          "bytes": 29903,
+          "sha256": "abe55523598aaae0dacebe5863c6b94d27221ad5f3a5e453f134b96835c31fb8"
+        },
+        "expected-hashes.json": {
+          "bytes": 248067,
+          "sha256": "7d6bfd2eb6576e20803d22580e503942277a31c094614f87d72134c94768bab7"
+        },
+        "run-manifest.json": {
+          "bytes": 17735,
+          "sha256": "0f5787ac734e47aac93b00166d5b56a06a7926d6bcfe632ff460908dcb32e85c"
+        }
+      }
+    },
+    "run_files_verified": 92,
+    "runner_sha256": "1c0225f838f22110c83978d072e2eaf4450701dfed67985747c5c74d334efa3a",
+    "free_bytes_before": 447225810944,
+    "scope": "CPU checkpoint readability only; no training or cross-host precision acceptance"
+  },
+  "timeout_seconds": 600,
+  "status": "PASS",
+  "npu_started": false,
+  "migration_admitted": false,
+  "docker_create_command": [
+    "docker",
+    "create",
+    "--name",
+    "jt-cpu-201-a1e6-checkpoint-read-v1",
+    "--label",
+    "codex.owner=01a13aa4-a553-7e22-a1c1-ebd16b083bb9",
+    "--label",
+    "codex.case=201-a1e6-checkpoint-read-v1",
+    "--runtime",
+    "runc",
+    "--network",
+    "none",
+    "--memory",
+    "8g",
+    "--cpus",
+    "4",
+    "--pids-limit",
+    "256",
+    "--read-only",
+    "--tmpfs",
+    "/tmp:rw,nosuid,nodev,size=1g",
+    "--env",
+    "PYTHONDONTWRITEBYTECODE=1",
+    "--env",
+    "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+    "--workdir",
+    "/workspace/hyper-parallel",
+    "--entrypoint",
+    "/bin/bash",
+    "--mount",
+    "type=bind,source=/opt/xxl-jt-dev-8npu-20261014,target=/work,readonly",
+    "--mount",
+    "type=bind,source=/opt/xxl-jt-dev-8npu-20261014/repo,target=/workspace/hyper-parallel,readonly",
+    "--mount",
+    "type=bind,source=/opt/xxl-jt-dev-8npu-20261014/evidence/201-a1e6-checkpoint-read-v1,target=/result",
+    "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "-lc",
+    "source /workspace/env.sh && export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 && nice -n 10 /work/venvs/validation/bin/python /work/evidence/201-a1e6-checkpoint-read-v1-inputs-v2/read_checkpoint_cpu.py --checkpoint /work/checkpoints/r201-a1e6-fsdp8-0-200-v1/global_step_200 --source /workspace/hyper-parallel --expected-hashes /work/evidence/201-a1e6-checkpoint-read-v1-inputs-v2/expected-hashes.json --metrics-dir /work/runs/r201-a1e6-fsdp8-0-200-v1 --output /result/checkpoint-cpu-read.json --max-slice-mib 32"
+  ],
+  "phase": "start-and-read",
+  "container_id": "a531e0861d70657a6799b5dea1329800e0cd9341efd48862dc43722229a5304e",
+  "verified_container": {
+    "host_config": {
+      "Runtime": "runc",
+      "Privileged": false,
+      "NetworkMode": "none",
+      "Memory": 8589934592,
+      "NanoCpus": 4000000000,
+      "PidsLimit": 256,
+      "ReadonlyRootfs": true,
+      "PidMode": "",
+      "Devices": [],
+      "DeviceRequests": null,
+      "DeviceCgroupRules": null,
+      "Tmpfs": {
+        "/tmp": "rw,nosuid,nodev,size=1g"
+      }
+    },
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/opt/xxl-jt-dev-8npu-20261014",
+        "Destination": "/work",
+        "Mode": "",
+        "RW": false,
+        "Propagation": "rprivate"
+      },
+      {
+        "Type": "bind",
+        "Source": "/opt/xxl-jt-dev-8npu-20261014/repo",
+        "Destination": "/workspace/hyper-parallel",
+        "Mode": "",
+        "RW": false,
+        "Propagation": "rprivate"
+      },
+      {
+        "Type": "bind",
+        "Source": "/opt/xxl-jt-dev-8npu-20261014/evidence/201-a1e6-checkpoint-read-v1",
+        "Destination": "/result",
+        "Mode": "",
+        "RW": true,
+        "Propagation": "rprivate"
+      }
+    ]
+  },
+  "attach_exit_code": 0,
+  "container_state": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-16T14:25:30.559694359Z",
+    "FinishedAt": "2026-10-16T14:27:02.271241443Z"
+  },
+  "result_sha256": "d328f4589bd583008ff164b9306a1195565933ecaa5782a52cb0bef1eae26cd0",
+  "final_container_state": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-16T14:25:30.559694359Z",
+    "FinishedAt": "2026-10-16T14:27:02.271241443Z"
+  },
+  "removed_verified": true,
+  "finished_epoch": 1792160822.4414291
+}

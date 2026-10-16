@@ -1,0 +1,2170 @@
+{
+  "schema_version": 1,
+  "audited_at": "2026-10-16T14:54:34.378Z",
+  "title": "14 组 issue/PR 具体定位与证据范围审计",
+  "scope": "只读已发布快照、current-head 回执、固定 PR commit 的本地 git 对象和既有报告；未修改远端 issue/PR、publication checkout、训练源或 live guard/waiter/request，未启动实验。",
+  "initial_check": {
+    "existing_audit_files": false,
+    "action": "检查进程列表；未终止任何进程，未恢复或创建实验。"
+  },
+  "current_target": "按 root 最新明确转述：先主 LM loss 的完整窗口逐步最大绝对误差≤0.005，达到后停下询问 MTP/aux；历史多分量严格记录保留但不继续称当前全部门槛。",
+  "evidence_receipts": {
+    "evidence/github-chinese-publication-receipt.json": "f22ff816b447381e3a032182fa4e9dc8fc777525051610f0c957a37f2c59798a",
+    "evidence/github-chinese-full-link-audit.json": "a9ebb243379f93748dbaa04350081375db7e842621333162da1e7acc3f2071a3",
+    "evidence/github-current-head-gates-20261016-143506.json": "1403186f710c4ed9d53ef81bf801e0d2d241edc22f5d5df2c4eb558ef14c1e58"
+  },
+  "current_head_checked_at": "2026-10-16T14:35:06.587714+00:00",
+  "overall_findings": [
+    "14 个当前 head 均与已审阅一致，均一个 commit；13 草稿开放，#230 已合入。14 个 head 均无 status/check，不能据此声称 CI 通过。",
+    "14 组父子/互链已有已保存审计，28 份正文均有固定版本实验报告链接，但没有生产函数的固定 SHA 行锚和 MF/Megatron 直接源码链接；缺链接不等于不存在定位或回归证据。",
+    "按当前补丁职责分类为11个独立已确认缺陷修复、1个上游已修复后的独立回归PR、2个可选数值策略。不能把它们都描述成TP/CP/EP长跑漂移根因。",
+    "#201 的plain对照是本仓库同实现Muon的独立未分片实例，证明通信/分片等价，不证明NS算法已与外部实现对齐。",
+    "清理旧当前进展时保留固定版本、真实失败、数值口径和未完成项；不要改模板checklist或将历史18602c4验收移用到544526f7。"
+  ],
+  "latest_external_references": {
+    "status": "pending_other_agent_fixed_source_review",
+    "mindformers": {
+      "official_source": "GitCode master",
+      "expected_head_from_root": "1c9258ca845e21ddd66fde83e262d5635359bd30",
+      "locally_audited_here": false
+    },
+    "megatron": {
+      "official_source": "NVIDIA Megatron-LM main",
+      "expected_head_prefix_from_root": "3e2807ce",
+      "full_sha_and_source_review": "pending",
+      "locally_audited_here": false
+    },
+    "historical_only": [
+      {
+        "mindformers": "5089da308ebcc146d0cbe32180c209c4f1d39d77",
+        "megatron": "6e7e6ed435e41af04fc41e7007ef862049153fdc",
+        "report": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-dense-wgrad-prefix/dense-wgrad-reference-review-20261016.md"
+      },
+      {
+        "mindformers": "5089da308ebcc146d0cbe32180c209c4f1d39d77",
+        "megatron": "3914483fd325e053797aff3fa431d4a3141139aa",
+        "report": "publication/docs/validation/jt-dev-8npu-20261014/reports/f637-resource-overview/f637-recompute-flexibility-gap-review-v2.md"
+      }
+    ],
+    "qualification": "旧固定版本仍可作为历史参考，不能叫最新。数值/重算/优化器问题补最新同构语义对照；设备接口、调度、计数、报告与所有权缺陷使用真实API/局部契约，不强套同名MF/Megatron实现。源码比较不等于跨框架实测。"
+  },
+  "historical_200_step_boundary": {
+    "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "pass": "FSDP 1–200与resume201–400对独立连续400；off/full/selective各自完整200×8rank，已记录loss及grad_norm最大差0。",
+    "fail_unlocalized": [
+      {
+        "topology": "EP2",
+        "main_lm_max_abs": 0.0075230598
+      },
+      {
+        "topology": "CP2",
+        "main_lm_max_abs": 0.0110616684
+      },
+      {
+        "topology": "TP2",
+        "main_lm_max_abs": 0.0214481354
+      }
+    ],
+    "limit": "只是记录量与固定集成配方，不是逐元素参数/梯度全等、单修复因果证明或最新版验收。上述三个长漂移仍由#202跟踪，不创建未经定位的新bug。"
+  },
+  "ablations": [
+    {
+      "name": "普通Linear FP32 dgrad",
+      "status": "rejected_by_matched_prefix_main_lm",
+      "scope": "相同1–163步×8rank主LM最大差0.0120849609375，第112步首次>0.005；参考163步中断，CP候选200步完成；不拼接、不写200步通过。"
+    },
+    {
+      "name": "普通Linear FP32 wgrad",
+      "status": "rejected_by_matched_prefix_main_lm",
+      "scope": "相同1–159步×8rank主LM最大差0.0178985595703125，第36步首次>0.005；FSDP200完成，CP159步中断；不视作确认根因或新产品修复。"
+    },
+    {
+      "name": "558eff5共享head局部dX padding替换",
+      "status": "inconclusive_short_local_intervention",
+      "scope": "3步、96次反向改变77,814个坐标，max1.1920928955078125e-7；主LM第2步恶化、第3步改善。仅定位线索；最新544526f7须匹配参考，不能声称有效。"
+    }
+  ],
+  "stale_text_exact_for_195_196": [
+    "| 其他并行验收缺口 | EP2/CP2完整200步精度仍失败，TP2仅69步前缀，整体验收仍未通过 |",
+    "当前源尚未集成#230，所以旧集成报告可能把动态HSDP wrapper漏计为1；已通过独立模块树/日志核实实际三处覆盖，该报告问题单独见#229。"
+  ],
+  "stale_text_replacement_guidance": "这些句子原指18602c4历史轮次；明确其日期/固定版本，并链接总202当前边界。TP2后来独立完成200仍FAIL；最新544526f7包含#230，但不能把新版本状态回写为旧实验源码。",
+  "rows": [
+    {
+      "issue": 203,
+      "pr": 194,
+      "category": "confirmed_independent_defect",
+      "priority": "高",
+      "title": "梯度累积有效 token 分母",
+      "trigger": "同一 optimizer step 的微批有效监督数不同（含空目标或 mask）；旧实现逐微批覆盖 step_token_counts。",
+      "head": "bad2550675ff5e32ca6aba465aacbaa28af0480c",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/203",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/194",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/data/batching/get_batch.py",
+          "changed_spans": [
+            [
+              20,
+              21
+            ],
+            [
+              266,
+              307
+            ],
+            [
+              326,
+              332
+            ]
+          ],
+          "functions": [
+            {
+              "function": "__call__",
+              "line": 254,
+              "end_line": 266,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L254"
+            },
+            {
+              "function": "prepare_step",
+              "line": 268,
+              "end_line": 296,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L268"
+            },
+            {
+              "function": "_iter_prepared_batches",
+              "line": 298,
+              "end_line": 304,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L298"
+            },
+            {
+              "function": "_prepare_parallel_batch",
+              "line": 306,
+              "end_line": 326,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L306"
+            },
+            {
+              "function": "_finalize_batch",
+              "line": 328,
+              "end_line": 340,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L328"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/trainer/text_trainer.py",
+          "changed_spans": [
+            [
+              17,
+              17
+            ],
+            [
+              221,
+              222
+            ],
+            [
+              224,
+              224
+            ],
+            [
+              227,
+              228
+            ],
+            [
+              232,
+              232
+            ],
+            [
+              233,
+              233
+            ],
+            [
+              253,
+              258
+            ],
+            [
+              267,
+              277
+            ],
+            [
+              288,
+              288
+            ]
+          ],
+          "functions": [
+            {
+              "function": "forward_backward_step",
+              "line": 219,
+              "end_line": 243,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/trainer/text_trainer.py#L219"
+            },
+            {
+              "function": "train_step",
+              "line": 245,
+              "end_line": 314,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/trainer/text_trainer.py#L245"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/trainer/text_trainer.py",
+          "function": "train_step",
+          "line": 245,
+          "end_line": 314,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/trainer/text_trainer.py#L245"
+        },
+        {
+          "path": "hyper_parallel/data/batching/get_batch.py",
+          "function": "prepare_step",
+          "line": 268,
+          "end_line": 296,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L268"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "整批有效 token 的 sum(loss)/sum(valid) 是独立目标；已保存真实 Trainer 反例的正确 loss/grad 为 7/14，旧值为 5/10。",
+        "candidate_or_parallel": "真实 train_step 与 reducer 对整批和不同微批切分比较 loss/参数梯度；包含不均匀、空监督、mask。当前定向 UT 9 passed、15 subtests。"
+      },
+      "red_green_and_200_step_scope": "旧集成跨拓扑误差降低不构成此单 PR 的 200 步因果证明；18602c4 的 FSDP 续训/重算 200 步零差只属于固定多修复配方。",
+      "required_description_updates": [
+        "在 issue 和 PR 同时补 train_step/prepare_step 的固定 SHA 行锚及整步分母公式。",
+        "明确 UT 是整批/微批切分等价；DP/CP 归约与各 MTP 深度分母须与最新参考逐项核对，不能由主 LM UT 自动推广。",
+        "清理重复 2026-10-15 当前进展、400 步/CP4 ST 尚待措辞；将旧全分量门槛改为历史口径，当前先主 LM。"
+      ],
+      "external_reference_status": "pending_latest_numeric_semantics",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "a86cf228db14aa2faa0486b628782892bb0947311d6a3a90d51e4bbf646ebe5b",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "fcd82679ae1d918260b513dd908f5a39b7c179ab088947b168d3e1e15fbc3102",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 204,
+      "pr": 198,
+      "category": "confirmed_independent_defect",
+      "priority": "中",
+      "title": "FSDP 源 Parameter 引用留存",
+      "trigger": "分片初始化已克隆并替换模块参数后，scheduler/state 的 source_shard_infos 和显式 replicated 集合仍强引用完整源参数。",
+      "head": "b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/204",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/198",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/core/fully_shard/hsdp_scheduler.py",
+          "changed_spans": [
+            [
+              154,
+              156
+            ]
+          ],
+          "functions": [
+            {
+              "function": "__init__",
+              "line": 99,
+              "end_line": 157,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_scheduler.py#L99"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/core/fully_shard/hsdp_state.py",
+          "changed_spans": [
+            [
+              107,
+              109
+            ]
+          ],
+          "functions": [
+            {
+              "function": "__init__",
+              "line": 61,
+              "end_line": 120,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_state.py#L61"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/core/fully_shard/hsdp_scheduler.py",
+          "function": "__init__",
+          "line": 99,
+          "end_line": 157,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_scheduler.py#L99"
+        },
+        {
+          "path": "hyper_parallel/core/fully_shard/hsdp_state.py",
+          "function": "__init__",
+          "line": 61,
+          "end_line": 120,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_state.py#L61"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "真实 HSDPParam + weakref 检查源参数可回收；调用者仍持有、ignored/tied/活跃参数引用不能被错误清除。",
+        "candidate_or_parallel": "红测 6 失败；修复后相关 5 文件 112 passed、12 subtests；不在共享 storage 上 resize。"
+      },
+      "red_green_and_200_step_scope": "历史同拓扑 200 步 LM/MTP/aux/total/grad_norm 零差；EP/CP allocated 分别减少 9.422171/10.125296 GiB，属于相应固定集成版本，不能移到最新 544526f7 或宣称单 PR 完整跨拓扑精度。",
+      "required_description_updates": [
+        "补 scheduler.__init__ 和 state.__init__ 中释放引用的行锚；说明所有权与 HSDPParam 已建立活跃副本的先后关系。",
+        "保留同拓扑前后证据和集成干扰说明；清理重复旧当前状态与旧全分量目标。"
+      ],
+      "external_reference_status": "not_applicable_memory_ownership_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "0dd597328bab2954007d955d9b8c25d0ca1db6cc9aad169cee7c97f74852e7d9",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "3e849efd62449bbde0ea0b0026b4ae1e133a40d8e0294e40cc0b214249b717cc",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 205,
+      "pr": 199,
+      "category": "confirmed_upstream_fix_current_pr_regression_only",
+      "priority": "高",
+      "title": "CP 分块损失与多 MTP 分母回归",
+      "trigger": "原 CP 路径拒绝正 loss_chunk_size；#186 已提供生产能力。当前 PR 仅覆盖 CP2 多 MTP 深度共享 head 的分母独立性及 CP4/TP2+CP2 分块路径。",
+      "head": "e9fc94d376ca7380c13a5e09c0020b34a75dc1d2",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/205",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/199",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+          "unchanged_upstream_production": true,
+          "functions": [
+            {
+              "function": "reduce_losses",
+              "line": 271,
+              "end_line": 280,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L271"
+            },
+            {
+              "function": "token_loss",
+              "line": 290,
+              "end_line": 299,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L290"
+            },
+            {
+              "function": "projection_loss",
+              "line": 301,
+              "end_line": 318,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L301"
+            }
+          ]
+        },
+        {
+          "path": "tests/torch/context_parallel/_test_jt_mla_cp.py",
+          "changed_spans": [
+            [
+              56,
+              56
+            ],
+            [
+              74,
+              76
+            ],
+            [
+              113,
+              128
+            ],
+            [
+              161,
+              162
+            ],
+            [
+              181,
+              182
+            ],
+            [
+              235,
+              236
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_build_pair",
+              "line": 56,
+              "end_line": 107,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/torch/context_parallel/_test_jt_mla_cp.py#L56"
+            },
+            {
+              "function": "_backward",
+              "line": 110,
+              "end_line": 129,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/torch/context_parallel/_test_jt_mla_cp.py#L110"
+            },
+            {
+              "function": "_training_case",
+              "line": 161,
+              "end_line": 192,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/torch/context_parallel/_test_jt_mla_cp.py#L161"
+            },
+            {
+              "function": "test_jt_mla_cp_training",
+              "line": 225,
+              "end_line": 238,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/torch/context_parallel/_test_jt_mla_cp.py#L225"
+            }
+          ]
+        },
+        {
+          "path": "tests/ut/models/jt_deepseek_v3/test_context_parallel.py",
+          "changed_spans": [
+            [
+              18,
+              18
+            ],
+            [
+              26,
+              27
+            ],
+            [
+              31,
+              31
+            ],
+            [
+              127,
+              162
+            ]
+          ],
+          "functions": [
+            {
+              "function": "test_chunked_mtp_depths_keep_independent_denominators",
+              "line": 127,
+              "end_line": 161,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/ut/models/jt_deepseek_v3/test_context_parallel.py#L127"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+          "function": "projection_loss",
+          "line": 301,
+          "end_line": 318,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L301"
+        },
+        {
+          "path": "tests/ut/models/jt_deepseek_v3/test_context_parallel.py",
+          "function": "test_chunked_mtp_depths_keep_independent_denominators",
+          "line": 127,
+          "end_line": 161,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/ut/models/jt_deepseek_v3/test_context_parallel.py#L127"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "未分片完整序列 CE 独立参考；两 MTP 深度有效监督总数 4/3，联合建图后 backward，比较 hidden 与共享 head 梯度。",
+        "candidate_or_parallel": "当前基点 CPU 20 passed、25 subtests；真实 4 卡 ST 1 passed，8 组合×2 步，保留 backward 后 collective 数量检查。"
+      },
+      "red_green_and_200_step_scope": "ST 使用其相对容差，16 条 rank0 数值记录；不是 8 rank×200 步绝对误差验收。旧 ec2e 配方 CP200 的失败必须保留；当前 PR 不再声称修改生产实现。",
+      "required_description_updates": [
+        "补 #186 在当前固定 head 中的 projection_loss/reduce_losses 生产行锚，以及本 PR 独立 CE 回归行锚。",
+        "将数学分母、CP objective sum、FSDP 梯度归约分开说明；最新 MF/Megatron 语义对照待补，不能拿 2 步 ST 填补 200 步矩阵。"
+      ],
+      "external_reference_status": "pending_latest_numeric_semantics",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "6a83e31a623144ba75ec14fd4a80d2fc3f15182737319299c71790d0c98ad89a",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "2c7b613f44a357102558f1a374d2963ab22ff646c9c0e8dfe579c622eb587d08",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 206,
+      "pr": 195,
+      "category": "confirmed_independent_defect",
+      "priority": "高",
+      "title": "独立 MTP decoder 漏包重算",
+      "trigger": "通用 discovery 只识别 decoder 序列容器，遗漏 mtp.layers.0.transformer_layer 这种独立 HF GradientCheckpointingLayer；不能回退 JT HF native 开关破坏 aux 生命周期。",
+      "head": "00ae8a77b36ed4a306147255781d986638249057",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/206",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/195",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/distributed/activation_checkpoint.py",
+          "changed_spans": [
+            [
+              205,
+              214
+            ],
+            [
+              224,
+              226
+            ],
+            [
+              243,
+              257
+            ],
+            [
+              261,
+              261
+            ],
+            [
+              512,
+              512
+            ],
+            [
+              514,
+              514
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_is_hf_checkpointing_layer",
+              "line": 205,
+              "end_line": 212,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L205"
+            },
+            {
+              "function": "_find_transformer_block_modules",
+              "line": 215,
+              "end_line": 286,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L215"
+            },
+            {
+              "function": "_should_use_hf_native_gradient_checkpointing",
+              "line": 497,
+              "end_line": 517,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L497"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+          "changed_spans": [
+            [
+              632,
+              634
+            ]
+          ],
+          "functions": []
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/distributed/activation_checkpoint.py",
+          "function": "_find_transformer_block_modules",
+          "line": 215,
+          "end_line": 286,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L215"
+        },
+        {
+          "path": "hyper_parallel/distributed/activation_checkpoint.py",
+          "function": "_should_use_hf_native_gradient_checkpointing",
+          "line": 497,
+          "end_line": 517,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L497"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "相同 JT eager 模型/输入/初态为无重算参考；UT 比较完整参数梯度和辅助图消费，并用执行计数检验实际 backward replay。",
+        "candidate_or_parallel": "当前 CPU 21 tests、16 subtests；覆盖 standalone decoder、full/selective、既有 wrapper 幂等性；compile=True 仅构造验证。"
+      },
+      "red_green_and_200_step_scope": "18602c4 固定配方 off/full/selective 各自从 0 完整 200 步×8 rank 零差，3 处覆盖由模块树/日志验证。不是各算子 replay 全覆盖或最新 544526f7 的重算验收。",
+      "required_description_updates": [
+        "补 discovery 与 HF fallback gate 的固定 SHA 行锚；区分漏包装修复、#230 报告识别、算子级重放与 MF 灵活配置能力。",
+        "最新 MF PyNative/Megatron 的 full/selective、模块选择、持久状态重放差异待固定版本对照。",
+        "将 TP2 69 步及当前源尚未集成 #230 改成 18602c4 历史范围；已完成 TP2 200 步失败，最新源包含 #230。"
+      ],
+      "external_reference_status": "pending_latest_recompute_semantics",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "72e3a5da99bebf4a82e3b91d8868cd81cf9160f1a8dade22cde05e0adc21a7d0",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "8c85b1bbd7d3c9f7f3d66946e6176201e2100d8c43e722fb1640ad54be4ef276",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 207,
+      "pr": 196,
+      "category": "confirmed_independent_defect",
+      "priority": "高",
+      "title": "重算重复提交路由计数",
+      "trigger": "JTDeepseekV3MoE.route 在原前向与 checkpoint replay 都累加 tokens_per_expert；混合覆盖产生模块间持久计数语义不一致。",
+      "head": "d1f52136421c258646463e764421d34aac503f97",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/207",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/196",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+          "changed_spans": [
+            [
+              449,
+              451
+            ]
+          ],
+          "functions": [
+            {
+              "function": "route",
+              "line": 427,
+              "end_line": 457,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/d1f52136421c258646463e764421d34aac503f97/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py#L427"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+          "function": "route",
+          "line": 427,
+          "end_line": 457,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/d1f52136421c258646463e764421d34aac503f97/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py#L427"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "真实前向路由计数只提交一次；eager 与 full/selective 的梯度及 aux 图释放相同，必要 replay 张量计算仍执行。",
+        "candidate_or_parallel": "当前独立 CPU 2 tests、4 subtests，含三次累积微批、aux 单独反向与 total；旧联合测试数量不可充当此提交独立数量。"
+      },
+      "red_green_and_200_step_scope": "18602c4 重算 200 步集成零差不证明旧计数错误必然造成 loss 漂移：sign(mean_count-count) 对统一正倍数可能不变。",
+      "required_description_updates": [
+        "补 route 中持久更新条件的固定 SHA 行锚及每 optimizer step 消费计数的契约。",
+        "最新参考核对必须区分 replay 必需计算与持久状态提交，保留均匀倍数不必改变 bias 符号的限制。",
+        "与 #195 同步清除 TP2 69 步/#230 未集成的非历史化措辞。"
+      ],
+      "external_reference_status": "pending_latest_recompute_semantics",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "dace578ff2b0ff5c9cbb44a11f799af2ddc9e707d52b63280bd2b1c7da1582a3",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "da521e83dac8cee261212234710fffebbc2114e156e70994b1966906a0115591",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 208,
+      "pr": 197,
+      "category": "confirmed_independent_defect",
+      "priority": "中",
+      "title": "checkpoint 累计样本/token 计数恢复",
+      "trigger": "checkpoint 恢复后 global_step=200，但 meter 累计计数从零起算；step201 出现 8/6304 而不是 1608/3720095。",
+      "head": "bd18261a14fc0608d0728defef756fd0028f80aa",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/208",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/197",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/trainer/callbacks/checkpoint_callback.py",
+          "changed_spans": [
+            [
+              77,
+              78
+            ],
+            [
+              213,
+              213
+            ],
+            [
+              224,
+              227
+            ],
+            [
+              434,
+              435
+            ],
+            [
+              477,
+              482
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_collect_extra_state",
+              "line": 197,
+              "end_line": 227,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L197"
+            },
+            {
+              "function": "_apply_extra_state",
+              "line": 408,
+              "end_line": 475,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L408"
+            },
+            {
+              "function": "_restore_meter_state",
+              "line": 477,
+              "end_line": 481,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L477"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/trainer/callbacks/checkpoint_callback.py",
+          "function": "_collect_extra_state",
+          "line": 197,
+          "end_line": 227,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L197"
+        },
+        {
+          "path": "hyper_parallel/trainer/callbacks/checkpoint_callback.py",
+          "function": "_restore_meter_state",
+          "line": 477,
+          "end_line": 481,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L477"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "独立连续 400 步计数轨迹为 oracle；旧 checkpoint 字段缺失和 weights-only 的兼容行为必须单独验证，不能由 step 推测 token 数。",
+        "candidate_or_parallel": "CPU 8 passed、6 subtests 覆盖实际 callback save/load 边界；历史红测累计计数 3200 处不符，绿测 0。"
+      },
+      "red_green_and_200_step_scope": "18602c4 baseline 1–200 与 resume 201–400 分别对独立连续参考，8 rank×200 步全部记录量零差；最新 544526f7 不能继承此恢复结论。",
+      "required_description_updates": [
+        "补 _collect_extra_state/_apply_extra_state/_restore_meter_state 固定 SHA 行锚。",
+        "将旧全分量当前目标改为历史记录；当前先主 LM 目标及最新参考状态统一指向 #202。"
+      ],
+      "external_reference_status": "not_applicable_checkpoint_counter_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "3d36f4f5fc991fb72bddf12077fa856a5d66224a9179c2a6172c167f19ba9c2e",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "3cce7229c1994bd3ee03d7e4b90d1ff3f338efd5b9afb47f2aeffa0d50c3a0ce",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 209,
+      "pr": 200,
+      "category": "optional_numeric_strategy_not_localized_drift_fix",
+      "priority": "高",
+      "title": "专家 dW 直接 FP32 main_grad 累积",
+      "trigger": "低精度 grouped SwiGLU dW 在 FSDP 的 FP32 归约之前已经舍入；新增默认关闭的 expert_fp32_weight_gradients 选择，不能把默认 BF16 的舍入直接等同为算法 bug。",
+      "head": "630d54358f94e34dc8e7f22c6a57d4043ba211f5",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/209",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/200",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/components/functional/grouped_matmul.py",
+          "changed_spans": [
+            [
+              93,
+              95
+            ],
+            [
+              117,
+              119
+            ]
+          ],
+          "functions": [
+            {
+              "function": "backward",
+              "line": 65,
+              "end_line": 137,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/grouped_matmul.py#L65"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/components/functional/npu_grouped_swiglu.py",
+          "changed_spans": [
+            [
+              16,
+              16
+            ],
+            [
+              20,
+              24
+            ],
+            [
+              35,
+              35
+            ],
+            [
+              42,
+              42
+            ],
+            [
+              44,
+              46
+            ],
+            [
+              59,
+              59
+            ],
+            [
+              72,
+              79
+            ],
+            [
+              91,
+              91
+            ],
+            [
+              97,
+              132
+            ],
+            [
+              138,
+              139
+            ],
+            [
+              148,
+              150
+            ],
+            [
+              164,
+              165
+            ],
+            [
+              167,
+              167
+            ],
+            [
+              176,
+              176
+            ],
+            [
+              183,
+              183
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_get_npu_grouped_matmul",
+              "line": 29,
+              "end_line": 94,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L29"
+            },
+            {
+              "function": "_validate_fused_weight",
+              "line": 97,
+              "end_line": 112,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L97"
+            },
+            {
+              "function": "_accumulate_fp32_weight_gradient",
+              "line": 115,
+              "end_line": 130,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L115"
+            },
+            {
+              "function": "npu_grouped_swiglu",
+              "line": 133,
+              "end_line": 184,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L133"
+            },
+            {
+              "function": "forward",
+              "line": 42,
+              "end_line": 56,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L42"
+            },
+            {
+              "function": "backward",
+              "line": 59,
+              "end_line": 91,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L59"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/core/fully_shard/hsdp_param.py",
+          "changed_spans": [
+            [
+              27,
+              27
+            ],
+            [
+              760,
+              762
+            ],
+            [
+              811,
+              812
+            ],
+            [
+              826,
+              826
+            ],
+            [
+              837,
+              857
+            ]
+          ],
+          "functions": [
+            {
+              "function": "init_unsharded_param",
+              "line": 707,
+              "end_line": 762,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/core/fully_shard/hsdp_param.py#L707"
+            },
+            {
+              "function": "to_accumulated_grad_if_needed",
+              "line": 810,
+              "end_line": 823,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/core/fully_shard/hsdp_param.py#L810"
+            },
+            {
+              "function": "accumulate_unsharded_grad_if_needed",
+              "line": 825,
+              "end_line": 835,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/core/fully_shard/hsdp_param.py#L825"
+            },
+            {
+              "function": "_accumulate_fused_grad_if_needed",
+              "line": 837,
+              "end_line": 856,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/core/fully_shard/hsdp_param.py#L837"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+          "changed_spans": [
+            [
+              76,
+              82
+            ],
+            [
+              96,
+              99
+            ]
+          ],
+          "functions": [
+            {
+              "function": "__init__",
+              "line": 76,
+              "end_line": 81,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py#L76"
+            },
+            {
+              "function": "forward_expert_major",
+              "line": 83,
+              "end_line": 100,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py#L83"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/components/functional/npu_grouped_swiglu.py",
+          "function": "_accumulate_fp32_weight_gradient",
+          "line": 115,
+          "end_line": 130,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L115"
+        },
+        {
+          "path": "hyper_parallel/core/fully_shard/hsdp_param.py",
+          "function": "_accumulate_fused_grad_if_needed",
+          "line": 837,
+          "end_line": 856,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/core/fully_shard/hsdp_param.py#L837"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "CPU FP64 算子参考约束局部梯度；正常 autograd 贡献必须保留，forward/dX 配方保持；验证显式原始 Parameter owner 与生命周期。",
+        "candidate_or_parallel": "CPU 87 passed、25 subtests，旧实现 6 fail/3 pass；真实 2 卡 ST 1 passed，2 轮×3 微批、off/非重入重算、空专家/全空/共享融合+普通梯度，FP64 参考 rtol=1e-6、atol=2e-6，重算差0。"
+      },
+      "red_green_and_200_step_scope": "生产策略合用的历史 FSDP 200/续训/重算可自洽；EP2/CP2/TP2 200 步仍失败。早期不同布局诊断 wrapper 不是生产 PR 验收。",
+      "required_description_updates": [
+        "补 NPU grouped backward、_accumulate_fp32_weight_gradient、HSDPParam._accumulate_fused_grad_if_needed 三段行锚，明确 local GEMM 输出/累积/归约 dtype 不等价。",
+        "保持可选策略分类；最新 MF/Megatron 必须限定到实际 dW/main_grad 路径，不能称所有 Linear 均 FP32。",
+        "移除重复旧当前状态；组合成本 +24.25% 不拆归单项，也不宣称解决长步漂移。"
+      ],
+      "external_reference_status": "pending_latest_local_gradient_semantics",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "eed3ada9d6a57b2e585a9de566d2e6bef881ce8c2b6b8eb7d7781ff979a0378a",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "f29d00ed406740f4b58b3b3b772c386ef46a63e597d729e95bc2defef0644012",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 210,
+      "pr": 201,
+      "category": "optional_numeric_strategy_not_localized_drift_fix",
+      "priority": "高",
+      "title": "可恢复 Muon NS 精度配置",
+      "trigger": "Muon 默认将 NS 输入及 relay 缓冲转 BF16；新增默认 bfloat16、可选 float32 的参数组字段，需覆盖 momentum 输出、NS、空/无梯度 rank、relay 与恢复。",
+      "head": "59a03c63490f2e47d0fd89d9e7974982abe1e9e2",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/210",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/201",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/components/optim/mixed_precision_optimizer.py",
+          "changed_spans": [
+            [
+              318,
+              325
+            ]
+          ],
+          "functions": [
+            {
+              "function": "state_dict_for_load",
+              "line": 318,
+              "end_line": 324,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/components/optim/mixed_precision_optimizer.py#L318"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/core/optimizer/muon.py",
+          "changed_spans": [
+            [
+              81,
+              81
+            ],
+            [
+              98,
+              98
+            ],
+            [
+              118,
+              125
+            ],
+            [
+              209,
+              209
+            ],
+            [
+              237,
+              239
+            ],
+            [
+              250,
+              250
+            ],
+            [
+              279,
+              279
+            ],
+            [
+              293,
+              294
+            ],
+            [
+              307,
+              345
+            ],
+            [
+              400,
+              401
+            ],
+            [
+              555,
+              556
+            ],
+            [
+              589,
+              590
+            ],
+            [
+              607,
+              607
+            ],
+            [
+              630,
+              630
+            ],
+            [
+              687,
+              687
+            ],
+            [
+              707,
+              708
+            ],
+            [
+              761,
+              761
+            ],
+            [
+              958,
+              958
+            ],
+            [
+              962,
+              964
+            ],
+            [
+              966,
+              967
+            ],
+            [
+              1149,
+              1150
+            ],
+            [
+              1168,
+              1168
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_ns_dtype",
+              "line": 118,
+              "end_line": 123,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L118"
+            },
+            {
+              "function": "__init__",
+              "line": 211,
+              "end_line": 289,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L211"
+            },
+            {
+              "function": "reset_optimizer_parameters",
+              "line": 291,
+              "end_line": 305,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L291"
+            },
+            {
+              "function": "load_state_dict",
+              "line": 307,
+              "end_line": 318,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L307"
+            },
+            {
+              "function": "validate_checkpoint_state_dict",
+              "line": 321,
+              "end_line": 335,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L321"
+            },
+            {
+              "function": "state_dict_for_load",
+              "line": 337,
+              "end_line": 344,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L337"
+            },
+            {
+              "function": "step",
+              "line": 383,
+              "end_line": 478,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L383"
+            },
+            {
+              "function": "_update_muon_momentum",
+              "line": 550,
+              "end_line": 610,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L550"
+            },
+            {
+              "function": "_process_unshard_params",
+              "line": 612,
+              "end_line": 645,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L612"
+            },
+            {
+              "function": "_gather_and_compute_shard_updates",
+              "line": 647,
+              "end_line": 718,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L647"
+            },
+            {
+              "function": "_process_shard_params",
+              "line": 720,
+              "end_line": 772,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L720"
+            },
+            {
+              "function": "_split_into_memory_safe_batches",
+              "line": 953,
+              "end_line": 990,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L953"
+            },
+            {
+              "function": "_fused_broadcast_and_apply",
+              "line": 1127,
+              "end_line": 1213,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L1127"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/core/optimizer/muon_shard.py",
+          "changed_spans": [
+            [
+              210,
+              210
+            ],
+            [
+              212,
+              220
+            ],
+            [
+              226,
+              227
+            ],
+            [
+              233,
+              234
+            ]
+          ],
+          "functions": [
+            {
+              "function": "build_pad_ns_inputs",
+              "line": 206,
+              "end_line": 256,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon_shard.py#L206"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/core/optimizer/optimizer.py",
+          "changed_spans": [
+            [
+              220,
+              265
+            ],
+            [
+              294,
+              299
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_legacy_group_defaults_by_fqn",
+              "line": 220,
+              "end_line": 233,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/optimizer.py#L220"
+            },
+            {
+              "function": "_with_legacy_group_defaults",
+              "line": 235,
+              "end_line": 256,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/optimizer.py#L235"
+            },
+            {
+              "function": "state_dict_for_load",
+              "line": 258,
+              "end_line": 264,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/optimizer.py#L258"
+            },
+            {
+              "function": "load_state_dict",
+              "line": 288,
+              "end_line": 309,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/optimizer.py#L288"
+            }
+          ]
+        },
+        {
+          "path": "hyper_parallel/trainer/callbacks/checkpoint_callback.py",
+          "changed_spans": [
+            [
+              340,
+              340
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_load_checkpoint",
+              "line": 320,
+              "end_line": 402,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L320"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/core/optimizer/muon.py",
+          "function": "_update_muon_momentum",
+          "line": 550,
+          "end_line": 610,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L550"
+        },
+        {
+          "path": "hyper_parallel/core/optimizer/muon.py",
+          "function": "_fused_broadcast_and_apply",
+          "line": 1127,
+          "end_line": 1213,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L1127"
+        },
+        {
+          "path": "hyper_parallel/core/optimizer/muon.py",
+          "function": "load_state_dict",
+          "line": 307,
+          "end_line": 318,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L307"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "默认与显式 BF16 精确一致；checkpoint 指定值恢复、旧 checkpoint 缺字段回到 BF16、weights-only 保留新配置；局部 momentum 手工公式/回调别名有定向契约测试。",
+        "candidate_or_parallel": "CPU 44 passed、52 subtests 含 12 种实际 DCP 恢复；NPU 2 ST：FSDP8/HSDP2×4 各 10 更新，2 卡无梯度/空分片各3更新。reference 和 candidate 都使用本仓库 Muon 的独立实例，一侧未分片、一侧分片。"
+      },
+      "red_green_and_200_step_scope": "NPU ST 证明同实现分片/relay/状态等价，不是外部独立 NS 数学实现。18602c4 FP32 恢复和连续400一致仅是多修复配方；没有跨 MF/Megatron 实测或独立 NS 成本实验。",
+      "required_description_updates": [
+        "补 _update_muon_momentum/_gather_and_compute_shard_updates/_fused_broadcast_and_apply 和 load_state_dict 行锚，保持 dtype 与算法超参边界。",
+        "将“独立 plain optimizer”明确为“独立实例的同实现未分片 Muon”；最新参考要逐项核对 NS 系数、方向、迭代、缩放，未就绪标 pending。",
+        "整合旧 400 待运行状态；+24.25% 只能记 #200+#201 组合成本，6.8× 归因已撤回。"
+      ],
+      "external_reference_status": "pending_latest_optimizer_semantics",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "419e535fe83fefba4808ac89903ba9c3839071dbfb937720f01c1bfcfa94b603",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "919663f6bb6c9f9aa30078dc94adab629a05d700e270761471753ab6184ec278",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 211,
+      "pr": 214,
+      "category": "confirmed_independent_defect",
+      "priority": "中",
+      "title": "普通非整除 Shard 重建错误",
+      "trigger": "逻辑 [1,64]/[3,64] 普通 Shard(0) 分给两个 rank，进入等长重分布；空分片/一般非整除可返回错形状或通信失败，直接 Partial 归约也需入口拒绝。",
+      "head": "453618aaad72c3a2f9fb7bf367cd31ca45437d17",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/211",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/214",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/core/dtensor/tensor_redistribution.py",
+          "changed_spans": [
+            [
+              273,
+              274
+            ],
+            [
+              291,
+              296
+            ],
+            [
+              301,
+              308
+            ],
+            [
+              504,
+              505
+            ]
+          ],
+          "functions": [
+            {
+              "function": "redistribution",
+              "line": 270,
+              "end_line": 291,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L270"
+            },
+            {
+              "function": "_check_equal_shard_sizes",
+              "line": 294,
+              "end_line": 308,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L294"
+            },
+            {
+              "function": "reduce_partial",
+              "line": 497,
+              "end_line": 562,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L497"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/core/dtensor/tensor_redistribution.py",
+          "function": "_check_equal_shard_sizes",
+          "line": 294,
+          "end_line": 308,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L294"
+        },
+        {
+          "path": "hyper_parallel/core/dtensor/tensor_redistribution.py",
+          "function": "reduce_partial",
+          "line": 497,
+          "end_line": 562,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L497"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "合法等长重建对原逻辑 tensor 零差；Partial 归约后对独立 2×reference 零差；不支持输入各 rank 根据同一全局元数据一致拒绝。",
+        "candidate_or_parallel": "CPU DTensor 457 passed、41 subtests；2/4 进程 Gloo 通过；真实 Ascend/HCCL 2/4 卡定向 ST 通过，24 原始文件核验。"
+      },
+      "red_green_and_200_step_scope": "选择明确拒绝未支持普通非整除分片，不是实现 ragged gather；不改变 RaggedShard/FSDP 私有 padding。无 200 步、性能或显存收益声明。",
+      "required_description_updates": [
+        "补 redistribution/_check_equal_shard_sizes/reduce_partial 固定 SHA 行锚，保留行为是拒绝与合法输入兼容的边界。"
+      ],
+      "external_reference_status": "not_applicable_dtensor_layout_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "881b00af43b66af1d72f9f1a9d0c81ea4da347130dafb331fba1114a2a90155d",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "03e950d1bc9a8498178d27c1962d4cc1e097f49dfb959a581a1e3f7772e87506",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 218,
+      "pr": 219,
+      "category": "confirmed_independent_defect",
+      "priority": "中",
+      "title": "CPU 设备索引类型错误",
+      "trigger": "CPU current_device() 返回字符串 cpu，get_device_id() 却把它当整数传给 torch.device(type,index)，JT 在设备构造时报 TypeError。",
+      "head": "86930ddc7263f6ff53a79b504b9e8db33dc83e3b",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/218",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/219",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/models/build_options.py",
+          "changed_spans": [
+            [
+              78,
+              81
+            ]
+          ],
+          "functions": [
+            {
+              "function": "get_device_id",
+              "line": 78,
+              "end_line": 82,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/86930ddc7263f6ff53a79b504b9e8db33dc83e3b/hyper_parallel/models/build_options.py#L78"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/models/build_options.py",
+          "function": "get_device_id",
+          "line": 78,
+          "end_line": 82,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/86930ddc7263f6ff53a79b504b9e8db33dc83e3b/hyper_parallel/models/build_options.py#L78"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "CPU 的无索引设备应可构造；CUDA/NPU 保留实际当前整数编号。原测试 get_device_id=0 的返回 mock 遮住缺陷。",
+        "candidate_or_parallel": "移除返回值 mock 后红测5失败；绿测20 passed、7 subtests，真实 JT 初始化/参考加载/前后向和参数更新保留；后端可用性隔离。"
+      },
+      "red_green_and_200_step_scope": "实际 CPU 接口缺陷修复，不证明 125 的 NPU 发现恢复，不替代 NPU/HCCL 或200步。",
+      "required_description_updates": [
+        "补 get_device_id 固定 SHA 行锚；外部参考按 Torch device/current_device API 契约，不强套 MF/Megatron。"
+      ],
+      "external_reference_status": "not_applicable_torch_device_api_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "ca1e3f099733f88de67ca4f410de4aa60049f37aad92890a43654d75b5a8a33a",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "9ccf2d9296639e491596bac65761e8337e752fff8b1dc819185a9a6665ff94f2",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 223,
+      "pr": 224,
+      "category": "confirmed_independent_defect",
+      "priority": "中",
+      "title": "并行测试覆盖上层 NPU 选卡",
+      "trigger": "上层 ASCEND_RT_VISIBLE_DEVICES=4,5,6,7，旧 parallel_run 仍分配 0,1 和2,3；会越过资源授权范围。",
+      "head": "a37d6bcb699d0509477882a71348c2d1d3d83177",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/223",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/224",
+      "code_locations": [
+        {
+          "path": "tests/common/parallel_case.py",
+          "changed_spans": [
+            [
+              82,
+              118
+            ],
+            [
+              125,
+              128
+            ],
+            [
+              131,
+              134
+            ],
+            [
+              136,
+              137
+            ],
+            [
+              142,
+              142
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_visible_device_pool",
+              "line": 82,
+              "end_line": 94,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L82"
+            },
+            {
+              "function": "_device_assignments",
+              "line": 97,
+              "end_line": 116,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L97"
+            },
+            {
+              "function": "parallel_run",
+              "line": 119,
+              "end_line": 168,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L119"
+            }
+          ]
+        },
+        {
+          "path": "tests/ut/common/test_parallel_case.py",
+          "changed_spans": [
+            [
+              1,
+              133
+            ]
+          ],
+          "functions": [
+            {
+              "function": "setUp",
+              "line": 31,
+              "end_line": 41,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L31"
+            },
+            {
+              "function": "_assigned_devices",
+              "line": 43,
+              "end_line": 44,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L43"
+            },
+            {
+              "function": "test_inherited_devices_are_split_without_renumbering",
+              "line": 46,
+              "end_line": 53,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L46"
+            },
+            {
+              "function": "test_single_group_inherits_selected_four_devices",
+              "line": 55,
+              "end_line": 60,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L55"
+            },
+            {
+              "function": "test_unset_visibility_keeps_zero_based_allocation",
+              "line": 62,
+              "end_line": 66,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L62"
+            },
+            {
+              "function": "test_insufficient_visible_devices_fail_before_side_effects",
+              "line": 68,
+              "end_line": 74,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L68"
+            },
+            {
+              "function": "test_explicit_budget_still_limits_a_larger_selection",
+              "line": 76,
+              "end_line": 82,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L76"
+            },
+            {
+              "function": "test_malformed_visibility_fails_before_side_effects",
+              "line": 84,
+              "end_line": 92,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L84"
+            },
+            {
+              "function": "test_invalid_process_counts_fail_before_side_effects",
+              "line": 94,
+              "end_line": 104,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L94"
+            },
+            {
+              "function": "test_cpu_allocation_ignores_npu_visibility",
+              "line": 106,
+              "end_line": 111,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L106"
+            },
+            {
+              "function": "test_worker_receives_assigned_ids_and_cpu_clears_visibility",
+              "line": 113,
+              "end_line": 123,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L113"
+            },
+            {
+              "function": "test_launcher_import_does_not_load_training_frameworks",
+              "line": 125,
+              "end_line": 133,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/ut/common/test_parallel_case.py#L125"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "tests/common/parallel_case.py",
+          "function": "_visible_device_pool",
+          "line": 82,
+          "end_line": 94,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L82"
+        },
+        {
+          "path": "tests/common/parallel_case.py",
+          "function": "_device_assignments",
+          "line": 97,
+          "end_line": 116,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L97"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "Runtime 逻辑设备 ID 池及 global_num_proc 双重预算；按父列表顺序分组且互不重叠；非法输入先于端口/进程副作用失败。",
+        "candidate_or_parallel": "同新增回归红测24 fail/4 pass；绿测10 passed、18 subtests；连续/稀疏选卡、非法列表、预算、CPU 清变量、导入不加载框架。"
+      },
+      "red_green_and_200_step_scope": "仅无设备调度逻辑；不验证实际 ID 存在、多卡通信或200步。已有 Ascend 官方环境变量契约链接。",
+      "required_description_updates": [
+        "补 _visible_device_pool/_device_assignments/parallel_run 固定 SHA 行锚；MF/Megatron 同名参考不适用，无需为此补训练实验。"
+      ],
+      "external_reference_status": "not_applicable_ascend_visibility_api_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "ea9198d40338dc46b05650a60b203b2ae3a9c9d32a516a535d0eaf4febe1a8b6",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "2117478daeee58c88dd9e536e8885bbac208421f3db58de9a800efbe20072de5",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 225,
+      "pr": 226,
+      "category": "confirmed_independent_defect",
+      "priority": "中",
+      "title": "资源 MAX 漏掉 TP/PP rank",
+      "trigger": "资源仅在 DP+CP 子组 MAX，最慢或最大显存 rank 位于另 TP lane/PP stage 时漏报；数值 loss/token 不能改成 world sum。",
+      "head": "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/225",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/226",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/trainer/callbacks/environ_meter_callback.py",
+          "changed_spans": [
+            [
+              158,
+              162
+            ],
+            [
+              165,
+              166
+            ],
+            [
+              225,
+              226
+            ],
+            [
+              315,
+              316
+            ]
+          ],
+          "functions": [
+            {
+              "function": "_reduce",
+              "line": 158,
+              "end_line": 167,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L158"
+            },
+            {
+              "function": "_memory_metrics",
+              "line": 220,
+              "end_line": 231,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L220"
+            },
+            {
+              "function": "on_step_end",
+              "line": 296,
+              "end_line": 346,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L296"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/trainer/callbacks/environ_meter_callback.py",
+          "function": "_reduce",
+          "line": 158,
+          "end_line": 167,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L158"
+        },
+        {
+          "path": "hyper_parallel/trainer/callbacks/environ_meter_callback.py",
+          "function": "on_step_end",
+          "line": 296,
+          "end_line": 346,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L296"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "人工时钟/显存哨兵的独立 world MAX 与原子组 MAX oracle；tokens/loss 按原 DP+CP 归约，不重复计副本。",
+        "candidate_or_parallel": "UT 红4 fail、绿5 passed/7 subtests；真实8进程 CPU/Gloo v2 两侧96条观测/1152比较，资源64错→0、非资源0；真实旧TP2 69步日志证明部分漏报。"
+      },
+      "red_green_and_200_step_scope": "真实 collective 但秒数/GiB 是哨兵；不是TP/PP模型训练、NPU/HCCL成本或200步收益。",
+      "required_description_updates": [
+        "补 _reduce/_memory_metrics/on_step_end 行锚；保留所有 rank 同序参与契约与未测 HCCL 成本，勿用回调修复解释 TP2 loss。"
+      ],
+      "external_reference_status": "not_applicable_collective_and_metric_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "55ccc02fe0c7f4eda1d1799befef830c199146c87cb5bcbdd42fabf44f245975",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "7e708f13291c532f4bc99f0c4c92163c143cf1bc8a07f720ea5fca58874cee39",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 227,
+      "pr": 228,
+      "category": "confirmed_independent_defect",
+      "priority": "中",
+      "title": "NPU 精度初始化写无效属性",
+      "trigger": "创建 Trainer 前 HF32=true；NPU 分支写 CUDA 的 allow_tf32/BF16 属性被 TorchNPU 静默忽略，未关闭真实 allow_hf32。",
+      "head": "453fe5723429b0e45ee6f0236d6e262cbe58b04f",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/227",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/228",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/trainer/runtime/random.py",
+          "changed_spans": [
+            [
+              35,
+              38
+            ],
+            [
+              45,
+              45
+            ]
+          ],
+          "functions": [
+            {
+              "function": "enable_high_precision_for_bf16",
+              "line": 34,
+              "end_line": 45,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/453fe5723429b0e45ee6f0236d6e262cbe58b04f/hyper_parallel/trainer/runtime/random.py#L34"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/trainer/runtime/random.py",
+          "function": "enable_high_precision_for_bf16",
+          "line": 34,
+          "end_line": 45,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/453fe5723429b0e45ee6f0236d6e262cbe58b04f/hyper_parallel/trainer/runtime/random.py#L34"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "TorchNPU 2.12.0 实际 setter/getter、CPU 不触碰加速器、CUDA 原有两选项不变；HF32影响FP32 matmul降精度，不等于BF16累加控制。",
+        "candidate_or_parallel": "替身 UT 红2子测试失败→3 passed/2 subtests；真实安装 TorchNPU 配置对象 false/true 读写探针，NPU未初始化，最后恢复原值。"
+      },
+      "red_green_and_200_step_scope": "默认 HF32=false；未证明是长步漂移原因。无独立修复设备 matmul/200步/收益验证。",
+      "required_description_updates": [
+        "补 enable_high_precision_for_bf16 行锚；依据实际 TorchNPU 版本 API，保留 HF32/BF16 区别与默认false限制，勿硬套MF/Megatron数值根因。"
+      ],
+      "external_reference_status": "not_applicable_torchnpu_option_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "370645d9f2aadc1ea837289de88dafdca28338a8c235501b951c035f16ed893d",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "5baa3c323030b0ca91f3f054e98bf5f06526a7e1a0d7dd45467a6f2f523f2592",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "父子关系沿用已保存只读审计；本审计未重新请求网络。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    },
+    {
+      "issue": 229,
+      "pr": 230,
+      "category": "confirmed_independent_defect_merged",
+      "priority": "低",
+      "title": "动态 FSDP wrapper 报告漏计",
+      "trigger": "CheckpointWrapper 被 FSDP 动态扩展为 HSDPCheckpointWrapper，精确类名判断漏计；同名无关对象又可能误计。",
+      "head": "85b091b9100141ebc161a68a5c4bed5932d44509",
+      "issue_url": "https://github.com/hf1s/hyper-parallel/issues/229",
+      "pr_url": "https://github.com/hf1s/hyper-parallel/pull/230",
+      "code_locations": [
+        {
+          "path": "hyper_parallel/tools/model_integration/integration_validator.py",
+          "changed_spans": [
+            [
+              24,
+              24
+            ],
+            [
+              455,
+              455
+            ],
+            [
+              458,
+              458
+            ]
+          ],
+          "functions": [
+            {
+              "function": "collect_activation_checkpoint_wrappers",
+              "line": 454,
+              "end_line": 471,
+              "url": "https://github.com/hf1s/hyper-parallel/blob/85b091b9100141ebc161a68a5c4bed5932d44509/hyper_parallel/tools/model_integration/integration_validator.py#L454"
+            }
+          ]
+        }
+      ],
+      "primary_locations": [
+        {
+          "path": "hyper_parallel/tools/model_integration/integration_validator.py",
+          "function": "collect_activation_checkpoint_wrappers",
+          "line": 454,
+          "end_line": 471,
+          "url": "https://github.com/hf1s/hyper-parallel/blob/85b091b9100141ebc161a68a5c4bed5932d44509/hyper_parallel/tools/model_integration/integration_validator.py#L454"
+        }
+      ],
+      "two_sided_correctness": {
+        "baseline_or_contract": "真实 CheckpointWrapper 类型继承契约；报告完整 FQN/被包对象，普通模块及同名无关对象不算。",
+        "candidate_or_parallel": "真实 FSDP 类扩展回归，红1 fail/58 deselected；绿59 passed；2文件lint[]。"
+      },
+      "red_green_and_200_step_scope": "真实8卡触发0训练步仅证明报告遗漏；只修报告识别，不证明实际MTP replay、200步或资源收益。已合入并关闭issue，当前body是合并前记录。",
+      "required_description_updates": [
+        "审计提供固定 SHA collect_activation_checkpoint_wrappers 行锚供总报告引用；本轮不改已合入PR/关闭issue。",
+        "保留当前body“草稿/等待复核”为合并前历史记录说明，不据正文推翻已验证的合入状态。"
+      ],
+      "external_reference_status": "not_applicable_python_type_contract",
+      "published_body_audit": [
+        {
+          "kind": "issue",
+          "sha256": "0d8f4973fa2ae5f1721021ec1ad798da9f71b0845cb23f7b6612845beed9960f",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        },
+        {
+          "kind": "pr",
+          "sha256": "b6d45127efe130febdd1d6b6dd7c00ba025259039147729e353d7dc43f1f03f3",
+          "fixed_production_line_links": [],
+          "mf_megatron_direct_source_links": []
+        }
+      ],
+      "links": {
+        "native_parent_202": true,
+        "issue_pr_parent_text_links": true,
+        "source": "evidence/github-chinese-publication-receipt.json; evidence/github-chinese-full-link-audit.json",
+        "note": "旧full-link-audit中的head已过时；当前head/body/合入状态以14:35:06 UTC快照为准。"
+      },
+      "current_head_snapshot": {
+        "checked_at": "2026-10-16T14:35:06.587714+00:00",
+        "head_matches": true,
+        "body_matches": true,
+        "commits": 1,
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "status_count": 0,
+        "check_run_count": 0
+      }
+    }
+  ]
+}

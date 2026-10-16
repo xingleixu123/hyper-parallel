@@ -1,0 +1,97 @@
+{
+  "status": "PASS_LOCAL_METADATA_AND_CAPTURED_HEADERS_FULL_CPU_PENDING",
+  "reviewed_utc": "2026-10-16T14:24:13.147089+00:00",
+  "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "reader": {
+    "path": "evidence/201-a1e6-checkpoint-cpu-draft/read_checkpoint_cpu.py",
+    "sha256": "abe55523598aaae0dacebe5863c6b94d27221ad5f3a5e453f134b96835c31fb8",
+    "frozen": true
+  },
+  "manifest_sha256": "7d6bfd2eb6576e20803d22580e503942277a31c094614f87d72134c94768bab7",
+  "evidence": {
+    "metadata-header-readback-v3.json": "f365281bc04b1abd840eabe2438ac743600065b131a3f63177d46871e77b06cc",
+    "reader-boundary-checks-v2.json": "d489041cb57100c6184c45ff4939511acf959091ec419016e69dee45b86f0a07",
+    "review-v2.md": "a7becb95a725ca39bc2ff2b8939203723f0b283624e738b61b9181984705703b"
+  },
+  "actual_structure": {
+    "logical_items": 648,
+    "tensor_items": 112,
+    "byte_items": 536,
+    "physical_storage_items": 1418,
+    "physical_tensor_chunks": 882,
+    "tensor_dtypes": {
+      "torch.float32": 112
+    },
+    "optimizer_step_entries": 46,
+    "optimizer_step": 200,
+    "model_tensor_items": 48,
+    "files_rehashed": [
+      ".metadata",
+      "_rank0_.bytes",
+      "_rank1_.bytes",
+      "_rank2_.bytes",
+      "_rank3_.bytes",
+      "_rank4_.bytes",
+      "_rank5_.bytes",
+      "_rank6_.bytes",
+      "_rank7_.bytes",
+      "extra_state/extra_state_rank_0.pt",
+      "extra_state/extra_state_rank_1.pt",
+      "extra_state/extra_state_rank_2.pt",
+      "extra_state/extra_state_rank_3.pt",
+      "extra_state/extra_state_rank_4.pt",
+      "extra_state/extra_state_rank_5.pt",
+      "extra_state/extra_state_rank_6.pt",
+      "extra_state/extra_state_rank_7.pt"
+    ],
+    "all_25_files_rehashed": false,
+    "header_source": "collected manifest only"
+  },
+  "local_boundary_checks": 16,
+  "python_3_9_ast_pass": true,
+  "scope": {
+    "local_small_files_rehashed": 17,
+    "remote_tensor_payload_copied": false,
+    "tensor_values_checked": false,
+    "torch_extra_state_unpacked": false,
+    "containers_created": false,
+    "npu_used": false,
+    "canonical_modified": false
+  },
+  "full_cpu_contract": {
+    "expected_file_count": 25,
+    "max_slice_mib": 32,
+    "full_streaming_sha256": true,
+    "expected_source_files_pinned": 8,
+    "no_output_overwrite": true,
+    "max_single_tensor_tile_only": true,
+    "stateful_generator_roundtrip": "CPU and Python only",
+    "device_rng_applied": false
+  },
+  "remaining": [
+    "Independent CPU runner must execute full-mode 25-file hashing, tensor finite checks and torch extra_state CPU unpack.",
+    "Actual model/DCP restoration and NPU resume not covered.",
+    "No shared-machine reference; migration admission remains false.",
+    "Tensor hashes first measured after save; no save-time tensor checksum comparator."
+  ],
+  "distributed_resume_verified": false,
+  "migration_admitted": false,
+  "revision": 2,
+  "previous_reader": {
+    "path": "D:\\Obsidian Vault D\\hyperllal\\jt-dev-8npu-20261014\\evidence\\201-a1e6-checkpoint-read-v1-inputs\\read_checkpoint_cpu.py",
+    "sha256": "a103369e620c5000086b81134cc5a061c4d109502018238d34a308dc345ba645",
+    "input_package_never_executed": true
+  },
+  "changes": [
+    "Use explicit storage_module_name for dynamic module creation and registration.",
+    "Use getattr(storage_types, StorageInfo) for the actual dynamically loaded type."
+  ],
+  "pylint_EF": {
+    "status": "PASS",
+    "command": "python -m pylint --disable=all --enable=E,F --reports=n --score=n read_checkpoint_cpu.py",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "suppressions_added": false
+  }
+}

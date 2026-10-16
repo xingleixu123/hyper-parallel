@@ -1,0 +1,60 @@
+{
+  "created_utc": "2026-10-16T14:25:30.508933+00:00",
+  "status": "PASS_READY_FOR_SCOPED_CPU_CHECKPOINT_READ",
+  "execution_ready_for_cpu_diagnostic": true,
+  "npu_execution_admitted": false,
+  "migration_admitted": false,
+  "active_findings": [],
+  "scope": "仅本机最小差异与冻结部署读回证据补审；未重跑 mock/完整分析，未执行远端、容器或 NPU。",
+  "runner_sha256": "1c0225f838f22110c83978d072e2eaf4450701dfed67985747c5c74d334efa3a",
+  "reader_sha256": "abe55523598aaae0dacebe5863c6b94d27221ad5f3a5e453f134b96835c31fb8",
+  "input_manifest_sha256": "8df7ab602c32029d8454d448e6fb13467a43de403b11d797644ba147ef11450e",
+  "minimal_change_checks": {
+    "runner_only_INPUTS_v2_directory": true,
+    "reader_only_two_equivalent_dynamic_module_access_changes": true,
+    "python39_ast_parse": true,
+    "checkpoint_and_run_evidence_byte_identical_to_reviewed_v1": true,
+    "input_manifest_all_three_members_size_and_sha_match": true
+  },
+  "deployment_readback_evidence": {
+    "path": "evidence/201-a1e6-checkpoint-cpu-deployment-v2.json",
+    "sha256": "3eea3f0478fb556436f2de82e8136f2daf2bdd5560e21288bbc9208396dddf5b",
+    "exact_five_files_match_local_frozen_bytes": true,
+    "files": {
+      "evidence/201-a1e6-checkpoint-read-v1-inputs-v2/expected-hashes.json": {
+        "sha256": "7d6bfd2eb6576e20803d22580e503942277a31c094614f87d72134c94768bab7",
+        "bytes": 248067
+      },
+      "evidence/201-a1e6-checkpoint-read-v1-inputs-v2/input-manifest.json": {
+        "sha256": "8df7ab602c32029d8454d448e6fb13467a43de403b11d797644ba147ef11450e",
+        "bytes": 561
+      },
+      "evidence/201-a1e6-checkpoint-read-v1-inputs-v2/read_checkpoint_cpu.py": {
+        "sha256": "abe55523598aaae0dacebe5863c6b94d27221ad5f3a5e453f134b96835c31fb8",
+        "bytes": 29903
+      },
+      "evidence/201-a1e6-checkpoint-read-v1-inputs-v2/run-manifest.json": {
+        "sha256": "0f5787ac734e47aac93b00166d5b56a06a7926d6bcfe632ff460908dcb32e85c",
+        "bytes": 17735
+      },
+      "tools/run_201_checkpoint_cpu_v2.py": {
+        "sha256": "1c0225f838f22110c83978d072e2eaf4450701dfed67985747c5c74d334efa3a",
+        "bytes": 11940
+      }
+    },
+    "free_bytes_after": 447225913344,
+    "checked_utc": "2026-10-16T14:24:26.677783+00:00",
+    "pylint_evidence": "PASS_EMPTY_OUTPUT_ROOT_AND_AUTHOR",
+    "pylint_scope": "采用 root/作者已完成的 E/F 结果，不在此次补审重复执行。"
+  },
+  "previous_review": {
+    "path": "evidence/201-a1e6-checkpoint-cpu-runner-review-v2.json",
+    "sha256": "92b0c172f53b5023d825f1d9aa13f945ce4ee57a69adbb58455cda01fd73759f",
+    "lifecycle_scope": "沿用 v1 的 5 个 mock 生命周期、13 个 CPU 隔离/只读负例、5 个身份负例；本次执行语义未改变。"
+  },
+  "execution_contract": "只执行该固定 201 CPU reader：runc/network none/4 CPU/8 GiB/no device，checkpoint 与 source 只读，600 秒 attach 超时，精确所有权清理，不接触共享 guard/waiter。",
+  "limits": [
+    "这是启动前的 scoped CPU 执行就绪，不是 checkpoint 实际可读或有限值通过。",
+    "需检查实际 result/receipt/removed_verified；未执行 NPU 续训，也未批准迁往 201 的训练矩阵。"
+  ]
+}

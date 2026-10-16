@@ -1,0 +1,707 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-16T15:00:19.121217+00:00",
+  "status": "PASS_BODY_ONLY_EXTERNAL_REFERENCES_PENDING",
+  "scope": "只读26份候选与原github-cn-drafts比较；未修改候选/远端/训练源/守卫；不重跑已验证训练。",
+  "candidate_directory": "evidence/localization-description-refresh-v1/drafts",
+  "source_audit_sha256": "adf892d3ba961bba6738b7ba72091d44b33c140fbdacbda3e1e4a29df8fd4b8c",
+  "counts": {
+    "candidates": 26,
+    "pr_templates": 13,
+    "original_evidence_url_deletions": 0,
+    "fixed_function_link_occurrences": 62
+  },
+  "automated_failures": [],
+  "semantic_checks": {
+    "recompute_186_history_and_544_pending": true,
+    "muon_metadata_limits_and_original_links_restored": true,
+    "muon_same_implementation_oracle_explicit": true,
+    "outdated_current_gate_removed": true,
+    "new_main_lm_first_gate_explicit_where_replaced": true,
+    "old_cp_st_pending_removed": true,
+    "old_tp69_only_removed": true,
+    "no_closed_229_or_merged_230_drafts": true
+  },
+  "resolved_findings": [
+    {
+      "id": "R1",
+      "problem": "清理issue210/PR201旧状态时误删28项NS dtype/46项optimizer step与恢复覆盖限制及直接证据链接。",
+      "resolution": "已恢复为18602c4历史元数据与续训段；只更新独立400后续完成状态，保留原始3链接、旧总报告链接及同FP32/配置冲突边界。"
+    },
+    {
+      "id": "R2",
+      "problem": "#195/#196新句把186三处覆盖证据接到最新544包含#230之后，可能误读为最新重算已验证。",
+      "resolution": "已分开版本归属；明确186模块树/76文件与数值资源证据，最新544重算矩阵尚待验证。"
+    }
+  ],
+  "review_conclusions": [
+    "26份标题、expected_old_body_sha256、expected_head保持原绑定；13份PR固定标题行与checklist字节相同。",
+    "原证据URL全部保留；清除的是重复过时当前状态，核心红绿/失败数据、固定配方、容差、模型/设备边界未扩大。",
+    "所有新增固定SHA函数行锚均匹配对应PR当前head及此前独立核验的本地git函数位置。",
+    "#201明确plain对照是同实现独立未分片Muon实例；未宣称独立数学或跨MF/Megatron端到端对齐。",
+    "旧186历史矩阵与最新544待验边界已分开；当前主LM优先表述与root最新明确目标一致。",
+    "只评正文主体；外部MF/Megatron固定源码新增段尚未加入，需在形成后单独复核，不可据本报告提前发布外部引用结论。"
+  ],
+  "rows": [
+    {
+      "item": "issue-203",
+      "head": "bad2550675ff5e32ca6aba465aacbaa28af0480c",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "2cb1055d74e9bdd2a521247d0d942ee634281f6cb0c02004a7d45206be0e0327",
+      "json_sha256": "b90f1d04eda895dd08dc023940468bc3e91a96d1e76dc995a9386904d5bbfc7e",
+      "md_sha256": "7e7f5f0e2e84fc010f94985808456c63c7f0d62e61191b70e87edd46c629913a",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L268",
+        "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/trainer/text_trainer.py#L245"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-204",
+      "head": "b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "bbdb837a91f0700a9b5a1af25a43df0ac722c0d8859d4c89794a5898e1b03234",
+      "json_sha256": "18c3944571777f48c1101f3c51a15d82088867182f800caa02fcefab00db7ec6",
+      "md_sha256": "1efdbd03099f1fdb0253784ad1a9bdb5ff604a0577adf499400f63384c187e94",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_scheduler.py#L99",
+        "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_state.py#L61"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-205",
+      "head": "e9fc94d376ca7380c13a5e09c0020b34a75dc1d2",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "047da71dcb2f1b57b13fa2a63612c97f67a7cdc9f729149a74f0421850264ac0",
+      "json_sha256": "5902b3232d2fb132a93d450ca0ff3fa50700b01df240408fc36ef810da7f439e",
+      "md_sha256": "e1f8da15f3bef4c114cc8082df9bd84cf3637ab8ee7c4fbca9734ec409356543",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L271",
+        "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L301",
+        "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/ut/models/jt_deepseek_v3/test_context_parallel.py#L127"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-206",
+      "head": "00ae8a77b36ed4a306147255781d986638249057",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "0f00dc232a0921128b24444802c1fc67e9496fd308a4f404b6d93e25db9321fe",
+      "json_sha256": "f0efdc4412366024ebdbdb2c0527006f3501c0e5eceb4078ecafa3db3ff53e94",
+      "md_sha256": "fc2246b35448e91216fe819072ba4777437c0c57d6871ec5ff252584e381d829",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L215",
+        "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L497"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-207",
+      "head": "d1f52136421c258646463e764421d34aac503f97",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "2e9cb36c48fcaa8792e520ba3eacf43a0f28c6635e67971f0a10862f830cd7d0",
+      "json_sha256": "19c7d40fcbe6b7fd445053c0d7224f97d91e468e08896ae6258ca428e193e70a",
+      "md_sha256": "fcb2c52813bf597951f57dd4055786fe7083a525a14b0c95d972851fdeae8554",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/d1f52136421c258646463e764421d34aac503f97/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py#L427"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-208",
+      "head": "bd18261a14fc0608d0728defef756fd0028f80aa",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "87c30fbd192fbb6c928e1f9689d49b3fc1e12c7fb3e0007eeb1776fc4820c036",
+      "json_sha256": "ee617cfd43b9c70c7963a945945765ed12ea7bbeae7614513238d6269773e6cd",
+      "md_sha256": "1d066241ac7837f61df6e65d255e970d84461437c943e674d9b62b83cf5daac6",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L197",
+        "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L408",
+        "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L477"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-209",
+      "head": "630d54358f94e34dc8e7f22c6a57d4043ba211f5",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "42f25fcaead9acbf358c15f28b3c7989b863ad3327343e6ecf786a66e4710ef7",
+      "json_sha256": "6558d8fa65ae46d6d866e59bae86014cff3ca2d3027c77145739c9e05eeb7ccb",
+      "md_sha256": "00b49396065855179af8c34fa3d41d965f3278857aed74e836fb609c7f508387",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L115",
+        "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L59",
+        "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/core/fully_shard/hsdp_param.py#L837"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-210",
+      "head": "59a03c63490f2e47d0fd89d9e7974982abe1e9e2",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "d1f0154ba4201a3dcbea61840142d0aad95ef8f3553b059cbb66357b1ec24894",
+      "json_sha256": "606e4fd23bfe1c813e65a77e60a4c67f7ee2f1986144cc8b159d330aa59c554d",
+      "md_sha256": "306acf3659898c1a312b03d40ae46bac6b39faccbae17016f7de9797ba833e63",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L1127",
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L307",
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L550",
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L647"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-211",
+      "head": "453618aaad72c3a2f9fb7bf367cd31ca45437d17",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "2c84d0fc47979390367d8ca4d6e613c4bf0bc0c8bfbd4164874587c8b8bf090f",
+      "json_sha256": "7171929175a62ab06fc99e3431a5869a5716c404b6b418838a823b16d3624e33",
+      "md_sha256": "fecadd22c314ff1b0289741c0720dcf03ee3de974e78dde8f6749ac8ba8c2565",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L270",
+        "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L294",
+        "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L497"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-218",
+      "head": "86930ddc7263f6ff53a79b504b9e8db33dc83e3b",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "62a494199a33e9cb6636a775c903d8049cbd690025ac1ab6c55ceb2c1a4c05d2",
+      "json_sha256": "d6f63788a09f8ee2fb9dc5f564a55b325d05610634b50c250eb2f4b21da1ac02",
+      "md_sha256": "49b3b7977b4a6661bfbf8e093c44422aa851f63787388e397851acf569669bcc",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/86930ddc7263f6ff53a79b504b9e8db33dc83e3b/hyper_parallel/models/build_options.py#L78"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-223",
+      "head": "a37d6bcb699d0509477882a71348c2d1d3d83177",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "1f0924064cc2cb01bbb05a26b29a41b1afad60d3a101a4f028d16330f48fadbd",
+      "json_sha256": "cd76d6875d1d2f0a99b50a12399b08331d90d02576b6f7a81a5550fed2f72971",
+      "md_sha256": "f2b80d8bc6ee81bc2b26f252e04abc2468f419c5046dfff917946420954f81c7",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L119",
+        "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L82",
+        "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L97"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-225",
+      "head": "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "f5e44e0e96f32769132eeb82be099e1a1e6ab42e9df9befaaf2522d4114dec9d",
+      "json_sha256": "7db46ab8e8023097d486e62a5084716cc72737c92db8c0bd25fa8bd1f04071f4",
+      "md_sha256": "58bafe93e6e26d786797653b95ca2f74193bf660517bf809054ac2ddff8f320a",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L158",
+        "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L220",
+        "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L296"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "issue-227",
+      "head": "453fe5723429b0e45ee6f0236d6e262cbe58b04f",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "792c77659362c1bf24dd413a6735eef588f89b901a3cc80fae358835df73e9bb",
+      "json_sha256": "5d7b90261e0a51153c5bd6b81ef8a6ca648bc7a01766a66c1b1bb1c16e3b9018",
+      "md_sha256": "8de25b7c2210bc4845f2ee03e7e431c8aafb46bc12a5173c90b2ba5b789f3efe",
+      "template_headings_sha256": null,
+      "checklist_sha256": null,
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/453fe5723429b0e45ee6f0236d6e262cbe58b04f/hyper_parallel/trainer/runtime/random.py#L34"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-194",
+      "head": "bad2550675ff5e32ca6aba465aacbaa28af0480c",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "5194352c729f41eedf565f3c388e7f18fab4cc30d02657ebd23446b595ebfae7",
+      "json_sha256": "8e97ab6141168d2166c3470d2a42ed69b1ea1cf180e18047634a307e47861bb6",
+      "md_sha256": "0be28882b6dccc73eed26be8197329be0a7a014dd37fe18e813e6eedc373463c",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "5ea39fc7068bf9df63ad2e0f8f929ac2e98bbdb84bd821358580576c0904bc2f",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/data/batching/get_batch.py#L268",
+        "https://github.com/hf1s/hyper-parallel/blob/bad2550675ff5e32ca6aba465aacbaa28af0480c/hyper_parallel/trainer/text_trainer.py#L245"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-195",
+      "head": "00ae8a77b36ed4a306147255781d986638249057",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "d569f68c021813b8105ed4d824d21cd4052e5473b00871a11c5880fe5be111d3",
+      "json_sha256": "bcc114f1616e11c5411e396138d5217103970eb4916a1bdb4fecc5fc9bfa0e8f",
+      "md_sha256": "547b400e7d367a304bf13d1f53dcabda1240a3bf3064a9df6144b9572b833288",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "5ea39fc7068bf9df63ad2e0f8f929ac2e98bbdb84bd821358580576c0904bc2f",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L215",
+        "https://github.com/hf1s/hyper-parallel/blob/00ae8a77b36ed4a306147255781d986638249057/hyper_parallel/distributed/activation_checkpoint.py#L497"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-196",
+      "head": "d1f52136421c258646463e764421d34aac503f97",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "3a3372e270f96227d1b81b24c3df6c3721be7446667897fdc647737148d37b44",
+      "json_sha256": "937efb84c06dc41f391601e0386569598a5dfcdf1d08515c36be0f53b68665af",
+      "md_sha256": "eb493f6575691a5491793f2092d6361336c8dea6143b90181d6d95cf373f6d8a",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "9e009df23bc3d9db7f2cbac5909e900e829a9db4220c7825e40fbcd225cae0cd",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/d1f52136421c258646463e764421d34aac503f97/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py#L427"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-197",
+      "head": "bd18261a14fc0608d0728defef756fd0028f80aa",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "1bb0b366debe5089b072f228a74f6c456c61dc889cd03eefb9d06927338da28e",
+      "json_sha256": "6584d2af10af6a9ed685564ad5dd5af271c289ecc26f80491358889bb9a2b206",
+      "md_sha256": "863a8f92f26fba5aa949ee5bd2271a6642510b757b0169532c2d06db2c187a26",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "9e009df23bc3d9db7f2cbac5909e900e829a9db4220c7825e40fbcd225cae0cd",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L197",
+        "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L408",
+        "https://github.com/hf1s/hyper-parallel/blob/bd18261a14fc0608d0728defef756fd0028f80aa/hyper_parallel/trainer/callbacks/checkpoint_callback.py#L477"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-198",
+      "head": "b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "7fc9c0e90c9ce57cd11ea6249aeb459f6ae8464bda3d913013885ba68d22b7da",
+      "json_sha256": "cd072128e36f3ddb1e51843489a4e70b8a6c8788998acfd66680b94840d3dd8e",
+      "md_sha256": "eb2afef9146702d6daecb2e267c487cd479047c6645889ff56a77f39ccff93f4",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "9e009df23bc3d9db7f2cbac5909e900e829a9db4220c7825e40fbcd225cae0cd",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_scheduler.py#L99",
+        "https://github.com/hf1s/hyper-parallel/blob/b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6/hyper_parallel/core/fully_shard/hsdp_state.py#L61"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-199",
+      "head": "e9fc94d376ca7380c13a5e09c0020b34a75dc1d2",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "346a9ee8db8fdce28f10c0df4f5f098c40e1b87db192027c3ede5eb2638ca5da",
+      "json_sha256": "b3b6eb905cbd6323b5aec0a8306af366f3ef591fd671c394e66bd94dab715d11",
+      "md_sha256": "ac6560924290adef8f159198bc1d84e907d758829e709b18b46d9a1e6b6dc5b7",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "5ea39fc7068bf9df63ad2e0f8f929ac2e98bbdb84bd821358580576c0904bc2f",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L271",
+        "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py#L301",
+        "https://github.com/hf1s/hyper-parallel/blob/e9fc94d376ca7380c13a5e09c0020b34a75dc1d2/tests/ut/models/jt_deepseek_v3/test_context_parallel.py#L127"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-200",
+      "head": "630d54358f94e34dc8e7f22c6a57d4043ba211f5",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "56f54d9dfbbbf83e87f60e47c1e04cd2ca6eb3153d29de1bc2932ab309df5420",
+      "json_sha256": "dad1360fc23bd5b6f0678bd41846787a65809f53f52ab475d8044f6bdc5f8b6f",
+      "md_sha256": "ce0567895ee12a25e9b251d185e38aefda6d2938799c65138a170f63f4c8a656",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "5ea39fc7068bf9df63ad2e0f8f929ac2e98bbdb84bd821358580576c0904bc2f",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L115",
+        "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/components/functional/npu_grouped_swiglu.py#L59",
+        "https://github.com/hf1s/hyper-parallel/blob/630d54358f94e34dc8e7f22c6a57d4043ba211f5/hyper_parallel/core/fully_shard/hsdp_param.py#L837"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-201",
+      "head": "59a03c63490f2e47d0fd89d9e7974982abe1e9e2",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "33ac7683ab5dd2f589aef0fb48a7669d5f4bc7a58d1693231d6e333b3ed37499",
+      "json_sha256": "42cf6fd69eb4ee3fecff552904b03ac3e343c8c6376a6d30907f27bd4ab2f5fe",
+      "md_sha256": "c549afc37a4aaa3e5e1eefd891a5d4f6cc9ac097d8b250e1affab0d09f95d3a2",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "5ea39fc7068bf9df63ad2e0f8f929ac2e98bbdb84bd821358580576c0904bc2f",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L1127",
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L307",
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L550",
+        "https://github.com/hf1s/hyper-parallel/blob/59a03c63490f2e47d0fd89d9e7974982abe1e9e2/hyper_parallel/core/optimizer/muon.py#L647"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-214",
+      "head": "453618aaad72c3a2f9fb7bf367cd31ca45437d17",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "a5ed4c0eb84a19237983adafb6e8398b5c05f226f542a4d1f4ce4085e044d98e",
+      "json_sha256": "d1e7f03c6c7939c1405433bcf4652c2be1dc8039c988aa88c94ffe756e2b4b29",
+      "md_sha256": "53899fd593ac1fc148e33ffeb976082bd10b37cf4a364117681a208e109859a7",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "5ea39fc7068bf9df63ad2e0f8f929ac2e98bbdb84bd821358580576c0904bc2f",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L270",
+        "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L294",
+        "https://github.com/hf1s/hyper-parallel/blob/453618aaad72c3a2f9fb7bf367cd31ca45437d17/hyper_parallel/core/dtensor/tensor_redistribution.py#L497"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-219",
+      "head": "86930ddc7263f6ff53a79b504b9e8db33dc83e3b",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "f326ed0db007747140bb3f032fdebce4527f99ce588b85acca5e98431fa5ba2b",
+      "json_sha256": "e980e50cd09b72adc3e9c056ae2cacdbd4efa4cf3a2d2e386896a676968b5938",
+      "md_sha256": "4f8e43f481eadf56a0f3229d4d581b42598314ac1eef0e001dab52db5d92d885",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "5ea39fc7068bf9df63ad2e0f8f929ac2e98bbdb84bd821358580576c0904bc2f",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/86930ddc7263f6ff53a79b504b9e8db33dc83e3b/hyper_parallel/models/build_options.py#L78"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-224",
+      "head": "a37d6bcb699d0509477882a71348c2d1d3d83177",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "ec4e3120c59321dab515c5ebf741b244bc6a36da93e5e631d8fb1262478e87f8",
+      "json_sha256": "4ea0df51efa6f5c3b9a8b81307f21fc01b36bb6bbfabf751a51bc46c66e2be84",
+      "md_sha256": "e917c8b9f8c053fbeae5658e02c68a327953e7ce61c30df1ef44ff7e116fef89",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "0c496e4f512d32755c3f111dd6f4d0a3e68179c35a47213f8518678545ca142d",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L119",
+        "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L82",
+        "https://github.com/hf1s/hyper-parallel/blob/a37d6bcb699d0509477882a71348c2d1d3d83177/tests/common/parallel_case.py#L97"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-226",
+      "head": "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "7d7fbf884692f12cbc7891a04ed4d4a46b3cce51d347583a821dd2a9f7f0231f",
+      "json_sha256": "5072e918a1fec4f703a8d25c585bd36abc04587ee2108070c89d6d5a5468d67d",
+      "md_sha256": "e2550f8c5b9d74ffe5df0e439cfa39a79c5f8100218869700cc0fe6b3793b030",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "0c496e4f512d32755c3f111dd6f4d0a3e68179c35a47213f8518678545ca142d",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L158",
+        "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L220",
+        "https://github.com/hf1s/hyper-parallel/blob/b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7/hyper_parallel/trainer/callbacks/environ_meter_callback.py#L296"
+      ],
+      "removed_urls": []
+    },
+    {
+      "item": "pr-228",
+      "head": "453fe5723429b0e45ee6f0236d6e262cbe58b04f",
+      "checks": {
+        "title_unchanged": true,
+        "old_body_sha_matches": true,
+        "expected_head_unchanged": true,
+        "fixed_template_headings_bytes_identical": true,
+        "checklist_bytes_identical": true,
+        "json_md_match": true,
+        "all_original_urls_retained": true,
+        "all_function_anchors_verified": true,
+        "parent_and_counterpart_mentioned": true
+      },
+      "body_sha256": "b046cdb1c17936155d51405c938ae2d4e48509765b0ae7629c424e7f2404712f",
+      "json_sha256": "480bfa766d1fa1f515c185a4c64b84c9aeaf4e4536d062084025047ce0559b17",
+      "md_sha256": "2f5b958ca54abc00fd41209a6a627f9b7691fb0d64d27d719f0a931a04123c44",
+      "template_headings_sha256": "68a83c5dbd5a34a80f9386c23d4fcb22119564e0c6098bd163359a1706086ebe",
+      "checklist_sha256": "9e009df23bc3d9db7f2cbac5909e900e829a9db4220c7825e40fbcd225cae0cd",
+      "verified_code_links": [
+        "https://github.com/hf1s/hyper-parallel/blob/453fe5723429b0e45ee6f0236d6e262cbe58b04f/hyper_parallel/trainer/runtime/random.py#L34"
+      ],
+      "removed_urls": []
+    }
+  ]
+}
