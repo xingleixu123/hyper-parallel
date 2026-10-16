@@ -1,0 +1,1564 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "entry_hash": true,
+      "config_hash": true,
+      "launcher_hash": true,
+      "config_only_paths": true,
+      "49_frozen_sources": true,
+      "unchanged_RESTORE.json": true,
+      "unchanged_SOURCE_REVISION.json": true,
+      "unchanged_PROBE_SOURCE_MANIFEST.json": true,
+      "unchanged_CE_TAIL226_FACTOR.json": true,
+      "unchanged_NS_EPSILON229_FACTOR.json": true,
+      "unchanged_NORM219_FACTOR.json": true,
+      "unchanged_Q_NPU_SQRT222_FACTOR.json": true,
+      "unchanged_GLOBAL_NPU_SQRT235_FACTOR.json": true,
+      "all_clip_calls": true,
+      "FORWARD236.json_source": true,
+      "FORWARD236.json_helper": true,
+      "FORWARD236.json_no_arrays": true,
+      "BACKWARD236_OBSERVER.json_source": true,
+      "BACKWARD236_OBSERVER.json_helper": true,
+      "BACKWARD236_OBSERVER.json_no_arrays": true,
+      "forward_coverage": true,
+      "backward_coverage": true
+    },
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "entry_hash": true,
+      "config_hash": true,
+      "launcher_hash": true,
+      "config_only_paths": true,
+      "dump_config_hash": true,
+      "model_hashes_exact_reference_probe": true,
+      "no_dump_arrays": true
+    }
+  },
+  "comparisons": [
+    {
+      "name": "model.norm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "359",
+      "native_op": "Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33",
+      "mf_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33"
+    },
+    {
+      "name": "model.norm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "361",
+      "native_op": "Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "575245917140aeae8c8166f697485fdca84215d6",
+      "mf_sha1": "575245917140aeae8c8166f697485fdca84215d6"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "646",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8",
+      "mf_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "648",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "620fb6ead4272c4ce671865876233164b408b322",
+      "mf_sha1": "620fb6ead4272c4ce671865876233164b408b322"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "762",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8",
+      "mf_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8"
+    },
+    {
+      "name": "mtp.layers.0.enorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "394",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/enorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "743522596e8776bd00a9e660e7cbd3bf63f01d3c",
+      "mf_sha1": "743522596e8776bd00a9e660e7cbd3bf63f01d3c"
+    },
+    {
+      "name": "mtp.layers.0.enorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "396",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/enorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "4af2352d4694f58f5f86691856cfcca86c77ffff",
+      "mf_sha1": "4af2352d4694f58f5f86691856cfcca86c77ffff"
+    },
+    {
+      "name": "mtp.layers.0.enorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "697",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/enorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "743522596e8776bd00a9e660e7cbd3bf63f01d3c",
+      "mf_sha1": "743522596e8776bd00a9e660e7cbd3bf63f01d3c"
+    },
+    {
+      "name": "mtp.layers.0.enorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "699",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/enorm-FusedRMSNorm/Cast-op2",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "4af2352d4694f58f5f86691856cfcca86c77ffff",
+      "mf_sha1": "4af2352d4694f58f5f86691856cfcca86c77ffff"
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "387",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/hnorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33",
+      "mf_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33"
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "389",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/hnorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "e54e6d5fc6cdf8dc72cd3f63bb0a14af40e59ef1",
+      "mf_sha1": "e54e6d5fc6cdf8dc72cd3f63bb0a14af40e59ef1"
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "691",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/hnorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33",
+      "mf_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33"
+    },
+    {
+      "name": "mtp.layers.0.hnorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "693",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/hnorm-FusedRMSNorm/Cast-op2",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "e54e6d5fc6cdf8dc72cd3f63bb0a14af40e59ef1",
+      "mf_sha1": "e54e6d5fc6cdf8dc72cd3f63bb0a14af40e59ef1"
+    },
+    {
+      "name": "model.layers.0.input_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "23",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/input_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "48e08135b5a467aca78bf887aa507fcb6f07d3bc",
+      "mf_sha1": "48e08135b5a467aca78bf887aa507fcb6f07d3bc"
+    },
+    {
+      "name": "model.layers.0.input_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "25",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/input_layernorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "71f6e10c0250d63ac7ea1507fb5c7adb92693bcc",
+      "mf_sha1": "71f6e10c0250d63ac7ea1507fb5c7adb92693bcc"
+    },
+    {
+      "name": "model.layers.0.input_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1406",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/input_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "48e08135b5a467aca78bf887aa507fcb6f07d3bc",
+      "mf_sha1": "48e08135b5a467aca78bf887aa507fcb6f07d3bc"
+    },
+    {
+      "name": "model.layers.0.input_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1408",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/input_layernorm-FusedRMSNorm/Cast-op2",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "71f6e10c0250d63ac7ea1507fb5c7adb92693bcc",
+      "mf_sha1": "71f6e10c0250d63ac7ea1507fb5c7adb92693bcc"
+    },
+    {
+      "name": "model.layers.0.post_attention_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "128",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "ad16400950d0ca7904b431d4191b2d388a04d4e8",
+      "mf_sha1": "ad16400950d0ca7904b431d4191b2d388a04d4e8"
+    },
+    {
+      "name": "model.layers.0.post_attention_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "130",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "f507172522467e0a837a40772ed5c34c8f181842",
+      "mf_sha1": "f507172522467e0a837a40772ed5c34c8f181842"
+    },
+    {
+      "name": "model.layers.0.post_attention_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1309",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "ad16400950d0ca7904b431d4191b2d388a04d4e8",
+      "mf_sha1": "ad16400950d0ca7904b431d4191b2d388a04d4e8"
+    },
+    {
+      "name": "model.layers.0.post_attention_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1311",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "f507172522467e0a837a40772ed5c34c8f181842",
+      "mf_sha1": "f507172522467e0a837a40772ed5c34c8f181842"
+    },
+    {
+      "name": "model.layers.0.self_attn.q_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "36",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "82804842a08409fc7f967aa23c5062cb7ae89dbe",
+      "mf_sha1": "82804842a08409fc7f967aa23c5062cb7ae89dbe"
+    },
+    {
+      "name": "model.layers.0.self_attn.q_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "38",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "4d8e8bdd02f25ab305d6d5ce051a8dac8726d19c",
+      "mf_sha1": "4d8e8bdd02f25ab305d6d5ce051a8dac8726d19c"
+    },
+    {
+      "name": "model.layers.0.self_attn.q_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1414",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "82804842a08409fc7f967aa23c5062cb7ae89dbe",
+      "mf_sha1": "82804842a08409fc7f967aa23c5062cb7ae89dbe"
+    },
+    {
+      "name": "model.layers.0.self_attn.q_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1543",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/Cast-op3",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "4d8e8bdd02f25ab305d6d5ce051a8dac8726d19c",
+      "mf_sha1": "4d8e8bdd02f25ab305d6d5ce051a8dac8726d19c"
+    },
+    {
+      "name": "model.layers.0.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "74",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "39a295f07481590f8cbb25c7bfea4d0287383e24",
+      "mf_sha1": "39a295f07481590f8cbb25c7bfea4d0287383e24"
+    },
+    {
+      "name": "model.layers.0.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "76",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "faa4c4f387e1f3ce1602ec29a844b7b56595d18f",
+      "mf_sha1": "faa4c4f387e1f3ce1602ec29a844b7b56595d18f"
+    },
+    {
+      "name": "model.layers.0.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1437",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "39a295f07481590f8cbb25c7bfea4d0287383e24",
+      "mf_sha1": "39a295f07481590f8cbb25c7bfea4d0287383e24"
+    },
+    {
+      "name": "model.layers.0.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1558",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/Cast-op3",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "faa4c4f387e1f3ce1602ec29a844b7b56595d18f",
+      "mf_sha1": "faa4c4f387e1f3ce1602ec29a844b7b56595d18f"
+    },
+    {
+      "name": "model.layers.1.input_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "150",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/input_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "5208ea411c1d86e2e19b6bbeb4d899dcd19ae0cd",
+      "mf_sha1": "5208ea411c1d86e2e19b6bbeb4d899dcd19ae0cd"
+    },
+    {
+      "name": "model.layers.1.input_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "152",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/input_layernorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "611fb826fbf6c87b0d6330464e6f7e8d0be6cd27",
+      "mf_sha1": "611fb826fbf6c87b0d6330464e6f7e8d0be6cd27"
+    },
+    {
+      "name": "model.layers.1.input_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1232",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/input_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "5208ea411c1d86e2e19b6bbeb4d899dcd19ae0cd",
+      "mf_sha1": "5208ea411c1d86e2e19b6bbeb4d899dcd19ae0cd"
+    },
+    {
+      "name": "model.layers.1.input_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1234",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/input_layernorm-FusedRMSNorm/Cast-op2",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "611fb826fbf6c87b0d6330464e6f7e8d0be6cd27",
+      "mf_sha1": "611fb826fbf6c87b0d6330464e6f7e8d0be6cd27"
+    },
+    {
+      "name": "model.layers.1.post_attention_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "243",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "2bcd86f94e60d73a053392b98ba02a38f967422e",
+      "mf_sha1": "2bcd86f94e60d73a053392b98ba02a38f967422e"
+    },
+    {
+      "name": "model.layers.1.post_attention_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "245",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "b7f9b95afa8e7c2a3a1ebdcaf6ebee288abf2628",
+      "mf_sha1": "b7f9b95afa8e7c2a3a1ebdcaf6ebee288abf2628"
+    },
+    {
+      "name": "model.layers.1.post_attention_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1031",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "2bcd86f94e60d73a053392b98ba02a38f967422e",
+      "mf_sha1": "2bcd86f94e60d73a053392b98ba02a38f967422e"
+    },
+    {
+      "name": "model.layers.1.post_attention_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1033",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "b7f9b95afa8e7c2a3a1ebdcaf6ebee288abf2628",
+      "mf_sha1": "b7f9b95afa8e7c2a3a1ebdcaf6ebee288abf2628"
+    },
+    {
+      "name": "model.layers.1.self_attn.q_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "160",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "6b9577488a665f40f7053883fd8317cca06f33f7",
+      "mf_sha1": "6b9577488a665f40f7053883fd8317cca06f33f7"
+    },
+    {
+      "name": "model.layers.1.self_attn.q_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "162",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "a4fd286bd68899a5d498f83cbdfdff42ba6f1e88",
+      "mf_sha1": "a4fd286bd68899a5d498f83cbdfdff42ba6f1e88"
+    },
+    {
+      "name": "model.layers.1.self_attn.q_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1239",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "6b9577488a665f40f7053883fd8317cca06f33f7",
+      "mf_sha1": "6b9577488a665f40f7053883fd8317cca06f33f7"
+    },
+    {
+      "name": "model.layers.1.self_attn.q_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1593",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/Cast-op3",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "a4fd286bd68899a5d498f83cbdfdff42ba6f1e88",
+      "mf_sha1": "a4fd286bd68899a5d498f83cbdfdff42ba6f1e88"
+    },
+    {
+      "name": "model.layers.1.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "193",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "d411edb7f6f2cf118954035913e4bef0a4778fef",
+      "mf_sha1": "d411edb7f6f2cf118954035913e4bef0a4778fef"
+    },
+    {
+      "name": "model.layers.1.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "195",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "a3784e0ffb84a1cf59553deadbf1185ea6b0591b",
+      "mf_sha1": "a3784e0ffb84a1cf59553deadbf1185ea6b0591b"
+    },
+    {
+      "name": "model.layers.1.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "1262",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "d411edb7f6f2cf118954035913e4bef0a4778fef",
+      "mf_sha1": "d411edb7f6f2cf118954035913e4bef0a4778fef"
+    },
+    {
+      "name": "model.layers.1.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1608",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/1-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/Cast-op3",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "a3784e0ffb84a1cf59553deadbf1185ea6b0591b",
+      "mf_sha1": "a3784e0ffb84a1cf59553deadbf1185ea6b0591b"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.input_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "404",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/input_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "fc904a952064bec9f3fd993f9da040bf7e62001f",
+      "mf_sha1": "fc904a952064bec9f3fd993f9da040bf7e62001f"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.input_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "406",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/input_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "92f0f06a4941c484da8fa8cebfbe459947d7f42c",
+      "mf_sha1": "92f0f06a4941c484da8fa8cebfbe459947d7f42c"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.input_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "943",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/input_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "fc904a952064bec9f3fd993f9da040bf7e62001f",
+      "mf_sha1": "fc904a952064bec9f3fd993f9da040bf7e62001f"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.input_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "945",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/input_layernorm-FusedRMSNorm/Cast-op3",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "92f0f06a4941c484da8fa8cebfbe459947d7f42c",
+      "mf_sha1": "92f0f06a4941c484da8fa8cebfbe459947d7f42c"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "493",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "845110cb9349e8e077a707bb6de60c7d5a960181",
+      "mf_sha1": "845110cb9349e8e077a707bb6de60c7d5a960181"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "495",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/Cast-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "c38bbb4fddbfa459545c4ff810880cea9fd9d0ec",
+      "mf_sha1": "c38bbb4fddbfa459545c4ff810880cea9fd9d0ec"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "716",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "845110cb9349e8e077a707bb6de60c7d5a960181",
+      "mf_sha1": "845110cb9349e8e077a707bb6de60c7d5a960181"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.post_attention_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "718",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/pre_mlp_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "c38bbb4fddbfa459545c4ff810880cea9fd9d0ec",
+      "mf_sha1": "c38bbb4fddbfa459545c4ff810880cea9fd9d0ec"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "412",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "27583aa36dbe35424a8a1f4c4471b06fd6352029",
+      "mf_sha1": "27583aa36dbe35424a8a1f4c4471b06fd6352029"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "414",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "fa5be707564ca706c4d6b6b72681e0fbab4a1bf1",
+      "mf_sha1": "fa5be707564ca706c4d6b6b72681e0fbab4a1bf1"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "950",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "27583aa36dbe35424a8a1f4c4471b06fd6352029",
+      "mf_sha1": "27583aa36dbe35424a8a1f4c4471b06fd6352029"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.q_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1676",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/q_layernorm-FusedRMSNorm/Cast-op3",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        1536
+      ],
+      "exact": true,
+      "hp_sha1": "fa5be707564ca706c4d6b6b72681e0fbab4a1bf1",
+      "mf_sha1": "fa5be707564ca706c4d6b6b72681e0fbab4a1bf1"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "441",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "eda9d114ddf23ca971979e79905b910a7abdd93c",
+      "mf_sha1": "eda9d114ddf23ca971979e79905b910a7abdd93c"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "443",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "b9b483ed1e2c138c30b50ed04d4e6f6cebed76e6",
+      "mf_sha1": "b9b483ed1e2c138c30b50ed04d4e6f6cebed76e6"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+      "kind": "input",
+      "boundary": "norm_forward_input",
+      "native_node": "973",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "eda9d114ddf23ca971979e79905b910a7abdd93c",
+      "mf_sha1": "eda9d114ddf23ca971979e79905b910a7abdd93c"
+    },
+    {
+      "name": "mtp.layers.0.transformer_layer.self_attn.kv_a_layernorm",
+      "kind": "output",
+      "boundary": "norm_forward_bf16_output",
+      "native_node": "1691",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/transformer_layer-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/Cast-op3",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        512
+      ],
+      "exact": true,
+      "hp_sha1": "b9b483ed1e2c138c30b50ed04d4e6f6cebed76e6",
+      "mf_sha1": "b9b483ed1e2c138c30b50ed04d4e6f6cebed76e6"
+    },
+    {
+      "name": "model.norm",
+      "kind": "x",
+      "boundary": "final_norm_native_forward",
+      "native_node": "359",
+      "native_op": "Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33",
+      "mf_sha1": "1402b33875a3f1758b8fb39c0e5502fb0abd7b33"
+    },
+    {
+      "name": "model.norm",
+      "kind": "weight",
+      "boundary": "final_norm_native_forward",
+      "native_node": "359",
+      "native_op": "Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 1,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "ef0feb5787d309e33eaf1cdff76fa1cbdcf4f964",
+      "mf_sha1": "ef0feb5787d309e33eaf1cdff76fa1cbdcf4f964"
+    },
+    {
+      "name": "model.norm",
+      "kind": "y_fp32",
+      "boundary": "final_norm_native_forward",
+      "native_node": "359",
+      "native_op": "Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "625bdf4140a1ac61aed95502d9b0b5e20d2c060a",
+      "mf_sha1": "625bdf4140a1ac61aed95502d9b0b5e20d2c060a"
+    },
+    {
+      "name": "model.norm",
+      "kind": "inverse_rms",
+      "boundary": "final_norm_native_forward",
+      "native_node": "359",
+      "native_op": "Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "output",
+      "slot": 1,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1
+      ],
+      "exact": true,
+      "hp_sha1": "e1f1c8b825d7cb144231ecac735172ef2308cfb1",
+      "mf_sha1": "e1f1c8b825d7cb144231ecac735172ef2308cfb1"
+    },
+    {
+      "name": "model.norm",
+      "kind": "dy",
+      "boundary": "final_norm_backward_dy",
+      "native_node": "554",
+      "native_op": "Gradients/Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/Grad_RmsNorm/RmsNormGrad-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "e06159b2992cdd3f23a299b8c5905f40d873ed46",
+      "mf_sha1": "e06159b2992cdd3f23a299b8c5905f40d873ed46"
+    },
+    {
+      "name": "model.norm",
+      "kind": "dx",
+      "boundary": "final_norm_backward_dx",
+      "native_node": "554",
+      "native_op": "Gradients/Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/final_layernorm-FusedRMSNorm/Grad_RmsNorm/RmsNormGrad-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "8eae27d4d118524d30c6be33b96a070b30c958ad",
+      "mf_sha1": "8eae27d4d118524d30c6be33b96a070b30c958ad"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "x",
+      "boundary": "final_norm_native_forward",
+      "native_node": "646",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8",
+      "mf_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "weight",
+      "boundary": "final_norm_native_forward",
+      "native_node": "646",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "input",
+      "slot": 1,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "f1e5d452e39847eef9a15b6be199729354976ef5",
+      "mf_sha1": "f1e5d452e39847eef9a15b6be199729354976ef5"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "y_fp32",
+      "boundary": "final_norm_native_forward",
+      "native_node": "646",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "73c0c9a5793217b9c394eb43d52e897f7e715b48",
+      "mf_sha1": "73c0c9a5793217b9c394eb43d52e897f7e715b48"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "inverse_rms",
+      "boundary": "final_norm_native_forward",
+      "native_node": "646",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op0",
+      "io": "output",
+      "slot": 1,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1
+      ],
+      "exact": true,
+      "hp_sha1": "40188a2708ea7e6d60e175d5ae32b1b889e6e1f8",
+      "mf_sha1": "40188a2708ea7e6d60e175d5ae32b1b889e6e1f8"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "x",
+      "boundary": "final_norm_native_forward",
+      "native_node": "762",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8",
+      "mf_sha1": "38c1b0c0f8df0962834f06c9349c4bd18b4ca8a8"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "weight",
+      "boundary": "final_norm_native_forward",
+      "native_node": "762",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "input",
+      "slot": 1,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "f1e5d452e39847eef9a15b6be199729354976ef5",
+      "mf_sha1": "f1e5d452e39847eef9a15b6be199729354976ef5"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "y_fp32",
+      "boundary": "final_norm_native_forward",
+      "native_node": "762",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "73c0c9a5793217b9c394eb43d52e897f7e715b48",
+      "mf_sha1": "73c0c9a5793217b9c394eb43d52e897f7e715b48"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "inverse_rms",
+      "boundary": "final_norm_native_forward",
+      "native_node": "762",
+      "native_op": "recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/mtp-MultiTokenPredictionBlock/layers-CellList/0-MultiTokenPredictionLayer/final_layernorm-FusedRMSNorm/RmsNorm-op1",
+      "io": "output",
+      "slot": 1,
+      "hp_dtype": "torch.float32",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        1
+      ],
+      "exact": true,
+      "hp_sha1": "40188a2708ea7e6d60e175d5ae32b1b889e6e1f8",
+      "mf_sha1": "40188a2708ea7e6d60e175d5ae32b1b889e6e1f8"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "dy",
+      "boundary": "final_norm_backward_dy",
+      "native_node": "764",
+      "native_op": "Gradients/recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/input_layernorm-FusedRMSNorm/Grad_RmsNorm/RmsNormGrad-op0",
+      "io": "input",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "float32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "5e75ef16c3fef858faf4d38c36bba6bee21f832e",
+      "mf_sha1": "5e75ef16c3fef858faf4d38c36bba6bee21f832e"
+    },
+    {
+      "name": "mtp.layers.0.final_layernorm",
+      "kind": "dx",
+      "boundary": "final_norm_backward_dx",
+      "native_node": "766",
+      "native_op": "Gradients/recompute_Default/network-MFTrainOneStepCell/network-_VirtualDatasetCell/_backbone-DataOrderWrapperCell/network-ObservedInputModel/model-GPTModel/decoder-TransformerBlock/layers-CellList/0-TransformerLayer/self_attention-MLASelfAttention/kv_layernorm-FusedRMSNorm/Grad_Cast/Cast-op1",
+      "io": "output",
+      "slot": 0,
+      "hp_dtype": "torch.bfloat16",
+      "mf_dtype": "bfloat16",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "exact": true,
+      "hp_sha1": "add7243f27ab2f9e72050528f896a206a9f6e260",
+      "mf_sha1": "add7243f27ab2f9e72050528f896a206a9f6e260"
+    }
+  ],
+  "source_sha256": "89758d2754c1266bb340864fd06241790c32ee73b9ddd4e4a7b2c5d2ee8e5e7e",
+  "native_graph_sha256": "0cc512eb0d35dcdbd891da45eb3720e0d7bcb4b22f54b712aecd2e35ff279b15",
+  "native_statistics_sha256": "2ec18d91f8c3ced03fc52ff3d2d43cf22813ed1f0a6e511d9debb68d80f6e8b0",
+  "native_statistics_bytes": 2421672,
+  "unmatched_backward_moe": [
+    {
+      "name": "model.layers.1.mlp",
+      "kind": "x",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "sha256": "329acfce95307238875b0093e6422f4a103c3d486cee5720ba36b21a0bcbfed0",
+      "dtype": "torch.bfloat16",
+      "fp32_native_dump_sha1": "750aec25f65cc0fc3c504aee300a8f0705412a9c",
+      "native_dump_sha1": "b7f9b95afa8e7c2a3a1ebdcaf6ebee288abf2628"
+    },
+    {
+      "name": "model.layers.1.mlp",
+      "kind": "y_fp32",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "sha256": "1399e4516bea0d9bc48c9f5b4b4c46e1798eacea5a82b5dc00513f58c56b5ca3",
+      "dtype": "torch.float32",
+      "fp32_native_dump_sha1": "fb356c8f7b2c1cfe112917315e496450701efdf5",
+      "native_dump_sha1": "fb356c8f7b2c1cfe112917315e496450701efdf5"
+    },
+    {
+      "name": "model.layers.1.mlp",
+      "kind": "dy",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "sha256": "f074ae0889947b0974b536c16f8a8aa1758d293ab99c6f7c7742e35d7a03ac84",
+      "dtype": "torch.float32",
+      "fp32_native_dump_sha1": "7997c2916c50052b44fb4f69a31bc45a5b7b963f",
+      "native_dump_sha1": "7997c2916c50052b44fb4f69a31bc45a5b7b963f"
+    },
+    {
+      "name": "model.layers.1.mlp",
+      "kind": "dx",
+      "shape": [
+        1,
+        4096,
+        5120
+      ],
+      "sha256": "17dbd48eafdbc2128013a6644d2d61add606136953712c3d64f430c14c583a4e",
+      "dtype": "torch.bfloat16",
+      "fp32_native_dump_sha1": "e19324e25ee01311c97787dfc5220c994c9efa67",
+      "native_dump_sha1": "87f101055a47af6c9dea999f8e74277d8d389849"
+    }
+  ],
+  "scope": "Typed norm graph boundaries only; hash mismatch does not quantify elementwise error. Repeated native recomputation must independently match. Other captured HP boundaries remain available."
+}
