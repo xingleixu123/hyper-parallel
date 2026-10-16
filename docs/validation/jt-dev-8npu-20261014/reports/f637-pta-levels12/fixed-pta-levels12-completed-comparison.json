@@ -1,0 +1,487 @@
+{
+  "status": "PASS_MEASUREMENT_AUDIT_NOT_TRAINING_ACCEPTANCE",
+  "checked_at": "2026-10-16T02:56:10.548126+00:00",
+  "reviewer": "primary agent self-audit; not independent reviewer",
+  "fixed_identity": {
+    "source": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "jt_model_sha256": "2ddd28910688710ea777f1724fb8aeb8821c6045a01f18f21eea4e92507fd906",
+    "manifest_sha256": "2fd048282b47551c6fd5131ef62f314821c16bb4c3750e0210d7fe37d12e0d54",
+    "expected_image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "actual_image_validation": "external coordinator/guard responsibility",
+    "python": "3.12.14",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0",
+    "pta_git_version": "fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d",
+    "transformers": "5.13.1",
+    "installed_pta_python_sources": {
+      "references/installed-torch-npu-version.py": {
+        "installed_path": "/workspace/venv/lib/python3.12/site-packages/torch_npu/version.py",
+        "sha256": "9dc0a539f5507b0d9a9d8a91ca21568414aca85900edd0e241994960cfe3fa84"
+      },
+      "references/installed-torch-npu-npu-npu_config.py": {
+        "installed_path": "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/npu_config.py",
+        "sha256": "77144ac4544e21eaaf447548c684832d35f48b4936a0f42b4630333ed820938b"
+      },
+      "references/torch-npu-fa0f83fe49d3-torch_npu-npu-__init__.py": {
+        "installed_path": "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py",
+        "sha256": "355df777433fd8c85670db75d8aacf7fa076332092470d59b6ba26202ed7fd2f"
+      }
+    },
+    "hyper_parallel_import": "/workspace/hyper-parallel/hyper_parallel/__init__.py",
+    "cann_version_file": {
+      "path": "/workspace/Ascend/cann-9.2.0-beta.2/aarch64-linux/ascend_toolkit_install.info",
+      "installation_alias": "/usr/local/Ascend/ascend-toolkit/latest/aarch64-linux/ascend_toolkit_install.info",
+      "sha256": "d0bfd8c3016aec465d723af0dadd59f6014c709b572c1678f5ed1d38b5be373b",
+      "text": "package_name=Ascend-cann-toolkit\nversion=9.2.0-beta.2\ninnerversion=V100R001C12B086\ncompatible_version=[V100R001C15],[V100R001C23],[V100R001C10],[V100R001C12]\narch=aarch64\nos=linux\npath=/usr/local/Ascend/cann-9.2.0-beta.2\n"
+    },
+    "rmsnorm_forward": {
+      "decorator_chain": [
+        {
+          "function": "transformers.models.deepseek_v32.modeling_deepseek_v32.DeepseekV32RMSNorm.forward",
+          "file": "/workspace/venv/lib/python3.12/site-packages/transformers/models/deepseek_v32/modeling_deepseek_v32.py",
+          "file_sha256": "519f271a7e3b0a56655e1f92054d4191686b91af5df5bccdc6208b6569ef4d1a",
+          "line": 57,
+          "function_sha256": "790fa612e4fa57acfcbea31da45f92ba91f9016f7260ef539f61c5530ba06a5f",
+          "source": "    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:\n        input_dtype = hidden_states.dtype\n        hidden_states = hidden_states.to(torch.float32)\n        variance = hidden_states.pow(2).mean(-1, keepdim=True)\n        hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)\n        return self.weight * hidden_states.to(input_dtype)\n",
+          "source_truncated": false
+        }
+      ]
+    },
+    "linear_forward": {
+      "decorator_chain": [
+        {
+          "function": "torch.nn.modules.linear.Linear.forward",
+          "file": "/workspace/venv/lib/python3.12/site-packages/torch/nn/modules/linear.py",
+          "file_sha256": "1961ad1a1f650e104b3c7f78d19af2d21bf977e7af6c3fdf2420aad563c9e202",
+          "line": 130,
+          "function_sha256": "c0ab8f42cc3bf9489809b19c321cc85f0b1d4eafebacb96bd8e132cb9e95ef76",
+          "source": "    def forward(self, input: Tensor) -> Tensor:\n        \"\"\"\n        Runs the forward pass.\n        \"\"\"\n        return F.linear(input, self.weight, self.bias)\n",
+          "source_truncated": false
+        }
+      ]
+    },
+    "pta_setter": {
+      "decorator_chain": [
+        {
+          "function": "torch_npu.npu.set_deterministic_level",
+          "file": "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py",
+          "file_sha256": "355df777433fd8c85670db75d8aacf7fa076332092470d59b6ba26202ed7fd2f",
+          "line": 603,
+          "function_sha256": "87f571d3be8bd49b219a32c7782706c1ff7b50c6a02ef5bfca583a86ca9275d6",
+          "source": "def set_deterministic_level(level):\n    warnings.warn(\"After using 'torch_npu.npu.set_deterministic_level', \"\n                  \"please do not use 'torch.use_deterministic_algorithms' anymore, \"\n                  \"as it may cause unknown errors.\")\n    if level == 0 and torch.are_deterministic_algorithms_enabled():\n        warnings.warn(\"The current configuration value of 'torch_npu.npu.set_deterministic_level' \"\n                      \"conflicts with 'torch.use_deterministic_algorithms'. \"\n                      \"'torch.use_deterministic_algorithms' has been configured to 'False'\")\n        torch.use_deterministic_algorithms(False)\n    elif level >= 1 and not torch.are_deterministic_algorithms_enabled():\n        warnings.warn(\"The current configuration value of 'torch_npu.npu.set_deterministic_level' \"\n                      \"conflicts with 'torch.use_deterministic_algorithms'. \"\n                      \"'torch.use_deterministic_algorithms' has been configured to 'True'\")\n        torch.use_deterministic_algorithms(True)\n    torch_npu._C._npu_set_deterministic_level(level)\n",
+          "source_truncated": false
+        }
+      ]
+    }
+  },
+  "measurements": [
+    {
+      "level": 1,
+      "case": "r129-f637-pta-levels12-1npu-v2",
+      "report_sha256": "80ae21d88dbee6de2deefb876d6c3a15f38ceae6b40db5871fe705091fc32307",
+      "manifest_sha256": "6cd04a05e21882111367aee05212e914545698305c3773d3d965b665d6612b36",
+      "raw_files": 12,
+      "process_seconds": 25.899024970000028,
+      "computation_seconds": 11.470870279998053,
+      "reservation_seconds": 50.153551990006235,
+      "physical_sampled_hbm_max_mb": 3569,
+      "allocator_peak_bytes": 629160960,
+      "allocator_reserved_peak_bytes": 694157312
+    },
+    {
+      "level": 2,
+      "case": "r129-f637-pta-level2-1npu-v3",
+      "report_sha256": "49da4012c7a44159df76ef7ab32a262b5e5fc5348b38605ad9519937aa75a52c",
+      "manifest_sha256": "8b135425c28787964e29e23a0760a7bb4f3cd53ae33dac82ba8b5def82b6bcf4",
+      "raw_files": 10,
+      "process_seconds": 26.156200329991407,
+      "computation_seconds": 11.48768217000179,
+      "reservation_seconds": 30.814286640001228,
+      "physical_sampled_hbm_max_mb": 3523,
+      "allocator_peak_bytes": 629160960,
+      "allocator_reserved_peak_bytes": 694157312
+    }
+  ],
+  "same_cpu_inputs_between_levels": true,
+  "cross_level_reference_byte_hashes_equal": true,
+  "comparisons": [
+    {
+      "operator": "rmsnorm",
+      "level": 1,
+      "variant": "repeat",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "rmsnorm",
+      "level": 1,
+      "variant": "partition",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "rmsnorm",
+      "level": 1,
+      "variant": "permutation",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "rmsnorm",
+      "level": 1,
+      "variant": "permuted_partition",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "rmsnorm",
+      "level": 2,
+      "variant": "repeat",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "rmsnorm",
+      "level": 2,
+      "variant": "partition",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "rmsnorm",
+      "level": 2,
+      "variant": "permutation",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "rmsnorm",
+      "level": 2,
+      "variant": "permuted_partition",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 1,
+      "variant": "repeat",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 1,
+      "variant": "partition",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 1,
+      "variant": "permutation",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 1,
+      "variant": "permuted_partition",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 2,
+      "variant": "repeat",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 2,
+      "variant": "partition",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 2,
+      "variant": "permutation",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "operator": "linear",
+      "level": 2,
+      "variant": "permuted_partition",
+      "forward": {
+        "count": 100663296,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 6291456,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    }
+  ],
+  "total_compared_coordinates": 1191182336,
+  "recommendation": "No measured benefit from level2 on these synthetic operator shapes; do not change training recipe on this evidence. Continue the matched 200-step FP32 dgrad candidate.",
+  "limitations": [
+    "Different reservations; v2 level2 interrupted and never merged into v3",
+    "No wgrad, collective, LM-head shape or real training tensor coverage",
+    "Only reference hashes available cross-level, not cross-level full-array numerical differences",
+    "Requesting a public deterministic level does not provide a read-only runtime-level confirmation",
+    "Stored statistics audited, not independently recomputed from retained full arrays",
+    "No full-training precision or production performance conclusion"
+  ]
+}

@@ -1,0 +1,34 @@
+DrvMngGetConsoleLogLevel failed. (ret=4)
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+  warnings.warn("Can't get ascend_hal device count")
+/work/tools/check_dgrad_long_cpu.py:46: UserWarning: mkldnn_matmul failed, switching to BLAS gemm:mkldnn_matmul: mkldnn_matmul bf16 path needs a cpu with bf16 support
+Exception raised from mkldnn_matmul at /pytorch/aten/src/ATen/native/mkldnn/Matmul.cpp:338 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffffa57ba988 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, char const*) + 0x6c (0xffffa5759018 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #2: at::native::mkldnn_matmul(at::Tensor const&, at::Tensor const&, at::Tensor const&, float, float) + 0x8f0 (0xffffa748ef70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x19cf658 (0xffffa6e4f658 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: at::native::structured_addmm_out_cpu::impl(at::Tensor const&, at::Tensor const&, at::Tensor const&, c10::Scalar const&, c10::Scalar const&, at::Tensor const&) + 0x17c (0xffffa6e4fbac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: <unknown function> + 0x294abcc (0xffffa7dcabcc in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: at::_ops::addmm::redispatch(c10::DispatchKeySet, at::Tensor const&, at::Tensor const&, at::Tensor const&, c10::Scalar const&, c10::Scalar const&) + 0x9c (0xffffa685330c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #7: <unknown function> + 0x13f1fd4 (0xffffa6871fd4 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: <unknown function> + 0x13f2c4c (0xffffa6872c4c in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #9: at::_ops::addmm::call(at::Tensor const&, at::Tensor const&, at::Tensor const&, c10::Scalar const&, c10::Scalar const&) + 0x1b4 (0xffffa6855cb4 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #10: <unknown function> + 0x13b04c0 (0xffffa68304c0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #11: at::native::linear(at::Tensor const&, at::Tensor const&, std::optional<at::Tensor> const&) + 0x488 (0xffffa6830d48 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #12: <unknown function> + 0x13eb660 (0xffffa686b660 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #13: at::_ops::linear::call(at::Tensor const&, at::Tensor const&, std::optional<at::Tensor> const&) + 0x198 (0xffffa6857538 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #14: <unknown function> + 0x5e38a8 (0xffffb01a38a8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+<omitting python frames>
+frame #25: <unknown function> + 0x27400 (0xffffb22a7400 in /lib/aarch64-linux-gnu/libc.so.6)
+frame #26: __libc_start_main + 0x98 (0xffffb22a74d8 in /lib/aarch64-linux-gnu/libc.so.6)
+ (Triggered internally at /pytorch/aten/src/ATen/native/LinearAlgebra.cpp:1531.)
+  native = functional.linear(inputs, weight, bias)
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+  warnings.warn("Can't get ascend_hal device count")
+Traceback (most recent call last):
+  File "/work/tools/check_dgrad_long_cpu.py", line 115, in <module>
+    main()
+  File "/work/tools/check_dgrad_long_cpu.py", line 95, in main
+    raise AssertionError('Candidate altered more than the disabled checkpoint destination: ' + case)
+AssertionError: Candidate altered more than the disabled checkpoint destination: r129-f637-dgrad-cp2-fp32-200-v1
+[ERROR] 2026-10-16-02:49:24 (PID:45, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception

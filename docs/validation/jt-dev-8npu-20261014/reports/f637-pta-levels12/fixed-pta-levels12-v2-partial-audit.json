@@ -1,0 +1,254 @@
+{
+  "checked_at": "2026-10-16T02:42:56.323472+00:00",
+  "case": "r129-f637-pta-levels12-1npu-v2",
+  "status": "LEVEL1_COMPLETED_LEVEL2_INTERRUPTED_FOR_FOREIGN_JOB",
+  "reviewer": "primary agent; self-audit, not independent reviewer",
+  "verified_raw_files": 12,
+  "pinned_request_files": 24,
+  "level1_operators": {
+    "rmsnorm": {
+      "native_calls": 7,
+      "variants": 4,
+      "per_variant_forward_coordinates": 20971520,
+      "per_variant_dX_coordinates": 20971520,
+      "all_recorded_error_statistics_zero": true,
+      "native_repeat_exact": true,
+      "input_identity": {
+        "kind": "rmsnorm",
+        "seed": 20261016,
+        "cpu_generation": "FP32 randn then BF16 round",
+        "operands": {
+          "input": {
+            "shape": [
+              4096,
+              5120
+            ],
+            "stride": [
+              5120,
+              1
+            ],
+            "dtype": "torch.bfloat16",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "531a196edf8b13dc80b9a62e72eec4e851999e15537fea882780c20f0c714a55"
+          },
+          "weight": {
+            "shape": [
+              5120
+            ],
+            "stride": [
+              1
+            ],
+            "dtype": "torch.bfloat16",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "ba35bcb5d8730c7152321f15e18e0f93cc1ec38b31c0762e463536400c2a78a4"
+          },
+          "output_gradient": {
+            "shape": [
+              4096,
+              5120
+            ],
+            "stride": [
+              5120,
+              1
+            ],
+            "dtype": "torch.bfloat16",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "6ca6d2a51dc8a65c3e0e934c747c3a0a6197875bf1208bc1e703d03e8625e5bd"
+          },
+          "permutation": {
+            "shape": [
+              4096
+            ],
+            "stride": [
+              1
+            ],
+            "dtype": "torch.int64",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "1eca7eb95fc8633dbc4df8d7614b47b5a0e509586f427e5270c1cf97dc876ac9"
+          }
+        }
+      }
+    },
+    "linear": {
+      "native_calls": 7,
+      "variants": 4,
+      "per_variant_forward_coordinates": 100663296,
+      "per_variant_dX_coordinates": 6291456,
+      "all_recorded_error_statistics_zero": true,
+      "native_repeat_exact": true,
+      "input_identity": {
+        "kind": "linear",
+        "seed": 20261017,
+        "cpu_generation": "FP32 randn then BF16 round",
+        "operands": {
+          "input": {
+            "shape": [
+              4096,
+              1536
+            ],
+            "stride": [
+              1536,
+              1
+            ],
+            "dtype": "torch.bfloat16",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "82ce8059777762aa6957d5c8c777d86e10f0770c62c568d9974281111740fd45"
+          },
+          "weight": {
+            "shape": [
+              24576,
+              1536
+            ],
+            "stride": [
+              1536,
+              1
+            ],
+            "dtype": "torch.bfloat16",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "bd0a86c3fbe87beb6f2acbb23b63c1cce9829373a4bc86ad030e698e92f9fe77"
+          },
+          "output_gradient": {
+            "shape": [
+              4096,
+              24576
+            ],
+            "stride": [
+              24576,
+              1
+            ],
+            "dtype": "torch.bfloat16",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "14f9d61fb1ab8339cbf4f3c756840680a49b152120398dcbf1b3213cdbd43441"
+          },
+          "permutation": {
+            "shape": [
+              4096
+            ],
+            "stride": [
+              1
+            ],
+            "dtype": "torch.int64",
+            "device": "cpu",
+            "requires_grad": false,
+            "sha256": "122f2080a07b242098d0440e1fa1470431056ca5f52c6a9ad405c82e6dd983ab"
+          }
+        }
+      }
+    }
+  },
+  "level1_total_comparison_coordinates": 595591168,
+  "level1_elapsed_seconds_after_import": 11.470870279998053,
+  "level1_process_seconds_including_import": 25.899024970000028,
+  "level2_partial_summaries": [
+    {
+      "stage": "rmsnorm/repeat",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "stage": "rmsnorm/partition",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "stage": "rmsnorm/permutation",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    },
+    {
+      "stage": "rmsnorm/permuted_partition",
+      "forward": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      },
+      "input_gradient": {
+        "count": 20971520,
+        "nonzero_count": 0,
+        "max_abs": 0.0,
+        "absolute_sum": 0.0,
+        "squared_sum": 0.0,
+        "mean_abs": 0.0,
+        "rms_abs": 0.0
+      }
+    }
+  ],
+  "level2_linear_result_available": false,
+  "whole_reservation_completed": false,
+  "reservation_seconds": 50.153551990006235,
+  "sampled_physical_hbm_max_mb": 3569,
+  "sampled_hbm_limit_mb": 16384,
+  "foreign_process_verified_by_distinct_cgroup_and_pid_namespace": true,
+  "only_owned_container_stopped": "b0a8e840ac05c4d11d4aa9addeb03f50dfce86f3b3ecada3e887ed2753c7a9c7",
+  "owned_pids_remaining": [],
+  "foreign_pid_retained_after_own_stop": [
+    2101020
+  ],
+  "raw_manifest_sha256": "6cd04a05e21882111367aee05212e914545698305c3773d3d965b665d6612b36",
+  "limitations": [
+    "No full level1/level2 comparison until fresh level2 completes",
+    "Synthetic RMSNorm and q_b_proj-shaped Linear forward/dX only; no wgrad/collective or training result",
+    "Zero errors for these inputs do not prove other module shapes or actual training tensors agree",
+    "Physical HBM samples are not instantaneous peak proof",
+    "No cross-level full-array differences retained"
+  ]
+}

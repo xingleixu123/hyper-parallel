@@ -1,0 +1,174 @@
+{
+  "status": "CPU_ONLY_PASS",
+  "derivative_cases": [
+    {
+      "flags": [
+        false,
+        false,
+        false
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1
+      }
+    },
+    {
+      "flags": [
+        false,
+        false,
+        true
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1,
+        "actual_backward": 1,
+        "fp32_dgrad": 0,
+        "native_wgrad": 0,
+        "native_bias_grad": 1
+      }
+    },
+    {
+      "flags": [
+        false,
+        true,
+        false
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1,
+        "actual_backward": 1,
+        "fp32_dgrad": 0,
+        "native_wgrad": 1,
+        "native_bias_grad": 0
+      }
+    },
+    {
+      "flags": [
+        false,
+        true,
+        true
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1,
+        "actual_backward": 1,
+        "fp32_dgrad": 0,
+        "native_wgrad": 1,
+        "native_bias_grad": 1
+      }
+    },
+    {
+      "flags": [
+        true,
+        false,
+        false
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1,
+        "actual_backward": 1,
+        "fp32_dgrad": 1,
+        "native_wgrad": 0,
+        "native_bias_grad": 0
+      }
+    },
+    {
+      "flags": [
+        true,
+        false,
+        true
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1,
+        "actual_backward": 1,
+        "fp32_dgrad": 1,
+        "native_wgrad": 0,
+        "native_bias_grad": 1
+      }
+    },
+    {
+      "flags": [
+        true,
+        true,
+        false
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1,
+        "actual_backward": 1,
+        "fp32_dgrad": 1,
+        "native_wgrad": 1,
+        "native_bias_grad": 0
+      }
+    },
+    {
+      "flags": [
+        true,
+        true,
+        true
+      ],
+      "dtype": "torch.bfloat16",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "eligible_forward": 1,
+        "actual_backward": 1,
+        "fp32_dgrad": 1,
+        "native_wgrad": 1,
+        "native_bias_grad": 1
+      }
+    },
+    {
+      "flags": [
+        true,
+        true,
+        true
+      ],
+      "dtype": "torch.float32",
+      "exact_oracle_match": true,
+      "step_metadata_cleared": true,
+      "coverage": {
+        "bypassed_forward": 1
+      }
+    }
+  ],
+  "resolved_configs": [
+    {
+      "case": "r129-f637-dgrad-fsdp8-fp32-200-v1",
+      "status": "PASS",
+      "reference": "r129-f637-fp32-fsdp8-0-200-r4",
+      "sha256": "2e46e8b9604346158f86627852f323646cb02cdbddf40c8abaecc42e60ddb3c5"
+    },
+    {
+      "case": "r129-f637-dgrad-cp2-fp32-200-v1",
+      "status": "PASS",
+      "reference": "r129-f637-fp32-cp2-200",
+      "sha256": "13611a17d15dfc845c7fa8a8b4211ef60983f1043e967aac5c920aff94dbed29"
+    }
+  ],
+  "npu_initialized": false,
+  "torch": "2.12.0+cpu",
+  "source_sha256": {
+    "check_dgrad_long_cpu.py": "59f3efd89dee5aa4baad868b5d69d2fa219ac0a17bcc2258a9b9620dea83eea6",
+    "linear_dgrad_long_observer.py": "fa4d41f4b56e0b8bb40f640cb21cef422994909b89c52b57611a7a533538473d",
+    "capture_dgrad_200_training.py": "dd9702bf9c84ea12da6d3c4e0e217acd35b0df95140e855fc9180531163e4d56",
+    "linear_dgrad_experiment.py": "373b5ed016604a92dbfec9afeb2c76edc8b456cf427ade592dfab2aa8098f925",
+    "linear_dgrad_trace_experiment.py": "62a18e143b1a8af826cc8ebdaf201e7be442c8179362caa102e02a73bea8ab87"
+  },
+  "scope": "Small CPU derivative and metadata contracts; no NPU or 200-step training acceptance"
+}

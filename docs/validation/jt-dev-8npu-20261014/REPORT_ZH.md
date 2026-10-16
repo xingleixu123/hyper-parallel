@@ -217,7 +217,7 @@ JT底层已有checkpoint、exclude及策略接口；当前YAML的off/full/select
 #214保持一个提交，在Ascend完成两卡FP32/BF16及四卡Partial回归，普通非整除Shard的行为为明确拒绝不支持布局。#199功能由上游#186提供，该PR保留独立回归并完成四卡短步ST。各PR的测试范围与剩余限制见顶部排序表及对应中文小问题；短回归和CPU通过不代替200步训练或完整CI。
 
 
-## 最新精度定位：Linear输入梯度FP32未整体改善CP2
+## 最新精度定位：Linear输入梯度FP32只有三步主loss改善证据
 
 2026-10-16（UTC+8）完成四组独立3步：A=FSDP8原生、B=CP2原生、C=FSDP8 FP32 dgrad、D=CP2 FP32 dgrad。全部8rank完成、退出0并释放，各轮间隔至少1200秒；固定源码/镜像/初态/输入及实际反向分支均有原始记录和独立审计。
 
@@ -234,8 +234,16 @@ LM最大差缩小，但MTP、aux分别变为原来的2.241/1.883倍。首步1,74
 
 [详细设计、四种比较、限制与复算方式](reports/f637-dgrad-four-arm/README_ZH.md) · [原始四臂无损包及SHA](reports/f637-dgrad-four-arm/four-arm-inputs-manifest.json) · [独立逐值/执行审计](reports/f637-dgrad-four-arm/analysis/f637-dgrad-four-arm-independent-review.json)。原字节206.59MB压缩为32.43MB，本机恢复554文件并重算后逐SHA核验，临时恢复副本已清理。
 
-模块成本四组已通过固定镜像parser4/4与CPU7项合约。新增off控制组完整40步×8rank对原基线前40步的各loss/梯度范数误差均为0，9个模块边界的前三步计数和hook移除已验证；norm/dense/MoE成本消融尚未执行，暂优先排查主loss。单卡PTA探针v1启动因诊断器自身venv路径问题失败，6.296秒后释放，没有算子结论；v2正在前置验证，下一轮仍遵守20分钟间隔。[原始130文件、40步审计及探针失败说明](reports/f637-module-off-and-probe-preflight/README_ZH.md)。
+模块成本四组已通过固定镜像parser4/4与CPU7项合约。新增off控制组完整40步×8rank对原基线前40步的各loss/梯度范数误差均为0，9个模块边界的前三步计数和hook移除已验证；norm/dense/MoE成本消融尚未执行，暂优先排查主loss。单卡PTA探针v1因诊断器venv路径问题在算子执行前失败；后续v2的level1完整，level2遇外部任务后让卡，v3在完整20分钟间隔后仅重跑level2并正常释放。[原始130文件、40步审计及探针失败说明](reports/f637-module-off-and-probe-preflight/README_ZH.md)。
 
+
+## 单卡确定性探针已完成，200步候选仍待验证
+
+固定PTA/CANN和相同合成BF16输入下，level1/2的RMSNorm `[1,4096,5120]` 与Linear `[1,4096,1536]→[1,4096,24576]`，重复、行二分、行置换及置换后二分的前向/dX最大差均为0；两级别参考字节SHA相同。所测形状没有level2收益证据，不据此修改训练确定性级别。这里没有真实LM head、wgrad、通信或200步训练覆盖。
+
+v2单卡50.154秒，另一容器在同卡出现后只停止自有容器；level2中断记录保留。释放后完整等待1200秒，再以v3单卡30.814秒重跑level2，exit0且释放。两轮22份原始文件、冻结依赖、真实所有权凭据及自审结果见[单卡探针完整报告与无损包](reports/f637-pta-levels12/README_ZH.md)。未把主代理自审标为独立检视。
+
+按主loss优先，已准备FP32 Linear dgrad同配方FSDP8/CP2各200步：CPU9个导数用例、parser2份配置和守卫25项测试通过。两组NPU长跑尚未执行，不能据此修改验收状态；与同配方新FSDP参考比较，关闭新checkpoint输出，不放宽0.005门槛。实际导数复用此前三步C/D实现，额外wgrad replay不作为生产性能收益。[设计与前置证据](reports/f637-pta-levels12/prepared-200-step-dgrad/f637-dgrad-long-prelaunch-review.json)。
 
 ## 待完成项、资源与数据管理
 
