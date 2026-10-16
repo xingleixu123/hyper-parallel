@@ -1,0 +1,80 @@
+{
+  "complete": true,
+  "checks": {
+    "all_reports_complete": true,
+    "training_observer_fidelity": true,
+    "previous_selected_weight_and_momentum_exact": true,
+    "current_postclip_gradient_exact": true,
+    "current_momentum_exact": true,
+    "mf_replay_full_outputs_exact": true,
+    "hp_replay_full_outputs_exact": true,
+    "hp_explicit_normalization_exact": true,
+    "same_pre_normalization_input": true,
+    "hp_actual_normalization_matches_fixture": true,
+    "scheduled_square_sum_exact_native": true,
+    "scheduled_normalization_exact_native": true,
+    "candidate_full_weight_exact_mf": true,
+    "candidate_momentum_unchanged": true,
+    "factor_source_unchanged": true,
+    "epsilon_unchanged": true,
+    "no_teacher_or_step_factor": true,
+    "mf_exit_zero": true,
+    "hp_exit_zero": true,
+    "candidate_exit_zero": true,
+    "fixture_exit_zero": true
+  },
+  "target": "model.layers.1.mlp.shared_experts.down_proj.weight",
+  "shape": [
+    5120,
+    3072
+  ],
+  "step": 396,
+  "before_weight_difference": {
+    "elements": 15728640,
+    "fp32_bitwise_different": 9556275,
+    "bf16_different": 117828,
+    "max_abs": 7.752329111099243e-06,
+    "mean_abs": 7.494017546484589e-08,
+    "l2_error_squared": 2.712845462311154e-07,
+    "relative_l2": 1.3004936973213795e-05
+  },
+  "after_weight_difference": {
+    "fp32_bitwise_different": 0,
+    "bf16_different": 0
+  },
+  "normalized_bf16_different_elements": 92955,
+  "norm": {
+    "hp": 0.22601467370986938,
+    "mf": 0.2260146588087082,
+    "fp64": 0.22601466135891418
+  },
+  "fp64_normalization_distance": {
+    "hp_closer_elements": 92955,
+    "mf_closer_elements": 0
+  },
+  "classification": "Archived DVM reduction compatibility; no generic HP mathematical defect established.",
+  "loss_acceptance": "Still requires independent full200 total/raw-MTP/raw-Aux simultaneous acceptance.",
+  "sources": {
+    "state": {
+      "file": "frontier396-state-comparison.json",
+      "sha256": "3de8dbbf248ec69c278bbeb6954018ca3d2ce0abea691c0cfbd0d55cafe6a55e"
+    },
+    "mf": {
+      "file": "frontier396-mf-builtin-stat.json",
+      "sha256": "91f672d064f3ead44ea29aad28222ffc8769f26c4092b0021dbaa3a8bdfb2ff3"
+    },
+    "hp": {
+      "file": "frontier396-hp-muon-replay.json",
+      "sha256": "393b493e60a5575aff21fb62570ba0cb4bea5b69f451e72162c9e29e174d0f25"
+    },
+    "candidate": {
+      "file": "frontier396-hp-shared-down-replay.json",
+      "sha256": "7a2523e7580a3aa14b9b571b5eb85ad3ca56367dd08095eab518f787a213495f"
+    },
+    "fixture": {
+      "file": "frontier396-normalization-fixture.json",
+      "sha256": "c5bea0166db08958090c52eb36fef862ef01a51f04bd9ab38a9de8bdf4f68c71"
+    }
+  },
+  "source_sha256": "3064dc3a7f0d62f790d73f87178b023da8d3dc604cae8c22dd68369621b121a3"
+}

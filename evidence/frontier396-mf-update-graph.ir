@@ -1,0 +1,557 @@
+# IR entry: @kernel_graph0
+# Total subgraphs: 1
+
+# Attrs:
+enable_zero_copy_in_graph: 1
+
+# Total params: 7
+# Params:
+%para1_lr: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+%para2_weight_decay: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+%para3_actual_weight: <Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>  :  has_default  :  <Float32xDefaultFormat[const vector]{5120, 3072}>  :  IsWeight: true
+%para4_actual_momentum: <Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>  :  has_default  :  <Float32xDefaultFormat[const vector]{5120, 3072}>  :  IsWeight: true
+%para5_beta: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+%para6_gradient: <Tensor[Float32], (5120, 3072)> : [5120, 3072]  :  <Float32xDefaultFormat[const vector]{5120, 3072}>  :  IsWeight: false
+%para7_rms: <Tensor[Float32], (1)> : [1]  :  <Float32xDefaultFormat[const vector]{1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 139
+Total number of cnodes: 62
+
+subgraph attr:
+enable_zero_copy_in_graph: 1
+subgraph instance: kernel_graph0 : 0xaaab43971400
+
+subgraph @kernel_graph0() {
+  %0(CNode_41) = Load(%para4_actual_momentum, UMonad[U]) primitive_attrs: {visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Tensor[Float32], (5120, 3072)>)
+      # Fullname with scope: (Default/Load-op0)
+  %1(CNode_40) = GraphKernel_Mul_fusion(%0, %para5_beta) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__39, graph_kernel: "Mul_fusion", visited: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (5120, 3072)>, <Tensor[Float32], (1)>) -> (<Tensor[Float32], (5120, 3072)>)
+      : (<Float32xDefaultFormat[const vector]{5120, 3072}>, <Float32xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_fusion-op0)
+  %2(CNode_30) = Load(%para3_actual_weight, UMonad[U]) primitive_attrs: {visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Tensor[Float32], (5120, 3072)>)
+      # Fullname with scope: (Default/Load-op1)
+  %3(CNode_29) = GraphKernel_Mul_Sub_Mul_fusion(%para1_lr, %para2_weight_decay, %2) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1, 2), func_graph: seg_trans__anonymous__28, graph_kernel: "Mul_Sub_Mul_fusion", visited: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (1)>, <Tensor[Float32], (1)>, <Tensor[Float32], (5120, 3072)>) -> (<Tensor[Float32], (5120, 3072)>)
+      : (<Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{5120, 3072}>) -> (<Float32xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Sub_Mul_fusion-op0)
+  %4(CNode_228) = MakeTuple(%0, %2, %1, %3) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (5120, 3072)>, <Tensor[Float32], (5120, 3072)>, <Tensor[Float32], (5120, 3072)>, <Tensor[Float32], (5120, 3072)>) -> (<Tuple[Tensor[Float32]*4], TupleShape((5120, 3072), (5120, 3072), (5120, 3072), (5120, 3072))>)
+      # Fullname with scope: (Default/MakeTuple-op0)
+  %5(CNode_229) = UpdateState(UMonad[U], %4) primitive_attrs: {visited: Bool(1)}
+      : (<UMonad, NoShape>, <Tuple[Tensor[Float32]*4], TupleShape((5120, 3072), (5120, 3072), (5120, 3072), (5120, 3072))>) -> (<UMonad, NoShape>)
+      # Fullname with scope: (Default/UpdateState-op0)
+  %6(CNode_45) = Depend(%para4_actual_momentum, %5) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)}
+      : (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/Depend-op0)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:154, 38~46/    next_param = F.depend(next_param, F.assign(param, op_cast(next_param, F.dtype(param))))/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7583~7607/def assign(variable, value):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7607, 11~37/    return assign_op(variable, value)/
+  %7(CNode_44) = GraphKernel_Add_Mul_Add_Cast_Assign_fusion(%1, %para6_gradient, %para5_beta, %6) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (0, 1, 2, 3), side_effect_mem: Bool(1), graph_kernel: "Add_Mul_Add_Cast_Assign_fusion", visited: Bool(1), IsFeatureMapOutput: Bool(1), func_graph: seg_trans__anonymous__43} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (5120, 3072)>, <Tensor[Float32], (5120, 3072)>, <Tensor[Float32], (1)>, <Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>) -> (<Tuple[Tensor[BFloat16],Ref[Tensor[Float32]]], TupleShape((5120, 3072), (5120, 3072))>)
+      : (<Float32xDefaultFormat[const vector]{5120, 3072}>, <Float32xDefaultFormat[const vector]{5120, 3072}>, <Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{5120, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{5120, 3072}>, <Float32xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tensor, Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Add_Mul_Add_Cast_Assign_fusion-op0)
+  %8(CNode_230) = TupleGetItem(%7, I64(0)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[BFloat16],Ref[Tensor[Float32]]], TupleShape((5120, 3072), (5120, 3072))>, <Int64, NoShape>) -> (<Tensor[BFloat16], (5120, 3072)>)
+      # Fullname with scope: (Default/TupleGetItem-op0)
+  %9(CNode_52) = PrimFunc_Transpose(%8, (I64(1), I64(0))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (5120, 3072)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{5120, 3072}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Transpose-op0)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:61, 12~15/        x = x.T/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:602~608/def T(x):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:608, 11~20/    return transpose(x)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:562~599/def transpose(x, *axis):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:599, 11~22/    return F.transpose(x, perm)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2913~2943/def transpose(input, dims):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2943, 11~36/    return transpose_op(input, dims)/
+  %10(CNode_231) = GraphKernel_Cast_Mul_ReduceSum_split(%9) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (), node_name: "Square_ReduceSum_Sqrt_Add_Div_fusion_0", graph_kernel: "Cast_Mul_ReduceSum_split", visited: Bool(1), IsFeatureMapOutput: Bool(0), func_graph: 2seg_trans__anonymous__127} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>) -> (<Tuple[Tensor[Float32]*2], TupleShape((3072, 5120), ())>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<Float32xDefaultFormat[const vector]{3072, 5120}>, <Float32xDefaultFormat[const vector]{}>)
+      : (Tensor) -> (Tensor, Tensor)
+      # Fullname with scope: (Default/GraphKernel_Cast_Mul_ReduceSum_split-op0)
+  %11(CNode_232) = TupleGetItem(%10, I64(1)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]*2], TupleShape((3072, 5120), ())>, <Int64, NoShape>) -> (<Tensor[Float32], ()>)
+      # Fullname with scope: (Default/TupleGetItem-op1)
+  %12(CNode_233) = TupleGetItem(%10, I64(0)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]*2], TupleShape((3072, 5120), ())>, <Int64, NoShape>) -> (<Tensor[Float32], (3072, 5120)>)
+      # Fullname with scope: (Default/TupleGetItem-op2)
+  %13(CNode_234) = GraphKernel_Sqrt_Add_Div_Cast_split(%11, %12) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (0), node_name: "Square_ReduceSum_Sqrt_Add_Div_fusion_1", graph_kernel: "Sqrt_Add_Div_Cast_split", visited: Bool(1), IsFeatureMapOutput: Bool(1), func_graph: 2seg_trans__anonymous__128} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], ()>, <Tensor[Float32], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<Float32xDefaultFormat[const vector]{}>, <Float32xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Sqrt_Add_Div_Cast_split-op0)
+  %14(CNode_235) = PrimFunc_Transpose(%13, (I64(1), I64(0))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (5120, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Transpose-op1)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:61, 12~15/        x = x.T/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:602~608/def T(x):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:608, 11~20/    return transpose(x)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:562~599/def transpose(x, *axis):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:599, 11~22/    return F.transpose(x, perm)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2913~2943/def transpose(input, dims):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2943, 11~36/    return transpose_op(input, dims)/
+  %15(CNode_64) = PrimFunc_MatMulExt(%13, %14) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (5120, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{5120, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op0)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %16(CNode_69) = GraphKernel_Mul_fusion(%15) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), func_graph: seg_trans__anonymous__68, graph_kernel: "Mul_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_fusion-op1)
+  %17(CNode_65) = PrimFunc_MatMulExt(%16, %15) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op1)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %18(CNode_63) = GraphKernel_Mul_Add_fusion(%15, %17) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__62, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op0)
+  %19(CNode_59) = PrimFunc_MatMulExt(%18, %13) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op2)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %20(CNode_58) = GraphKernel_Mul_Add_fusion(%13, %19) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__57, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op1)
+  %21(CNode_236) = PrimFunc_Transpose(%20, (I64(1), I64(0))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (5120, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Transpose-op2)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:61, 12~15/        x = x.T/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:602~608/def T(x):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:608, 11~20/    return transpose(x)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:562~599/def transpose(x, *axis):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:599, 11~22/    return F.transpose(x, perm)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2913~2943/def transpose(input, dims):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2943, 11~36/    return transpose_op(input, dims)/
+  %22(CNode_78) = PrimFunc_MatMulExt(%20, %21) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (5120, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{5120, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op3)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %23(CNode_83) = GraphKernel_Mul_fusion(%22) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), func_graph: seg_trans__anonymous__82, graph_kernel: "Mul_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_fusion-op2)
+  %24(CNode_79) = PrimFunc_MatMulExt(%23, %22) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op4)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %25(CNode_77) = GraphKernel_Mul_Add_fusion(%22, %24) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__76, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op2)
+  %26(CNode_73) = PrimFunc_MatMulExt(%25, %20) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op5)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %27(CNode_72) = GraphKernel_Mul_Add_fusion(%20, %26) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__71, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op3)
+  %28(CNode_237) = PrimFunc_Transpose(%27, (I64(1), I64(0))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (5120, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Transpose-op3)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:61, 12~15/        x = x.T/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:602~608/def T(x):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:608, 11~20/    return transpose(x)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:562~599/def transpose(x, *axis):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:599, 11~22/    return F.transpose(x, perm)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2913~2943/def transpose(input, dims):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2943, 11~36/    return transpose_op(input, dims)/
+  %29(CNode_92) = PrimFunc_MatMulExt(%27, %28) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (5120, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{5120, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op6)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %30(CNode_97) = GraphKernel_Mul_fusion(%29) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), func_graph: seg_trans__anonymous__96, graph_kernel: "Mul_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_fusion-op3)
+  %31(CNode_93) = PrimFunc_MatMulExt(%30, %29) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op7)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %32(CNode_91) = GraphKernel_Mul_Add_fusion(%29, %31) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__90, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op4)
+  %33(CNode_87) = PrimFunc_MatMulExt(%32, %27) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op8)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %34(CNode_86) = GraphKernel_Mul_Add_fusion(%27, %33) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__85, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op5)
+  %35(CNode_238) = PrimFunc_Transpose(%34, (I64(1), I64(0))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (5120, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Transpose-op4)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:61, 12~15/        x = x.T/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:602~608/def T(x):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:608, 11~20/    return transpose(x)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:562~599/def transpose(x, *axis):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:599, 11~22/    return F.transpose(x, perm)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2913~2943/def transpose(input, dims):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2943, 11~36/    return transpose_op(input, dims)/
+  %36(CNode_106) = PrimFunc_MatMulExt(%34, %35) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (5120, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{5120, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op9)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %37(CNode_111) = GraphKernel_Mul_fusion(%36) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), func_graph: seg_trans__anonymous__110, graph_kernel: "Mul_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_fusion-op4)
+  %38(CNode_107) = PrimFunc_MatMulExt(%37, %36) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op10)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %39(CNode_105) = GraphKernel_Mul_Add_fusion(%36, %38) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__104, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op6)
+  %40(CNode_101) = PrimFunc_MatMulExt(%39, %34) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op11)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %41(CNode_100) = GraphKernel_Mul_Add_fusion(%34, %40) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__99, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op7)
+  %42(CNode_239) = PrimFunc_Transpose(%41, (I64(1), I64(0))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (5120, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Transpose-op5)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:61, 12~15/        x = x.T/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:602~608/def T(x):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:608, 11~20/    return transpose(x)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:562~599/def transpose(x, *axis):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:599, 11~22/    return F.transpose(x, perm)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2913~2943/def transpose(input, dims):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2943, 11~36/    return transpose_op(input, dims)/
+  %43(CNode_120) = PrimFunc_MatMulExt(%41, %42) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (5120, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{5120, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op12)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %44(CNode_125) = GraphKernel_Mul_fusion(%43) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), func_graph: seg_trans__anonymous__124, graph_kernel: "Mul_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_fusion-op5)
+  %45(CNode_121) = PrimFunc_MatMulExt(%44, %43) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op13)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %46(CNode_119) = GraphKernel_Mul_Add_fusion(%43, %45) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__118, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 3072)>) -> (<Tensor[BFloat16], (3072, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 3072}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 3072}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op8)
+  %47(CNode_115) = PrimFunc_MatMulExt(%46, %41) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 3072)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 3072}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/MatMulExt-op14)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:68, 20~29/        x = a * x + b_mat @ x/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8421~8462/def matmul(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/function/math_func.py:8462, 11~35/    return auto_generate.matmul_ext(input, other)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1287~1291/def matmul_ext(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:1291, 11~38/    return matmul_ext_op(input, other)/
+  %48(CNode_114) = GraphKernel_Mul_Add_fusion(%41, %47) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), func_graph: seg_trans__anonymous__113, graph_kernel: "Mul_Add_fusion", visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tensor[BFloat16], (3072, 5120)>) -> (<Tensor[BFloat16], (3072, 5120)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <BFloat16xDefaultFormat[const vector]{3072, 5120}>) -> (<BFloat16xDefaultFormat[const vector]{3072, 5120}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Add_fusion-op9)
+  %49(CNode_35) = PrimFunc_Transpose(%48, (I64(1), I64(0))) primitive_attrs: {stream_id: I32(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), visited: Bool(1)} cnode_attrs: {input_multi_thread_safe: Bool(1), checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[BFloat16], (3072, 5120)>, <Tuple[Int64*2], TupleShape(NoShape, NoShape), elements_use_flags={[const vector]{1, 1}}>) -> (<Tensor[BFloat16], (5120, 3072)>)
+      : (<BFloat16xDefaultFormat[const vector]{3072, 5120}>, <Int64xDefaultFormat[const vector]{}>) -> (<BFloat16xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tuple) -> (Tensor)
+      # Fullname with scope: (Default/Transpose-op6)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:139, 16~46/            x = zeropower_via_newtonschulz5_2d(ns_inputs_item, dim_a, dim_b)/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:56~71/def zeropower_via_newtonschulz5_2d(x, dim_a, dim_b):/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:61, 12~15/        x = x.T/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:602~608/def T(x):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:608, 11~20/    return transpose(x)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:562~599/def transpose(x, *axis):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/_extends/parse/standard_method.py:599, 11~22/    return F.transpose(x, perm)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2913~2943/def transpose(input, dims):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2943, 11~36/    return transpose_op(input, dims)/
+  %50(CNode_36) = Depend(%para3_actual_weight, %5) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)}
+      : (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>, <UMonad, NoShape>) -> (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/Depend-op1)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:154, 38~46/    next_param = F.depend(next_param, F.assign(param, op_cast(next_param, F.dtype(param))))/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7583~7607/def assign(variable, value):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:7607, 11~37/    return assign_op(variable, value)/
+  %51(CNode_34) = GraphKernel_Mul_Mul_Cast_Mul_Sub_Assign_fusion(%para7_rms, %para1_lr, %49, %3, %50) primitive_attrs: {stream_id: I32(0), IsFeatureMapInputList: (0, 1, 2, 3, 4), side_effect_mem: Bool(1), graph_kernel: "Mul_Mul_Cast_Mul_Sub_Assign_fusion", visited: Bool(1), IsFeatureMapOutput: Bool(1), func_graph: seg_trans__anonymous__33} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (1)>, <Tensor[Float32], (1)>, <Tensor[BFloat16], (5120, 3072)>, <Tensor[Float32], (5120, 3072)>, <Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>) -> (<Tuple[Tensor[Float32],Ref[Tensor[Float32]]], TupleShape((5120, 3072), (5120, 3072))>)
+      : (<Float32xDefaultFormat[const vector]{1}>, <Float32xDefaultFormat[const vector]{1}>, <BFloat16xDefaultFormat[const vector]{5120, 3072}>, <Float32xDefaultFormat[const vector]{5120, 3072}>, <Float32xDefaultFormat[const vector]{5120, 3072}>) -> (<Float32xDefaultFormat[const vector]{5120, 3072}>, <Float32xDefaultFormat[const vector]{5120, 3072}>)
+      : (Tensor, Tensor, Tensor, Tensor, Tensor) -> (Tensor)
+      # Fullname with scope: (Default/GraphKernel_Mul_Mul_Cast_Mul_Sub_Assign_fusion-op0)
+  %52(CNode_38) = TupleGetItem(%51, I64(0)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32],Ref[Tensor[Float32]]], TupleShape((5120, 3072), (5120, 3072))>, <Int64, NoShape>) -> (<Tensor[Float32], (5120, 3072)>)
+      # Fullname with scope: (Default/TupleGetItem-op3)
+  %53(CNode_240) = TupleGetItem(%51, I64(1)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32],Ref[Tensor[Float32]]], TupleShape((5120, 3072), (5120, 3072))>, <Int64, NoShape>) -> (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/TupleGetItem-op4)
+  %54(next_param) = Depend(%52, %53) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (5120, 3072)>, <Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>) -> (<Tensor[Float32], (5120, 3072)>)
+      # Fullname with scope: (Default/Depend-op2)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:154, 17~91/    next_param = F.depend(next_param, F.assign(param, op_cast(next_param, F.dtype(param))))/
+  %55(CNode_241) = TupleGetItem(%7, I64(1)) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[BFloat16],Ref[Tensor[Float32]]], TupleShape((5120, 3072), (5120, 3072))>, <Int64, NoShape>) -> (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>)
+      # Fullname with scope: (Default/TupleGetItem-op5)
+  %56(next_param) = Depend(%54, %55) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (5120, 3072)>, <Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>) -> (<Tensor[Float32], (5120, 3072)>)
+      # Fullname with scope: (Default/Depend-op3)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:109~156/def _apply_muon_update(/
+      # In file /workspace/mindformers/mindformers/core/optim/muon.py:155, 17~89/    next_param = F.depend(next_param, F.assign(muon_m, op_cast(next_m, F.dtype(muon_m))))/
+  %57(CNode_242) = MakeTuple(%53, %55) primitive_attrs: {visited: Bool(1)}
+      : (<Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_weight, is_parameter, is_inplace>, <Ref[Tensor[Float32]], (5120, 3072), ref_key=actual_momentum, is_parameter, is_inplace>) -> (<Tuple[Ref[Tensor[Float32]]*2], TupleShape((5120, 3072), (5120, 3072))>)
+      # Fullname with scope: (Default/MakeTuple-op1)
+  %58(CNode_243) = UpdateState(%5, %57) primitive_attrs: {visited: Bool(1)}
+      : (<UMonad, NoShape>, <Tuple[Ref[Tensor[Float32]]*2], TupleShape((5120, 3072), (5120, 3072))>) -> (<UMonad, NoShape>)
+      # Fullname with scope: (Default/UpdateState-op1)
+  %59(CNode_244) = Depend(%56, %58) primitive_attrs: {side_effect_propagate: I64(1), visited: Bool(1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (5120, 3072)>, <UMonad, NoShape>) -> (<Tensor[Float32], (5120, 3072)>)
+      # Fullname with scope: (Default/Depend-op4)
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:52~55, 4~68/    def construct(self, gradient, lr, weight_decay, beta, rms):/
+      # In file /alignment/phase12/tools/replay_mf_frontier396_builtin_dump.py:53, 15~38/        return muon._apply_muon_update(/
+  %60(CNode_245) = MakeTuple(%59) primitive_attrs: {visited: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (5120, 3072)>) -> (<Tuple[Tensor[Float32]], TupleShape((5120, 3072))>)
+      : (Tensor) -> (TupleUnfold)
+      # Fullname with scope: (Default/MakeTuple-op2)
+  Return(%60) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]], TupleShape((5120, 3072))>)
+      # Fullname with scope: (Default/Return-op0)
+}
+
+

@@ -1,0 +1,64 @@
+<frozen runpy>:128: RuntimeWarning: 'torch.distributed.run' found in sys.modules after import of package 'torch.distributed', but prior to execution of 'torch.distributed.run'; this may result in unpredictable behaviour
+[W1016 14:02:33.167119000 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Traceback (most recent call last):
+  File "/alignment/phase12/tools-e213/capture_hp_frontier396_state.py", line 27, in <module>
+    runpy.run_path('/alignment/phase12/tools-e213/capture_hp_expert_norm328.py', run_name='__main__')
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/alignment/phase12/tools-e213/capture_hp_expert_norm328.py", line 46, in <module>
+    runpy.run_path('/alignment/phase12/tools-e213/' + entries[mode], run_name='__main__')
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/alignment/phase12/tools-e213/capture_hp_fc1_norm293.py", line 34, in <module>
+    runpy.run_path('/alignment/phase12/tools-e213/capture_hp_q_up258.py', run_name='__main__')
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/alignment/phase12/tools-e213/capture_hp_q_up258.py", line 34, in <module>
+    runpy.run_path('/alignment/phase12/tools-f637/capture_hp_global_sqrt400.py', run_name='__main__')
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/alignment/phase12/tools-f637/capture_hp_global_sqrt400.py", line 23, in <module>
+    hp_global_sqrt235_factor.install()
+  File "/alignment/phase12/tools-f637/hp_global_sqrt235_factor.py", line 32, in install
+    raise ValueError('Unexpected frozen clipping source')
+ValueError: Unexpected frozen clipping source
+[ERROR] 2026-10-16-14:02:44 (PID:2139955, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+E1016 14:02:45.969000 2139951 venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 0 (pid: 2139955) of binary: /state/jt-recipe-20261014/jt-e213-pr192-venv/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/alignment/phase12/tools-e213/capture_hp_frontier396_state.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-16_14:02:45
+  host      : localhost
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 2139955) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+[ERROR] 2026-10-16-14:02:45 (PID:2139951, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception

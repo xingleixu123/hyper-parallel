@@ -1,5 +1,5 @@
 {
-  "complete_runs": 99,
+  "complete_runs": 100,
   "excluded": [
     {
       "run": "hp-cann92-jt81-best-mf-bias-diag",
@@ -10376,9 +10376,26 @@
       "numerical_passed": false,
       "total_loss_passed": true,
       "scope": "Only live expert-down reduction added; epsilon and all prior factors unchanged. Current gate is total loss only."
+    },
+    {
+      "run": "hp-jte213-shareddown396400",
+      "commit": "181fab5f5c31ceeb2e385c1267aa586d5c6c8835",
+      "total_first": 9.5367431640625e-07,
+      "total_max": 1.9073486328125e-06,
+      "total_max_step": 210,
+      "total_mae": 5.7220458984375e-07,
+      "total_bad_steps": 0,
+      "mtp_raw_max": 3.1789143886129523e-06,
+      "aux_raw_max": 1.2973323464393616e-06,
+      "numerical_passed": true,
+      "total_loss_passed": true,
+      "comparison": "evidence/frontier396-shared-independent200-audit.json"
     }
   ],
-  "current_acceptance": "仅总loss：201首步<=0.001且201-400每步<=0.005；numerical_passed保留历史六指标口径，不作为当前门槛。",
-  "total_loss_passed_runs": 1,
-  "updated_at": "2026-10-16T17:42:16.786302+08:00"
+  "current_acceptance": "总loss首步<=0.0005；原始MTP/Aux首步<=0.001；三项201-400每步<=0.005。numerical_passed保留历史六指标口径；当前三项结论以独立验收回执为准。",
+  "total_loss_passed_runs": 2,
+  "updated_at": "2026-10-16T22:50:58.879720+08:00",
+  "three_loss_acceptance_passed_runs": [
+    "hp-jte213-shareddown396400"
+  ]
 }

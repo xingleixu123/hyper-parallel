@@ -1,0 +1,86 @@
+Source nodes of Default/GraphKernel_Mul_Sub_Mul_fusion-op0 = @kernel_graph0:CNode_29{[0]: ValueNode<FuncGraph> seg_trans__anonymous__28, [1]: param_lr, [2]: param_weight_decay, [3]: CNode_30}
+  Default/Mul-op0 = @kernel_graph0:CNode_31{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: param_lr, [2]: param_weight_decay}
+  Default/Sub-op0 = @kernel_graph0:CNode_32{[0]: ValueNode<Primitive> PrimFunc_Sub, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=Float32, value=1), [2]: CNode_31}
+  Default/Mul-op1 = @kernel_graph0:param_fp32{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: CNode_30, [2]: CNode_32}
+=======================
+Source nodes of Default/GraphKernel_Mul_Mul_Cast_Mul_Sub_Assign_fusion-op0 = @kernel_graph0:CNode_34{[0]: ValueNode<FuncGraph> seg_trans__anonymous__33, [1]: param_rms, [2]: param_lr, [3]: CNode_35, [4]: CNode_29, [5]: CNode_36}
+  Default/Mul-op2 = @kernel_graph0:adjusted_ratio{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=Float32, value=71.5542), [2]: param_rms}
+  Default/Mul-op3 = @kernel_graph0:adjusted_lr{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: param_lr, [2]: adjusted_ratio}
+  Default/Cast-op1 = @kernel_graph0:update_with_lr{[0]: ValueNode<Primitive> PrimFunc_Cast, [1]: CNode_35, [2]: ValueNode<Int64Imm> 43}
+  Default/Mul-op21 = @kernel_graph0:update_with_lr{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: adjusted_lr, [2]: update_with_lr}
+  Default/Sub-op1 = @kernel_graph0:next_param{[0]: ValueNode<Primitive> PrimFunc_Sub, [1]: CNode_29, [2]: update_with_lr}
+  Default/Assign-op2 = @kernel_graph0:CNode_37{[0]: ValueNode<Primitive> PrimFunc_Assign, [1]: CNode_36, [2]: CNode_38}
+=======================
+Source nodes of Default/GraphKernel_Mul_fusion-op0 = @kernel_graph0:CNode_40{[0]: ValueNode<FuncGraph> seg_trans__anonymous__39, [1]: CNode_41, [2]: param_beta}
+  Default/Mul-op4 = @kernel_graph0:CNode_42{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: CNode_41, [2]: param_beta}
+=======================
+Source nodes of Default/GraphKernel_Add_Mul_Add_Cast_Assign_fusion-op0 = @kernel_graph0:CNode_44{[0]: ValueNode<FuncGraph> seg_trans__anonymous__43, [1]: CNode_40, [2]: param_gradient, [3]: param_beta, [4]: CNode_45}
+  Default/Add-op0 = @kernel_graph0:CNode_46{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_40, [2]: param_gradient}
+  Default/Mul-op5 = @kernel_graph0:CNode_47{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: CNode_46, [2]: param_beta}
+  Default/Add-op1 = @kernel_graph0:CNode_48{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: param_gradient, [2]: CNode_47}
+  Default/Cast-op0 = @kernel_graph0:ns_inputs{[0]: ValueNode<Primitive> PrimFunc_Cast, [1]: CNode_48, [2]: ValueNode<Int64Imm> 45}
+  Default/Assign-op3 = @kernel_graph0:CNode_49{[0]: ValueNode<Primitive> PrimFunc_Assign, [1]: CNode_45, [2]: CNode_46}
+=======================
+Source nodes of Default/GraphKernel_Square_ReduceSum_Sqrt_Add_Div_fusion-op0 = @kernel_graph0:CNode_51{[0]: ValueNode<FuncGraph> seg_trans__anonymous__50, [1]: CNode_52}
+  Default/GraphKernel_Square-op0 = @kernel_graph0:CNode_53{[0]: ValueNode<FuncGraph> _anonymous__27, [1]: CNode_52}
+  Default/ReduceSum-op0 = @kernel_graph0:CNode_54{[0]: ValueNode<Primitive> PrimFunc_ReduceSum, [1]: CNode_53, [2]: ValueNode<ValueTuple> (0, 1)}
+  Default/Sqrt-op0 = @kernel_graph0:CNode_55{[0]: ValueNode<Primitive> PrimFunc_Sqrt, [1]: CNode_54}
+  Default/Add-op2 = @kernel_graph0:CNode_56{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_55, [2]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=1.00117e-07)}
+  Default/Div-op0 = @kernel_graph0:x{[0]: ValueNode<Primitive> PrimFunc_Div, [1]: CNode_52, [2]: CNode_56}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op0 = @kernel_graph0:CNode_58{[0]: ValueNode<FuncGraph> seg_trans__anonymous__57, [1]: CNode_51, [2]: CNode_59}
+  Default/Mul-op6 = @kernel_graph0:CNode_60{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=3.4375), [2]: CNode_51}
+  Default/Add-op4 = @kernel_graph0:CNode_61{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_60, [2]: CNode_59}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op1 = @kernel_graph0:CNode_63{[0]: ValueNode<FuncGraph> seg_trans__anonymous__62, [1]: CNode_64, [2]: CNode_65}
+  Default/Mul-op7 = @kernel_graph0:CNode_66{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=-4.78125), [2]: CNode_64}
+  Default/Add-op3 = @kernel_graph0:CNode_67{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_66, [2]: CNode_65}
+=======================
+Source nodes of Default/GraphKernel_Mul_fusion-op1 = @kernel_graph0:CNode_69{[0]: ValueNode<FuncGraph> seg_trans__anonymous__68, [1]: CNode_64}
+  Default/Mul-op8 = @kernel_graph0:CNode_70{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=2.03125), [2]: CNode_64}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op2 = @kernel_graph0:CNode_72{[0]: ValueNode<FuncGraph> seg_trans__anonymous__71, [1]: CNode_58, [2]: CNode_73}
+  Default/Mul-op9 = @kernel_graph0:CNode_74{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=3.4375), [2]: CNode_58}
+  Default/Add-op6 = @kernel_graph0:CNode_75{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_74, [2]: CNode_73}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op3 = @kernel_graph0:CNode_77{[0]: ValueNode<FuncGraph> seg_trans__anonymous__76, [1]: CNode_78, [2]: CNode_79}
+  Default/Mul-op10 = @kernel_graph0:CNode_80{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=-4.78125), [2]: CNode_78}
+  Default/Add-op5 = @kernel_graph0:CNode_81{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_80, [2]: CNode_79}
+=======================
+Source nodes of Default/GraphKernel_Mul_fusion-op2 = @kernel_graph0:CNode_83{[0]: ValueNode<FuncGraph> seg_trans__anonymous__82, [1]: CNode_78}
+  Default/Mul-op11 = @kernel_graph0:CNode_84{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=2.03125), [2]: CNode_78}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op4 = @kernel_graph0:CNode_86{[0]: ValueNode<FuncGraph> seg_trans__anonymous__85, [1]: CNode_72, [2]: CNode_87}
+  Default/Mul-op12 = @kernel_graph0:CNode_88{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=3.4375), [2]: CNode_72}
+  Default/Add-op8 = @kernel_graph0:CNode_89{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_88, [2]: CNode_87}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op5 = @kernel_graph0:CNode_91{[0]: ValueNode<FuncGraph> seg_trans__anonymous__90, [1]: CNode_92, [2]: CNode_93}
+  Default/Mul-op13 = @kernel_graph0:CNode_94{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=-4.78125), [2]: CNode_92}
+  Default/Add-op7 = @kernel_graph0:CNode_95{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_94, [2]: CNode_93}
+=======================
+Source nodes of Default/GraphKernel_Mul_fusion-op3 = @kernel_graph0:CNode_97{[0]: ValueNode<FuncGraph> seg_trans__anonymous__96, [1]: CNode_92}
+  Default/Mul-op14 = @kernel_graph0:CNode_98{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=2.03125), [2]: CNode_92}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op6 = @kernel_graph0:CNode_100{[0]: ValueNode<FuncGraph> seg_trans__anonymous__99, [1]: CNode_86, [2]: CNode_101}
+  Default/Mul-op15 = @kernel_graph0:CNode_102{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=3.4375), [2]: CNode_86}
+  Default/Add-op10 = @kernel_graph0:CNode_103{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_102, [2]: CNode_101}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op7 = @kernel_graph0:CNode_105{[0]: ValueNode<FuncGraph> seg_trans__anonymous__104, [1]: CNode_106, [2]: CNode_107}
+  Default/Mul-op16 = @kernel_graph0:CNode_108{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=-4.78125), [2]: CNode_106}
+  Default/Add-op9 = @kernel_graph0:CNode_109{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_108, [2]: CNode_107}
+=======================
+Source nodes of Default/GraphKernel_Mul_fusion-op4 = @kernel_graph0:CNode_111{[0]: ValueNode<FuncGraph> seg_trans__anonymous__110, [1]: CNode_106}
+  Default/Mul-op17 = @kernel_graph0:CNode_112{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=2.03125), [2]: CNode_106}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op8 = @kernel_graph0:CNode_114{[0]: ValueNode<FuncGraph> seg_trans__anonymous__113, [1]: CNode_100, [2]: CNode_115}
+  Default/Mul-op18 = @kernel_graph0:CNode_116{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=3.4375), [2]: CNode_100}
+  Default/Add-op12 = @kernel_graph0:CNode_117{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_116, [2]: CNode_115}
+=======================
+Source nodes of Default/GraphKernel_Mul_Add_fusion-op9 = @kernel_graph0:CNode_119{[0]: ValueNode<FuncGraph> seg_trans__anonymous__118, [1]: CNode_120, [2]: CNode_121}
+  Default/Mul-op19 = @kernel_graph0:CNode_122{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=-4.78125), [2]: CNode_120}
+  Default/Add-op11 = @kernel_graph0:CNode_123{[0]: ValueNode<Primitive> PrimFunc_Add, [1]: CNode_122, [2]: CNode_121}
+=======================
+Source nodes of Default/GraphKernel_Mul_fusion-op5 = @kernel_graph0:CNode_125{[0]: ValueNode<FuncGraph> seg_trans__anonymous__124, [1]: CNode_120}
+  Default/Mul-op20 = @kernel_graph0:CNode_126{[0]: ValueNode<Primitive> PrimFunc_Mul, [1]: ValueNode<Tensor> Tensor(shape=[], dtype=BFloat16, value=2.03125), [2]: CNode_120}
+=======================
+
