@@ -1,0 +1,56 @@
+{
+  "created_utc": "2026-10-16T08:35:52.860418+00:00",
+  "scope": "Read-only Git object inspection and immutable-image metadata/layer-file inspection; no Git writes and no container or NPU execution",
+  "old_source": "558eff53571498538048015ae3a7e3e57ba74fb9",
+  "upstream_source": "a1e6c222eab097c9609d6e744a3c5f98aeed6bdc",
+  "integrated_source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "merge_base": "e21302f9e7b47d41b61f5f4987fc34c000f7c978",
+  "upstream_changed_files": [
+    "hyper_parallel/trainer/runtime/random.py",
+    "tests/ut/trainer/runtime/test_random.py"
+  ],
+  "changed_file_overlap": [],
+  "integrated_delta_from_old": " hyper_parallel/trainer/runtime/random.py |  9 ++++-\n tests/ut/trainer/runtime/test_random.py  | 67 ++++++++++++++++++++++++++++++++\n 2 files changed, 74 insertions(+), 2 deletions(-)\n",
+  "source_files": {
+    "558eff53571498538048015ae3a7e3e57ba74fb9": {
+      "sha256": "8954496f1f089b4a448fad750816588278e01db1b638ff10f55957136e4127b2",
+      "k_shift_lines": [
+        {
+          "line": 60,
+          "text": "        os.environ[\"CLOSE_MATMUL_K_SHIFT\"] = \"1\""
+        }
+      ]
+    },
+    "a1e6c222eab097c9609d6e744a3c5f98aeed6bdc": {
+      "sha256": "f36688062e458695ca286f9e7c7246054bedd12ec31f9db8b0cd250c1c8378ad",
+      "k_shift_lines": [
+        {
+          "line": 60,
+          "text": "        # Deliberately not touching CLOSE_MATMUL_K_SHIFT here: CANN's K-shift and non-K-shift matmul"
+        }
+      ]
+    },
+    "544526f7db8342c607244fd41009b2a74adb84c8": {
+      "sha256": "f36688062e458695ca286f9e7c7246054bedd12ec31f9db8b0cd250c1c8378ad",
+      "k_shift_lines": [
+        {
+          "line": 60,
+          "text": "        # Deliberately not touching CLOSE_MATMUL_K_SHIFT here: CANN's K-shift and non-K-shift matmul"
+        }
+      ]
+    }
+  },
+  "policy": "Old NPU full_determinism unconditionally assigns CLOSE_MATMUL_K_SHIFT=1; new source leaves the inherited value untouched, including absence",
+  "image_inspection_files": [
+    "evidence/a1e6-image-k-shift-readonly.json",
+    "evidence/a1e6-image-k-shift-cann-alias-readonly.json"
+  ],
+  "image_env_k_shift_present": false,
+  "image_env_bash_env_present": false,
+  "image_env_env_present": false,
+  "env_sh_direct_k_shift_lines": [],
+  "cann_set_env_direct_k_shift_lines": [],
+  "cann_alias": "cann-9.2.0-beta.2",
+  "runtime_status": "Actual new training process before/after flags still require capture_a1e6_training.py evidence; no operator tiling claim from static absence",
+  "comparison_requirement": "Use new same-source 200-step native FSDP/CP references; old 558 trajectories are historical evidence, not acceptance reference for 544 numerical policy"
+}

@@ -1,0 +1,50 @@
+{
+  "delivery": "显式 Matplotlib 静态 PNG+SVG，中文 README 相对引用；仅本地交付",
+  "palette": {
+    "policy": "single-root preferred",
+    "blue_base": "#4C78A8",
+    "blue_light": "#DCE8F2",
+    "ink": "#20252B",
+    "neutral": "#7C838B",
+    "grid": "#DDE1E6"
+  },
+  "figures": [
+    {
+      "file": "figures/201-lm-loss-200",
+      "question": "201同次8卡FSDP的200步LM记录如何变化？",
+      "takeaway": "200个原始优化器步完整；没有共享reference，不能从轨迹判断0.005精度准入。",
+      "family": "line",
+      "variant": "单条原始逐步轨迹，首尾点直接标注",
+      "rows": 200,
+      "grain": "每优化器步一次；8rank全局LM相同，画rank0记录",
+      "fields": [
+        "step",
+        "lm_loss"
+      ],
+      "scale": "横轴1–200，纵轴从0开始；不平滑、不补点、不画差值",
+      "non_color": "首尾直接数值标签、圆点",
+      "footprint": "12×5.8英寸，180dpi PNG+SVG"
+    },
+    {
+      "file": "figures/201-hbm-sampled-capacity",
+      "question": "201采样时的物理HBM占用距32GiB单卡容量有多远？",
+      "takeaway": "82次采样中最大31393MiB、最小剩余1375MiB；末段无采样，不能视作瞬时峰值或OOM安全承诺。",
+      "family": "line",
+      "variant": "每次8卡最小–最大包络、最大值折线、容量虚线与尾部无采样区域",
+      "rows": 656,
+      "temporal_points": 82,
+      "grain": "host相对时间×8张卡；物理HBM单位MiB",
+      "fields": [
+        "seconds_from_guard_start",
+        "device",
+        "hbm_mib",
+        "capacity_mib"
+      ],
+      "scale": "HBM从0开始，参考线32768MiB；未采样尾段不延长曲线",
+      "non_color": "容量虚线、最大值点、无采样区域斜线填充",
+      "footprint": "12×6.4英寸，180dpi PNG+SVG"
+    }
+  ],
+  "chart_family_rationale": "两图分别回答随优化器步变化和随宿主采样时刻变化，均需连续轨迹；没有参考，排除差值/收益图。",
+  "qa": "导出后逐张检查中文字体、标注碰撞、数轴、来源与边界；CSV与输入文件SHA留存。"
+}

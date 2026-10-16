@@ -1,0 +1,81 @@
+{
+  "created_utc": "2026-10-16T10:10:04.319769+00:00",
+  "status": "PASS_LOCAL_REPORT_QA_ONLY",
+  "migration_allowed": false,
+  "readme": "README_ZH.md",
+  "relative_link_occurrences_checked": 20,
+  "relative_links": [
+    "evidence/numerical-default-policy.json",
+    "evidence/cpu-matrix-collection.json",
+    "evidence/cpu-matrix-independent-review.json",
+    "evidence/execution-summary.json",
+    "evidence/independent-run-review.json",
+    "evidence/smoke-independent-review.json",
+    "figures/201-lm-loss-200.png",
+    "figures/201-hbm-sampled-capacity.png",
+    "evidence/checkpoint-inventory.json",
+    "evidence/environment-public-summary.json",
+    "evidence/historical-namespace-correction.json",
+    "a1e6-201-admission-evidence.tar.gz",
+    "evidence/archive-manifest.json",
+    "evidence/archive-stream-verification.json",
+    "data/loss-and-time.csv",
+    "data/hbm-samples.csv",
+    "data/provenance.json",
+    "plot_figures.py",
+    "figures/201-lm-loss-200.svg",
+    "figures/201-hbm-sampled-capacity.svg"
+  ],
+  "raw_metric_rows_checked": 1600,
+  "derived_loss_rows_checked": 200,
+  "derived_hbm_rows_checked": 656,
+  "raw_input_fingerprints_verified": 12,
+  "csv_fingerprints_verified": 2,
+  "metrics": {
+    "median_callback_seconds_after20_rankmax": 1.7298421263694763,
+    "sampled_hbm_peak_mib": 31393,
+    "sampled_min_free_mib": 1375,
+    "sampled_cgroup_highwater_bytes": 99737739264,
+    "last_hbm_sample_to_receipt_finish_seconds": 65.11333107948303
+  },
+  "loss_semantics": {
+    "lm": "primary 200-step x 8-rank <= 0.005 gate after a matching reference exists",
+    "mtp": "logged weighted value x0.3; parallel strict observation, not extra migration veto",
+    "aux": "logged weighted value x0.0001; parallel strict observation, not extra migration veto"
+  },
+  "images": [
+    {
+      "path": "figures/201-lm-loss-200.png",
+      "width": 2160,
+      "height": 1044,
+      "visual_inspection": "PASS: Chinese glyphs, labels, axes, source notes and single-run/no-alignment titles visible without overlap"
+    },
+    {
+      "path": "figures/201-hbm-sampled-capacity.png",
+      "width": 2160,
+      "height": 1152,
+      "visual_inspection": "PASS: Chinese glyphs, labels, axes, source notes and single-run/no-alignment titles visible without overlap"
+    }
+  ],
+  "plot_script": {
+    "pylint_errors_fatal_exit_code": 0,
+    "maximum_line_length": 106
+  },
+  "agents_catalog": "PASS: 9 skills, 12 agents",
+  "archive": {
+    "status": "PASS",
+    "archive": "a1e6-201-admission-evidence.tar.gz",
+    "archive_bytes": 481119,
+    "archive_sha256": "0773c464e87c14b00e2ccb3aea8e9457a4ea082570d4e137a50dec81f75121d5",
+    "payload_file_count": 309,
+    "verified_members_including_embedded_manifest": 310,
+    "verified_uncompressed_bytes": 3432244,
+    "method": "Sequential tar r|gz read, SHA256 and byte count for every regular member; no extraction or roundtrip directory",
+    "all_original_collection_files_verified": 249,
+    "cpu_parser_pinned_inputs_verified": 25,
+    "privacy_scan": "Explicit path/type allowlist, known foreign full/short container-ID exclusion, secret/email/private-key pattern scan; private namespace evidence remains local only",
+    "memory_bound": "Archive verification reads 64KiB chunks; no tensor payloads"
+  },
+  "scope": "Local artifact creation and read-only local evidence checks only; no new containers, NPU work, Git commit, push or GitHub action.",
+  "svg_format_review": "svg-format-validation.json"
+}

@@ -1,0 +1,377 @@
+{
+  "case": "r201-a1e6-fsdp8-3-v1",
+  "created_epoch": 1792142736.965561,
+  "status": "PASS_SMOKE_ONLY",
+  "scope": "仅本机离线读取既有三步原始证据；未访问服务器、未启动容器、未修改运行代码或原始文件。不授予200步精度准入，也不比较跨硬件性能。",
+  "verification": {
+    "manifest": "evidence/201-a1e6-fsdp8-smoke3-v1-evidence-manifest.json",
+    "manifest_sha256": "130f70df31415cdb1782d7c5e9a144328c947dfa4e878b797bfa287683af9839",
+    "verified_file_count": 92,
+    "verified_run_file_count": 90,
+    "verified_total_bytes": 410301,
+    "all_hashes_match": true,
+    "run_file_set_matches_manifest": true,
+    "checks": {
+      "八rank分别完整记录1到3步": true,
+      "全部标量有限": true,
+      "全部start从0开始且3步1microbatch": true,
+      "全部complete为step3_epoch1": true,
+      "全部48项初始持久state内容一致": true,
+      "46个可训练参数均有初始state记录": true,
+      "初始state的形状dtypeSHA合法": true,
+      "八rank_start参数元数据一致": true,
+      "八rank运行flags一致": true,
+      "八rank_device与rank对应且终步为3": true,
+      "step1全局输入identity一致且8rank1microstep": true,
+      "step1记录的全局标量各rank一致": true,
+      "step2全局输入identity一致且8rank1microstep": true,
+      "step2记录的全局标量各rank一致": true,
+      "step3全局输入identity一致且8rank1microstep": true,
+      "step3记录的全局标量各rank一致": true,
+      "三步输入全局hash互不相同": true,
+      "样本和token累计值一致": true,
+      "真实运行配置等于CPU准入解析配置": true,
+      "两份解析配置语义相同": true,
+      "FSDP8_其余并行1_关闭重算_不保存checkpoint": true,
+      "clean544源码证据": true,
+      "原生训练退出码0": true,
+      "设备0抽样峰值与guard回执一致": true,
+      "设备1抽样峰值与guard回执一致": true,
+      "设备2抽样峰值与guard回执一致": true,
+      "设备3抽样峰值与guard回执一致": true,
+      "设备4抽样峰值与guard回执一致": true,
+      "设备5抽样峰值与guard回执一致": true,
+      "设备6抽样峰值与guard回执一致": true,
+      "设备7抽样峰值与guard回执一致": true,
+      "所有采样健康且设备集合完整": true,
+      "26个采样且递增": true,
+      "cgroup路径对应唯一容器": true,
+      "guard退出0且已释放所有记录的NPU进程": true,
+      "cgroup高水位与guard回执一致": true,
+      "worker无Traceback_RuntimeError_OOM文本": true
+    },
+    "errors": []
+  },
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "rank_count": 8,
+  "steps": [
+    {
+      "step": 1,
+      "input_identity": {
+        "global_sha256": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+        "rank_count": 8,
+        "micro_steps": 1
+      },
+      "lm_loss": 12.881054878234863,
+      "mtp_loss": 3.928363800048828,
+      "aux_loss": 0.00025308559997938573,
+      "total_loss": 16.809673309326172,
+      "grad_norm": 22.473445892333984,
+      "step_tokens": 32573.0,
+      "consumed_tokens": 32573.0,
+      "step_samples": 8.0,
+      "consumed_samples": 8.0
+    },
+    {
+      "step": 2,
+      "input_identity": {
+        "global_sha256": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+        "rank_count": 8,
+        "micro_steps": 1
+      },
+      "lm_loss": 12.849451065063477,
+      "mtp_loss": 3.884253740310669,
+      "aux_loss": 0.0002226923534180969,
+      "total_loss": 16.733928680419922,
+      "grad_norm": 8.052473068237305,
+      "step_tokens": 21239.0,
+      "consumed_tokens": 53812.0,
+      "step_samples": 8.0,
+      "consumed_samples": 16.0
+    },
+    {
+      "step": 3,
+      "input_identity": {
+        "global_sha256": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25",
+        "rank_count": 8,
+        "micro_steps": 1
+      },
+      "lm_loss": 12.472123146057129,
+      "mtp_loss": 3.8443076610565186,
+      "aux_loss": 0.0002404620172455907,
+      "total_loss": 16.316669464111328,
+      "grad_norm": 13.128016471862793,
+      "step_tokens": 24848.0,
+      "consumed_tokens": 78660.0,
+      "step_samples": 8.0,
+      "consumed_samples": 24.0
+    }
+  ],
+  "initial_state": {
+    "entry_count": 48,
+    "named_parameter_count": 46,
+    "extra_state_names": [
+      "model.layers.1.mlp.gate.e_score_correction_bias",
+      "mtp.layers.0.transformer_layer.mlp.gate.e_score_correction_bias"
+    ],
+    "total_state_numel": 2717982736,
+    "serialized_rank0_sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "scope": "48项完整pre-sharding持久state的shape/dtype/逐项SHA一致，包括46参数与2个路由bias；其余非持久buffer/RNG/优化器状态不由该文件覆盖。"
+  },
+  "runtime_flags": {
+    "before_trainer": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": null,
+        "FLASH_ATTENTION_DETERMINISTIC": null,
+        "CUBLAS_WORKSPACE_CONFIG": null,
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "scope": "Environment only; no backend queries"
+    },
+    "training": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": "true",
+        "FLASH_ATTENTION_DETERMINISTIC": "1",
+        "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "npu_matmul": {
+        "allow_tf32": null,
+        "allow_hf32": false,
+        "allow_bf16_reduced_precision_reduction": null
+      }
+    }
+  },
+  "memory": {
+    "per_device": [
+      {
+        "device": 0,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28777119744,
+        "allocator_max_reserved_gib": 26.80078125,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28777119744,
+        "sampled_hbm_max_mib": 28115,
+        "sampled_min_free_mib": 4653,
+        "sampled_aicore_max_percent": 91,
+        "before_hbm_mib": 2660,
+        "after_hbm_mib": 2866,
+        "after_minus_before_mib": 206,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      },
+      {
+        "device": 1,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28756148224,
+        "allocator_max_reserved_gib": 26.78125,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28756148224,
+        "sampled_hbm_max_mib": 28115,
+        "sampled_min_free_mib": 4653,
+        "sampled_aicore_max_percent": 0,
+        "before_hbm_mib": 2660,
+        "after_hbm_mib": 2865,
+        "after_minus_before_mib": 205,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      },
+      {
+        "device": 2,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28756148224,
+        "allocator_max_reserved_gib": 26.78125,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28756148224,
+        "sampled_hbm_max_mib": 29599,
+        "sampled_min_free_mib": 3169,
+        "sampled_aicore_max_percent": 99,
+        "before_hbm_mib": 2660,
+        "after_hbm_mib": 2865,
+        "after_minus_before_mib": 205,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      },
+      {
+        "device": 3,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28777119744,
+        "allocator_max_reserved_gib": 26.80078125,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28777119744,
+        "sampled_hbm_max_mib": 31372,
+        "sampled_min_free_mib": 1396,
+        "sampled_aicore_max_percent": 100,
+        "before_hbm_mib": 2659,
+        "after_hbm_mib": 2866,
+        "after_minus_before_mib": 207,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      },
+      {
+        "device": 4,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28777119744,
+        "allocator_max_reserved_gib": 26.80078125,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28777119744,
+        "sampled_hbm_max_mib": 31370,
+        "sampled_min_free_mib": 1398,
+        "sampled_aicore_max_percent": 100,
+        "before_hbm_mib": 2660,
+        "after_hbm_mib": 2866,
+        "after_minus_before_mib": 206,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      },
+      {
+        "device": 5,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28735176704,
+        "allocator_max_reserved_gib": 26.76171875,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28735176704,
+        "sampled_hbm_max_mib": 31350,
+        "sampled_min_free_mib": 1418,
+        "sampled_aicore_max_percent": 100,
+        "before_hbm_mib": 2659,
+        "after_hbm_mib": 2865,
+        "after_minus_before_mib": 206,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      },
+      {
+        "device": 6,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28735176704,
+        "allocator_max_reserved_gib": 26.76171875,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28735176704,
+        "sampled_hbm_max_mib": 31333,
+        "sampled_min_free_mib": 1435,
+        "sampled_aicore_max_percent": 98,
+        "before_hbm_mib": 2660,
+        "after_hbm_mib": 2865,
+        "after_minus_before_mib": 205,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      },
+      {
+        "device": 7,
+        "allocator_max_allocated_bytes": 23656889344,
+        "allocator_max_allocated_gib": 22.03219509124756,
+        "allocator_max_reserved_bytes": 28735176704,
+        "allocator_max_reserved_gib": 26.76171875,
+        "allocator_final_allocated_bytes": 3496637952,
+        "allocator_final_reserved_bytes": 28735176704,
+        "sampled_hbm_max_mib": 31372,
+        "sampled_min_free_mib": 1396,
+        "sampled_aicore_max_percent": 100,
+        "before_hbm_mib": 2659,
+        "after_hbm_mib": 2865,
+        "after_minus_before_mib": 206,
+        "after_pids": [],
+        "after_core": 0,
+        "after_healthy": true
+      }
+    ],
+    "allocator_max_allocated_gib": 22.03219509124756,
+    "allocator_max_reserved_gib": 26.80078125,
+    "sampled_physical_hbm_peak_mib": 31372,
+    "sampled_physical_min_free_mib": 1396,
+    "sampled_min_free_percent": 4.26025390625,
+    "sampling": {
+      "count": 26,
+      "configured_interval_seconds": 5,
+      "actual_interval_min_seconds": 6.157850742340088,
+      "actual_interval_median_seconds": 6.187267065048218,
+      "actual_interval_max_seconds": 7.026125192642212,
+      "first_sample_seconds_after_start": 6.15730357170105,
+      "last_sample_seconds_before_finish": 6.235880374908447,
+      "physical_peak_scope": "npu-smi离散抽样最大值，不是瞬时物理峰值；不能将卡间抽样差异解释为负载/显存不均。"
+    },
+    "cgroup": {
+      "path": "/sys/fs/cgroup/memory/docker/a7ed702f57526de47637d591c02f1bf63a5f9795293b8ce9c39fb26665a7c922",
+      "max_observed_kernel_high_water_bytes": 99751608320,
+      "max_observed_kernel_high_water_gib": 92.90092468261719,
+      "maximum_sampled_current_bytes": 99747901440,
+      "maximum_sampled_current_gib": 92.8974723815918,
+      "last_sample_current_bytes": 12695105536,
+      "last_sample_current_gib": 11.823238372802734,
+      "recorded_container_limit_bytes": 343597383680,
+      "high_water_fraction_of_recorded_limit": 0.2903153896331787,
+      "scope": "peak_bytes来自cgroup v1 memory.max_usage_in_bytes内核高水位，最大已读值覆盖到最后一次采样；不是简单对current_bytes取max，也没有覆盖最后约6.24秒的最终高水位。"
+    },
+    "release": {
+      "guard_released": true,
+      "remaining_owned_pids": [],
+      "after_all_cards_idle": true,
+      "after_hbm_above_before_mib_range": [
+        205,
+        207
+      ],
+      "container_deletion_independently_proven_by_manifest": false,
+      "post_exit_cgroup_value_recorded": false,
+      "scope": "回执证明停止与NPU PID释放；结束HBM仍高于起始205–207MiB，不能称完全回到基线，也不足以认定泄漏。guard先落receipt后docker rm，当前92文件未含删除后独立核验；不存在退出后cgroup归零观测。"
+    }
+  },
+  "limitations": [
+    {
+      "priority": "P1",
+      "item": "仅3步且checkpoint关闭",
+      "detail": "没有第200步save/consolidation、200–400恢复、完整200步三项loss差值或其他并行/重算结果；不构成迁移或200准入。"
+    },
+    {
+      "priority": "P1",
+      "item": "物理HBM观测余量较小且采样稀疏",
+      "detail": "31,372/32,768MiB，最少观察余量1,396MiB（4.26%）；真实瞬时余量可能更小。卡1在26个样本中AICore最大为0却完成3步，直观说明采样可漏掉计算阶段。"
+    },
+    {
+      "priority": "P2",
+      "item": "两个matmul控制字段为null",
+      "detail": "allow_tf32与allow_bf16_reduced_precision_reduction在探针使用的对象路径没有取得值；null不能解释为False/已禁用。allow_hf32=false与确定性开关true是已实际取得的值。"
+    },
+    {
+      "priority": "P2",
+      "item": "输入身份为聚合全局hash",
+      "detail": "每步8rank一致且rank_count8/micro_steps1，累计24样本/78660token；未保存原始batch或各rank局部hash清单，不能从聚合hash还原具体内容，尚未同其他主机参考匹配。"
+    },
+    {
+      "priority": "P2",
+      "item": "回收证据边界",
+      "detail": "NPU无PID/核心闲置已证实，但当前归档没有container删除后检查、退出后cgroup读数或恢复到起始HBM的后续观测；报告用“进程/设备已释放”更准确。"
+    },
+    {
+      "priority": "P3",
+      "item": "未评估稳定性能",
+      "detail": "三步包含启动/预热；日志有32-padding分配与ArgSort在AiCpu执行等提示，仅记为后续分析候选，不作性能收益/退化定论。"
+    }
+  ],
+  "suggested_summary_wording": "201 8×910B4/32GiB在clean544与既定FSDP8关闭重算配方下完成3步，八rank证据齐全、配置/初始state/输入身份记录自洽。allocator峰值allocated22.0322GiB、reserved26.8008GiB；物理HBM抽样峰值31,372MiB、最少观察余量1,396MiB；cgroup内核高水位最大已读值92.9009GiB。停止后无NPU进程，HBM较起始仍多205–207MiB。仅完成短跑适配验证，200步、保存/续训、0.005精度与跨硬件性能均待独立结论。",
+  "original_summary_consistency": {
+    "original_summary_sha256": "0f4d55850a1f8aa231b80a8e6ea8079caf105ebbad2aacd714351a7cae79fa8a",
+    "numeric_peaks_match": true,
+    "recommended_changes": "保留原PASS_SMOKE_ONLY结论；补充实际采样间隔、cgroup高水位语义与回收边界，并明确null控制值不可作禁用断言。"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "schema": "a1e6-environment-diagnosis-public-v2",
+  "local_observation_utc": "2026-10-16T09:37:15.945015+00:00",
+  "scope": "只读证据分析；不创建容器、不执行 NPU 探测、不更改驱动/源码/venv、不操作他人任务。公开摘要不包含其他任务的容器 ID、PID、进程名或路径。",
+  "conclusion": "125/129 当前各存在其他普通容器持有全部八卡的设备命名空间，应等待资源释放。该事实与官方设备占用排查项对应，但不足以单独证明此前两次失败的完整因果链。201 当前无低编号设备命名空间占用。",
+  "hosts": [
+    {
+      "host": "125",
+      "low_namespace_count": 1,
+      "namespaces": [
+        {
+          "namespace_type": "低编号普通容器设备命名空间",
+          "namespace_id_class": "<128",
+          "device_count": 8,
+          "foreign": true,
+          "running": true,
+          "non_privileged": true,
+          "container_pid_and_namespace_identifier_match": true
+        }
+      ],
+      "next_launch_admissible_by_namespace_only": false,
+      "limit": "只判断当前设备命名空间；无 FD 或无计算进程记录不等于设备已释放。"
+    },
+    {
+      "host": "129",
+      "low_namespace_count": 1,
+      "namespaces": [
+        {
+          "namespace_type": "低编号普通容器设备命名空间",
+          "namespace_id_class": "<128",
+          "device_count": 8,
+          "foreign": true,
+          "running": true,
+          "non_privileged": true,
+          "container_pid_and_namespace_identifier_match": true
+        }
+      ],
+      "next_launch_admissible_by_namespace_only": false,
+      "limit": "只判断当前设备命名空间；无 FD 或无计算进程记录不等于设备已释放。"
+    },
+    {
+      "host": "201",
+      "low_namespace_count": 0,
+      "namespaces": [],
+      "next_launch_admissible_by_namespace_only": true,
+      "limit": "只判断当前设备命名空间；无 FD 或无计算进程记录不等于设备已释放。"
+    }
+  ],
+  "official_source": {
+    "title": "新容器中运行 npu-smi 或 hccn_tool 等命令提示设备被占用",
+    "url": "https://www.hiascend.com/document/caselibrary/detail/topic_0000002238354198",
+    "accessed_utc_date": "2026-10-16",
+    "relevant_guidance": "官方建议读取宿主机 namespace_node，依据 ns_id 小于 128 的映射表、设备编号和 root_tgid 确认设备使用者。本任务只读取证并等待；不执行网页中终止其他进程/容器的处置。"
+  },
+  "failure_boundary": {
+    "125": "0–200 尝试在首步前失败；已完成 CPU 初始化的 rank 在 JT 构建器构造 torch.device 时收到 index 为 str 的 TypeError。",
+    "129": "0–200 尝试在首步前失败；已完成 CPU 初始化的 rank 在同一构造点收到同一 TypeError。",
+    "201": "三步和 0–200 已完成并释放；本摘要不代替跨机精度对齐、续训或其他并行验收。",
+    "causality_limit": "失败时没有保存每个 rank 的 drvGetDevNum 返回码、C 后备设备数、IS_NPU_AVAILABLE 实值和 get_device_id 值。HAL 警告本身不能证明最终 availability=false。当前 129 持有者的启动时刻晚于失败窗口，当前快照不能倒推此前占用关系。"
+  },
+  "matched_evidence": {
+    "same_runtime_helpers": true,
+    "same_helpers_count": 6,
+    "observed_initial_state_hash": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "initial_state_ranks": {
+      "125": [
+        3,
+        5,
+        6,
+        7
+      ],
+      "129": [
+        0
+      ],
+      "201": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "initial_state_limit": "只对实际已写出的模型初始 state_dict 摘要作比较，不扩展为缺失 rank、优化器/RNG、训练损失对齐结论。",
+    "production_runtime": "125/129 当前 daemon 默认 runc；201 guard 显式 runc。没有证据支持默认 Ascend hook 是本次差异。",
+    "software": "既有只读环境证据显示三机相同镜像、env.sh 和所核对的 PTA 文件；宿主驱动、Docker/内核和设备节点权限存在差异，不能仅按版本差异认定根因。"
+  },
+  "next_admission": "下一次共享机器 launch 前，除 npu-smi 空闲判断外，还应只读核对目标设备在 ns_id<128 的映射是否为空；解析失败或未知格式应阻断，不能通过 privileged 或 host PID namespace 绕过。",
+  "pending_verification": [
+    "自然释放后重新记录设备命名空间，再执行已授权的最小设备发现探针。",
+    "探针需同时保存原始 HAL 返回码、C 后备返回值、实际可用性缓存、设备索引值/类型与实际加载的驱动库路径。",
+    "若发现成功，再恢复同源码/同配置的共享机器参考训练；需满 200 步数值比较后才作迁移准入。"
+  ],
+  "clock_reference": "以下偏差是远端 epoch 减本机请求往返中点，采用三次测量中最小 RTT 样本；区间使用请求开始/结束边界。本机不是绝对 UTC 校准源。",
+  "clock_offsets": {
+    "125": {
+      "midpoint_seconds": -266.49406814575195,
+      "interval_seconds": [
+        -266.9419560432434,
+        -266.0461802482605
+      ],
+      "roundtrip_seconds": 0.8909999999996217
+    },
+    "129": {
+      "midpoint_seconds": -3.638660430908203,
+      "interval_seconds": [
+        -4.16506814956665,
+        -3.112252712249756
+      ],
+      "roundtrip_seconds": 1.0470000000022992
+    },
+    "201": {
+      "midpoint_seconds": 14.63140320777893,
+      "interval_seconds": [
+        14.175053358078003,
+        15.087753057479858
+      ],
+      "roundtrip_seconds": 0.9059999999990396
+    }
+  },
+  "evidence_fingerprints": {
+    "current_private_namespace_sha256": "c265be06b2ff1ab17f96a7f58552b156d4c8ae50d605da20adfa0d7d30739fc2",
+    "clock_runtime_sha256": "8ba238a93a72477f6adf8e2d055d13ada84dedda189fb18a5202ffb0f06943b9",
+    "prior_environment_summary_sha256": "2f711ac64a228726328e1d7493e70a63e15ba0136799642152dfc476ecc5b6f7",
+    "smoke_independent_review_sha256": "62544517240759ad0ad38571ee1e5c1c635af7b795926db88ff9c3f59988c79a"
+  }
+}

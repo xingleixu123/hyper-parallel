@@ -1,0 +1,178 @@
+{
+  "time_utc": "2026-10-16T09:43:51.547144+00:00",
+  "case": "r201-a1e6-fsdp8-0-200-v1",
+  "status": "PASS_SINGLE_RUN_AND_RESOURCE_INTEGRITY_ONLY",
+  "migration_admitted": false,
+  "cross_host_precision_status": "UNVERIFIED_NO_COMPLETE_MATCHING_SOURCE_SHARED_HOST_REFERENCE",
+  "cross_hardware_parallel_performance_claim": false,
+  "pinned_inputs_sha256": {
+    "evidence/201-a1e6-fsdp8-200-v1-evidence-manifest.json": "0f5787ac734e47aac93b00166d5b56a06a7926d6bcfe632ff460908dcb32e85c",
+    "evidence/201-a1e6-fsdp8-200-v1-joint-audit-manifest.json": "ea154ebe0511cc2b51b142e6bf75581e50f75e9a8055d7afb281794f9071326f",
+    "evidence/201-fsdp8-reference-config.json": "dfb276d6b985e0d6197888d4480c340611bc2ab42a3d58c89121a1319457f782",
+    "evidence/201-data-source-manifest.json": "4438e20fb2e95251a9358eadcc1dc2b435f58a4528d604a5b2a32e9965105e21",
+    "evidence/201-a1e6-fsdp8-200-v1-independent-remote-state.json": "5fa15d590904616cb6c6b7f9379e4019ad10973d56730a4dd772ff932f7ca4da",
+    "evidence/201-a1e6-fsdp8-200-v1-independent-data-hashes.json": "ee1fc418a61b2f4caa3d2ff3c36010e2be37066a44410a33a342af51343844d6"
+  },
+  "original_files_verified": 92,
+  "joint_files_verified": 98,
+  "original_total_bytes": 1776009,
+  "original_collection_unchanged": true,
+  "request_json_provenance_equal": true,
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "source_clean": true,
+  "ranks": 8,
+  "ordered_optimizer_steps_each_rank": [
+    1,
+    200
+  ],
+  "metric_rows": 1600,
+  "initial_tensor_count_each_rank": 48,
+  "cross_rank_initial_and_input_identity_equal": true,
+  "cross_rank_logged_scalar_max_abs": {
+    "training/total_loss": 0.0,
+    "training/foundation_loss/lm": 0.0,
+    "training/foundation_loss/mtp": 0.0,
+    "training/foundation_loss/aux": 0.0,
+    "training/grad_norm": 0.0
+  },
+  "runtime_flags": {
+    "before_trainer": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": null,
+        "FLASH_ATTENTION_DETERMINISTIC": null,
+        "CUBLAS_WORKSPACE_CONFIG": null,
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "scope": "Environment only; no backend queries"
+    },
+    "training": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": "true",
+        "FLASH_ATTENTION_DETERMINISTIC": "1",
+        "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "npu_matmul": {
+        "allow_tf32": null,
+        "allow_hf32": false,
+        "allow_bf16_reduced_precision_reduction": null
+      }
+    }
+  },
+  "end_counters": {
+    "samples": 1600.0,
+    "tokens": 3713791.0
+  },
+  "first_step_logged_losses": {
+    "training/total_loss": 16.809673309326172,
+    "training/foundation_loss/lm": 12.881054878234863,
+    "training/foundation_loss/mtp": 3.928363800048828,
+    "training/foundation_loss/aux": 0.00025308559997938573,
+    "training/grad_norm": 22.473445892333984
+  },
+  "last_step_logged_losses": {
+    "training/total_loss": 10.134613037109375,
+    "training/foundation_loss/lm": 7.756636619567871,
+    "training/foundation_loss/mtp": 2.377513885498047,
+    "training/foundation_loss/aux": 0.00046271138126030564,
+    "training/grad_norm": 9.231714248657227
+  },
+  "resources": {
+    "sample_count": 82,
+    "sampled_hbm_max_mib_by_device": {
+      "0": 31374,
+      "1": 31373,
+      "2": 31373,
+      "3": 31373,
+      "4": 31391,
+      "5": 31371,
+      "6": 31373,
+      "7": 31393
+    },
+    "sampled_hbm_peak_mib": 31393,
+    "sampled_min_free_mib": 1375,
+    "sampled_aicore_max_percent_by_device": {
+      "0": 100,
+      "1": 100,
+      "2": 100,
+      "3": 100,
+      "4": 100,
+      "5": 100,
+      "6": 100,
+      "7": 100
+    },
+    "sampled_container_cgroup_peak_bytes": 99737739264,
+    "host_mem_available_min_bytes": 1507812552704,
+    "configured_interval_seconds": 5,
+    "observed_interval_median_seconds": 6.2030415534973145,
+    "observed_interval_max_seconds": 6.4940173625946045,
+    "last_sample_to_receipt_finish_seconds": 65.11333107948303,
+    "scope": "Sampled physical HBM only; capture gaps and launch/release edges prevent an instantaneous peak claim.",
+    "median_callback_step_seconds_after20": 1.7298421263694763,
+    "summed_callback_seconds_after20": 311.78939282894135,
+    "supervised_tokens_after20": 3325552.0,
+    "supervised_tokens_per_callback_second_after20": 10666.020321687194,
+    "allocator_lifetime_max_allocated_bytes": 23656889344,
+    "allocator_lifetime_max_reserved_bytes": 28756148224
+  },
+  "execution_exit_code": 0,
+  "released": true,
+  "live_terminal_check": {
+    "fixed_container_absent": true,
+    "owned_containers": 0,
+    "healthy_empty_devices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "remote_source_clean": true
+  },
+  "checkpoint": {
+    "file_count": 25,
+    "total_bytes": 27973262840,
+    "small_sha256_files_rechecked": 17,
+    "large_tensor_files_size_only": 8,
+    "restore_or_resume_tested": false,
+    "all_inventory_entries_unchanged": true
+  },
+  "shared_references": [
+    {
+      "host": "125",
+      "case": "r125-a1e6-fsdp8-0-200-v1",
+      "complete_rank_count": 0,
+      "metric_rank_count": 0,
+      "receipt_exit_code": 1
+    },
+    {
+      "host": "129",
+      "case": "r129-a1e6-fsdp8-0-200-v1",
+      "complete_rank_count": 0,
+      "metric_rank_count": 0,
+      "receipt_exit_code": 1
+    }
+  ],
+  "boundaries": [
+    "No independent shared-host reference exists; rank agreement does not prove accuracy.",
+    "Physical HBM maxima are sampled; 5s configuration is not a guaranteed sampling interval.",
+    "Callback timing excludes first20 steps and does not include end-to-end setup/checkpoint/release.",
+    "Checkpoint 17 small-file hashes verified; 8 large tensor payloads were not read/hashed/restored.",
+    "No NPU experiment, container launch, source edit or evidence replacement was performed."
+  ],
+  "additional_inputs_sha256": {
+    "evidence/201-a1e6-fsdp8-200-v1-summary.json": "398154d207cc8a6372fd8747694580ec75fa76e7f60b7fe260516d76f2090249",
+    "evidence/201-a1e6-step200-checkpoint-inventory.json": "58e5976049c37181c3ea217e7f223e146106d8c8e7959c29dad6986b6830ef0c",
+    "evidence/201-cross-host-admission-auditor-independent-review-v2.json": "5e8e4d778a86ae8bf0e75456c9521df51925cb3148d1cfe60f54b38e4fae99a6"
+  },
+  "analysis_script_sha256": "3cfc5bb649f44bf03353c1390c839701734d628dfad998200a2e1478119772d1"
+}
