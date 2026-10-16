@@ -30,11 +30,11 @@
 | Top12 | 非整除普通 Shard 重建返回错误形状或通信不一致 | [#211](https://github.com/hf1s/hyper-parallel/issues/211) | [#214](https://github.com/hf1s/hyper-parallel/pull/214) | 优化器无关的 Gloo 复现；入口一致拒绝不支持布局，457 项 UT/41 项子测试、2/4 进程 ST 通过；Ascend两卡各2项、四卡各1项通过，原提交未改；不代替200步训练验收 |
 | Top13 | CPU 后端返回字符串设备索引，JT 模型构建报 TypeError | [#218](https://github.com/hf1s/hyper-parallel/issues/218) | [#219](https://github.com/hf1s/hyper-parallel/pull/219) | 单提交3文件；真实 CPU 路径修复前5失败，修复后20测试/7子测试通过；不代表125 NPU发现问题已修复 |
 | Top14 | 资源MAX仅覆盖DP+CP，漏报其他TP/PP rank的耗时或显存峰值 | [#225](https://github.com/hf1s/hyper-parallel/issues/225) | [#226](https://github.com/hf1s/hyper-parallel/pull/226) | 单提交2文件；受控回归修复前4项子测试失败、修复后5测试/7子测试通过；旧69步前缀确认耗时及reserved漏报；新完整200步有51步时间漏报；真实8进程CPU/Gloo资源偏差64→0，NPU/PP训练通信仍待回归 |
-| Top15 | FSDP动态派生的重算wrapper被覆盖报告漏计 | [#229](https://github.com/hf1s/hyper-parallel/issues/229) | [#230](https://github.com/hf1s/hyper-parallel/pull/230) | 真实三处区域报告为一处；采用真实基类isinstance，单提交2文件；CPU62测试/4子测试、两种导入顺序和lint通过；仅修报告，Maintainer复核/CI另计 |
+| Top15 | FSDP动态派生的重算wrapper被覆盖报告漏计 | [#229](https://github.com/hf1s/hyper-parallel/issues/229) | [#230](https://github.com/hf1s/hyper-parallel/pull/230) | 真实三处区域报告为一处；采用真实基类isinstance，单提交2个已有文件；只新增1个回归，现有模块59项通过，lint通过；不新增测试文件；仅修报告，Maintainer复核/CI另计 |
 
 目前优先推荐审阅 #194 的训练目标修复和 #198 的源参数释放修复：前者有明确的数学反例，后者有显著且可解释的实测显存收益。#200/#201 是显式可选数值配方，尚无足够证据默认启用。#214 的边界是明确拒绝尚不支持的普通非整除分片，不是实现其收集算法。
 
-已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `81f54d2`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
+已固定的独立提交：#194 `bad2550`、#195 `00ae8a7`、#196 `d1f5213`、#197 `bd18261`、#198 `b948684`、#199 `e9fc94d`（旧提交 `d86b74e` 保留备份）、#200 `630d543`、#201 `59a03c6`、#214 `453618a`、#219 `86930dd`、#224 `a37d6bc`、#226 `b58fed7`、#228 `453fe57`、#230 `85b091b`。各 PR 的完整 SHA、文件范围和定向测试以对应 PR 及回读凭据为准；集成测试含多个修复，不能全部归功于单一 PR。
 
 ## 当前固定环境
 
@@ -212,7 +212,7 @@ JT底层已有checkpoint、exclude及策略接口；当前YAML的off/full/select
 
 ## 其他独立修复及回归边界
 
-#228真实TorchNPU选项及CPU定向测试通过，修复预先开启HF32后Trainer不能关闭的问题；镜像默认HF32关闭，尚未证明是本轮漂移根因。[复现、修复前后与两轴检视](reports/npu-precision-switch/README_ZH.md)。#230按评审建议改用真实基类isinstance识别FSDP动态派生wrapper，已squash为`81f54d2`；当前完整CPU回归62项测试/4项子测试、两种导入顺序与lint通过。旧MRO方案会误计同模块同名的无关类，新回归已覆盖。只修报告，保持草稿，Maintainer复核和当前head的CI另计。[本轮原始证据与失败边界](https://github.com/xingleixu123/hyper-parallel/blob/0137ab4462bc1190d45ce71ce1063a0398903d20/README_ZH.md)。
+#228真实TorchNPU选项及CPU定向测试通过，修复预先开启HF32后Trainer不能关闭的问题；镜像默认HF32关闭，尚未证明是本轮漂移根因。[复现、修复前后与两轴检视](reports/npu-precision-switch/README_ZH.md)。#230按评审建议改用真实基类isinstance识别FSDP动态派生wrapper，已squash为`85b091b`，仅改两个已有文件。移除独立测试文件，在现有模块只新增1个必要回归，同时检查动态/普通wrapper和无关对象；基点该用例失败，修复后59项测试通过（原有58项＋新增1项），lint通过。只修报告，保持草稿，Maintainer复核和当前head的CI另计。[精简版原始证据与复现](https://github.com/xingleixu123/hyper-parallel/blob/c437ca6e050d64f2c9614e759950ad21c00bf40f/README_ZH.md)。
 
 #214保持一个提交，在Ascend完成两卡FP32/BF16及四卡Partial回归，普通非整除Shard的行为为明确拒绝不支持布局。#199功能由上游#186提供，该PR保留独立回归并完成四卡短步ST。各PR的测试范围与剩余限制见顶部排序表及对应中文小问题；短回归和CPU通过不代替200步训练或完整CI。
 
@@ -249,7 +249,15 @@ FP32 Linear输入梯度候选已进入长跑：新FSDP8参考在163步后遇外�
 
 两布局数值helper字节一致，CP2实际记录76,800次FP32输入梯度调用；各自前三步与此前C/D短臂的全部loss和梯度范数差0，初始化和输入核验通过。未修改的严格比较器仍返回FAIL并保留中断参考的完整性问题，未将前缀审计转换为200步验收。额外原生wgrad重放不作生产性能收益。723份原始文件恢复后逐SHA核验，离线分析精确复现，临时恢复目录已删除；这是主代理自审及离线复算，未冒称独立审阅者。[长前缀详细结果、完整原始包及复算方法](reports/f637-dgrad-long-prefix/README_ZH.md)。
 
-下一步检查普通Linear的FP32权重梯度累积，保持原生BF16前向和输入梯度。已有小形状算子误差改善，当前源码的200步对齐尚未验证；不会把未证实的候选作为新产品修复PR。
+普通Linear的FP32权重梯度候选也已完成筛查：保持原生BF16前向/dX，新的FSDP8参考完整200步，CP2在159步后因其他任务出现而让卡。共有1–159步、全部8rank的**主LM loss最大差0.0178985595703125（第98步），第36步首次超0.005**；原配方同窗口最大差0.011061668395996094。已有前缀否决该候选，不补跑拼接缺失窗口，不作为完整200步验收。MTP/aux还原后最大差0.0244148572/0.1048651757保留作观测，当前失败依据仍为主LM loss。
+
+![权重梯度候选共有159步的原始主loss与误差](figures/f637-dense-wgrad-prefix-zh.png)
+
+23个Linear含共享LM head每步均有实际覆盖；FSDP/CP2分别记录38,400/61,056次FP32权重梯度累加，主梯度消费检查通过。两布局数值helper相同，各自首步前向loss相对原配方控制均差0，完整输入/初始化/源码核验通过。CPU5项合约与2项配置解析、28项守卫回归通过。严格比较器保留20条精确预期的中断/窗口不足问题并返回FAIL，完整运行审计仍拒绝该159步输入。371份原始输入恢复、逐SHA核验并精确复算JSON后，29.59MB临时恢复目录及两端传输重复包已清理。[详细报告、无损包、原始值及复算工具](reports/f637-dense-wgrad-prefix/README_ZH.md)。
+
+本候选FSDP完整200步allocated峰值增加2.729855GiB（12.3903%），单步中位时间增加2.6213%；CP2共有前缀allocated为21.930424GiB，单步中位1.653327秒。这些为带有界观测的单次原型成本，CP2还是中断运行，不能声称已获得满足精度目标的性能收益。未把该候选作为生产修复PR。
+
+最新MF官方源`5089da3`与Megatron官方主线`6e7e6ed`已逐文件核对，明确区分局部GEMM输出精度、分布式归约dtype和main_grad累积，不把源码配置当成跨框架实测。按用户建议，后续改用受控参考替换与分段二分：固定输入/状态，先定位前向、反向或优化器边界，再细分层/模块；优先用实际算子VJP核对输出头附近的首步分歧，避免把共享张量hook或重放的重复观测误当根因。优先设备内比较，仅保留必要摘要/切片。[源码对照](reports/f637-dense-wgrad-prefix/dense-wgrad-reference-review-20261016.md)与[二分定位计划](reports/f637-dense-wgrad-prefix/precision-causal-bisection-plan-20261016.md)。
 
 ## 待完成项、资源与数据管理
 

@@ -1,0 +1,157 @@
+{
+  "status": "PASS_EXECUTION_AND_IDENTITY_ONLY",
+  "case": "r129-f637-dense-wgrad-fsdp8-200-v1",
+  "source": {
+    "commit": "18602c4524dc664b81b2bad9a7b624455ce1494f",
+    "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "execution": {
+    "case": "r129-f637-dense-wgrad-fsdp8-200-v1",
+    "container_id": "a16032324e2e5c322ea0dcc54eac681bda137f47166861898fa29982dcefaa0c",
+    "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "exit_code": 0,
+    "reason": null
+  },
+  "verified_file_counts": [
+    95,
+    76
+  ],
+  "runtime_helper_sha256": {
+    "dense_wgrad_experiment.py": "41a7a366f69dbd6f5d314ccfa0cb89b35e86e747d38f79b62f45d5dfd9a02fc8",
+    "dense_wgrad_long_observer.py": "9c7e54fe2a41b46dcf0af1ffb187f78013389e266e88d4d65407a473a4596fd6",
+    "capture_dense_wgrad_200_training.py": "1ed0f6227e678e62ea51442562bc7578ab8aa65484fe6e8c080c98ef7d8a74bd"
+  },
+  "native_identity_control": "r129-f637-fp32-fsdp8-0-200-r4",
+  "first_step_forward_loss_errors": {
+    "training/total_loss": 0.0,
+    "training/foundation_loss/lm": 0.0,
+    "training/foundation_loss/mtp": 0.0,
+    "training/foundation_loss/aux": 0.0
+  },
+  "coverage": [
+    {
+      "rank": 0,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    },
+    {
+      "rank": 1,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    },
+    {
+      "rank": 2,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    },
+    {
+      "rank": 3,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    },
+    {
+      "rank": 4,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    },
+    {
+      "rank": 5,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    },
+    {
+      "rank": 6,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    },
+    {
+      "rank": 7,
+      "steps": 200,
+      "selected_modules": 23,
+      "calls": {
+        "forward": 5200,
+        "fp32_wgrad": 4800
+      },
+      "unscoped_native_forward": {
+        "torch.float32": 400
+      }
+    }
+  ],
+  "modules": {
+    "model.layers.0.self_attn.linear_qkv": "Linear",
+    "model.layers.0.self_attn.q_b_proj": "Linear",
+    "model.layers.0.self_attn.kv_b_proj": "Linear",
+    "model.layers.0.self_attn.o_proj": "Linear",
+    "model.layers.0.mlp.gate_proj": "Linear",
+    "model.layers.0.mlp.up_proj": "Linear",
+    "model.layers.0.mlp.down_proj": "Linear",
+    "model.layers.1.self_attn.linear_qkv": "Linear",
+    "model.layers.1.self_attn.q_b_proj": "Linear",
+    "model.layers.1.self_attn.kv_b_proj": "Linear",
+    "model.layers.1.self_attn.o_proj": "Linear",
+    "model.layers.1.mlp.shared_experts.gate_proj": "Linear",
+    "model.layers.1.mlp.shared_experts.up_proj": "Linear",
+    "model.layers.1.mlp.shared_experts.down_proj": "Linear",
+    "lm_head": "Linear",
+    "mtp.layers.0.eh_proj": "Linear",
+    "mtp.layers.0.transformer_layer.self_attn.linear_qkv": "Linear",
+    "mtp.layers.0.transformer_layer.self_attn.q_b_proj": "Linear",
+    "mtp.layers.0.transformer_layer.self_attn.kv_b_proj": "Linear",
+    "mtp.layers.0.transformer_layer.self_attn.o_proj": "Linear",
+    "mtp.layers.0.transformer_layer.mlp.shared_experts.gate_proj": "Linear",
+    "mtp.layers.0.transformer_layer.mlp.shared_experts.up_proj": "Linear",
+    "mtp.layers.0.transformer_layer.mlp.shared_experts.down_proj": "Linear"
+  },
+  "findings": [],
+  "cross_layout_precision_acceptance": "NOT_EVALUATED",
+  "scope": "Complete run and identity audit only; matching changed-recipe FSDP/CP2 comparison remains required"
+}

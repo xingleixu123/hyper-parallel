@@ -1,0 +1,99 @@
+DrvMngGetConsoleLogLevel failed. (ret=4)
+/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+  warnings.warn("Can't get ascend_hal device count")
+test_checkpointed_output_head (__main__.DenseWgradContracts.test_checkpointed_output_head)
+Use the production projected loss and avoid duplicate accumulation during replay. ... /work/tools/check_dense_wgrad_long_cpu.py:53: UserWarning: mkldnn_matmul failed, switching to BLAS gemm:mkldnn_matmul: mkldnn_matmul bf16 path needs a cpu with bf16 support
+Exception raised from mkldnn_matmul at /pytorch/aten/src/ATen/native/mkldnn/Matmul.cpp:338 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0xc8 (0xffffad6ca988 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, char const*) + 0x6c (0xffffad669018 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #2: at::native::mkldnn_matmul(at::Tensor const&, at::Tensor const&, at::Tensor const&, float, float) + 0x8f0 (0xffffaf39ef70 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: <unknown function> + 0x19cf658 (0xffffaed5f658 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #4: at::native::structured_mm_out_cpu::impl(at::Tensor const&, at::Tensor const&, at::Tensor const&) + 0xb0 (0xffffaed601f0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #5: <unknown function> + 0x28774ac (0xffffafc074ac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #6: at::_ops::mm::redispatch(c10::DispatchKeySet, at::Tensor const&, at::Tensor const&) + 0x104 (0xffffae76e894 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #7: <unknown function> + 0x13fd978 (0xffffae78d978 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #8: <unknown function> + 0x13fe1d0 (0xffffae78e1d0 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #9: at::_ops::mm::call(at::Tensor const&, at::Tensor const&) + 0x174 (0xffffae770624 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #10: <unknown function> + 0x13b36cc (0xffffae7436cc in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #11: at::native::matmul(at::Tensor const&, at::Tensor const&) + 0x48 (0xffffae7441a8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #12: <unknown function> + 0x13eb4ac (0xffffae77b4ac in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #13: at::_ops::matmul::call(at::Tensor const&, at::Tensor const&) + 0x174 (0xffffae7769d4 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #14: at::native::linear(at::Tensor const&, at::Tensor const&, std::optional<at::Tensor> const&) + 0x128 (0xffffae7409e8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #15: <unknown function> + 0x13eb660 (0xffffae77b660 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #16: at::_ops::linear::call(at::Tensor const&, at::Tensor const&, std::optional<at::Tensor> const&) + 0x198 (0xffffae767538 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #17: <unknown function> + 0x5e38a8 (0xffffb80b38a8 in /workspace/venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so)
+<omitting python frames>
+frame #51: <unknown function> + 0x27400 (0xffffba307400 in /lib/aarch64-linux-gnu/libc.so.6)
+frame #52: __libc_start_main + 0x98 (0xffffba3074d8 in /lib/aarch64-linux-gnu/libc.so.6)
+ (Triggered internally at /pytorch/aten/src/ATen/native/LinearAlgebra.cpp:1531.)
+  return functional.linear(inputs, weight)
+ERROR
+test_exception_unscoped_calls_and_patch_ownership (__main__.DenseWgradContracts.test_exception_unscoped_calls_and_patch_ownership)
+Always remove module scopes, preserve native functional calls and reject lost ownership. ... ok
+test_full_row_slice_empty_and_multiple_microbatches (__main__.DenseWgradContracts.test_full_row_slice_empty_and_multiple_microbatches)
+Keep native dX and collect FP32 wgrad across real FSDP handoffs including mixed gradients. ... ok
+test_owner_views_and_unmanaged_weights_fail (__main__.DenseWgradContracts.test_owner_views_and_unmanaged_weights_fail)
+Reject unrelated storage, column slicing and missing managed-gradient ownership. ... ok
+test_unconsumed_buffer_is_rejected (__main__.DenseWgradContracts.test_unconsumed_buffer_is_rejected)
+A successful kernel alone cannot certify delivery to FSDP reduction. ... ok
+
+======================================================================
+ERROR: test_checkpointed_output_head (__main__.DenseWgradContracts.test_checkpointed_output_head)
+Use the production projected loss and avoid duplicate accumulation during replay.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/tools/check_dense_wgrad_long_cpu.py", line 151, in test_checkpointed_output_head
+    native_dx = torch.autograd.grad(native, values)[0]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 530, in grad
+    result = _engine_run_backward(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 882, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1167, in unpack_hook
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+  File "/workspace/venv/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1298, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1134, in _run_fn_with_dynamo_disabled
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1617, in recompute_fn
+    device_autocast_ctx = torch.amp.autocast(
+                          ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch/amp/autocast_mode.py", line 268, in __init__
+    device_supported_dtypes = self.custom_device_mod.get_amp_supported_dtype()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/autocast_utils.py", line 9, in get_amp_supported_dtype
+    if torch.npu.is_bf16_supported():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/utils.py", line 360, in is_bf16_supported
+    torch_npu.npu._lazy_init()
+  File "/workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py", line 273, in _lazy_init
+    torch_npu._C._npu_init()
+RuntimeError: Initialize:../torch_npu/csrc/core/npu/sys_ctrl/npu_sys_ctrl.cpp:165 NPU function error: aclInit, error code is 507899
+[ERROR] 2026-10-16-04:50:30 (PID:44, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+[Error]: An internal error occurs in the Driver module. 
+        Rectify the fault based on the error information in the ascend log.
+[PID: 44] 2026-10-16-04:50:29.524.029 Invalid_Argument(EL0003): The argument is invalid.
+        Solution: Try again with a valid argument.
+TraceBack (most recent call last):
+        Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:driver.cc][LINE:72]
+        rtGetDeviceCount execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+        Call driver api drvGetDevNum failed, drvRetCode=7.[FUNC:GetDeviceCount][FILE:npu_driver.cc][LINE:133]
+        Get device cnt failed, retCode=0x7020010[FUNC:CheckDeviceIdIsValid][FILE:api_error.cc][LINE:5899]
+        drv devId is invalid, drv devId=0, retCode=0x7020010[FUNC:SetDefaultDeviceId][FILE:api_error.cc][LINE:6668]
+        rtSetDefaultDeviceId execution failed, reason=driver error:internal error[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:69]
+        [Process][DefaultDevice]process HandleDefaultDevice failed[FUNC:ReportInnerError][FILE:log_inner.cpp][LINE:133]
+        chipType=0 does not support get device msg feature.[FUNC:GetDevMsg][FILE:api_impl_standard_soc.cc][LINE:611]
+        The argument is invalid. Reason: rtGetDevMsg execution failed, the feature is not supported.
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.700s
+
+FAILED (errors=1)
