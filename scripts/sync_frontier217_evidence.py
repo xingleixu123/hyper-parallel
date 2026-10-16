@@ -15,15 +15,19 @@
 
 """Fetch only bounded scalar/hash evidence; never transfer model, gradient or dataset values."""
 import io
+import sys
 from pathlib import Path
 import subprocess
 import tarfile
 
 ROOT = Path(__file__).resolve().parent
-RUNS = ['hp-jtf637-weighted-dvm-preclip217', 'mf-preclip217', 'hp-jtf637-weighted-dvm-forward217', 'mf-forward217', 'hp-jtf637-weighted-dvm-attention217', 'mf-attention217', 'hp-jtf637-packed217-absolute-positions226', 'hp-jtf637-packed217-global-mtp226', 'hp-jtf637-packed217-both226', 'hp-jtf637-packed217-absolute-positions400', 'hp-jtf637-packed217-global-mtp400', 'hp-jtf637-packed217-both400', 'hp-jtf637-packed217-both-hash226', 'hp-jtf637-packed217-preclip219', 'mf-preclip219', 'hp-jtf637-packed217-state219', 'mf-frontier219-state', 'frontier219-hp-muon-replay', 'frontier219-mf-muon-replay', 'frontier219-expert-denominator-replay', 'frontier219-dense-npusqrt-replay', 'mf-frontier219-ns-train', 'hp-jtf637-norm219-dense226', 'hp-jtf637-norm219-expert226', 'hp-jtf637-norm219-both226', 'hp-jtf637-norm219-dense400', 'hp-jtf637-norm219-expert400', 'hp-jtf637-norm219-both400', 'hp-jtf637-norm219-state222', 'mf-frontier222-state', 'frontier222-q-control-replay', 'frontier222-q-npu-replay', 'hp-jtf637-qsqrt222-both226', 'hp-jtf637-qsqrt222-expert226', 'hp-jtf637-qsqrt222-both400', 'hp-jtf637-qsqrt222-expert400', 'hp-jtf637-qsqrt222-preclip226', 'mf-preclip226', 'hp-jtf637-qsqrt222-forward226', 'mf-forward226', 'hp-jtf637-qsqrt222-backward226', 'mf-backward226', 'hp-jtf637-qsqrt222-head226', 'mf-head226', 'hp-jtf637-qsqrt222-head226-r2', 'hp-jtf637-qsqrt222-head226-r3', 'head226-gradient-cause-replay', 'hp-jtf637-qsqrt222-ce226', 'mf-ce226', 'mf-ce226-kernel', 'ce226-reduction-replay', 'ce226-reduction-replay-r2', 'ce226-reduction-replay-r3', 'ce226-row-positions', 'ce226-tail-holdout', 'hp-jtf637-ce-tail226', 'hp-jtf637-ce-tail400']
+RUNS = ['hp-jtf637-weighted-dvm-preclip217', 'mf-preclip217', 'hp-jtf637-weighted-dvm-forward217', 'mf-forward217', 'hp-jtf637-weighted-dvm-attention217', 'mf-attention217', 'hp-jtf637-packed217-absolute-positions226', 'hp-jtf637-packed217-global-mtp226', 'hp-jtf637-packed217-both226', 'hp-jtf637-packed217-absolute-positions400', 'hp-jtf637-packed217-global-mtp400', 'hp-jtf637-packed217-both400', 'hp-jtf637-packed217-both-hash226', 'hp-jtf637-packed217-preclip219', 'mf-preclip219', 'hp-jtf637-packed217-state219', 'mf-frontier219-state', 'frontier219-hp-muon-replay', 'frontier219-mf-muon-replay', 'frontier219-expert-denominator-replay', 'frontier219-dense-npusqrt-replay', 'mf-frontier219-ns-train', 'hp-jtf637-norm219-dense226', 'hp-jtf637-norm219-expert226', 'hp-jtf637-norm219-both226', 'hp-jtf637-norm219-dense400', 'hp-jtf637-norm219-expert400', 'hp-jtf637-norm219-both400', 'hp-jtf637-norm219-state222', 'mf-frontier222-state', 'frontier222-q-control-replay', 'frontier222-q-npu-replay', 'hp-jtf637-qsqrt222-both226', 'hp-jtf637-qsqrt222-expert226', 'hp-jtf637-qsqrt222-both400', 'hp-jtf637-qsqrt222-expert400', 'hp-jtf637-qsqrt222-preclip226', 'mf-preclip226', 'hp-jtf637-qsqrt222-forward226', 'mf-forward226', 'hp-jtf637-qsqrt222-backward226', 'mf-backward226', 'hp-jtf637-qsqrt222-head226', 'mf-head226', 'hp-jtf637-qsqrt222-head226-r2', 'hp-jtf637-qsqrt222-head226-r3', 'head226-gradient-cause-replay', 'hp-jtf637-qsqrt222-ce226', 'mf-ce226', 'mf-ce226-kernel', 'ce226-reduction-replay', 'ce226-reduction-replay-r2', 'ce226-reduction-replay-r3', 'ce226-row-positions', 'ce226-tail-holdout', 'hp-jtf637-ce-tail226', 'hp-jtf637-ce-tail400', 'hp-jtf637-ce-tail230', 'mf-modelhash230', 'hp-jtf637-ce-tail-state229', 'mf-frontier229-state', 'frontier229-hp-muon-replay', 'frontier229-mf-muon-replay', 'frontier229-mf-muon-fp32norm-replay', 'frontier229-mf-muon-fp32norm-cast-replay', 'frontier229-norm-expression-screen', 'frontier229-norm-epsilon-screen', 'frontier229-hp-epsilon-replay', 'hp-jtf637-epsilon230', 'hp-jtf637-epsilon400', 'frontier229-mf-builtin-stat-dump', 'frontier229-mf-builtin-tensor-dump', 'hp-jtf637-epsilon235', 'mf-modelhash235', 'frontier235-mf-stat-hash-probe']
 
 
 def main():
+    recent = sys.argv[1:] == ['--recent']
+    runs = RUNS[RUNS.index('hp-jtf637-ce-tail226'):] if recent else RUNS
+    prefixes = ['ce226-', 'frontier229-', 'frontier235-'] if recent else ['preclip217-', 'forward217-', 'attention217-', 'packed217-', 'preclip219-', 'frontier219-', 'norm219-', 'frontier222-', 'qsqrt222-', 'preclip226-', 'frontier226-', 'forward226-', 'backward226-', 'head226-', 'ce226-', 'frontier229-', 'frontier235-']
     remote = r"""from pathlib import Path
 import sys, tarfile
 root = Path('/home/xxl/jt-adamw-align-20261013/phase12')
@@ -34,14 +38,16 @@ for run in runs:
     paths += [root / 'runs' / (run + suffix) for suffix in ['.exit', '.log', '.dispatch.log']]
     paths += [p for p in (root / 'runs' / run).glob('*') if p.suffix in ('.json', '.jsonl')]
     paths += [root / 'evidence' / (run + '-launch.json')]
-for prefix in ['preclip217-', 'forward217-', 'attention217-', 'packed217-', 'preclip219-', 'frontier219-', 'norm219-', 'frontier222-', 'qsqrt222-', 'preclip226-', 'frontier226-', 'forward226-', 'backward226-', 'head226-', 'ce226-']:
+for prefix in __PREFIXES__:
     paths += list((root / 'evidence').glob(prefix + '*.json'))
     paths += list((root / 'evidence').glob(prefix + '*.log'))
+    for suffix in ['.txt', '.ir', '.csv']:
+        paths += list((root / 'evidence').glob(prefix + '*' + suffix))
 with tarfile.open(fileobj=sys.stdout.buffer, mode='w|gz') as archive:
     for path in sorted(set(paths)):
         if path.is_file() and not path.is_symlink() and path.stat().st_size < 20_000_000:
             archive.add(path, arcname=str(path.relative_to(root)), recursive=False)
-""".replace('__RUNS__', repr(RUNS))
+""".replace('__RUNS__', repr(runs)).replace('__PREFIXES__', repr(prefixes))
     result = subprocess.run(['ssh', '-o', 'BatchMode=yes', '125-root', 'python3', '-'],
                             input=remote.encode(), capture_output=True, timeout=45, check=True)
     count = 0

@@ -1,0 +1,106 @@
+{
+  "complete": true,
+  "diagnostic_only": true,
+  "checks": [
+    {
+      "label": "mtp_q_up",
+      "weight_exact_training": true,
+      "momentum_exact_training": true,
+      "weight_sha256": "91e06b9904b3311ac3766e373c07dd1af8949772ee16d7f9f64ea45d0898d676",
+      "expected_weight_sha256": "91e06b9904b3311ac3766e373c07dd1af8949772ee16d7f9f64ea45d0898d676",
+      "momentum_sha256": "b61436e25662814a5c89add5863dd4d10fa644045537687278f3ae9f5584f948",
+      "optimizer_step": 229
+    }
+  ],
+  "records": [
+    {
+      "label": "mtp_q_up",
+      "piece": 0,
+      "explicit_normalization_exact": true,
+      "scalar": {
+        "norm": [
+          0.002708831802010536
+        ],
+        "denominator": [
+          0.0027089316863566637
+        ]
+      },
+      "norm_fp64": 0.0027088318374805017,
+      "arrays": [
+        {
+          "name": "pre_norm",
+          "shape": [
+            1536,
+            16384
+          ],
+          "sha256": "0a81ee1b2eac0d359409b22aeba6f55c0de35343b536e55171ab06b45485e867"
+        },
+        {
+          "name": "normalized",
+          "shape": [
+            1536,
+            16384
+          ],
+          "sha256": "b12ac18ab778f0a556ffc3d41018bd54828d780814dde1e991f012ad57ae382b"
+        },
+        {
+          "name": "ns_output",
+          "shape": [
+            16384,
+            1536
+          ],
+          "sha256": "802c79a940359a21c8e9f68fedcd266225bfa741dc198afcd837a3d4d5f32e3a"
+        }
+      ]
+    },
+    {
+      "label": "mtp_q_up",
+      "piece": 1,
+      "explicit_normalization_exact": true,
+      "scalar": {
+        "norm": [
+          0.006672628689557314
+        ],
+        "denominator": [
+          0.006672728806734085
+        ]
+      },
+      "norm_fp64": 0.006672628674773954,
+      "arrays": [
+        {
+          "name": "pre_norm",
+          "shape": [
+            1536,
+            8192
+          ],
+          "sha256": "d89f1de1b5fb0f3bf05073730fadf604ae73f8f21875a2ca7ae418ae18ec4b3d"
+        },
+        {
+          "name": "normalized",
+          "shape": [
+            1536,
+            8192
+          ],
+          "sha256": "000fe533c2bc39de79c796a57fd8b82a6d3e8bb91920034e3fcb4410684e6fb5"
+        },
+        {
+          "name": "ns_output",
+          "shape": [
+            8192,
+            1536
+          ],
+          "sha256": "2234fd112e17e8557e8fd32f1845ad7085425714aa316c001dda5dafcb09ffa3"
+        }
+      ]
+    }
+  ],
+  "broadcast_policy": {
+    "scope": "single-card diagnostic only",
+    "teacher_values_used": false,
+    "original_source_sha256": "6f90302bb3ac87efe7c0e1a3b0dca8b49e08b99a83b0a9ec2bd0324baa442dfa",
+    "candidate_source_sha256": "2738381f4954119ee87703eeadc349376afa1c996b15c19016520ff88eafcbca",
+    "change": "Only alignment element size and pack buffer dtype BF16 -> FP32; arithmetic and inputs unchanged"
+  },
+  "source_sha256": "886040dcdcfab1604e2eb0deb11cf7d0e00ca4601db340cf4b133b8caca09607",
+  "warning": "Only full weight and momentum fidelity establishes a replay of actual training."
+}
