@@ -1,0 +1,57 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ TestModelIntegrationContracts.test_activation_checkpoint_inventory_handles_fsdp_wrapper _
+
+self = <test_model_integration.TestModelIntegrationContracts testMethod=test_activation_checkpoint_inventory_handles_fsdp_wrapper>
+
+    def test_activation_checkpoint_inventory_handles_fsdp_wrapper(self) -> None:
+        """Count real wrappers after FSDP composition and reject a same-named class."""
+        unrelated = type(
+            "CheckpointWrapper", (nn.Module,),
+            {"__module__": "hyper_parallel.core.activation_memory.wrapper"},
+        )()
+        model = nn.ModuleList([
+            checkpoint_wrapper(nn.Linear(3, 3)),
+            checkpoint_wrapper(nn.Linear(3, 3)),
+            nn.Linear(3, 3),
+            unrelated,
+        ])
+        with mock.patch.dict(fully_shard_api.origin_class_to_extend_class, clear=True):
+            fully_shard_api._extend_module_with_hsdp_interface(model[0])
+            actual = collect_activation_checkpoint_wrappers(model)
+>       self.assertEqual(actual, {
+            "count": 2,
+            "wrappers": [
+                {"fqn": "0", "wrapped_type": "torch.nn.modules.linear.Linear"},
+                {"fqn": "1", "wrapped_type": "torch.nn.modules.linear.Linear"},
+            ],
+        })
+E       AssertionError: {'cou[25 chars]n': '1', 'wrapped_type': 'torch.nn.modules.lin[45 chars]ne}]} != {'cou[25 chars]n': '0', 'wrapped_type': 'torch.nn.modules.lin[73 chars]r'}]}
+E         {'count': 2,
+E       -  'wrappers': [{'fqn': '1', 'wrapped_type': 'torch.nn.modules.linear.Linear'},
+E       ?                        ^
+E       
+E       +  'wrappers': [{'fqn': '0', 'wrapped_type': 'torch.nn.modules.linear.Linear'},
+E       ?                        ^
+E       
+E       -               {'fqn': '3', 'wrapped_type': None}]}
+E       ?                        ^                   ^
+E       
+E       +               {'fqn': '1', 'wrapped_type': 'torch.nn.modules.linear.Linear'}]}
+E       ?                        ^                   ^^ +++++++++++++++++  ++++++++++
+
+tests/ut/model_integration/test_model_integration.py:234: AssertionError
+=============================== warnings summary ===============================
+../../workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+../../workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402
+  /workspace/venv/lib/python3.12/site-packages/torch_npu/npu/__init__.py:402: UserWarning: Can't get ascend_hal device count
+    warnings.warn("Can't get ascend_hal device count")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/ut/model_integration/test_model_integration.py::TestModelIntegrationContracts::test_activation_checkpoint_inventory_handles_fsdp_wrapper
+1 failed, 58 deselected, 16 warnings in 30.39s

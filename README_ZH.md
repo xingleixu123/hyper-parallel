@@ -1,32 +1,27 @@
-# PR #230：采用真实基类识别重算 wrapper 的回归记录
+# PR #230：精简后的必要回归
 
-当前产品提交：`81f54d2670e7fdca2755ceadd0077cd32af31f11`；基点：`f637ef7ee4d4b416800716f1ebaaae7709b8a06a`。关联 [PR #230](https://github.com/hf1s/hyper-parallel/pull/230)、[issue #229](https://github.com/hf1s/hyper-parallel/issues/229)，总问题为 #202。
+当前产品提交：`85b091b9100141ebc161a68a5c4bed5932d44509`，基点：`f637ef7ee4d4b416800716f1ebaaae7709b8a06a`。PR 保持一个提交，只修改 validator 和已有 `tests/ut/model_integration/test_model_integration.py` 两个文件；不新增测试文件。
 
-## 结论
+生产修复按评审建议使用真实 `CheckpointWrapper` 的 `isinstance`。只新增一个回归用例：在同一模型中放置经真实 FSDP 类扩展的 wrapper、普通 wrapper、普通层，以及同模块同名但无继承关系的对象；断言完整结果中的数量、FQN 和直接包裹类型。没有新增根节点变体或导入行为测试。
 
-模块顶部导入真实 `CheckpointWrapper`，通过 `isinstance` 覆盖 FSDP 动态派生类。无需比较 MRO 字符串或增加运行时导入。返回结构、FQN、直接包裹类型及原遍历行为保持。
+| 验证 | 结果 |
+|---|---|
+| 基点生产函数 + 当前唯一新增用例 | `1 failed, 58 deselected`，exit 1 |
+| 修复后完整已有测试模块 | `59 passed`，exit 0：原有 58 个 + 新增 1 个 |
+| 两个修改文件按项目 `.pylintrc` 执行 pylint | 退出 0，诊断 `[]` |
+| `git diff --check` | 通过 |
 
-同一最终回归对基点、上一版 MRO 实现、新实现进行对照。基点定向结果为 `4 failed, 3 passed, 1 subtests passed`，MRO 方案为 `1 failed, 4 passed, 3 subtests passed`，其唯一失败是同模块同名但无继承关系的伪装对象被误计。新实现完整 `tests/ut/model_integration` 为 **62 passed, 4 subtests passed**，退出0；两种初始导入顺序均通过，真实动态类为 `HSDPCheckpointWrapper`；仓库根目录按 `.pylintrc` 运行 pylint，退出0、诊断 `[]`。
+基点的计数碰巧也是 2，但漏掉动态 wrapper、误计无关对象，完整结果断言会失败。当前测试同时约束这两类错误，避免仅检查数量掩盖缺陷。
 
-生产及测试两个文件的实际 editable 路径和 SHA 均核对；提交前后的 Git tree 一致，PR 相对基点只有一个提交。单提交仅包含生产识别和 CPU 回归两个文件。当前证据没有 NPU collective、训练 loss、显存或吞吐的新验收结论。
+CPU 红绿验证在 125 的固定镜像 `sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d` 中执行：Python 3.12.14、Torch 2.12.0+cpu、pytest 9.1.1，4 CPU、8 GiB、network none、无 NPU 设备映射。源码以 editable 方式安装，导入路径和两文件 SHA 已核对。容器最终退出 0。lint 在本机 Python 3.14.2 / pylint 3.3.7 / astroid 3.3.11、项目根目录使用原 `.pylintrc` 执行。
 
-## 环境与复现
-
-125 上相同固定镜像 `sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d`，Python3.12.14、Torch2.12.0+cpu、pytest9.1.1、pylint3.3.7。独立容器无设备映射、network none、4CPU/8GiB；所有包使用本任务专用离线 wheel 目录。导入时确认进程组和 CUDA 均未初始化。镜像仍安装 TorchNPU，其无可见设备告警保留于原始日志。
-
-从产品提交 editable 安装后运行：
+原始输出见 `red.log`、`green.log`、`pylint.json`；`manifest.json` 和 `commit.json` 绑定最终源码 SHA 与提交。`run.sh` 是实际离线执行记录，引用实验挂载目录。常规复现需在可导入本 checkout 的 CPU 环境从项目根目录执行：
 
 ```bash
-python -m pytest -p no:cacheprovider -q tests/ut/model_integration
-python -m pylint --output-format=json hyper_parallel/tools/model_integration/integration_validator.py tests/ut/model_integration/test_integration_validator.py
+python -m pytest -p no:cacheprovider -q tests/ut/model_integration/test_model_integration.py
+python -m pylint --output-format=json hyper_parallel/tools/model_integration/integration_validator.py tests/ut/model_integration/test_model_integration.py
 ```
 
-两个命令都从仓库根目录执行。完整分阶段步骤见 [run-tests-v3.sh](run-tests-v3.sh)；[输入哈希](input-manifest-v3.json)、[环境](environment-v3.json)、[基点红测](base-ut-v3.log)、[MRO红测](mro-ut-v3.log)、[完整绿测](candidate-ut-v3.log)、[导入顺序](import-smoke.json)、[最终lint](pylint-final.json)、[提交验证](commit-verification.json)。
+早前 62 个测试 / 4 个子测试的版本及导入顺序验证保留在[上一轮不可变快照](https://github.com/xingleixu123/hyper-parallel/blob/0137ab4462bc1190d45ce71ce1063a0398903d20/README_ZH.md)，不是当前精简版测试数量。初次 editable 安装缺少显式 PEP517 选项，在测试前失败；修正安装命令后复用了同一隔离容器，未跳过测试或屏蔽 lint 规则。
 
-## 失败及边界记录
-
-首轮挂载的共享离线 wheel 目录为空，安装 pytest 时退出1，未执行用例；改为本任务独立保存的依赖。随后附加的“同一个真实 wrapper 必须返回两个别名”断言失败：底层 `ActivationWrapper.named_modules` 已按 memo 处理共享 wrapper，collector 不应改变这个既有遍历行为。这项额外断言超出本修复边界，已收回；失败日志和测试源码保留，不将该轮算作通过。
-
-最终回归通过后，从仓库外执行的首轮 pylint 未加载项目配置，产生既有复杂度、行宽、受保护访问诊断。回到仓库根目录按原 `.pylintrc` 运行后为 `[]`，生产代码及最终测试源码未再改变；没有为此增加屏蔽项、跳过测试或放宽规则。
-
-旧版 CPU62/2子测试及八卡构建漏计的历史证据仍在原固定快照。本次62/4子测试、导入检查和lint分别以此目录为准，历史独立评审不自动视为当前提交评审。PR 保留草稿，issue 保持开放，等待 Maintainer 与当前 head 的 CI。
+本变更仅修复重算覆盖报告识别，不改变训练计算；这些 CPU 结果不构成 NPU 训练、200 步精度、性能或显存收益结论，也不代表 GitHub CI 已通过。
