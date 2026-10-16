@@ -1,0 +1,74 @@
+
+[dvm kernel] GraphKernel_Sub_Exp_ReduceSum_split Default/GraphKernel_Sub_Exp_ReduceSum_split-op0
+vgraph(tile_num=90112) {
+  %0[1,1]<float32> = Load() // stride=[1,64]
+  %1[6912,1]<float32> = Load() // stride=[6912,6912]
+  %2[6912,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[6912,6912]
+  %3[6912,1]<float32> = Sub(%1[6912,1]<float32>, %2[6912,1]<float32>) // stride=[6912,6912]
+  %4[6912,1]<float32> = Store(%3[6912,1]<float32>) // stride=[6912,6912]
+  %5[6912,1]<float32> = Exp(%3[6912,1]<float32>) // stride=[6912,6912]
+  %6[6912,1]<float32> = Store(%5[6912,1]<float32>) // stride=[6912,6912]
+  %7[1,1]<float32> = Reduce<[1], true>(%5[6912,1]<float32>) // stride=[1,64]
+  %8[1,1]<float32> = Store(%7[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:22}) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(252), iter_tail(4), rounds(22)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.27648x1 0x6e00, 0 //tile_stride(27648), pad_size(0), iter_tail(27648)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: BroadcastX.b32.[6912]x1x1 0x21e00, 0x200 //lead_pad(63)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: Sub.fp32.6912 0xda00, 0x6e00, 0x21e00
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 2), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  4: store.u8.27648x1 0, 0xda00 //tile_stride(27648), iter_tail(27648), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 2) }
+  5: Exp.fp32.6912 0x14600, 0xda00
+      {simd, bar(1), store_simd_sync(wait, 1), simd_store_sync(set, 1) }
+  6: store.u8.27648x1 0, 0x14600 //tile_stride(27648), iter_tail(27648), pad_size(0)
+      {store, simd_store_sync(wait, 1), store_simd_sync(set, 1) }
+  7: SumX.fp32.[6912]x1 0x21e00, 0x14600 //red_tail(6912), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1), store_simd_sync(wait, 0) }
+  8: SumJoin.fp32.1x1 0x1b200, 0x21e00 //xs(0x28a00), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 2) }
+  9: store_cond.u8.4 0, 0x1b200 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(22)
+      {store, simd_store_sync(wait, 2), store_simd_sync(set, 0) }
+}
+
+
+[dvm kernel] GraphKernel_Sub_Exp_ReduceSum_split Default/GraphKernel_Sub_Exp_ReduceSum_split-op1
+vgraph(tile_num=90112) {
+  %0[1,1]<float32> = Load() // stride=[1,64]
+  %1[6912,1]<float32> = Load() // stride=[6912,6912]
+  %2[6912,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[6912,6912]
+  %3[6912,1]<float32> = Sub(%1[6912,1]<float32>, %2[6912,1]<float32>) // stride=[6912,6912]
+  %4[6912,1]<float32> = Store(%3[6912,1]<float32>) // stride=[6912,6912]
+  %5[6912,1]<float32> = Exp(%3[6912,1]<float32>) // stride=[6912,6912]
+  %6[6912,1]<float32> = Store(%5[6912,1]<float32>) // stride=[6912,6912]
+  %7[1,1]<float32> = Reduce<[1], true>(%5[6912,1]<float32>) // stride=[1,64]
+  %8[1,1]<float32> = Store(%7[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:22}) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(252), iter_tail(4), rounds(22)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.27648x1 0x6e00, 0 //tile_stride(27648), pad_size(0), iter_tail(27648)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: BroadcastX.b32.[6912]x1x1 0x21e00, 0x200 //lead_pad(63)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: Sub.fp32.6912 0xda00, 0x6e00, 0x21e00
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 2), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  4: store.u8.27648x1 0, 0xda00 //tile_stride(27648), iter_tail(27648), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 2) }
+  5: Exp.fp32.6912 0x14600, 0xda00
+      {simd, bar(1), store_simd_sync(wait, 1), simd_store_sync(set, 1) }
+  6: store.u8.27648x1 0, 0x14600 //tile_stride(27648), iter_tail(27648), pad_size(0)
+      {store, simd_store_sync(wait, 1), store_simd_sync(set, 1) }
+  7: SumX.fp32.[6912]x1 0x21e00, 0x14600 //red_tail(6912), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1), store_simd_sync(wait, 0) }
+  8: SumJoin.fp32.1x1 0x1b200, 0x21e00 //xs(0x28a00), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 2) }
+  9: store_cond.u8.4 0, 0x1b200 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(22)
+      {store, simd_store_sync(wait, 2), store_simd_sync(set, 0) }
+}
+

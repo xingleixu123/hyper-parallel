@@ -1,0 +1,1120 @@
+[func graph] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+# IR entry: @_anonymous__9
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)> : [4096, 152064]  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 6
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+subgraph instance: _anonymous__9 : 0xaaaae9b2fe80
+
+subgraph @_anonymous__9() {
+  %0(CNode_10) = PrimFunc_ReduceSum(%para1_Parameter_11, Tensor(shape=[1], dtype=Int64, value=[1])) primitive_attrs: {keep_dims: Bool(1), skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default/expand_SumExt)
+  Return(%0) cnode_attrs: {expand_from: "SumExt"}
+      : (<Tensor[Float32], (4096, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+vgraph(tile_num=65536) {
+  %0[9504,1]<float32> = Load() // stride=[9536,9536]
+  %1[1,1]<float32> = Reduce<[1], true>(%0[9504,1]<float32>) // stride=[1,64]
+  %2[1,1]<float32> = Store(%1[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:16}) {
+  0: load.u8.38016x1 0x200, 0 //tile_stride(38016), pad_size(128), iter_tail(38016)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: ClrPad.fp32.9504x1 0x200 //iter_stride(9536), simd_width(64), iter_tail(0)
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0) }
+  2: SumX.fp32.[9536]x1 0x12c00, 0x200 //red_tail(9536), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1) }
+  3: SumJoin.fp32.1x1 0x9700, 0x12c00 //xs(0x1c100), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  4: store_cond.u8.4 0, 0x9700 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(16)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+# IR entry: @_anonymous__16
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096, 22, 6912)> : [4096, 22, 6912]  :  <Float32xDefaultFormat[const vector]{4096, 22, 6912}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 6
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+subgraph instance: _anonymous__16 : 0xaaaae9c5c4d0
+
+subgraph @_anonymous__16() {
+  %0(CNode_17) = PrimFunc_ReduceSum(%para1_Parameter_18, Tensor(shape=[1], dtype=Int64, value=[2])) primitive_attrs: {keep_dims: Bool(1), skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 22, 6912)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 22, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 22, 6912}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 22, 1}>)
+      # Scope: (Default/expand_SumExt)
+  Return(%0) primitive_attrs: {visited: Bool(1)} cnode_attrs: {expand_from: "SumExt"}
+      : (<Tensor[Float32], (4096, 22, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+vgraph(tile_num=90112) {
+  %0[6912,1,1]<float32> = Load() // stride=[6912,6912,6912]
+  %1[1,1,1]<float32> = Reduce<[2], true>(%0[6912,1,1]<float32>) // stride=[1,1,64]
+  %2[1,1,1]<float32> = Store(%1[1,1,1]<float32>) // stride=[1,1,64]
+}
+// target=0, block_dim=40, ffts_addr=0
+vmain.aiv(tile_num=2253x40-8) {
+  0: load.u8.27648x1 0x200, 0 //tile_stride(27648), pad_size(0), iter_tail(27648)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: SumX.fp32.[6912]x1 0x6e00, 0x200 //red_tail(6912), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  2: store.u8.4x1 0, 0x6e00 //tile_stride(4), iter_tail(4), pad_size(252)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_SubExt_Exp_SumExt_fusion Default/GraphKernel_SubExt_Exp_SumExt_fusion-op1
+# IR entry: @_anonymous__35
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SubExt_Exp_SumExt_fusion
+
+# Total params: 2
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)>  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 11
+Total number of cnodes: 4
+
+subgraph attr:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SubExt_Exp_SumExt_fusion
+subgraph instance: _anonymous__35 : 0xaaaad8036700
+
+subgraph @_anonymous__35() {
+  %0(CNode_30) = PrimFunc_Sub(%para1_Parameter_31, %para2_Parameter_32) primitive_attrs: {output_names: null, input_names: null} cnode_attrs: {expand_from: "SubExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %1(CNode_33) = PrimFunc_Exp(%0) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %2(CNode_34) = PrimFunc_ReduceSum(%1, Tensor(shape=[1], dtype=Int64, value=[1])) primitive_attrs: {output_names: null, keep_dims: Bool(1), input_names: null, skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default)
+  Return(%2) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (4096, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_SubExt_Exp_SumExt_fusion Default/GraphKernel_SubExt_Exp_SumExt_fusion-op1
+vgraph(tile_num=65536) {
+  %0[1,1]<float32> = Load() // stride=[1,64]
+  %1[9504,1]<float32> = Load() // stride=[9536,9536]
+  %2[9504,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[9536,9536]
+  %3[9504,1]<float32> = Sub(%1[9504,1]<float32>, %2[9504,1]<float32>) // stride=[9536,9536]
+  %4[9504,1]<float32> = Exp(%3[9504,1]<float32>) // stride=[9536,9536]
+  %5[1,1]<float32> = Reduce<[1], true>(%4[9504,1]<float32>) // stride=[1,64]
+  %6[1,1]<float32> = Store(%5[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:16}) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(252), iter_tail(4), rounds(16)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.38016x1 0x9700, 0 //tile_stride(38016), pad_size(128), iter_tail(38016)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: BroadcastX.b32.[9536]x1x1 0x1c100, 0x200 //lead_pad(63)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: Sub.fp32.9536 0x1c100, 0x9700, 0x1c100
+      {simd, bar(1), load_simd_sync(wait, 1), simd_load_sync(set, 0) }
+  4: Exp.fp32.9536 0x1c100, 0x1c100
+      {simd, bar(1) }
+  5: ClrPad.fp32.9504x1 0x1c100 //iter_stride(9536), simd_width(64), iter_tail(0)
+      {simd, bar(1), store_simd_sync(wait, 0) }
+  6: SumX.fp32.[9536]x1 0x1c100, 0x1c100 //red_tail(9536), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1) }
+  7: SumJoin.fp32.1x1 0x12c00, 0x1c100 //xs(0x25600), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 0) }
+  8: store_cond.u8.4 0, 0x12c00 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(16)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Sub_Exp_ReduceSum_split Default/GraphKernel_Sub_Exp_ReduceSum_split-op0
+# IR entry: @seg_trans__anonymous__65
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_0
+graph_kernel: Sub_Exp_ReduceSum_split
+
+# Total params: 2
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)>  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 13
+Total number of cnodes: 5
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_0
+graph_kernel: Sub_Exp_ReduceSum_split
+subgraph instance: seg_trans__anonymous__65 : 0xaaaae9c78ba0
+
+subgraph @seg_trans__anonymous__65() {
+  %0(seg_trans_CNode_70) = PrimFunc_Sub(%para1_Parameter_71, %para2_Parameter_72) primitive_attrs: {output_names: null, input_names: null} cnode_attrs: {expand_from: "SubExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %1(seg_trans_CNode_73) = PrimFunc_Exp(%0) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %2(seg_trans_CNode_74) = PrimFunc_ReduceSum(%1, Tensor(shape=[1], dtype=Int64, value=[1])) primitive_attrs: {output_names: null, keep_dims: Bool(1), input_names: null, skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default)
+  %3(CNode_75) = MakeTuple(%0, %2)
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 1))>)
+      # Scope: (Default)
+  Return(%3) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 1))>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Sub_Exp_ReduceSum_split Default/GraphKernel_Sub_Exp_ReduceSum_split-op0
+vgraph(tile_num=90112) {
+  %0[1,1]<float32> = Load() // stride=[1,64]
+  %1[6912,1]<float32> = Load() // stride=[6912,6912]
+  %2[6912,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[6912,6912]
+  %3[6912,1]<float32> = Sub(%1[6912,1]<float32>, %2[6912,1]<float32>) // stride=[6912,6912]
+  %4[6912,1]<float32> = Store(%3[6912,1]<float32>) // stride=[6912,6912]
+  %5[6912,1]<float32> = Exp(%3[6912,1]<float32>) // stride=[6912,6912]
+  %6[1,1]<float32> = Reduce<[1], true>(%5[6912,1]<float32>) // stride=[1,64]
+  %7[1,1]<float32> = Store(%6[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:22}) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(252), iter_tail(4), rounds(22)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.27648x1 0x6e00, 0 //tile_stride(27648), pad_size(0), iter_tail(27648)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: BroadcastX.b32.[6912]x1x1 0x1b200, 0x200 //lead_pad(63)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: Sub.fp32.6912 0xda00, 0x6e00, 0x1b200
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 1), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  4: store.u8.27648x1 0, 0xda00 //tile_stride(27648), iter_tail(27648), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 1) }
+  5: Exp.fp32.6912 0x21e00, 0xda00
+      {simd, bar(1) }
+  6: SumX.fp32.[6912]x1 0x21e00, 0x21e00 //red_tail(6912), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1), store_simd_sync(wait, 0) }
+  7: SumJoin.fp32.1x1 0x14600, 0x21e00 //xs(0x1b200), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 1) }
+  8: store_cond.u8.4 0, 0x14600 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(22)
+      {store, simd_store_sync(wait, 1), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Log_split Default/GraphKernel_Log_split-op0
+# IR entry: @seg_trans__anonymous__66
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_1
+graph_kernel: Log_split
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 5
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_1
+graph_kernel: Log_split
+subgraph instance: seg_trans__anonymous__66 : 0xaaaae9d56c60
+
+subgraph @seg_trans__anonymous__66() {
+  %0(seg_trans_CNode_76) = PrimFunc_Log(%para1_Parameter_77) primitive_attrs: {IsFeatureMapInputList: (0), shift: F32(0), scale: F32(1), cust_aicpu: "Log", input_names: null, base: F32(-1), output_names: null, IsFeatureMapOutput: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default)
+  Return(%0) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (4096, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Log_split Default/GraphKernel_Log_split-op0
+vgraph(tile_num=1) {
+  %0[4096,1]<float32> = Load() // stride=[4096,4096]
+  %1[4096,1]<float32> = Log(%0[4096,1]<float32>) // stride=[4096,4096]
+  %2[4096,1]<float32> = Store(%1[4096,1]<float32>) // stride=[4096,4096]
+}
+// target=0, block_dim=1, ffts_addr=0
+vmain.aiv(tile_num=1x1-0) {
+  0: load.u8.16384x1 0x200, 0 //tile_stride(16384), pad_size(0), iter_tail(16384)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: Log.fp32.4096 0x4200, 0x200
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  2: store.u8.16384x1 0, 0x4200 //tile_stride(16384), iter_tail(16384), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_ReduceSum_split Default/GraphKernel_ReduceSum_split-op0
+# IR entry: @2seg_trans__anonymous__68
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_0
+graph_kernel: ReduceSum_split
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096)> : [4096]  :  <Float32xDefaultFormat[const vector]{4096}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 6
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_0
+graph_kernel: ReduceSum_split
+subgraph instance: 2seg_trans__anonymous__68 : 0xaaaaebdfba50
+
+subgraph @2seg_trans__anonymous__68() {
+  %0(seg_trans_CNode_78) = PrimFunc_ReduceSum(%para1_Parameter_79, Tensor(shape=[1], dtype=Int64, value=[0])) primitive_attrs: {keep_dims: Bool(0), skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], ()>)
+      : (<Float32xDefaultFormat[const vector]{4096}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{}>)
+      # Scope: (Default)
+  Return(%0) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], ()>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_ReduceSum_split Default/GraphKernel_ReduceSum_split-op0
+vgraph(tile_num=1) {
+  %0[4096]<float32> = Load() // stride=[4096]
+  %1[1]<float32> = Reduce<[0], false>(%0[4096]<float32>) // stride=[64]
+  %2[1]<float32> = Store(%1[1]<float32>) // stride=[64]
+}
+// target=0, block_dim=1, ffts_addr=0
+vmain.aiv(tile_num=1x1-0) {
+  0: load.u8.16384x1 0x200, 0 //tile_stride(16384), pad_size(0), iter_tail(16384)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: SumX.fp32.[4096]x1 0x4200, 0x200 //red_tail(4096), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  2: store.u8.4x1 0, 0x4200 //tile_stride(4), iter_tail(4), pad_size(252)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Add_Div_Mul_split Default/GraphKernel_Add_Div_Mul_split-op0
+# IR entry: @2seg_trans__anonymous__69
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_1
+graph_kernel: Add_Div_Mul_split
+
+# Total params: 2
+# Params:
+%para1_: <Tensor[Float32], ()>  :  <Float32xDefaultFormat[const vector]{}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096)> : [4096]  :  <Float32xDefaultFormat[const vector]{4096}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 12
+Total number of cnodes: 4
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_1
+graph_kernel: Add_Div_Mul_split
+subgraph instance: 2seg_trans__anonymous__69 : 0xaaaae9af1b50
+
+subgraph @2seg_trans__anonymous__69() {
+  %0(2seg_trans_CNode_80) = PrimFunc_Add(%para1_Parameter_81, Tensor(shape=[], dtype=Float32, value=1e-08)) primitive_attrs: {IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], ()>, <Tensor[Float32], (), value=...>) -> (<Tensor[Float32], ()>)
+      : (<Float32xDefaultFormat[const vector]{}>, <Float32xDefaultFormat[const vector]{}>) -> (<Float32xDefaultFormat[const vector]{}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Scope: (Default)
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:42~55, 4~81/    def construct(self, values, labels, mask):/
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:52, 22~66/        denominator = self.sum(mask) + ms.Tensor(1e-8, ms.float32)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2376~2419/def add(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2419, 11~31/    return add_op(input, other)/
+  %1(2seg_trans_CNode_82) = PrimFunc_Div(Tensor(shape=[], dtype=Float32, value=0.3), %0) {instance name: div} primitive_attrs: {IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (), value=...>, <Tensor[Float32], ()>) -> (<Tensor[Float32], ()>)
+      : (<Float32xDefaultFormat[const vector]{}>, <Float32xDefaultFormat[const vector]{}>) -> (<Float32xDefaultFormat[const vector]{}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Scope: (Default)
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:42~55, 4~81/    def construct(self, values, labels, mask):/
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:53, 21~54/        multiplier = self.div(self.scale, denominator) * mask/
+  %2(2seg_trans_multiplier) = PrimFunc_Mul(%1, %para2_Parameter_83) primitive_attrs: {IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], ()>, <Tensor[Float32], (4096)>) -> (<Tensor[Float32], (4096)>)
+      : (<Float32xDefaultFormat[const vector]{}>, <Float32xDefaultFormat[const vector]{4096}>) -> (<Float32xDefaultFormat[const vector]{4096}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Scope: (Default)
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:42~55, 4~81/    def construct(self, values, labels, mask):/
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:53, 21~61/        multiplier = self.div(self.scale, denominator) * mask/
+  Return(%2) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (4096)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Add_Div_Mul_split Default/GraphKernel_Add_Div_Mul_split-op0
+vgraph(tile_num=1) {
+  %0[1]<float32> = Load() // stride=[8]
+  %1[4096]<float32> = Load() // stride=[4096]
+  %2[1]<float32> = Add<1e-08>(%0[1]<float32>) // stride=[8]
+  %3[1]<float32> = ScalarDiv<0.3>(%2[1]<float32>) // stride=[8]
+  %4[4096]<float32> = Broadcast(%3[1]<float32>) // stride=[4096]
+  %5[4096]<float32> = Mul(%4[4096]<float32>, %1[4096]<float32>) // stride=[4096]
+  %6[4096]<float32> = Store(%5[4096]<float32>) // stride=[4096]
+}
+// target=0, block_dim=1, ffts_addr=0
+vmain.aiv(tile_num=1x1-0) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(28), iter_tail(4)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.16384x1 0x4200, 0 //tile_stride(16384), pad_size(0), iter_tail(16384)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: Adds.fp32.8 0xc200, 0x200, 1e-08
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: SDiv.fp32.8 0xc200, 0xc200, 0.3
+      {simd, bar(1) }
+  4: BroadcastX.b32.[4096]x1x1 0x10200, 0xc200 //lead_pad(7)
+      {simd, bar(1) }
+  5: Mul.fp32.4096 0x8200, 0x10200, 0x4200
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  6: store.u8.16384x1 0, 0x8200 //tile_stride(16384), iter_tail(16384), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Sub_Exp_Cast_Sub_Mul_split Default/GraphKernel_Sub_Exp_Cast_Sub_Mul_split-op0
+# IR entry: @seg_trans__anonymous__67
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_2
+graph_kernel: Sub_Exp_Cast_Sub_Mul_split
+
+# Total params: 4
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)>  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+%para3_: <Tensor[Int32], (4096, 152064)>  :  <Int32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para4_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 19
+Total number of cnodes: 7
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_2
+graph_kernel: Sub_Exp_Cast_Sub_Mul_split
+subgraph instance: seg_trans__anonymous__67 : 0xaaaaebd430d0
+
+subgraph @seg_trans__anonymous__67() {
+  %0(seg_trans_CNode_84) = PrimFunc_Sub(%para1_Parameter_85, %para2_Parameter_86) primitive_attrs: {output_names: null, input_names: null} cnode_attrs: {expand_from: "SubExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %1(seg_trans_CNode_87) = PrimFunc_Exp(%0) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %2(seg_trans_CNode_88) = PrimFunc_Cast(%para3_Parameter_89, I64(43)) primitive_attrs: {output_names: null, is_backend_cast: Bool(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Int32], (4096, 152064)>, <Int64, NoShape>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Int32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %3(seg_trans_CNode_90) = PrimFunc_Sub(%1, %2) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %4(seg_trans_CNode_91) = PrimFunc_Mul(%3, %para4_Parameter_92) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %5(CNode_93) = MakeTuple(%0, %4)
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 152064)>) -> (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 152064))>)
+      # Scope: (Default)
+  Return(%5) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 152064))>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Sub_Exp_Cast_Sub_Mul_split Default/GraphKernel_Sub_Exp_Cast_Sub_Mul_split-op0
+vgraph(tile_num=110592) {
+  %0[1,1]<float32> = Load() // stride=[1,8]
+  %1[5632,1]<float32> = Load() // stride=[5632,5632]
+  %2[5632,1]<int32> = Load() // stride=[5632,5632]
+  %3[1,1]<float32> = Load() // stride=[1,8]
+  %4[5632,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[5632,5632]
+  %5[5632,1]<float32> = Sub(%1[5632,1]<float32>, %4[5632,1]<float32>) // stride=[5632,5632]
+  %6[5632,1]<float32> = Store(%5[5632,1]<float32>) // stride=[5632,5632]
+  %7[5632,1]<float32> = Exp(%5[5632,1]<float32>) // stride=[5632,5632]
+  %8[5632,1]<float32> = Cast(%2[5632,1]<int32>) // stride=[5632,5632]
+  %9[5632,1]<float32> = Sub(%7[5632,1]<float32>, %8[5632,1]<float32>) // stride=[5632,5632]
+  %10[5632,1]<float32> = Broadcast(%3[1,1]<float32>) // stride=[5632,5632]
+  %11[5632,1]<float32> = Mul(%9[5632,1]<float32>, %10[5632,1]<float32>) // stride=[5632,5632]
+  %12[5632,1]<float32> = Store(%11[5632,1]<float32>) // stride=[5632,5632]
+}
+// target=0, block_dim=40, ffts_addr=0
+vmain.aiv(tile_num=2765x40-8) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(28), iter_tail(4), rounds(27)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 3) }
+  1: load.u8.22528x1 0x5a00, 0 //tile_stride(22528), pad_size(0), iter_tail(22528)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 2) }
+  2: load.u8.22528x1 0xb200, 0 //tile_stride(22528), pad_size(0), iter_tail(22528)
+      {load, load_simd_sync(set, 2), simd_load_sync(wait, 1) }
+  3: load.u8.4x1 0x10a00, 0 //tile_stride(4), pad_size(28), iter_tail(4), rounds(27)
+      {load, load_simd_sync(set, 3), simd_load_sync(wait, 0) }
+  4: BroadcastX.b32.[5632]x1x1 0x21200, 0x200 //lead_pad(7)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 3) }
+  5: Sub.fp32.5632 0x16200, 0x5a00, 0x21200
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 1), simd_store_sync(set, 0), simd_load_sync(set, 2) }
+  6: store.u8.22528x1 0, 0x16200 //tile_stride(22528), iter_tail(22528), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 1) }
+  7: Exp.fp32.5632 0x26a00, 0x16200
+      {simd, bar(1) }
+  8: CastS32.fp32.5632 0x21200, 0xb200
+      {simd, load_simd_sync(wait, 2), simd_load_sync(set, 1) }
+  9: Sub.fp32.5632 0x26a00, 0x26a00, 0x21200
+      {simd, bar(1) }
+  10: BroadcastX.b32.[5632]x1x1 0x21200, 0x10a00 //lead_pad(7)
+      {simd, bar(1), load_simd_sync(wait, 3), simd_load_sync(set, 0) }
+  11: Mul.fp32.5632 0x1ba00, 0x26a00, 0x21200
+      {simd, bar(1), store_simd_sync(wait, 0), simd_store_sync(set, 1) }
+  12: store.u8.22528x1 0, 0x1ba00 //tile_stride(22528), iter_tail(22528), pad_size(0)
+      {store, simd_store_sync(wait, 1), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+# IR entry: @_anonymous__98
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)> : [4096, 152064]  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 6
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+subgraph instance: _anonymous__98 : 0xaaaae9af2ae0
+
+subgraph @_anonymous__98() {
+  %0(CNode_99) = PrimFunc_ReduceSum(%para1_Parameter_100, Tensor(shape=[1], dtype=Int64, value=[1])) primitive_attrs: {keep_dims: Bool(1), skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default/expand_SumExt)
+  Return(%0) primitive_attrs: {visited: Bool(1)} cnode_attrs: {expand_from: "SumExt"}
+      : (<Tensor[Float32], (4096, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+vgraph(tile_num=65536) {
+  %0[9504,1]<float32> = Load() // stride=[9536,9536]
+  %1[1,1]<float32> = Reduce<[1], true>(%0[9504,1]<float32>) // stride=[1,64]
+  %2[1,1]<float32> = Store(%1[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:16}) {
+  0: load.u8.38016x1 0x200, 0 //tile_stride(38016), pad_size(128), iter_tail(38016)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: ClrPad.fp32.9504x1 0x200 //iter_stride(9536), simd_width(64), iter_tail(0)
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0) }
+  2: SumX.fp32.[9536]x1 0x12c00, 0x200 //red_tail(9536), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1) }
+  3: SumJoin.fp32.1x1 0x9700, 0x12c00 //xs(0x1c100), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  4: store_cond.u8.4 0, 0x9700 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(16)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+# IR entry: @_anonymous__105
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096, 22, 6912)> : [4096, 22, 6912]  :  <Float32xDefaultFormat[const vector]{4096, 22, 6912}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 6
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SumExt
+subgraph instance: _anonymous__105 : 0xaaaaebe31100
+
+subgraph @_anonymous__105() {
+  %0(CNode_106) = PrimFunc_ReduceSum(%para1_Parameter_107, Tensor(shape=[1], dtype=Int64, value=[2])) primitive_attrs: {keep_dims: Bool(1), skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 22, 6912)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 22, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 22, 6912}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 22, 1}>)
+      # Scope: (Default/expand_SumExt)
+  Return(%0) primitive_attrs: {visited: Bool(1)} cnode_attrs: {expand_from: "SumExt"}
+      : (<Tensor[Float32], (4096, 22, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_SumExt Default/GraphKernel_SumExt-op0
+vgraph(tile_num=90112) {
+  %0[6912,1,1]<float32> = Load() // stride=[6912,6912,6912]
+  %1[1,1,1]<float32> = Reduce<[2], true>(%0[6912,1,1]<float32>) // stride=[1,1,64]
+  %2[1,1,1]<float32> = Store(%1[1,1,1]<float32>) // stride=[1,1,64]
+}
+// target=0, block_dim=40, ffts_addr=0
+vmain.aiv(tile_num=2253x40-8) {
+  0: load.u8.27648x1 0x200, 0 //tile_stride(27648), pad_size(0), iter_tail(27648)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: SumX.fp32.[6912]x1 0x6e00, 0x200 //red_tail(6912), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  2: store.u8.4x1 0, 0x6e00 //tile_stride(4), iter_tail(4), pad_size(252)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_SubExt_Exp_SumExt_fusion Default/GraphKernel_SubExt_Exp_SumExt_fusion-op1
+# IR entry: @_anonymous__123
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SubExt_Exp_SumExt_fusion
+
+# Total params: 2
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)>  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 11
+Total number of cnodes: 4
+
+subgraph attr:
+IsFeatureMapOutput: 1
+IsFeatureMapInputList: 
+graph_kernel: SubExt_Exp_SumExt_fusion
+subgraph instance: _anonymous__123 : 0xaaaae9bdf340
+
+subgraph @_anonymous__123() {
+  %0(CNode_118) = PrimFunc_Sub(%para1_Parameter_119, %para2_Parameter_120) primitive_attrs: {output_names: null, input_names: null} cnode_attrs: {expand_from: "SubExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %1(CNode_121) = PrimFunc_Exp(%0) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %2(CNode_122) = PrimFunc_ReduceSum(%1, Tensor(shape=[1], dtype=Int64, value=[1])) primitive_attrs: {output_names: null, keep_dims: Bool(1), input_names: null, skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default)
+  Return(%2) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (4096, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_SubExt_Exp_SumExt_fusion Default/GraphKernel_SubExt_Exp_SumExt_fusion-op1
+vgraph(tile_num=65536) {
+  %0[1,1]<float32> = Load() // stride=[1,64]
+  %1[9504,1]<float32> = Load() // stride=[9536,9536]
+  %2[9504,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[9536,9536]
+  %3[9504,1]<float32> = Sub(%1[9504,1]<float32>, %2[9504,1]<float32>) // stride=[9536,9536]
+  %4[9504,1]<float32> = Exp(%3[9504,1]<float32>) // stride=[9536,9536]
+  %5[1,1]<float32> = Reduce<[1], true>(%4[9504,1]<float32>) // stride=[1,64]
+  %6[1,1]<float32> = Store(%5[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:16}) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(252), iter_tail(4), rounds(16)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.38016x1 0x9700, 0 //tile_stride(38016), pad_size(128), iter_tail(38016)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: BroadcastX.b32.[9536]x1x1 0x1c100, 0x200 //lead_pad(63)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: Sub.fp32.9536 0x1c100, 0x9700, 0x1c100
+      {simd, bar(1), load_simd_sync(wait, 1), simd_load_sync(set, 0) }
+  4: Exp.fp32.9536 0x1c100, 0x1c100
+      {simd, bar(1) }
+  5: ClrPad.fp32.9504x1 0x1c100 //iter_stride(9536), simd_width(64), iter_tail(0)
+      {simd, bar(1), store_simd_sync(wait, 0) }
+  6: SumX.fp32.[9536]x1 0x1c100, 0x1c100 //red_tail(9536), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1) }
+  7: SumJoin.fp32.1x1 0x12c00, 0x1c100 //xs(0x25600), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 0) }
+  8: store_cond.u8.4 0, 0x12c00 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(16)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Sub_Exp_ReduceSum_split Default/GraphKernel_Sub_Exp_ReduceSum_split-op0
+# IR entry: @seg_trans__anonymous__150
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_0
+graph_kernel: Sub_Exp_ReduceSum_split
+
+# Total params: 2
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)>  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 13
+Total number of cnodes: 5
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_0
+graph_kernel: Sub_Exp_ReduceSum_split
+subgraph instance: seg_trans__anonymous__150 : 0xaaaae9cdfdf0
+
+subgraph @seg_trans__anonymous__150() {
+  %0(seg_trans_CNode_155) = PrimFunc_Sub(%para1_Parameter_156, %para2_Parameter_157) primitive_attrs: {output_names: null, input_names: null} cnode_attrs: {expand_from: "SubExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %1(seg_trans_CNode_158) = PrimFunc_Exp(%0) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %2(seg_trans_CNode_159) = PrimFunc_ReduceSum(%1, Tensor(shape=[1], dtype=Int64, value=[1])) primitive_attrs: {output_names: null, keep_dims: Bool(1), input_names: null, skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default)
+  %3(CNode_160) = MakeTuple(%0, %2)
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 1))>)
+      # Scope: (Default)
+  Return(%3) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 1))>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Sub_Exp_ReduceSum_split Default/GraphKernel_Sub_Exp_ReduceSum_split-op0
+vgraph(tile_num=90112) {
+  %0[1,1]<float32> = Load() // stride=[1,64]
+  %1[6912,1]<float32> = Load() // stride=[6912,6912]
+  %2[6912,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[6912,6912]
+  %3[6912,1]<float32> = Sub(%1[6912,1]<float32>, %2[6912,1]<float32>) // stride=[6912,6912]
+  %4[6912,1]<float32> = Store(%3[6912,1]<float32>) // stride=[6912,6912]
+  %5[6912,1]<float32> = Exp(%3[6912,1]<float32>) // stride=[6912,6912]
+  %6[1,1]<float32> = Reduce<[1], true>(%5[6912,1]<float32>) // stride=[1,64]
+  %7[1,1]<float32> = Store(%6[1,1]<float32>) // stride=[1,64]
+}
+// target=2, block_dim=20, ffts_addr=0
+vmain.aiv(visit={e:4096, r1:22}) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(252), iter_tail(4), rounds(22)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.27648x1 0x6e00, 0 //tile_stride(27648), pad_size(0), iter_tail(27648)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: BroadcastX.b32.[6912]x1x1 0x1b200, 0x200 //lead_pad(63)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: Sub.fp32.6912 0xda00, 0x6e00, 0x1b200
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 1), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  4: store.u8.27648x1 0, 0xda00 //tile_stride(27648), iter_tail(27648), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 1) }
+  5: Exp.fp32.6912 0x21e00, 0xda00
+      {simd, bar(1) }
+  6: SumX.fp32.[6912]x1 0x21e00, 0x21e00 //red_tail(6912), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, bar(1), store_simd_sync(wait, 0) }
+  7: SumJoin.fp32.1x1 0x14600, 0x21e00 //xs(0x1b200), ws(0), seg_tile_rel(9)
+      {simd, bar(1), simd_store_sync(set, 1) }
+  8: store_cond.u8.4 0, 0x14600 //iter_size(0), pad_size(0), cond_offset(1), dtype_shift(2), rounds(22)
+      {store, simd_store_sync(wait, 1), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Log_split Default/GraphKernel_Log_split-op0
+# IR entry: @seg_trans__anonymous__151
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_1
+graph_kernel: Log_split
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 5
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_1
+graph_kernel: Log_split
+subgraph instance: seg_trans__anonymous__151 : 0xaaaae9b163f0
+
+subgraph @seg_trans__anonymous__151() {
+  %0(seg_trans_CNode_161) = PrimFunc_Log(%para1_Parameter_162) primitive_attrs: {IsFeatureMapInputList: (0), shift: F32(0), scale: F32(1), cust_aicpu: "Log", input_names: null, base: F32(-1), output_names: null, IsFeatureMapOutput: Bool(1)} cnode_attrs: {is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 1)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 1}>)
+      # Scope: (Default)
+  Return(%0) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (4096, 1)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Log_split Default/GraphKernel_Log_split-op0
+vgraph(tile_num=1) {
+  %0[4096,1]<float32> = Load() // stride=[4096,4096]
+  %1[4096,1]<float32> = Log(%0[4096,1]<float32>) // stride=[4096,4096]
+  %2[4096,1]<float32> = Store(%1[4096,1]<float32>) // stride=[4096,4096]
+}
+// target=0, block_dim=1, ffts_addr=0
+vmain.aiv(tile_num=1x1-0) {
+  0: load.u8.16384x1 0x200, 0 //tile_stride(16384), pad_size(0), iter_tail(16384)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: Log.fp32.4096 0x4200, 0x200
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  2: store.u8.16384x1 0, 0x4200 //tile_stride(16384), iter_tail(16384), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_ReduceSum_split Default/GraphKernel_ReduceSum_split-op0
+# IR entry: @2seg_trans__anonymous__153
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_0
+graph_kernel: ReduceSum_split
+
+# Total params: 1
+# Params:
+%para1_: <Tensor[Float32], (4096)> : [4096]  :  <Float32xDefaultFormat[const vector]{4096}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 6
+Total number of cnodes: 2
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_0
+graph_kernel: ReduceSum_split
+subgraph instance: 2seg_trans__anonymous__153 : 0xaaaaebd398d0
+
+subgraph @2seg_trans__anonymous__153() {
+  %0(seg_trans_CNode_163) = PrimFunc_ReduceSum(%para1_Parameter_164, Tensor(shape=[1], dtype=Int64, value=[0])) primitive_attrs: {keep_dims: Bool(0), skip_mode: Bool(0)} cnode_attrs: {expand_from: "SumExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096)>, <Tensor[Int64], (1), value=...>) -> (<Tensor[Float32], ()>)
+      : (<Float32xDefaultFormat[const vector]{4096}>, <Int64xDefaultFormat[const vector]{1}>) -> (<Float32xDefaultFormat[const vector]{}>)
+      # Scope: (Default)
+  Return(%0) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], ()>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_ReduceSum_split Default/GraphKernel_ReduceSum_split-op0
+vgraph(tile_num=1) {
+  %0[4096]<float32> = Load() // stride=[4096]
+  %1[1]<float32> = Reduce<[0], false>(%0[4096]<float32>) // stride=[64]
+  %2[1]<float32> = Store(%1[1]<float32>) // stride=[64]
+}
+// target=0, block_dim=1, ffts_addr=0
+vmain.aiv(tile_num=1x1-0) {
+  0: load.u8.16384x1 0x200, 0 //tile_stride(16384), pad_size(0), iter_tail(16384)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 0) }
+  1: SumX.fp32.[4096]x1 0x4200, 0x200 //red_tail(4096), dup_block(1), dup_pad(0), simd_width(64)
+      {simd, load_simd_sync(wait, 0), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  2: store.u8.4x1 0, 0x4200 //tile_stride(4), iter_tail(4), pad_size(252)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Add_Div_Mul_split Default/GraphKernel_Add_Div_Mul_split-op0
+# IR entry: @2seg_trans__anonymous__154
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_1
+graph_kernel: Add_Div_Mul_split
+
+# Total params: 2
+# Params:
+%para1_: <Tensor[Float32], ()>  :  <Float32xDefaultFormat[const vector]{}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096)> : [4096]  :  <Float32xDefaultFormat[const vector]{4096}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 12
+Total number of cnodes: 4
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SumExt_Add_Div_Mul_fusion_1
+graph_kernel: Add_Div_Mul_split
+subgraph instance: 2seg_trans__anonymous__154 : 0xaaaaebe248d0
+
+subgraph @2seg_trans__anonymous__154() {
+  %0(2seg_trans_CNode_165) = PrimFunc_Add(%para1_Parameter_166, Tensor(shape=[], dtype=Float32, value=1e-08)) primitive_attrs: {IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], ()>, <Tensor[Float32], (), value=...>) -> (<Tensor[Float32], ()>)
+      : (<Float32xDefaultFormat[const vector]{}>, <Float32xDefaultFormat[const vector]{}>) -> (<Float32xDefaultFormat[const vector]{}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Scope: (Default)
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:42~55, 4~81/    def construct(self, values, labels, mask):/
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:52, 22~66/        denominator = self.sum(mask) + ms.Tensor(1e-8, ms.float32)/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2376~2419/def add(input, other):/
+      # In file /workspace/python/lib/python3.12/site-packages/mindspore/ops/auto_generate/gen_ops_def.py:2419, 11~31/    return add_op(input, other)/
+  %1(2seg_trans_CNode_167) = PrimFunc_Div(Tensor(shape=[], dtype=Float32, value=1), %0) {instance name: div} primitive_attrs: {IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (), value=...>, <Tensor[Float32], ()>) -> (<Tensor[Float32], ()>)
+      : (<Float32xDefaultFormat[const vector]{}>, <Float32xDefaultFormat[const vector]{}>) -> (<Float32xDefaultFormat[const vector]{}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Scope: (Default)
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:42~55, 4~81/    def construct(self, values, labels, mask):/
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:53, 21~54/        multiplier = self.div(self.scale, denominator) * mask/
+  %2(2seg_trans_multiplier) = PrimFunc_Mul(%1, %para2_Parameter_168) primitive_attrs: {IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1)} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], ()>, <Tensor[Float32], (4096)>) -> (<Tensor[Float32], (4096)>)
+      : (<Float32xDefaultFormat[const vector]{}>, <Float32xDefaultFormat[const vector]{4096}>) -> (<Float32xDefaultFormat[const vector]{4096}>)
+      : (Tensor, Tensor) -> (Tensor)
+      # Scope: (Default)
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:42~55, 4~81/    def construct(self, values, labels, mask):/
+      # In file /alignment/phase12/tools/replay_cross_entropy_mf_o1_stages.py:53, 21~61/        multiplier = self.div(self.scale, denominator) * mask/
+  Return(%2) primitive_attrs: {visited: Bool(1)}
+      : (<Tensor[Float32], (4096)>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Add_Div_Mul_split Default/GraphKernel_Add_Div_Mul_split-op0
+vgraph(tile_num=1) {
+  %0[1]<float32> = Load() // stride=[8]
+  %1[4096]<float32> = Load() // stride=[4096]
+  %2[1]<float32> = Add<1e-08>(%0[1]<float32>) // stride=[8]
+  %3[1]<float32> = ScalarDiv<1>(%2[1]<float32>) // stride=[8]
+  %4[4096]<float32> = Broadcast(%3[1]<float32>) // stride=[4096]
+  %5[4096]<float32> = Mul(%4[4096]<float32>, %1[4096]<float32>) // stride=[4096]
+  %6[4096]<float32> = Store(%5[4096]<float32>) // stride=[4096]
+}
+// target=0, block_dim=1, ffts_addr=0
+vmain.aiv(tile_num=1x1-0) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(28), iter_tail(4)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 1) }
+  1: load.u8.16384x1 0x4200, 0 //tile_stride(16384), pad_size(0), iter_tail(16384)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 0) }
+  2: Adds.fp32.8 0xc200, 0x200, 1e-08
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 1) }
+  3: SDiv.fp32.8 0xc200, 0xc200, 1
+      {simd, bar(1) }
+  4: BroadcastX.b32.[4096]x1x1 0x10200, 0xc200 //lead_pad(7)
+      {simd, bar(1) }
+  5: Mul.fp32.4096 0x8200, 0x10200, 0x4200
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 0), simd_store_sync(set, 0), simd_load_sync(set, 0) }
+  6: store.u8.16384x1 0, 0x8200 //tile_stride(16384), iter_tail(16384), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 0) }
+}
+
+[func graph] GraphKernel_Sub_Exp_Cast_Sub_Mul_split Default/GraphKernel_Sub_Exp_Cast_Sub_Mul_split-op0
+# IR entry: @seg_trans__anonymous__152
+# Total subgraphs: 1
+
+# Attrs:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_2
+graph_kernel: Sub_Exp_Cast_Sub_Mul_split
+
+# Total params: 4
+# Params:
+%para1_: <Tensor[Float32], (4096, 152064)>  :  <Float32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para2_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+%para3_: <Tensor[Int32], (4096, 152064)>  :  <Int32xDefaultFormat[const vector]{4096, 152064}>  :  IsWeight: false
+%para4_: <Tensor[Float32], (4096, 1)>  :  <Float32xDefaultFormat[const vector]{4096, 1}>  :  IsWeight: false
+
+Node counting information:
+Total number of nodes: 19
+Total number of cnodes: 7
+
+subgraph attr:
+IsFeatureMapOutput: 0
+IsFeatureMapInputList: 
+node_name: SubExt_Exp_SumExt_Log_SubExt_Exp_Cast_Sub_Mul_fusion_2
+graph_kernel: Sub_Exp_Cast_Sub_Mul_split
+subgraph instance: seg_trans__anonymous__152 : 0xaaaaebd43e00
+
+subgraph @seg_trans__anonymous__152() {
+  %0(seg_trans_CNode_169) = PrimFunc_Sub(%para1_Parameter_170, %para2_Parameter_171) primitive_attrs: {output_names: null, input_names: null} cnode_attrs: {expand_from: "SubExt", is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %1(seg_trans_CNode_172) = PrimFunc_Exp(%0) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %2(seg_trans_CNode_173) = PrimFunc_Cast(%para3_Parameter_174, I64(43)) primitive_attrs: {output_names: null, is_backend_cast: Bool(0), IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Int32], (4096, 152064)>, <Int64, NoShape>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Int32xDefaultFormat[const vector]{4096, 152064}>, <Int64xDefaultFormat[const vector]{}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %3(seg_trans_CNode_175) = PrimFunc_Sub(%1, %2) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 152064)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 152064}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %4(seg_trans_CNode_176) = PrimFunc_Mul(%3, %para4_Parameter_177) primitive_attrs: {output_names: null, IsFeatureMapOutput: Bool(1), IsFeatureMapInputList: (0, 1), input_names: null} cnode_attrs: {checkpoint: Bool(1), is_dynamic_len: Bool(0)}
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 1)>) -> (<Tensor[Float32], (4096, 152064)>)
+      : (<Float32xDefaultFormat[const vector]{4096, 152064}>, <Float32xDefaultFormat[const vector]{4096, 1}>) -> (<Float32xDefaultFormat[const vector]{4096, 152064}>)
+      # Scope: (Default)
+  %5(CNode_178) = MakeTuple(%0, %4)
+      : (<Tensor[Float32], (4096, 152064)>, <Tensor[Float32], (4096, 152064)>) -> (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 152064))>)
+      # Scope: (Default)
+  Return(%5) primitive_attrs: {visited: Bool(1)}
+      : (<Tuple[Tensor[Float32]*2], TupleShape((4096, 152064), (4096, 152064))>)
+      # Scope: (Default)
+}
+
+
+
+[dvm kernel] GraphKernel_Sub_Exp_Cast_Sub_Mul_split Default/GraphKernel_Sub_Exp_Cast_Sub_Mul_split-op0
+vgraph(tile_num=110592) {
+  %0[1,1]<float32> = Load() // stride=[1,8]
+  %1[5632,1]<float32> = Load() // stride=[5632,5632]
+  %2[5632,1]<int32> = Load() // stride=[5632,5632]
+  %3[1,1]<float32> = Load() // stride=[1,8]
+  %4[5632,1]<float32> = Broadcast(%0[1,1]<float32>) // stride=[5632,5632]
+  %5[5632,1]<float32> = Sub(%1[5632,1]<float32>, %4[5632,1]<float32>) // stride=[5632,5632]
+  %6[5632,1]<float32> = Store(%5[5632,1]<float32>) // stride=[5632,5632]
+  %7[5632,1]<float32> = Exp(%5[5632,1]<float32>) // stride=[5632,5632]
+  %8[5632,1]<float32> = Cast(%2[5632,1]<int32>) // stride=[5632,5632]
+  %9[5632,1]<float32> = Sub(%7[5632,1]<float32>, %8[5632,1]<float32>) // stride=[5632,5632]
+  %10[5632,1]<float32> = Broadcast(%3[1,1]<float32>) // stride=[5632,5632]
+  %11[5632,1]<float32> = Mul(%9[5632,1]<float32>, %10[5632,1]<float32>) // stride=[5632,5632]
+  %12[5632,1]<float32> = Store(%11[5632,1]<float32>) // stride=[5632,5632]
+}
+// target=0, block_dim=40, ffts_addr=0
+vmain.aiv(tile_num=2765x40-8) {
+  0: load.u8.4x1 0x200, 0 //tile_stride(4), pad_size(28), iter_tail(4), rounds(27)
+      {load, load_simd_sync(set, 0), simd_load_sync(wait, 3) }
+  1: load.u8.22528x1 0x5a00, 0 //tile_stride(22528), pad_size(0), iter_tail(22528)
+      {load, load_simd_sync(set, 1), simd_load_sync(wait, 2) }
+  2: load.u8.22528x1 0xb200, 0 //tile_stride(22528), pad_size(0), iter_tail(22528)
+      {load, load_simd_sync(set, 2), simd_load_sync(wait, 1) }
+  3: load.u8.4x1 0x10a00, 0 //tile_stride(4), pad_size(28), iter_tail(4), rounds(27)
+      {load, load_simd_sync(set, 3), simd_load_sync(wait, 0) }
+  4: BroadcastX.b32.[5632]x1x1 0x21200, 0x200 //lead_pad(7)
+      {simd, load_simd_sync(wait, 0), simd_load_sync(set, 3) }
+  5: Sub.fp32.5632 0x16200, 0x5a00, 0x21200
+      {simd, bar(1), load_simd_sync(wait, 1), store_simd_sync(wait, 1), simd_store_sync(set, 0), simd_load_sync(set, 2) }
+  6: store.u8.22528x1 0, 0x16200 //tile_stride(22528), iter_tail(22528), pad_size(0)
+      {store, simd_store_sync(wait, 0), store_simd_sync(set, 1) }
+  7: Exp.fp32.5632 0x26a00, 0x16200
+      {simd, bar(1) }
+  8: CastS32.fp32.5632 0x21200, 0xb200
+      {simd, load_simd_sync(wait, 2), simd_load_sync(set, 1) }
+  9: Sub.fp32.5632 0x26a00, 0x26a00, 0x21200
+      {simd, bar(1) }
+  10: BroadcastX.b32.[5632]x1x1 0x21200, 0x10a00 //lead_pad(7)
+      {simd, bar(1), load_simd_sync(wait, 3), simd_load_sync(set, 0) }
+  11: Mul.fp32.5632 0x1ba00, 0x26a00, 0x21200
+      {simd, bar(1), store_simd_sync(wait, 0), simd_store_sync(set, 1) }
+  12: store.u8.22528x1 0, 0x1ba00 //tile_stride(22528), iter_tail(22528), pad_size(0)
+      {store, simd_store_sync(wait, 1), store_simd_sync(set, 0) }
+}
+

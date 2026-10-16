@@ -1,0 +1,549 @@
+{
+  "complete": true,
+  "fidelity": {
+    "hp": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_sha": true,
+      "launcher_sha": true,
+      "config_exact_except_path": true,
+      "unchanged_SOURCE_REVISION.json": true,
+      "unchanged_PROBE_SOURCE_MANIFEST.json": true,
+      "unchanged_HEAD_GEMM_ROUTE.json": true,
+      "unchanged_SHARED_UP_FP32_FACTOR.json": true,
+      "unchanged_ADAMW_ARCHIVE_ARITHMETIC.json": true,
+      "unchanged_Q_NS_ADJACENT_FACTOR.json": true,
+      "unchanged_ROUTER_NS_NPU_SQRT_FACTOR.json": true,
+      "unchanged_WEIGHTED_DVM_FACTOR.json": true,
+      "unchanged_PACKED_SEMANTICS_FACTOR.json": true,
+      "unchanged_NORM219_FACTOR.json": true,
+      "unchanged_Q_NPU_SQRT222_FACTOR.json": true,
+      "unchanged_CE_SUM_TREE.json": true,
+      "exact26_HEAD_GEMM_ROUTE_CALLS.jsonl": true,
+      "exact26_Q_NS_ADJACENT_CALLS.jsonl": true,
+      "exact26_ROUTER_NS_NPU_SQRT_CALLS.jsonl": true,
+      "exact26_CLIP_REDUCTION.jsonl": true,
+      "exact26_WEIGHTED_DVM_CALLS.jsonl": true,
+      "exact26_PACKED_SEMANTICS_CALLS.jsonl": true,
+      "exact26_NORM219_CALLS.jsonl": true,
+      "49_frozen_sources": true,
+      "observer_source": true,
+      "all26_calls": true,
+      "head_dy_exact_model.mtp.compute_language_model_loss.cross_entropy": true,
+      "mask_exact_model.mtp.compute_language_model_loss.cross_entropy": true,
+      "valid_targets_exact_model.mtp.compute_language_model_loss.cross_entropy": true,
+      "head_dy_exact_model.loss": true,
+      "mask_exact_model.loss": true,
+      "valid_targets_exact_model.loss": true
+    },
+    "mf": {
+      "all_metrics_grad_norm_exact": true,
+      "all_inputs_exact": true,
+      "restore_exact": true,
+      "exit_zero": true,
+      "config_sha": true,
+      "launcher_sha": true,
+      "config_exact_except_path_length": true,
+      "observer_source": true,
+      "all26_observations": true,
+      "head_dy_exact_model.mtp.compute_language_model_loss.cross_entropy": true,
+      "head_dy_exact_model.loss": true
+    }
+  },
+  "runs": {
+    "hp": "hp-jtf637-qsqrt222-ce226",
+    "mf": "mf-ce226"
+  },
+  "source_sha256": "b5716cf3cc9bfb478223fdd4697a8230f460616dc98e80a204ab795f5dc03272",
+  "scope": "Four full vocabulary rows selected from actual full4096x152064 operations; no reference values injected.",
+  "mapping": {
+    "model.mtp.compute_language_model_loss.cross_entropy": {
+      "ce_call": 1,
+      "mf_head": "model.mtp.output_layer",
+      "hp_head_call": 1
+    },
+    "model.loss": {
+      "ce_call": 2,
+      "mf_head": "model.output_layer",
+      "hp_head_call": 2
+    }
+  },
+  "observations": [
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "logits",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "shifted",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "exponent",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "sum",
+      "numeric_different": 2,
+      "elements": 4,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 0,
+      "max_abs": 1.9073486328125e-06,
+      "mean_abs": 7.152557373046875e-07,
+      "l2_error_squared": 4.547473508864641e-12,
+      "relative_l2": 1.6092079900436094e-09
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "log_sum",
+      "numeric_different": 1,
+      "elements": 4,
+      "fp32_bitwise_different": 1,
+      "bf16_different": 0,
+      "max_abs": 2.384185791015625e-07,
+      "mean_abs": 5.960464477539063e-08,
+      "l2_error_squared": 5.684341886080802e-14,
+      "relative_l2": 2.337485114319834e-08
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "log_probability",
+      "numeric_different": 3,
+      "elements": 608256,
+      "fp32_bitwise_different": 3,
+      "bf16_different": 0,
+      "max_abs": 2.384185791015625e-07,
+      "mean_abs": 1.1759123416862103e-12,
+      "l2_error_squared": 1.7053025658242404e-13,
+      "relative_l2": 3.768838047909163e-11
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "probability",
+      "numeric_different": 3,
+      "elements": 608256,
+      "fp32_bitwise_different": 3,
+      "bf16_different": 0,
+      "max_abs": 1.4901161193847656e-08,
+      "mean_abs": 4.2871804123976416e-14,
+      "l2_error_squared": 2.8449465006019636e-16,
+      "relative_l2": 9.750508735399092e-08
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "dout",
+      "numeric_different": 0,
+      "elements": 4,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "dx_fp32",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 2,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "dx_bf16",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 2,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "token": 0,
+      "mask": 0.0,
+      "hp_dout": 0.0,
+      "mf_dout": 0.0,
+      "bf16_numeric_different": 0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "token": 1,
+      "mask": 0.0,
+      "hp_dout": 0.0,
+      "mf_dout": 0.0,
+      "bf16_numeric_different": 0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "token": 4080,
+      "mask": 1.0,
+      "hp_dout": 0.00016722409054636955,
+      "mf_dout": 0.00016722409054636955,
+      "bf16_numeric_different": 0
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "token": 4095,
+      "mask": 0.0,
+      "hp_dout": 0.0,
+      "mf_dout": 0.0,
+      "bf16_numeric_different": 0
+    },
+    {
+      "name": "model.loss",
+      "kind": "logits",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.loss",
+      "kind": "shifted",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.loss",
+      "kind": "exponent",
+      "numeric_different": 0,
+      "elements": 608256,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.loss",
+      "kind": "sum",
+      "numeric_different": 2,
+      "elements": 4,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 0,
+      "max_abs": 3.814697265625e-06,
+      "mean_abs": 1.3113021850585938e-06,
+      "l2_error_squared": 1.659827830735594e-11,
+      "relative_l2": 5.235224113151589e-09
+    },
+    {
+      "name": "model.loss",
+      "kind": "log_sum",
+      "numeric_different": 2,
+      "elements": 4,
+      "fp32_bitwise_different": 2,
+      "bf16_different": 0,
+      "max_abs": 2.384185791015625e-07,
+      "mean_abs": 1.1920928955078125e-07,
+      "l2_error_squared": 1.1368683772161603e-13,
+      "relative_l2": 3.4310468123232915e-08
+    },
+    {
+      "name": "model.loss",
+      "kind": "log_probability",
+      "numeric_different": 216731,
+      "elements": 608256,
+      "fp32_bitwise_different": 216731,
+      "bf16_different": 0,
+      "max_abs": 1.9073486328125e-06,
+      "mean_abs": 5.206955527817762e-07,
+      "l2_error_squared": 5.122099082655041e-07,
+      "relative_l2": 6.310662175455755e-08
+    },
+    {
+      "name": "model.loss",
+      "kind": "probability",
+      "numeric_different": 216731,
+      "elements": 608256,
+      "fp32_bitwise_different": 216731,
+      "bf16_different": 0,
+      "max_abs": 2.9802322387695312e-08,
+      "mean_abs": 1.1181718756684364e-12,
+      "l2_error_squared": 1.563251185858033e-15,
+      "relative_l2": 1.721963133887434e-07
+    },
+    {
+      "name": "model.loss",
+      "kind": "dout",
+      "numeric_different": 0,
+      "elements": 4,
+      "fp32_bitwise_different": 0,
+      "bf16_different": 0,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "l2_error_squared": 0.0,
+      "relative_l2": 0.0
+    },
+    {
+      "name": "model.loss",
+      "kind": "dx_fp32",
+      "numeric_different": 216730,
+      "elements": 608256,
+      "fp32_bitwise_different": 216732,
+      "bf16_different": 3318,
+      "max_abs": 1.4551915228366852e-11,
+      "mean_abs": 6.217350362788155e-16,
+      "l2_error_squared": 4.333328071493715e-22,
+      "relative_l2": 2.6685205122774967e-08
+    },
+    {
+      "name": "model.loss",
+      "kind": "dx_bf16",
+      "numeric_different": 3316,
+      "elements": 608256,
+      "fp32_bitwise_different": 3318,
+      "bf16_different": 3318,
+      "max_abs": 2.3283064365386963e-10,
+      "mean_abs": 5.2848671940721575e-15,
+      "l2_error_squared": 7.047420846841844e-19,
+      "relative_l2": 1.077490404050223e-06
+    },
+    {
+      "name": "model.loss",
+      "token": 0,
+      "mask": 0.0,
+      "hp_dout": 0.0,
+      "mf_dout": 0.0,
+      "bf16_numeric_different": 0
+    },
+    {
+      "name": "model.loss",
+      "token": 1,
+      "mask": 0.0,
+      "hp_dout": 0.0,
+      "mf_dout": 0.0,
+      "bf16_numeric_different": 0
+    },
+    {
+      "name": "model.loss",
+      "token": 4080,
+      "mask": 1.0,
+      "hp_dout": 0.0005574136157520115,
+      "mf_dout": 0.0005574136157520115,
+      "bf16_numeric_different": 3303
+    },
+    {
+      "name": "model.loss",
+      "token": 4095,
+      "mask": 1.0,
+      "hp_dout": 0.0005574136157520115,
+      "mf_dout": 0.0005574136157520115,
+      "bf16_numeric_different": 13
+    }
+  ],
+  "precision_fp64": [
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "shifted",
+      "hp": {
+        "max_abs": 2.384185791015625e-07,
+        "mean_abs": 2.4008210309426792e-12,
+        "l2": 5.662441253662109e-07
+      },
+      "mf": {
+        "max_abs": 2.384185791015625e-07,
+        "mean_abs": 2.4008210309426792e-12,
+        "l2": 5.662441253662109e-07
+      }
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "exponent",
+      "hp": {
+        "max_abs": 2.895730744079117e-08,
+        "mean_abs": 6.707439181539214e-11,
+        "l2": 2.248362085245728e-07
+      },
+      "mf": {
+        "max_abs": 2.895730744079117e-08,
+        "mean_abs": 6.707439181539214e-11,
+        "l2": 2.248362085245728e-07
+      }
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "sum",
+      "hp": {
+        "max_abs": 4.94623666327243e-05,
+        "mean_abs": 1.915518155115592e-05,
+        "l2": 5.5443936194227106e-05
+      },
+      "mf": {
+        "max_abs": 4.94623666327243e-05,
+        "mean_abs": 1.889815843902909e-05,
+        "l2": 5.54308326788314e-05
+      }
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "log_sum",
+      "hp": {
+        "max_abs": 1.9942969586850268e-07,
+        "mean_abs": 1.2975584595675826e-07,
+        "l2": 2.86028854658909e-07
+      },
+      "mf": {
+        "max_abs": 1.9942969586850268e-07,
+        "mean_abs": 1.2623580325499262e-07,
+        "l2": 2.8009914562554473e-07
+      }
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "log_probability",
+      "hp": {
+        "max_abs": 9.146854331731902e-07,
+        "mean_abs": 3.467668609360459e-07,
+        "l2": 0.00032062983435676094
+      },
+      "mf": {
+        "max_abs": 9.146854331731902e-07,
+        "mean_abs": 3.46766791490759e-07,
+        "l2": 0.0003206298186518543
+      }
+    },
+    {
+      "name": "model.mtp.compute_language_model_loss.cross_entropy",
+      "kind": "probability",
+      "hp": {
+        "max_abs": 1.154853723761562e-08,
+        "mean_abs": 1.944839108318811e-12,
+        "l2": 1.7386919849648555e-08
+      },
+      "mf": {
+        "max_abs": 5.348650536363131e-09,
+        "mean_abs": 1.9274345580394045e-12,
+        "l2": 1.2915817734921967e-08
+      }
+    },
+    {
+      "name": "model.loss",
+      "kind": "shifted",
+      "hp": {
+        "max_abs": 2.384185791015625e-07,
+        "mean_abs": 1.9598539028103504e-12,
+        "l2": 5.057621821307283e-07
+      },
+      "mf": {
+        "max_abs": 2.384185791015625e-07,
+        "mean_abs": 1.9598539028103504e-12,
+        "l2": 5.057621821307283e-07
+      }
+    },
+    {
+      "name": "model.loss",
+      "kind": "exponent",
+      "hp": {
+        "max_abs": 2.989278435894249e-08,
+        "mean_abs": 4.259368496735784e-11,
+        "l2": 1.5014866620405128e-07
+      },
+      "mf": {
+        "max_abs": 2.989278435894249e-08,
+        "mean_abs": 4.259368496735784e-11,
+        "l2": 1.5014866620405128e-07
+      }
+    },
+    {
+      "name": "model.loss",
+      "kind": "sum",
+      "hp": {
+        "max_abs": 7.020182397354802e-05,
+        "mean_abs": 2.2754198166108353e-05,
+        "l2": 7.213568706341296e-05
+      },
+      "mf": {
+        "max_abs": 7.020182397354802e-05,
+        "mean_abs": 2.1851454139021342e-05,
+        "l2": 7.206093140669057e-05
+      }
+    },
+    {
+      "name": "model.loss",
+      "kind": "log_sum",
+      "hp": {
+        "max_abs": 2.516590900114579e-07,
+        "mean_abs": 1.1334255345385458e-07,
+        "l2": 2.886579535434886e-07
+      },
+      "mf": {
+        "max_abs": 1.1147633882657715e-07,
+        "mean_abs": 4.98714333163619e-08,
+        "l2": 1.2837082783802762e-07
+      }
+    },
+    {
+      "name": "model.loss",
+      "kind": "log_probability",
+      "hp": {
+        "max_abs": 1.0861241150905698e-06,
+        "mean_abs": 6.149354652979786e-07,
+        "l2": 0.0005184103322439992
+      },
+      "mf": {
+        "max_abs": 8.212245177219302e-07,
+        "mean_abs": 5.227299784407559e-07,
+        "l2": 0.00043129211586724955
+      }
+    },
+    {
+      "name": "model.loss",
+      "kind": "probability",
+      "hp": {
+        "max_abs": 4.068995543282661e-08,
+        "mean_abs": 2.376243435261972e-12,
+        "l2": 4.708915928643801e-08
+      },
+      "mf": {
+        "max_abs": 1.453726775069164e-08,
+        "mean_abs": 2.366826424488996e-12,
+        "l2": 2.985582306273007e-08
+      }
+    }
+  ]
+}

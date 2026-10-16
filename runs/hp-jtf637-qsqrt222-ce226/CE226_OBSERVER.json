@@ -1,0 +1,77 @@
+{
+  "source_sha256": "efd9883ec4f18b5e1dac3bdbdb6ec5b7658421c1db50fbe8834fd14bce8347b6",
+  "factor_sha256": "6cf107df6198e123fe20a2a3c2579a5bc7a6a692fd4ee8fb297371327b727699",
+  "selection": {
+    "complete": true,
+    "step": 226,
+    "coordinates": [
+      [
+        4080,
+        1671
+      ],
+      [
+        4095,
+        2270
+      ],
+      [
+        4095,
+        3137
+      ],
+      [
+        4095,
+        3484
+      ],
+      [
+        4095,
+        4315
+      ],
+      [
+        4095,
+        4455
+      ],
+      [
+        4095,
+        4536
+      ],
+      [
+        4095,
+        4551
+      ],
+      [
+        4095,
+        4766
+      ]
+    ],
+    "token_rows": [
+      0,
+      1,
+      4080,
+      4095
+    ],
+    "affected_token_rows": [
+      4080,
+      4095
+    ],
+    "control_token_rows": [
+      0,
+      1
+    ],
+    "hidden_columns": [
+      1671,
+      2270,
+      3137,
+      3484,
+      4315,
+      4455,
+      4536,
+      4551,
+      4766
+    ],
+    "scope": "Every observed main-head dinput mismatch; all vocabulary entries in affected token rows; observation only."
+  },
+  "teacher_values_used": false,
+  "original_log_probabilities": "def log_probabilities(inputs: torch.Tensor) -> torch.Tensor:\n    \"\"\"Retain max/sub/exp/sum/log/sub order, with no reference-stage values.\"\"\"\n    shifted = inputs - inputs.max(dim=-1, keepdim=True).values\n    total = tiled_sum(shifted.exp())\n    return shifted - total.log()\n",
+  "original_backward": "@staticmethod\ndef backward(ctx, gradient):\n    inputs, targets = ctx.saved_tensors\n    result = log_probabilities(inputs).exp()\n    valid = targets != ctx.ignore_index\n    hot = torch.zeros_like(result).scatter_(1, targets.clamp_min(0)[:, None], 1)\n    result = (result - hot) * (valid[:, None] * gradient)\n    return result, None, None\n",
+  "instrumented_log_probabilities": "def log_probabilities(inputs: torch.Tensor) -> torch.Tensor:\n    \"\"\"Retain max/sub/exp/sum/log/sub order, with no reference-stage values.\"\"\"\n    shifted = inputs - inputs.max(dim=-1, keepdim=True).values\n    exponent = shifted.exp()\n    total = tiled_sum(exponent)\n    log_total = total.log()\n    result = shifted - log_total\n    ce226_save('shifted', shifted)\n    ce226_save('exponent', exponent)\n    ce226_save('sum', total)\n    ce226_save('log_sum', log_total)\n    ce226_save('log_probability', result)\n    return result\n",
+  "instrumented_backward": "def backward(ctx, gradient):\n    inputs, targets = ctx.saved_tensors\n    ce226_start(inputs, targets)\n    result = log_probabilities(inputs).exp()\n    ce226_save('probability', result)\n    valid = targets != ctx.ignore_index\n    hot = torch.zeros_like(result).scatter_(1, targets.clamp_min(0)[:, None], 1)\n    scaled = valid[:, None] * gradient\n    result = (result - hot) * scaled\n    ce226_save('one_hot', hot)\n    ce226_save('mask', valid)\n    ce226_save('dout', scaled)\n    ce226_save('gradient', gradient)\n    ce226_save('dx_fp32', result)\n    ce226_save('dx_bf16', result.bfloat16())\n    return result, None, None\n"
+}
