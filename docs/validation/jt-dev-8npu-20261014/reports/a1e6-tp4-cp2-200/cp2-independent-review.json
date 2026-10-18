@@ -1,0 +1,1842 @@
+{
+  "schema": "a1e6-cp2200-v2-independent-review",
+  "status": "REVIEW_COMPLETE_MAIN_LM_FAIL",
+  "reviewed_utc": "2026-10-18T05:26:58.588449+00:00",
+  "review_scope": "Independent local raw-evidence, scalar, layout, execution and resource audit; no SSH/NPU or source mutation.",
+  "evidence_integrity": "PASS",
+  "main_lm_status": "FAIL",
+  "root_cause_status": "UNRESOLVED",
+  "findings": [],
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "collection_manifests": {
+    "baseline": {
+      "path": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "bytes": 1707604,
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "files": 91,
+      "all_sha_size_match": true
+    },
+    "continuous": {
+      "path": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "bytes": 3040568,
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "files": 91,
+      "all_sha_size_match": true
+    },
+    "cp2": {
+      "path": "evidence/129-a1e6-cp2200-v2-evidence-manifest.json",
+      "bytes": 1806561,
+      "sha256": "54be9eda888f16bfc19e7bd0311a7124ca48aca5a49fed146612a1dd004857bf",
+      "files": 91,
+      "all_sha_size_match": true
+    }
+  },
+  "coverage": {
+    "candidate_steps": 200,
+    "candidate_ranks": 8,
+    "scalar_pairs_per_comparison": 1600,
+    "initial_CPU_tensor_objects_per_rank": 48,
+    "CPU_initial_mismatches": 0,
+    "integration_findings": 0,
+    "original_files_verified": 273,
+    "finite_scalar_values_checked": 89600
+  },
+  "comparisons": {
+    "baseline": {
+      "input_hash_pairs": 1600,
+      "input_hash_mismatches": 0,
+      "CPU_initial_objects_per_rank": 48,
+      "CPU_initial_all_ranks_equal": true,
+      "runtime_flags_all_ranks_equal": true,
+      "metrics": {
+        "training/total_loss": {
+          "pairs": 1600,
+          "max_abs": 0.02242898941040039,
+          "step": 188,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 91,
+          "over_0_005_steps": [
+            91,
+            98,
+            126,
+            130,
+            144,
+            147,
+            148,
+            151,
+            154,
+            164,
+            165,
+            177,
+            188,
+            189,
+            193,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 16.809673309326172,
+            "candidate_rank0": 16.809581756591797,
+            "signed_candidate_minus_reference": -9.1552734375e-05,
+            "max_abs_all_ranks": 9.1552734375e-05
+          }
+        },
+        "training/foundation_loss/lm": {
+          "pairs": 1600,
+          "max_abs": 0.018723011016845703,
+          "step": 188,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 91,
+          "over_0_005_steps": [
+            91,
+            130,
+            144,
+            147,
+            148,
+            151,
+            154,
+            164,
+            165,
+            188,
+            189,
+            193,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 12.881054878234863,
+            "candidate_rank0": 12.88092041015625,
+            "signed_candidate_minus_reference": -0.00013446807861328125,
+            "max_abs_all_ranks": 0.00013446807861328125
+          }
+        },
+        "training/foundation_loss/mtp": {
+          "pairs": 1600,
+          "max_abs": 0.0056400299072265625,
+          "step": 97,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 97,
+          "over_0_005_steps": [
+            97
+          ],
+          "step1": {
+            "reference_rank0": 3.928363800048828,
+            "candidate_rank0": 3.9284071922302246,
+            "signed_candidate_minus_reference": 4.3392181396484375e-05,
+            "max_abs_all_ranks": 4.3392181396484375e-05
+          }
+        },
+        "training/foundation_loss/aux": {
+          "pairs": 1600,
+          "max_abs": 1.3272394426167011e-05,
+          "step": 179,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.00025308559997938573,
+            "candidate_rank0": 0.00025306345196440816,
+            "signed_candidate_minus_reference": -2.214801497757435e-08,
+            "max_abs_all_ranks": 2.214801497757435e-08
+          }
+        },
+        "training/grad_norm": {
+          "pairs": 1600,
+          "max_abs": 0.409757137298584,
+          "step": 148,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 4,
+          "over_0_005_steps": [
+            4,
+            9,
+            10,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            31,
+            32,
+            33,
+            35,
+            37,
+            38,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            51,
+            52,
+            53,
+            54,
+            56,
+            57,
+            59,
+            62,
+            63,
+            64,
+            65,
+            66,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            78,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            104,
+            105,
+            106,
+            107,
+            108,
+            109,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115,
+            116,
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            129,
+            130,
+            131,
+            132,
+            133,
+            134,
+            135,
+            136,
+            137,
+            139,
+            140,
+            141,
+            142,
+            143,
+            144,
+            145,
+            146,
+            147,
+            148,
+            149,
+            150,
+            151,
+            152,
+            153,
+            154,
+            155,
+            156,
+            157,
+            159,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            167,
+            168,
+            169,
+            170,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            180,
+            181,
+            182,
+            183,
+            184,
+            185,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            196,
+            198,
+            199,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 22.473445892333984,
+            "candidate_rank0": 22.473630905151367,
+            "signed_candidate_minus_reference": 0.0001850128173828125,
+            "max_abs_all_ranks": 0.0001850128173828125
+          }
+        },
+        "training/lr": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.0001,
+            "candidate_rank0": 0.0001,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_tokens": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_samples": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_tokens": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_samples": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        }
+      },
+      "reconstructed_unweighted_diagnostics": {
+        "mtp": {
+          "coefficient": 0.3,
+          "max_abs": 0.01880009969075521,
+          "step": 97,
+          "step1_max_abs": 0.00014464060465494793
+        },
+        "aux": {
+          "coefficient": 0.0001,
+          "max_abs": 0.1327239442616701,
+          "step": 179,
+          "step1_max_abs": 0.00022148014977574348
+        }
+      }
+    },
+    "continuous": {
+      "input_hash_pairs": 1600,
+      "input_hash_mismatches": 0,
+      "CPU_initial_objects_per_rank": 48,
+      "CPU_initial_all_ranks_equal": true,
+      "runtime_flags_all_ranks_equal": true,
+      "metrics": {
+        "training/total_loss": {
+          "pairs": 1600,
+          "max_abs": 0.02242898941040039,
+          "step": 188,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 91,
+          "over_0_005_steps": [
+            91,
+            98,
+            126,
+            130,
+            144,
+            147,
+            148,
+            151,
+            154,
+            164,
+            165,
+            177,
+            188,
+            189,
+            193,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 16.809673309326172,
+            "candidate_rank0": 16.809581756591797,
+            "signed_candidate_minus_reference": -9.1552734375e-05,
+            "max_abs_all_ranks": 9.1552734375e-05
+          }
+        },
+        "training/foundation_loss/lm": {
+          "pairs": 1600,
+          "max_abs": 0.018723011016845703,
+          "step": 188,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 91,
+          "over_0_005_steps": [
+            91,
+            130,
+            144,
+            147,
+            148,
+            151,
+            154,
+            164,
+            165,
+            188,
+            189,
+            193,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 12.881054878234863,
+            "candidate_rank0": 12.88092041015625,
+            "signed_candidate_minus_reference": -0.00013446807861328125,
+            "max_abs_all_ranks": 0.00013446807861328125
+          }
+        },
+        "training/foundation_loss/mtp": {
+          "pairs": 1600,
+          "max_abs": 0.0056400299072265625,
+          "step": 97,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 97,
+          "over_0_005_steps": [
+            97
+          ],
+          "step1": {
+            "reference_rank0": 3.928363800048828,
+            "candidate_rank0": 3.9284071922302246,
+            "signed_candidate_minus_reference": 4.3392181396484375e-05,
+            "max_abs_all_ranks": 4.3392181396484375e-05
+          }
+        },
+        "training/foundation_loss/aux": {
+          "pairs": 1600,
+          "max_abs": 1.3272394426167011e-05,
+          "step": 179,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.00025308559997938573,
+            "candidate_rank0": 0.00025306345196440816,
+            "signed_candidate_minus_reference": -2.214801497757435e-08,
+            "max_abs_all_ranks": 2.214801497757435e-08
+          }
+        },
+        "training/grad_norm": {
+          "pairs": 1600,
+          "max_abs": 0.409757137298584,
+          "step": 148,
+          "rank": 0,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 4,
+          "over_0_005_steps": [
+            4,
+            9,
+            10,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            31,
+            32,
+            33,
+            35,
+            37,
+            38,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            51,
+            52,
+            53,
+            54,
+            56,
+            57,
+            59,
+            62,
+            63,
+            64,
+            65,
+            66,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            78,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            104,
+            105,
+            106,
+            107,
+            108,
+            109,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115,
+            116,
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            129,
+            130,
+            131,
+            132,
+            133,
+            134,
+            135,
+            136,
+            137,
+            139,
+            140,
+            141,
+            142,
+            143,
+            144,
+            145,
+            146,
+            147,
+            148,
+            149,
+            150,
+            151,
+            152,
+            153,
+            154,
+            155,
+            156,
+            157,
+            159,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            167,
+            168,
+            169,
+            170,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            180,
+            181,
+            182,
+            183,
+            184,
+            185,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            196,
+            198,
+            199,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 22.473445892333984,
+            "candidate_rank0": 22.473630905151367,
+            "signed_candidate_minus_reference": 0.0001850128173828125,
+            "max_abs_all_ranks": 0.0001850128173828125
+          }
+        },
+        "training/lr": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.0001,
+            "candidate_rank0": 0.0001,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_tokens": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_samples": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_tokens": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_samples": {
+          "pairs": 1600,
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        }
+      },
+      "reconstructed_unweighted_diagnostics": {
+        "mtp": {
+          "coefficient": 0.3,
+          "max_abs": 0.01880009969075521,
+          "step": 97,
+          "step1_max_abs": 0.00014464060465494793
+        },
+        "aux": {
+          "coefficient": 0.0001,
+          "max_abs": 0.1327239442616701,
+          "step": 179,
+          "step1_max_abs": 0.00022148014977574348
+        }
+      }
+    }
+  },
+  "input_coherence_independently_checked": {
+    "baseline": {
+      "steps": 200,
+      "ranks": 8,
+      "rows": 1600,
+      "finite_scalar_values": 22400,
+      "counter_accumulation_pairs": 3200,
+      "counter_accumulation_mismatches": 0,
+      "global_input_hash_same_across_8ranks": true,
+      "micro_steps": [
+        1
+      ]
+    },
+    "continuous": {
+      "steps": 400,
+      "ranks": 8,
+      "rows": 3200,
+      "finite_scalar_values": 44800,
+      "counter_accumulation_pairs": 6400,
+      "counter_accumulation_mismatches": 0,
+      "global_input_hash_same_across_8ranks": true,
+      "micro_steps": [
+        1
+      ]
+    },
+    "cp2": {
+      "steps": 200,
+      "ranks": 8,
+      "rows": 1600,
+      "finite_scalar_values": 22400,
+      "counter_accumulation_pairs": 3200,
+      "counter_accumulation_mismatches": 0,
+      "global_input_hash_same_across_8ranks": true,
+      "micro_steps": [
+        2
+      ]
+    }
+  },
+  "numerical_recipe_keys_equal_to_baseline": [
+    "model",
+    "optimizer",
+    "lr_scheduler",
+    "loss_fn",
+    "model_init_dtype",
+    "training",
+    "mixed_precision",
+    "dataset",
+    "dataloader",
+    "packed_sequence",
+    "activation_checkpoint",
+    "activation_swap",
+    "compile",
+    "memory"
+  ],
+  "global_parameter_metadata_equal_all_ranks": true,
+  "runtime_flags_all_ranks_equal": true,
+  "global_scalar_max_rank_spread": 0.0,
+  "LR_pairs_checked_per_comparison": 1600,
+  "LR_mismatch_pairs": 0,
+  "constant_LR": 0.0001,
+  "executions": {
+    "baseline": {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "container_id": "431499a668c960916ef11abe2fc379ef64109a2784164c992cb56d309eb6ecb1",
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "container_stopped_field": null,
+      "duration_seconds": 383.04995921999216,
+      "micro_batches_all_ranks": [
+        1
+      ],
+      "receipt": {
+        "path": "scheduling/r129-a1e6-fsdp8-0-200-v3.receipt.json",
+        "bytes": 9580,
+        "sha256": "6b5b9bcfa9aa0fbfb1fe1b74324397f3ffc1b1a1a8dbeaeff42e09754dea968b"
+      },
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    },
+    "continuous": {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "container_stopped_field": null,
+      "duration_seconds": 610.3890903799911,
+      "micro_batches_all_ranks": [
+        1
+      ],
+      "receipt": {
+        "path": "scheduling/r129-a1e6-fsdp8-continuous400-v2.receipt.json",
+        "bytes": 9593,
+        "sha256": "43187845ad046dbc551ff397a20fa51c245d6a6dd9e1069e63e3f19dc08109d2"
+      },
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    },
+    "cp2": {
+      "case": "r129-a1e6-cp2-200-v2",
+      "container_id": "aee522961bfb59f8afae0adfd722973dce27ead200d9723a7db689992643b974",
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "container_stopped_field": true,
+      "duration_seconds": 462.5807218400296,
+      "micro_batches_all_ranks": [
+        2
+      ],
+      "receipt": {
+        "path": "scheduling/r129-a1e6-cp2-200-v2.receipt.json",
+        "bytes": 9710,
+        "sha256": "b7b26e1c7a11093ecd69dbfe8d02d70de28010bc8df89ac26bf37e34e6fb0833"
+      },
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    }
+  },
+  "candidate_absence_evidence": {
+    "container_id": "aee522961bfb59f8afae0adfd722973dce27ead200d9723a7db689992643b974",
+    "remaining_exact_id": "",
+    "absent_verified": true,
+    "scope": "Read-only full-ID absence after canonical guard released/stopped and completed automatic removal",
+    "observed_local_utc": "2026-10-18T05:15:07.502253+00:00"
+  },
+  "resources": {
+    "baseline": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "all_rank_max_each_step": true,
+      "median_step_seconds": 1.156256079673767,
+      "summed_step_seconds": 207.97043895721436,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15990.50334593064,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.25,
+      "rank0_time_underreport_steps": 0,
+      "rank0_time_underreport_step_numbers": [],
+      "rank0_max_underestimate_seconds": 0.0
+    },
+    "continuous": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "all_rank_max_each_step": true,
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.171875,
+      "rank0_time_underreport_steps": 0,
+      "rank0_time_underreport_step_numbers": [],
+      "rank0_max_underestimate_seconds": 0.0
+    },
+    "cp2": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "all_rank_max_each_step": true,
+      "median_step_seconds": 1.593995213508606,
+      "summed_step_seconds": 286.5645694732666,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 11604.895909193123,
+      "allocated_gib": 20.706645965576172,
+      "reserved_gib": 25.943359375,
+      "rank0_time_underreport_steps": 0,
+      "rank0_time_underreport_step_numbers": [],
+      "rank0_max_underestimate_seconds": 0.0
+    }
+  },
+  "primary_resource_comparison": {
+    "reference": "continuous400 first200, off, no save",
+    "candidate": "CP2/DP4/TP1, FSDP8, off, no save",
+    "actual_HostConfig_equal": true,
+    "single_observation_only": true,
+    "diagnostic_only_precision_failed": true,
+    "relative": {
+      "median_step_time_increase_percent": 37.909670379369146,
+      "supervised_throughput_change_percent": -27.466452579803313,
+      "allocated_saved_gib": 1.3255500793457031,
+      "allocated_saved_percent": 6.0164228597231695,
+      "reserved_saved_gib": 1.228515625,
+      "rank0_initial_model_float32_gib_increase": 0.0
+    }
+  },
+  "initial_optimizer_layout_observations": {
+    "baseline": {
+      "scope": "rank0 initial inventory only",
+      "parameter_count": 46,
+      "model_local_numel": 339747840,
+      "model_float32_gib": 1.2656593322753906,
+      "initial_optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.0.self_attn.linear_qkv.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            2112,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            264,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    },
+    "continuous": {
+      "scope": "rank0 initial inventory only",
+      "parameter_count": 46,
+      "model_local_numel": 339747840,
+      "model_float32_gib": 1.2656593322753906,
+      "initial_optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.0.self_attn.linear_qkv.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            2112,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            264,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    },
+    "cp2": {
+      "scope": "rank0 initial inventory only",
+      "parameter_count": 46,
+      "model_local_numel": 339747840,
+      "model_float32_gib": 1.2656593322753906,
+      "initial_optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.0.self_attn.linear_qkv.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            2112,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            264,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        }
+      }
+    }
+  },
+  "figure_check": {
+    "status": "PASS",
+    "source": "tools/plot_comparison.py",
+    "title": "CP2完整200步对齐",
+    "source_label": "544526f7；129 / 910B3",
+    "raw_components": true,
+    "reference_curve_rank": 0,
+    "error_curves": "all8rank per-step maxima, independently recomputed; MTP /0.3, aux /0.0001",
+    "png_byte_equal": true,
+    "png_pixel_equal": true,
+    "image_size": [
+      3204,
+      1404
+    ],
+    "png_sha256": "d78603542bf4c28965244ec78363d81d9a36465d81eb76b7edd86822b8e612a6",
+    "svg_path_geometry_equal": true,
+    "svg_text_equal": true,
+    "svg_path_count": 115,
+    "replay_image_artifacts_written_to_disk": false,
+    "temporary_cache_files_removed": 1,
+    "temporary_directory_removed": true
+  },
+  "loss_units": {
+    "lm": "unweighted",
+    "mtp": "logged weighted by0.3",
+    "aux": "logged weighted by0.0001",
+    "derived": "absolute logged scalar gap divided by recorded coefficient; not independently captured pre-weight tensors"
+  },
+  "interpretation_zh": [
+    "主LM完整200×8rank最大差0.018723011016845703@188，13步超过0.005；与baseline及独立continuous400前200步比较得到相同结果，验收FAIL。",
+    "首步主LM已差0.00013446807861328125，在首次optimizer更新前形成；只能据此优先检查更新前参数/前向/损失归约和微批相关内部状态，未确认具体函数或根因。",
+    "实际canonical全局输入摘要1600对、CPU构造初态48项、四项计数、数值配方、runtime flags及LR一致；不能排除分片/设备搬运后的参数或内部状态差异。",
+    "八rank记录相同全局标量，不是八份独立本地loss观测；梯度只比较范数。",
+    "CP2为DP4×CP2，固定GBS8/MBS1下2微批；FSDP域是DP×CP=8。实际rank0初始FP32局部元素339747840，1.2656593322753906GiB，与基线相同；不能把CP2解释成持久参数减半。",
+    "CP可缩短本地序列及部分激活/attention范围，同时引入CP通信、重排/缓冲与两串行微批；本配置expanded_ulysses、overlap=false。总峰值和端到端速度不能按CP倍数推算，尚无阶段profile定量归因。",
+    "时间按逐步8rank MAX、去前20步统计；CP2全200步rank0低报0步，但仍统一使用allrankMAX；strict rank0 performance不用作正式资源结论。",
+    "相对无checkpoint保存的continuous前200步，中位步时增加37.91%、监督吞吐下降27.47%、allocated少1.325550GiB（6.02%）。精度失败，资源只作诊断，不推荐为已验收优化。"
+  ],
+  "limitations": [
+    "MTP/Aux还原来自加权日志除0.3/0.0001，不是另采张量，本轮未扩大为其专项全矩阵验收。",
+    "CPU初态hash采集点早于NPU并行处理，不证明首次NPU完整参数/状态相同。",
+    "初始optimizer_state为空；46项rank0 FP32布局不等于训练后全部momentum/AdamW、主参数或完整持久存储，不重复计model/main。",
+    "单次观测包含输入identity/标量回调开销；allocator进程累计峰值含warmup，非物理HBM瞬时峰值，亦非无插桩端到端性能。",
+    "镜像、source与释放证据来自已保存回执；本审核未新开SSH或NPU。absence为后续完整CID只读观察，不重构原rm事件。",
+    "当前本机2h连续实验/轮结束释放后10min休息政策已有部署及激活回执；这不改变数值失败结论。201后续已取消。"
+  ],
+  "input_sha256": {
+    "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json": {
+      "bytes": 17543,
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca"
+    },
+    "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json": {
+      "bytes": 18270,
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b"
+    },
+    "evidence/129-a1e6-cp2200-v2-evidence-manifest.json": {
+      "bytes": 17185,
+      "sha256": "54be9eda888f16bfc19e7bd0311a7124ca48aca5a49fed146612a1dd004857bf"
+    },
+    "evidence/a1e6-cp2200-v2-strict.json": {
+      "bytes": 27666,
+      "sha256": "13c05e62e1e9cf6702acff8845d60bff76ed876fd2c67e8f09ee0c9456cc8f47"
+    },
+    "evidence/a1e6-cp2200-v2-resources.json": {
+      "bytes": 48798,
+      "sha256": "1aa88de68353553e9df55bfa21780a5ef1524f9ce218812e9e6ceef2f3ece5ff"
+    },
+    "evidence/a1e6-cp2200-v2-summary.json": {
+      "bytes": 2818,
+      "sha256": "60eafed7fac25d33190ab33728e5628f4209c1def75c9a490a7e5385909f046c"
+    },
+    "evidence/a1e6-fsdp8-continuous-first200-v2-resources.json": {
+      "bytes": 48237,
+      "sha256": "0848d7976436eac6bcb35ad0d381d940af4ca09f30e40de3c1d4f1fa8270880b"
+    },
+    "evidence/a1e6-cp2200-v2-container-absence.json": {
+      "bytes": 322,
+      "sha256": "74074e6bfb44b1c35828f4b61947ea71981426eda01ec496e9f0f95911c652f9"
+    },
+    "scheduling/r129-a1e6-cp2-200-v2.request.json": {
+      "bytes": 1840,
+      "sha256": "352182c6b1acd74503008bfb30c276c13ca4cfb79e16bd15bfcdbd795e99d02a"
+    },
+    "configs/r129-a1e6-cp2-200-v2.yaml": {
+      "bytes": 6042,
+      "sha256": "7d9be2e3408a1183bdd8d31ee75d3bbc063053677be6777ab20bac80a083eaba"
+    },
+    "tools/fair_resource_guard.py": {
+      "bytes": 78252,
+      "sha256": "0ad7505b7886d17796a97ed9e034777f16bedf4baec48a42c0a97791cde91b5f"
+    },
+    "tools/run_fair_a1e6_matrix_v1.sh": {
+      "bytes": 2307,
+      "sha256": "449a6ba02e89e9e09c28aefec39cbc8ec5a8a39937b60958b619b2f3a7359768"
+    },
+    "tools/capture_training.py": {
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    "tools/capture_a1e6_training.py": {
+      "bytes": 3355,
+      "sha256": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df"
+    },
+    "tools/all_rank_resources.py": {
+      "bytes": 6602,
+      "sha256": "fb10519797206e58c4114bb3b9980d89553a0324d9188824cb26360c3104e93c"
+    },
+    "tools/plot_comparison.py": {
+      "bytes": 6871,
+      "sha256": "757e2586e5ce5f98a74ec1de236a82e69400934da9ddd1a255a62ce64d956d5c"
+    },
+    "figures/a1e6-cp2200-v2-loss.png": {
+      "bytes": 627381,
+      "sha256": "d78603542bf4c28965244ec78363d81d9a36465d81eb76b7edd86822b8e612a6"
+    },
+    "figures/a1e6-cp2200-v2-loss.svg": {
+      "bytes": 118080,
+      "sha256": "54b1d63e9eaac8b9a9b048a121f280cdc061fcedfb449b4dc87171b1e4735cde"
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/text_trainer.py": {
+      "bytes": 14547,
+      "sha256": "79426f3fdd5f91f8b74791b45b727558637552eadc702176761ac96ce6bf3c87"
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/runtime/fsdp.py": {
+      "bytes": 17585,
+      "sha256": "96b4ce0b53577fbcde9d7338aadb002a6ce0e4316fd6632241beea9e9eb32a79"
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/distributed/mesh.py": {
+      "bytes": 12230,
+      "sha256": "1fcbeb292a25f1655437adc1842a5dfd268d624ca04d5e3faeba59c98798e853"
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py": {
+      "bytes": 20770,
+      "sha256": "3e01e509e10b183f78d3f2408b2a49c17fca34db756757e4f3ed30877a165a9f"
+    },
+    "evidence/shared-cycle-policy-20261018-v1/deployment-receipt.json": {
+      "bytes": 1239,
+      "sha256": "3801485d7b05aaeefe5b2f1afff015ab84ade7e6087dda792afd671fe62ef969"
+    },
+    "evidence/shared-cycle-policy-20261018-v1/first-activation-tp4-readback.json": {
+      "bytes": 19277,
+      "sha256": "db94a3134eabf8c376e5f2a563618d7ba88011cdb2f0d84c5b2b8f8d6abb4784"
+    }
+  },
+  "methodology_zh": [
+    "三份原manifest共273文件重算size/SHA；逐rank检查完整步号、有限scalar、结束标记、source/空patch与exit。",
+    "独立stdlib代码直接读raw JSONL计算200×8每metric绝对差、阈值步、输入identity及计数累加；未调用原比较器作科学结论。",
+    "逐步MAX再聚合资源；逐shape乘积复算rank0初始局部元素。",
+    "CP2图用同源脚本内存重绘，PNG字节/像素与SVG路径/文字一致；本次唯一临时font cache已清理。"
+  ]
+}
