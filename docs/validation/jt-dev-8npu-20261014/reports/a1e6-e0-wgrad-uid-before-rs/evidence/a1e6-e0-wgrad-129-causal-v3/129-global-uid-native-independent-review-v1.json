@@ -1,0 +1,2043 @@
+{
+  "schema": "e0-v3-actual-global-uid-native-math-independent-review-v1",
+  "created_utc": "2026-10-18T20:51:24.412769+00:00",
+  "reviewer": "/root/shared_matrix_independent_review",
+  "status": "PASS_ACTUAL_UID_NATIVE_X_DY_AND_FAIR_SCOPE_LOCAL_ACCOUNTING_ONLY",
+  "blockers": [],
+  "role": "Independent recomputation of Root-executed raw data and numerical accounting. Reviewer authored the probe/capture; source independence is separately provided by A3 review2e89, not claimed again here.",
+  "inputs": [
+    {
+      "path": "evidence/a1e6-e0-wgrad-coordinate-runtime-v1/offline-join-candidate-v3/tools/compare_e0_uid_native.py",
+      "bytes": 24237,
+      "sha256": "ab80ce789da3d934a516c940f865e396187f5d3260d8d6b04ca5ecc04ce12602"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-coordinate-runtime-v1/e0_wgrad_contract.py",
+      "bytes": 17376,
+      "sha256": "d2fd3aecbb23b51c4bee147ab20d71c7e84c7738968ca201f24f121b2b311eeb"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-coordinate-runtime-v1/training-candidate-v3/source-bindings-v1.json",
+      "bytes": 15007,
+      "sha256": "3e23df199a06682fdde934330537bbd4da0d88174f942320d003c8aab4e4b8c6"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-coordinate-runtime-v1/training-candidate-v3/training-candidate-independent-review-v1.json",
+      "bytes": 9319,
+      "sha256": "2e89eedf62205f9103a49c2a753d4a0c6ce896c71265596ce766d449c826802e"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-coordinate-runtime-v1/offline-join-candidate-v3/offline-v3-independent-review-v1.json",
+      "bytes": 5959,
+      "sha256": "088abfa6ad216d792af8a7c89fade336ca40ad3cff2b051e0189c7a875ac27bb"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-129-causal-v3/129-fsdp-v3-prefix-native-independent-review-v1.json",
+      "bytes": 10449,
+      "sha256": "4b093373ddf1242e11726c64a61e29d72b4616062c002fd4ae23a335641a68dd"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-129-causal-v3/129-ep4-v3-prefix-native-independent-review-v1.json",
+      "bytes": 10440,
+      "sha256": "c4ef76590024e95bcca8bfa3aceae23e89f4879277d36ca4e4034d8986698ad9"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-129-causal-v3/129-global-uid-comparison-execution-v1.json",
+      "bytes": 1138,
+      "sha256": "2b133872080708f155f685cdab44412ba3b3bc1ad625b47db4b5530cc1a18703"
+    },
+    {
+      "path": "evidence/a1e6-e0-wgrad-129-causal-v3/129-fsdp-vs-ep4-global-uid-native-comparison-v1.json",
+      "bytes": 8990,
+      "sha256": "716ac1d96d9f7320f1ea512a5ee7857a36684d2c0f61ed53b987389c6e7a1119"
+    }
+  ],
+  "manifests": [
+    {
+      "mode": "fsdp8",
+      "manifest": {
+        "path": "evidence/e0-fsdp-v3-complete-20261018-e0-wgrad-v1-evidence-manifest.json",
+        "bytes": 25638,
+        "sha256": "b03aaf7168fbb20e1558802c51d5f10da06f112f8f4dbe431eaabbbdb7671649"
+      },
+      "files": 120,
+      "bytes": 2211823,
+      "container_id": "d73557a24f446ab3b522f96d9bccd83406f880503cfc339f81ff3d4a3def6cca",
+      "container_absence": {
+        "absent": true,
+        "case": "r129-a1e6-e0-wgrad-fsdp8-3-v3",
+        "command": [
+          "docker",
+          "-H",
+          "unix:///var/run/docker.sock",
+          "ps",
+          "-a",
+          "--no-trunc",
+          "--filter",
+          "id=d73557a24f446ab3b522f96d9bccd83406f880503cfc339f81ff3d4a3def6cca",
+          "--format",
+          "{{.ID}}"
+        ],
+        "container_id": "d73557a24f446ab3b522f96d9bccd83406f880503cfc339f81ff3d4a3def6cca",
+        "host_id": "129",
+        "observed_epoch": 1792356000.8052666,
+        "owner": "01a13aa4-a553-7e22-a1c1-ebd16b083bb9",
+        "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+        "stdout": ""
+      }
+    },
+    {
+      "mode": "ep4",
+      "manifest": {
+        "path": "evidence/e0-ep4-v3-complete-20261018-e0-wgrad-v1-evidence-manifest.json",
+        "bytes": 25400,
+        "sha256": "c05d0f5b149e622204922692e0064dbb1717bd10dfee1b02e1e209fb2b0e0164"
+      },
+      "files": 120,
+      "bytes": 3350919,
+      "container_id": "c2104d6839ee1d7c3ea49433029970652b4f254bedb62db9849516f81c0657a7",
+      "container_absence": {
+        "absent": true,
+        "case": "r129-a1e6-e0-wgrad-ep4-3-v3",
+        "command": [
+          "docker",
+          "-H",
+          "unix:///var/run/docker.sock",
+          "ps",
+          "-a",
+          "--no-trunc",
+          "--filter",
+          "id=c2104d6839ee1d7c3ea49433029970652b4f254bedb62db9849516f81c0657a7",
+          "--format",
+          "{{.ID}}"
+        ],
+        "container_id": "c2104d6839ee1d7c3ea49433029970652b4f254bedb62db9849516f81c0657a7",
+        "host_id": "129",
+        "observed_epoch": 1792356309.301545,
+        "owner": "01a13aa4-a553-7e22-a1c1-ebd16b083bb9",
+        "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+        "stdout": ""
+      }
+    }
+  ],
+  "all240_raw_file_bindings": [
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/EXIT_CODE",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/EXIT_CODE",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/capture_a1e6_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/capture_a1e6_training.py",
+      "bytes": 3355,
+      "sha256": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/capture_e0_wgrad_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/capture_e0_wgrad_training.py",
+      "bytes": 34976,
+      "sha256": "3ad7f86ffd6b32c97d42a4698704d99417fbd7708bba74e5067bba964df97a50"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/capture_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank0.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank1.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank2.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank3.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank4.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank5.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank6.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/complete-rank7.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/config.resolved.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/config.resolved.json",
+      "bytes": 13152,
+      "sha256": "cd162894ab0010c8d1702a52853e46f87fab6e1cd5053b4851d8b3a829b96757"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/config.yaml",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/config.yaml",
+      "bytes": 5804,
+      "sha256": "15fda3e9cda4824fb4fe9ba07455b74afee43d9a953d88f0a2e61c1f4089b675"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank0.json",
+      "bytes": 3416,
+      "sha256": "5a7b7b97fc4af9006d193726a93b245fda706165ceecfb585ddf1511b630ad43"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank1.json",
+      "bytes": 3416,
+      "sha256": "46ec14a7499d0d4a4a80b20862f7792a0c5605ef49a3ea1909b338b7b14fee79"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank2.json",
+      "bytes": 3416,
+      "sha256": "77f2c4159d85ec9e45b052742ecb205a89c796fec3e63f370b781e04d54b8269"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank3.json",
+      "bytes": 3416,
+      "sha256": "698e2a72f24ef5042403f79238c025a5dfdc0af425d8aef4640dca1ac141d0b8"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank4.json",
+      "bytes": 3416,
+      "sha256": "05cb4802d5fe8b6b8c9ef30fb51ea169bc820fbfd7920723abf9fc71dc051955"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank5.json",
+      "bytes": 3416,
+      "sha256": "eed354283f1f367de2be6da7b476f41c6b4948ae00385ef5b9cc31c46da681e9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank6.json",
+      "bytes": 3416,
+      "sha256": "fb04479a62f51e5e78d019435e4c6d922b78e4abd544739bc0f68b505cc69b73"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-identity-rank7.json",
+      "bytes": 3416,
+      "sha256": "44126211a5d63e4ee9f105ae96c4d55783fa63920e13d0ec75857e95a36f1535"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank0.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank0.bin",
+      "bytes": 203356,
+      "sha256": "944eacf5f17e1d82be667f18fe00332fd6dc0f5778764d856697697dcc8131e2"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank0.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank0.jsonl",
+      "bytes": 1963,
+      "sha256": "b577a2b7e5204697082dd27a3a282c72522f58c1a5eac640249adc392213f310"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank1.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank1.bin",
+      "bytes": 206444,
+      "sha256": "0fdf91f3af0060328420a512a1f38032fc28344bfcbf2ad2ec95b7198b1f3a10"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank1.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank1.jsonl",
+      "bytes": 1963,
+      "sha256": "8abd76de6196051fc85247302b70299af73995b8a330d6b4039429331823ea75"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank2.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank2.bin",
+      "bytes": 211512,
+      "sha256": "febaeae22060d878897d6c8dd9ebf873ba39f4049f60c1d6522d8be42708ca42"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank2.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank2.jsonl",
+      "bytes": 1961,
+      "sha256": "8f64208fa912a991f7e4f70ec874ac65104acea811776ea4d61b6a50e3207bc8"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank3.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank3.bin",
+      "bytes": 205752,
+      "sha256": "a8e54f14a203a49c7320ce71200c8cd77300eb4ba51fbce0d5c6e36504bd78bc"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank3.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank3.jsonl",
+      "bytes": 1962,
+      "sha256": "d9aca9d767ef75bc654144fac758aa2c82692dc3cea51c105b57564db6c2e7e6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank4.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank4.bin",
+      "bytes": 203684,
+      "sha256": "0c687b9f1d51993baaf56a606fe4cb78db7695b8bf0e6acb654b3d41b4b6ea4f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank4.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank4.jsonl",
+      "bytes": 1963,
+      "sha256": "906625844c1349368ecaaae96ab0362acfdbfa579a876bcf865b1a8c0eaa14c4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank5.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank5.bin",
+      "bytes": 211004,
+      "sha256": "3b862a8ec6a1325770f9eef67b2c91950ba3829f31d47788a32873c25566edd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank5.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank5.jsonl",
+      "bytes": 1961,
+      "sha256": "fd818ae315ad1a856def95a0eb3956c93dfb1e97850e008d41ac6bb6912facd3"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank6.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank6.bin",
+      "bytes": 210452,
+      "sha256": "f92fa592919d0f89d965c2af772c511c7e1e71666df9d612d8df3cd7cd189a30"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank6.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank6.jsonl",
+      "bytes": 1963,
+      "sha256": "6a0643ddaab752e0af118b4abb3870a017e532f74904bd55d88369bdc39e2acc"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank7.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank7.bin",
+      "bytes": 211196,
+      "sha256": "5609d0dcd8afeca9bffb414d45eb030f80df5691538bdc985ae3378b459b8f26"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank7.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0-wgrad-rank7.jsonl",
+      "bytes": 1960,
+      "sha256": "5285b69f00709cfe05ef83061ae9605a6de465b7a44716308d9a3db59da13eb8"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0_fused_grad_ownership.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0_fused_grad_ownership.py",
+      "bytes": 6745,
+      "sha256": "31ed29f45d5e847d372ca31ef553717ee260158b73e0d1d70128f20dfff262d4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0_wgrad_contract.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/e0_wgrad_contract.py",
+      "bytes": 17376,
+      "sha256": "d2fd3aecbb23b51c4bee147ab20d71c7e84c7738968ca201f24f121b2b311eeb"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/expert_probe.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank0.json",
+      "bytes": 309,
+      "sha256": "6bfc5b91f4615bf61fa0f8f0b7ca80871a5752696e10d735eeb861477f3fbe1f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank1.json",
+      "bytes": 309,
+      "sha256": "4993580ca1e5432f6e5702dd801a161bb5fee13c5634d4ff1ec8921a6a2a4148"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank2.json",
+      "bytes": 309,
+      "sha256": "b84d63ea798a266f7ab7bd63da51a4423beea6c5220ba07f77f3e763bcda759e"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank3.json",
+      "bytes": 309,
+      "sha256": "197316406319ded22121e30d91d80e1c03f1a7105ec81c442a565419f61320a6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank4.json",
+      "bytes": 309,
+      "sha256": "941572574ccda3b1d4c14a12047eaa95d203cb043a7097f1cc2c4edc9778a75f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank5.json",
+      "bytes": 309,
+      "sha256": "b79506d22c81be7bac3e9bbebc0c3e23c9caea0042ee05e5c4ea1dcb89138da9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank6.json",
+      "bytes": 309,
+      "sha256": "ea29cb284e54b650d9ec21f21bda6fa1df196b8461ac6bd726f17b949e1920d1"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/final-memory-rank7.json",
+      "bytes": 309,
+      "sha256": "3b7eb6b94a822e2b8ae44f496671550ea710d923d1f6b830a7e8af9780e63589"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/fp32_wgrad_experiment.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/import-path.txt",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/import-path.txt",
+      "bytes": 53,
+      "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank0.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank1.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank2.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank3.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank4.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank5.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank6.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/initial-state-rank7.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/activation_checkpoint.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/activation_checkpoint.json",
+      "bytes": 35,
+      "sha256": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/findings.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/findings.json",
+      "bytes": 388,
+      "sha256": "20ca3ae160fb953659e45164929dd0c3c7b4bafcc9763e58479e4a927c054ccd"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/fsdp_units.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/fsdp_units.json",
+      "bytes": 2621,
+      "sha256": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/optimizer_layout_initial.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/optimizer_layout_initial.json",
+      "bytes": 46868,
+      "sha256": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/parameter_ownership.csv",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/check/parameter_ownership.csv",
+      "bytes": 3863,
+      "sha256": "2f63402178bfd952812a7ea6483299d1edc6f9451785565e64b15db8d6906ad6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/checkpoint/coverage.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/checkpoint/coverage.json",
+      "bytes": 127,
+      "sha256": "c2c685e1fe5995375393df9abec6fc4807d65ae63768f41818f9fe4cc431ddd6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/data/field_ownership.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/data/field_ownership.json",
+      "bytes": 229,
+      "sha256": "41896dc974540373fa01a10a0b7087f543fac3d5df44c4ebe6fe37c6728d6cc3"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/data/findings.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/data/findings.json",
+      "bytes": 41,
+      "sha256": "ff9c9fad82662fc12754bd8f6714c7d329754d5a483e2aaa948566861f333170"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/environment.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/environment.json",
+      "bytes": 1388,
+      "sha256": "0f6f4c56cfd199ad9a0f6bca3e0b7ea485ceb47cd628112e379e522c00fe4fa9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/integration_state.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/integration_state.json",
+      "bytes": 223,
+      "sha256": "7e3defc6c12dd748ecd2325f6f3fe71f910eff1aed554b80ad3d343a8c50f111"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/inventory/candidate.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/inventory/candidate.json",
+      "bytes": 45899,
+      "sha256": "c369274e8e697c77445d33556a60dacb94bf3a8dd58320d96084c39e363794bc"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/trainer_config.resolved.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/integration/trainer_config.resolved.json",
+      "bytes": 13152,
+      "sha256": "b7bd5106b941f70bac748078d37be36628076137657d1205d66484b3d5ab4317"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/launcher.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/launcher.log",
+      "bytes": 220,
+      "sha256": "8295fc6178458ca9e848e833b57ccc311ace668172358c01293efa77b1924c35"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank0.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank0.jsonl",
+      "bytes": 2231,
+      "sha256": "c28f594ecde5c9a7b2c3bfd3a8082609dd92282c98801174959fdf30eaf345c4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank1.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank1.jsonl",
+      "bytes": 2231,
+      "sha256": "f49e956e3574520c89fafe5308b464fbeee938ad58a2e7aefc776998fe36f75c"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank2.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank2.jsonl",
+      "bytes": 2231,
+      "sha256": "caec6c5af40f5d9a005adb1e18aec113f431756fa6717cba8fa8129e68c25e0b"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank3.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank3.jsonl",
+      "bytes": 2231,
+      "sha256": "c77b26c43718711d88e62ee7fcac1dbcb79fa347f2a96e1f0194584e790593e2"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank4.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank4.jsonl",
+      "bytes": 2231,
+      "sha256": "70a902cd4cb566729cadb898dd6df701adfae8777143bd40ee4daea78267bb3f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank5.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank5.jsonl",
+      "bytes": 2231,
+      "sha256": "7b5c317f5f7520016a4c456bd6df9ab354e018d47a50374a325e83571daee797"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank6.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank6.jsonl",
+      "bytes": 2231,
+      "sha256": "337f51d3db20b2ee866f3441e606a9b76c24a692509aabcaed822958297cc9a0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank7.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank7.jsonl",
+      "bytes": 2231,
+      "sha256": "db6482548049e351ca10b30da839eb9613f48ac63089c27a09d03f901f52cc58"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/module_profile.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/native_e0_wgrad_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/native_e0_wgrad_training.py",
+      "bytes": 44700,
+      "sha256": "650004d255678696d6cd48353f1e9283769e8edb0405497ccd03557938da185d"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/observer-helper-compile.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/observer-helper-compile.json",
+      "bytes": 1788,
+      "sha256": "de0202f0e3b58252be6a300af8c6409f57a2fcc4a83bb73713961bbc9c2cfded"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/precision_experiments.py",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank0.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank1.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank2.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank3.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank4.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank5.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank6.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/runtime-flags-rank7.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/source-commit.txt",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/source-commit.txt",
+      "bytes": 41,
+      "sha256": "ced6a562331fdbe6d6186ee8c2da2d55df1576c995718d98faafc50401f6844b"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/source-status.txt",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/source-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/source.patch",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/source.patch",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank0.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank1.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank2.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank3.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank4.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank5.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank6.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/start-rank7.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/0/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/0/stderr.log",
+      "bytes": 25142,
+      "sha256": "a8f0d014353ec3c0d65b121ffef10de1ac665942095513c427a075cb59546e80"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/0/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/0/stdout.log",
+      "bytes": 846,
+      "sha256": "d1ce993167b543d11da361301ceb187ba19553860e700843462c3037017ab9c3"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/1/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/1/stderr.log",
+      "bytes": 2986,
+      "sha256": "d6aa40904978ed9caad56b4db0ef86487046df9b6f3ad4dfc0e1ea8e056c48d4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/1/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/1/stdout.log",
+      "bytes": 186,
+      "sha256": "25e3a96e41f8e6cf877cd7deb9fbec168ac79d70a99d3e2aa930ef86aff822af"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/2/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/2/stderr.log",
+      "bytes": 2986,
+      "sha256": "f7870ee7187e079596223591087a7edd8bc360c32d16d3a063d45f8be97a3c54"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/2/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/2/stdout.log",
+      "bytes": 186,
+      "sha256": "e434b9aa7c8b6d0a4a6cf5d1d91b39471632c96bcb841b64898215a4f0c76454"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/3/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/3/stderr.log",
+      "bytes": 2986,
+      "sha256": "a654a32dafdecdd67f15eb35b2b8a2795395af20da403aa642526d6f6899707e"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/3/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/3/stdout.log",
+      "bytes": 186,
+      "sha256": "c405c1824b6571fecd23d22e8668d397cc4d75ad380437ad5b6d90d7522eaf02"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/4/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/4/stderr.log",
+      "bytes": 2986,
+      "sha256": "942bb66b196f6b3fae18fbe299234148799af777d5d8f5d4ea029cab7748f2ca"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/4/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/4/stdout.log",
+      "bytes": 186,
+      "sha256": "12d9da10c04816f5d002752fa64cdbd5448641b8d19d810c2e91087faca59a74"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/5/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/5/stderr.log",
+      "bytes": 2986,
+      "sha256": "51d9cc9f33e24285dc3027104abf227bab8c343ccebe9893bc9f44c9d062338a"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/5/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/5/stdout.log",
+      "bytes": 186,
+      "sha256": "d7eb053ff7878ae60625861dd06659cf1f3d9281dd1c87d30d4bb326a2b018c0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/6/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/6/stderr.log",
+      "bytes": 2986,
+      "sha256": "846804c1baa602886dfee6475ad94ab0c5272e7caa00fa07099a5bc5a65b9c15"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/6/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/6/stdout.log",
+      "bytes": 186,
+      "sha256": "a8a66724e9ddcbca9256d1e9d65ecdc6ae30d44ba6f90f956d281cdc9d7b9578"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/7/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/7/stderr.log",
+      "bytes": 2986,
+      "sha256": "4fe500762bdc8d84ee92aeefba18a7210fe140c01ec052241930ee17e08006b3"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/7/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/worker-logs/none_irx_2dcj/attempt_0/7/stdout.log",
+      "bytes": 186,
+      "sha256": "f0b473d896f052a6293b39ab2ddf42890bfd96a41607e1bc9db3097f5d367f13"
+    },
+    {
+      "remote_path": "scheduling/r129-a1e6-e0-wgrad-fsdp8-3-v3.receipt.json",
+      "path": "evidence/e0-wgrad-remote-raw/r129-a1e6-e0-wgrad-fsdp8-3-v3/scheduling/r129-a1e6-e0-wgrad-fsdp8-3-v3.receipt.json",
+      "bytes": 15278,
+      "sha256": "58de80a4e114ccdabc5a111a11cf3428250a36b2135444d88a0b9b883882e467"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/EXIT_CODE",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/EXIT_CODE",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/capture_a1e6_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/capture_a1e6_training.py",
+      "bytes": 3355,
+      "sha256": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/capture_e0_wgrad_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/capture_e0_wgrad_training.py",
+      "bytes": 34976,
+      "sha256": "3ad7f86ffd6b32c97d42a4698704d99417fbd7708bba74e5067bba964df97a50"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/capture_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/capture_training.py",
+      "bytes": 7263,
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank0.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank1.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank2.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank3.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank4.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank5.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank6.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/complete-rank7.json",
+      "bytes": 37,
+      "sha256": "5e548452465003048fe49a519b01a91528232191259063a972e04830178657f0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/config.resolved.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/config.resolved.json",
+      "bytes": 13150,
+      "sha256": "cc26462e001ea22bdb3d379a379a3fe2101d966fe31f368229889dc6c9804b63"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/config.yaml",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/config.yaml",
+      "bytes": 5802,
+      "sha256": "b97b8809d943ea066bdef73ef58aa38e19d9e8e12a6aa8b4f30167052b82c903"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank0.json",
+      "bytes": 3412,
+      "sha256": "2745ba7832e310dce0c5d8d40ad09b83a11e27edd36fac3fee6f952e052673d6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank1.json",
+      "bytes": 3412,
+      "sha256": "3d125fc08aac446adc64d3dec834e990c6495fcc34bed49201632e6452677af4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank2.json",
+      "bytes": 3412,
+      "sha256": "697cc4d6ec9fe6eac5f309badadb640a9a366fb7bf8946a4d231332130a9e1e1"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank3.json",
+      "bytes": 3412,
+      "sha256": "8700c3bc7c1ba13bb9a265b39f3f99cceb2fb093bc24ea5d6aeb82d1d97ce9dd"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank4.json",
+      "bytes": 3412,
+      "sha256": "4d857b5f45666b1a28454a858baad1f6a0603ac248b4b5fe91e3a8ee0b4b0be8"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank5.json",
+      "bytes": 3412,
+      "sha256": "3fc97618a019dea12b55b6945b4aa025c9cd0d6f2da621b40ae208995241fd10"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank6.json",
+      "bytes": 3412,
+      "sha256": "72cf30cd65aa2837a8abb906746ea55cf3c632f024d4160f60b5024fb58eb3d9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-identity-rank7.json",
+      "bytes": 3412,
+      "sha256": "51f17314c26b5b28fdad6282eea8a3dd475abce98a296423ae6d9d4dd0ec4ad6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank0.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank0.bin",
+      "bytes": 439396,
+      "sha256": "d3209c6e318807758f6607319b042b555bc081070a3e97cce2d88414c4e6bf56"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank0.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank0.jsonl",
+      "bytes": 2661,
+      "sha256": "eead87809eece13008640275814032eb969890a62ee654a43d4dce04ab5a5e18"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank1.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank1.bin",
+      "bytes": 258816,
+      "sha256": "dda14bc78f243ebe433f1059ec96ab9644feaaf8e390d6add48ee881a4e24f1f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank1.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank1.jsonl",
+      "bytes": 1781,
+      "sha256": "e97f830b476547fd0da736d66b3d55cea3b3f3cf94de73bcad31cab9d868ac55"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank2.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank2.bin",
+      "bytes": 318640,
+      "sha256": "fe7c63141851a9224dfc317b80a2938defea674e68373bc38a952f607ee7dc2c"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank2.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank2.jsonl",
+      "bytes": 1780,
+      "sha256": "8d49746b68c28aa3c5edfe36d175d3959e1c1530b35644f4c553c4f6199bf10d"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank3.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank3.bin",
+      "bytes": 335552,
+      "sha256": "96a552f71f2b64bb2b46c6928c938681e4337b058298bc26d2536967003e56fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank3.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank3.jsonl",
+      "bytes": 1781,
+      "sha256": "c9a581a934a7c6eb34f9a7fee918a77add3e988a54b809404ba4a96f2d2831ca"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank4.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank4.bin",
+      "bytes": 521724,
+      "sha256": "20eaab97c121c9086f8263e643604f5daa4923aee002a6beeece4a8c654b9ab4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank4.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank4.jsonl",
+      "bytes": 2663,
+      "sha256": "26e82ca653368d196a4f6ff5ad2eb10663b9a788850c337d5f6db185dfcec599"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank5.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank5.bin",
+      "bytes": 220480,
+      "sha256": "86fb71ca6dae37450344d4b5cd1f81c76be6c55504cbfb8662a5d68ad18bd543"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank5.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank5.jsonl",
+      "bytes": 1780,
+      "sha256": "0b7d97c57a0da66cc55f9bb4872da3894b76d14f9b876c819a1907d24f79f6a6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank6.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank6.bin",
+      "bytes": 373360,
+      "sha256": "99f43b98883ad6621fa83b5a419d08b4ccd0809d804a9485b3811634c70b420b"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank6.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank6.jsonl",
+      "bytes": 1781,
+      "sha256": "00ca5cb6591a22aeb037b39e66aaf4dc71c3d456a4d4ba6c37aae2c1a1b86203"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank7.bin",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank7.bin",
+      "bytes": 246112,
+      "sha256": "7a0a711fe844ee12ad44986c008069d08ed012919f6840ce89e5c750dbdc4092"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank7.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0-wgrad-rank7.jsonl",
+      "bytes": 1780,
+      "sha256": "9d922e7f4a031e7f084be20ef62472efc29d21f3af5fc68d0fbc84c9972e9ac3"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0_fused_grad_ownership.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0_fused_grad_ownership.py",
+      "bytes": 6745,
+      "sha256": "31ed29f45d5e847d372ca31ef553717ee260158b73e0d1d70128f20dfff262d4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0_wgrad_contract.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/e0_wgrad_contract.py",
+      "bytes": 17376,
+      "sha256": "d2fd3aecbb23b51c4bee147ab20d71c7e84c7738968ca201f24f121b2b311eeb"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/expert_probe.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/expert_probe.py",
+      "bytes": 3220,
+      "sha256": "461fb5c6aeca377d1157f5f6a6a021650629d9d9decccef80d4442d030a6257f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank0.json",
+      "bytes": 309,
+      "sha256": "be154dc560287f9ed7d4b76a1b1909425b256b5f344be59a41fb4cf8495f69e5"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank1.json",
+      "bytes": 309,
+      "sha256": "873fe880d5733989e18a74224ae3d2fde6846d99c790253831e4e986e2b53126"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank2.json",
+      "bytes": 309,
+      "sha256": "f064a904f21bdc1d7c7a40d573c432ce15c999ba8b6cdb7428f9396a40a92cd4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank3.json",
+      "bytes": 309,
+      "sha256": "722871b1c9792d533265a34593c5d7ff228e4bf7107ef878c77526b485023636"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank4.json",
+      "bytes": 309,
+      "sha256": "6c56d81e20e63f7f4adeea8abf2396aafe20a2a0965bf1dc6f178b863499d793"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank5.json",
+      "bytes": 309,
+      "sha256": "b5c6d76319d9bfa62c2922d4186e2da4c304bfead5b4b60e9dff68e53245d1a2"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank6.json",
+      "bytes": 309,
+      "sha256": "672e28f81a886bcb0492a3998716ea73f072bfc62196be59b4b82e0ef24b3936"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/final-memory-rank7.json",
+      "bytes": 309,
+      "sha256": "4ec7f0f2eaa99726ec66b2df89c774f146332c4e0c0b470796fc1eadeaaf440b"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/fp32_wgrad_experiment.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/fp32_wgrad_experiment.py",
+      "bytes": 4610,
+      "sha256": "c9e3448d9f818f4c0ef3257f31e8bc4f24c7b9300109e85f9db086fd1bb7f670"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/import-path.txt",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/import-path.txt",
+      "bytes": 53,
+      "sha256": "7edcb6a1976ae65b44f265d5b993a6c103ab88812717e9a3c5259cbf80eeecf6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank0.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank1.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank2.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank3.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank4.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank5.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank6.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/initial-state-rank7.json",
+      "bytes": 9762,
+      "sha256": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/activation_checkpoint.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/activation_checkpoint.json",
+      "bytes": 35,
+      "sha256": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/findings.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/findings.json",
+      "bytes": 388,
+      "sha256": "20ca3ae160fb953659e45164929dd0c3c7b4bafcc9763e58479e4a927c054ccd"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/fsdp_units.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/fsdp_units.json",
+      "bytes": 3233,
+      "sha256": "6c7de737583b79514bf443f7f78e19f22fd9139d8b6237fabea516375985f46c"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/optimizer_layout_initial.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/optimizer_layout_initial.json",
+      "bytes": 52590,
+      "sha256": "84826235186318d3bcc6a6d95c9d14d1a08f6eeeb2a87415b291877ac42dc24f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/parameter_ownership.csv",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/check/parameter_ownership.csv",
+      "bytes": 4570,
+      "sha256": "4754c8efd6a096c9f1645fe6cfaf1c67c1c093a1ba1de6660b593fb7ca54a4a0"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/checkpoint/coverage.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/checkpoint/coverage.json",
+      "bytes": 127,
+      "sha256": "c2c685e1fe5995375393df9abec6fc4807d65ae63768f41818f9fe4cc431ddd6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/data/field_ownership.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/data/field_ownership.json",
+      "bytes": 229,
+      "sha256": "41896dc974540373fa01a10a0b7087f543fac3d5df44c4ebe6fe37c6728d6cc3"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/data/findings.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/data/findings.json",
+      "bytes": 41,
+      "sha256": "ff9c9fad82662fc12754bd8f6714c7d329754d5a483e2aaa948566861f333170"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/environment.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/environment.json",
+      "bytes": 1388,
+      "sha256": "0f6f4c56cfd199ad9a0f6bca3e0b7ea485ceb47cd628112e379e522c00fe4fa9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/integration_state.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/integration_state.json",
+      "bytes": 223,
+      "sha256": "7e3defc6c12dd748ecd2325f6f3fe71f910eff1aed554b80ad3d343a8c50f111"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/inventory/candidate.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/inventory/candidate.json",
+      "bytes": 48768,
+      "sha256": "ac89e9329109af5c723b14e325c16beb7047f5f49b86d7b75f34a47161c86006"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/trainer_config.resolved.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/integration/trainer_config.resolved.json",
+      "bytes": 13150,
+      "sha256": "f2a44f9b326c28613eb6274b7728cfe47c0aaa86203392cda45b2de0533477ce"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/launcher.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/launcher.log",
+      "bytes": 220,
+      "sha256": "8295fc6178458ca9e848e833b57ccc311ace668172358c01293efa77b1924c35"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank0.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank0.jsonl",
+      "bytes": 2220,
+      "sha256": "b02cd807d524eaa7c76f8c9caeaebc340d8b79aa3a50409ea07c853e75342aa9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank1.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank1.jsonl",
+      "bytes": 2220,
+      "sha256": "a1c4902ecd0f02492da73fa68f4e5796ac548d51c860c4e96c532b809679f86a"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank2.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank2.jsonl",
+      "bytes": 2220,
+      "sha256": "a1a677490127ae97f8b69082e320a5e9afc4de679b294c6c0747871cdb49f9b3"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank3.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank3.jsonl",
+      "bytes": 2220,
+      "sha256": "87b34f37fdc05402e5c4a67956c918c47d00a14f2a870f1bc042c4e1dbd6786f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank4.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank4.jsonl",
+      "bytes": 2220,
+      "sha256": "2e0a5f9163862d7f8c75b773b20cf6d0d18a16c7e5c6d2e72ab979d45a1b7b5a"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank5.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank5.jsonl",
+      "bytes": 2220,
+      "sha256": "3e20aa4d56138b3f57367db4992d508882c6035886545fd0bae5b94968484ad1"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank6.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank6.jsonl",
+      "bytes": 2220,
+      "sha256": "fa682dc3ed3bc54d877929590f516fb3f5ddd2fb04989f4098b3680845ce051a"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank7.jsonl",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank7.jsonl",
+      "bytes": 2220,
+      "sha256": "92717f7893106966a8366a999021343c5695cb98d6319cdd3c68a8a50aa8897e"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/module_profile.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/module_profile.py",
+      "bytes": 5066,
+      "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/native_e0_wgrad_training.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/native_e0_wgrad_training.py",
+      "bytes": 44700,
+      "sha256": "650004d255678696d6cd48353f1e9283769e8edb0405497ccd03557938da185d"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/observer-helper-compile.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/observer-helper-compile.json",
+      "bytes": 1786,
+      "sha256": "03267927138e3550693fd172b00ef7e6b25d9b63ec1e121c488649fabc7a1a1d"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/precision_experiments.py",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/precision_experiments.py",
+      "bytes": 1716,
+      "sha256": "50acc479aaa8ca4603243cfb9ce3dd0b8907e35a9fe430b816671e6d7bdf9659"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank0.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank1.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank2.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank3.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank4.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank5.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank6.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/runtime-flags-rank7.json",
+      "bytes": 857,
+      "sha256": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/source-commit.txt",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/source-commit.txt",
+      "bytes": 41,
+      "sha256": "ced6a562331fdbe6d6186ee8c2da2d55df1576c995718d98faafc50401f6844b"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/source-status.txt",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/source-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/source.patch",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/source.patch",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank0.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank0.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank1.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank1.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank2.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank2.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank3.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank3.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank4.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank4.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank5.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank5.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank6.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank6.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank7.json",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/start-rank7.json",
+      "bytes": 8930,
+      "sha256": "d1605a20a18575a01170c283ac812a6fe312a7d8193b9b01b9075f6634ff0d82"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/0/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/0/stderr.log",
+      "bytes": 34962,
+      "sha256": "ad3aaa0d0071f22d3df1e85799e6afeed7580e71d606849ae3cfe64b2fc5da2a"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/0/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/0/stdout.log",
+      "bytes": 846,
+      "sha256": "c17a09f4d2e21509d26a96334f730615c84791f0b7181e95204d718ba15c402f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/1/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/1/stderr.log",
+      "bytes": 12773,
+      "sha256": "3529fcbe2b9201807ad93d4ccda1101f7eb67c23004630e543551a06eec9fa60"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/1/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/1/stdout.log",
+      "bytes": 186,
+      "sha256": "13df0a7d9cddc398e08846073f310f4f68c24227be8ddd7dd56701af2e0dbe79"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/2/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/2/stderr.log",
+      "bytes": 12773,
+      "sha256": "e604877f817605c3119e0a7e5f8288dade526454c2f3c0d92ae26db006cf0ff6"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/2/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/2/stdout.log",
+      "bytes": 186,
+      "sha256": "333a6a87e0d72230f9988017bae446b84c047bb30edf2f0a2082416903a7b07d"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/3/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/3/stderr.log",
+      "bytes": 12773,
+      "sha256": "901d5a88242296f0810a555cdf3ea1a306be1b1b380d7744caf84dbc3163a565"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/3/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/3/stdout.log",
+      "bytes": 186,
+      "sha256": "f09717483ae90d271e24dff6f1774ac4aa5926927010c8b910234071f739a67d"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/4/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/4/stderr.log",
+      "bytes": 12773,
+      "sha256": "77c9c1033f4816d76f8bf0142ba1c9cab79e0f418897e02686d847a584b176a2"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/4/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/4/stdout.log",
+      "bytes": 186,
+      "sha256": "fc640f10741db3a8a280a8726b9ff82324ec47ab7b94cda66fde1868b7262ad4"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/5/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/5/stderr.log",
+      "bytes": 12773,
+      "sha256": "f9b408101d86877f79f4ce14d3ae6e15f5818ee8fe00cf46e6eaff647d2a828f"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/5/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/5/stdout.log",
+      "bytes": 186,
+      "sha256": "aace912f6fabb9ce64797c14574a0bf93ed7a3a04cc05b973407547385d8fc43"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/6/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/6/stderr.log",
+      "bytes": 12773,
+      "sha256": "754821d56b1a9e3abbf3cbbb6f11679f996e69bb74021b329d5032e5500bc638"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/6/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/6/stdout.log",
+      "bytes": 186,
+      "sha256": "805f52fbb2531da11fb571e10ffd4a54b5cd3e1e8887664bfbede577072fa2bd"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/7/stderr.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/7/stderr.log",
+      "bytes": 12773,
+      "sha256": "ff6e9821d424af24aa990a4fab02ec34b48673d2d17717404674f7e916642211"
+    },
+    {
+      "remote_path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/7/stdout.log",
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/worker-logs/none_s58gdxoi/attempt_0/7/stdout.log",
+      "bytes": 186,
+      "sha256": "5d2518a6f3d7dcddf9f9e259519f43a9dd1175268f03fe77a98c0383aae4bfb3"
+    },
+    {
+      "remote_path": "scheduling/r129-a1e6-e0-wgrad-ep4-3-v3.receipt.json",
+      "path": "evidence/e0-wgrad-remote-raw/r129-a1e6-e0-wgrad-ep4-3-v3/scheduling/r129-a1e6-e0-wgrad-ep4-3-v3.receipt.json",
+      "bytes": 15272,
+      "sha256": "a5c5144fe53a29e3605781fcd25197d36801148b3f7612ef9c24dd0e00c770cb"
+    }
+  ],
+  "execution_receipts": [
+    {
+      "mode": "fsdp8",
+      "request": {
+        "path": "scheduling/r129-a1e6-e0-wgrad-fsdp8-3-v3.request.json",
+        "bytes": 5957,
+        "sha256": "dbaccae58055d9958035a31e24eae7e20e812dc38bff8a7fc8af59efc70acc2b"
+      },
+      "receipt": {
+        "path": "scheduling/r129-a1e6-e0-wgrad-fsdp8-3-v3.receipt.json",
+        "bytes": 15761,
+        "sha256": "5fbe73509468787d3c7335810d78fe56b05ee49d51cc3121df91e9c1205676f7"
+      },
+      "remote_receipt": {
+        "path": "evidence/e0-wgrad-remote-raw/r129-a1e6-e0-wgrad-fsdp8-3-v3/scheduling/r129-a1e6-e0-wgrad-fsdp8-3-v3.receipt.json",
+        "bytes": 15278,
+        "sha256": "58de80a4e114ccdabc5a111a11cf3428250a36b2135444d88a0b9b883882e467"
+      },
+      "owner": "01a13aa4-a553-7e22-a1c1-ebd16b083bb9",
+      "container_id": "d73557a24f446ab3b522f96d9bccd83406f880503cfc339f81ff3d4a3def6cca",
+      "exit0_released_stopped_no_owned_PIDs": true
+    },
+    {
+      "mode": "ep4",
+      "request": {
+        "path": "scheduling/r129-a1e6-e0-wgrad-ep4-3-v3.request.json",
+        "bytes": 5953,
+        "sha256": "2651834c029ba8abe006cc8e6cf16adad2aeb5f62417265736bc40d447fedbf6"
+      },
+      "receipt": {
+        "path": "scheduling/r129-a1e6-e0-wgrad-ep4-3-v3.receipt.json",
+        "bytes": 15755,
+        "sha256": "4bd55deb999e00a318bda26371b165a0b68c5ba4450b06acd78b9ed4be51a19f"
+      },
+      "remote_receipt": {
+        "path": "evidence/e0-wgrad-remote-raw/r129-a1e6-e0-wgrad-ep4-3-v3/scheduling/r129-a1e6-e0-wgrad-ep4-3-v3.receipt.json",
+        "bytes": 15272,
+        "sha256": "a5c5144fe53a29e3605781fcd25197d36801148b3f7612ef9c24dd0e00c770cb"
+      },
+      "owner": "01a13aa4-a553-7e22-a1c1-ebd16b083bb9",
+      "container_id": "c2104d6839ee1d7c3ea49433029970652b4f254bedb62db9849516f81c0657a7",
+      "exit0_released_stopped_no_owned_PIDs": true
+    }
+  ],
+  "identity_and_coverage": {
+    "sidecars": 48,
+    "ranks_per_arm": 8,
+    "identity_fields": 17,
+    "identity_pins": 35,
+    "step": 1,
+    "micro": 0,
+    "target": "model.layers.1.mlp.experts.down_proj",
+    "coordinate": {
+      "expert": 0,
+      "row": 306,
+      "column": 58
+    },
+    "strict_reader_complete_blocks_reference_SHA_and_finite_pass": true,
+    "UID_rows": 21714,
+    "padding_rows_included": 16,
+    "source_dp_slots": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "source_dp_batch_SHA": {
+      "0": "4f56367ecb160ac672cca0af8d9cd86c01e49d3b5b50bb92149f66ec9df67be7",
+      "1": "427327a71374253ba6cf8c6902a95733723e600833db8ef2d89e78f294395203",
+      "2": "19bfa5db8cf365e0f843d7af1894da7f578285c2d94e9270e8cad4d843c90e63",
+      "3": "5eeffa56dfab53c5fa723001e15de9666393d9a2743d3d897ea5e87bccc2ba18",
+      "4": "cd22f41dd15a1e4d2d6c1b7d1d75cd1daa90901af7f38768f13dab01fd458027",
+      "5": "261debb780c9f3ee62a13ce78fb0c5a4fa9588aa37335c999c46e97641ac0684",
+      "6": "d5dc217498ae7bd8b29a7cce99bcfaca4a9bbd6d6e13d8b618f6323670a81d57",
+      "7": "23c9dc543cfce2c3d09d8f8456f584bf8d00555b51aab4a4338bd689d7d190f5"
+    },
+    "native_element_encoding_differences": {
+      "X_column58": 0,
+      "dY_row306": 0
+    },
+    "independent_canonical_UID_BF16_digests": {
+      "fsdp8": {
+        "X_column58": "246dbdca9abc39fdfccf0c91c4ced73e6cf31fedb0cc70ebb4b06355879f27fd",
+        "dY_row306": "ad8b173a867c3349ba642c106e80d5328ed4692ef868b7fa38790fbfd80cd08f"
+      },
+      "ep4": {
+        "X_column58": "246dbdca9abc39fdfccf0c91c4ced73e6cf31fedb0cc70ebb4b06355879f27fd",
+        "dY_row306": "ad8b173a867c3349ba642c106e80d5328ed4692ef868b7fa38790fbfd80cd08f"
+      }
+    }
+  },
+  "independent_method": "Only schema/raw-bound reader reused from reviewed comparer. Routing reconstruction was written separately here without contract.fsdp_map/sender_map/receiver_map/reconstruct/compare_runs: validate original FSDP permutation,source and count groups; split original EP sender permutation using actual send counts; match each receiver list slot in recorded ProcessGroup rank order and original recv counts/received expert IDs; apply recorded token_order and local counts; join unique expert0 UID including sourceDP,batchSHA,micro,pad/real token position and topk slot. Decode original two-byte BF16 and four-byte FP32 via struct, finite checks; recompute every selected product and f64 math.fsum independently.",
+  "actual_local_observations": {
+    "fsdp8": [
+      {
+        "rank": 0,
+        "source_dp_slots": [
+          0
+        ],
+        "rows": 1572,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.00010195808863500133,
+        "pre_rs_scaling_pre": -0.00010195808863500133,
+        "pre_rs_scaling_post": -0.00010195808863500133,
+        "products_fsum_f64": -0.0001019580804708653,
+        "post_minus_fsum_f64": -8.164136033883551e-12,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 1,
+        "source_dp_slots": [
+          1
+        ],
+        "rows": 2344,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.0043886578641831875,
+        "pre_rs_scaling_pre": -0.0043886578641831875,
+        "pre_rs_scaling_post": -0.0043886578641831875,
+        "products_fsum_f64": -0.004388657261371609,
+        "post_minus_fsum_f64": -6.028115784317833e-10,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 2,
+        "source_dp_slots": [
+          2
+        ],
+        "rows": 3611,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.014368599280714989,
+        "pre_rs_scaling_pre": -0.014368599280714989,
+        "pre_rs_scaling_post": -0.014368599280714989,
+        "products_fsum_f64": -0.014368605414631475,
+        "post_minus_fsum_f64": 6.133916485850932e-09,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 3,
+        "source_dp_slots": [
+          3
+        ],
+        "rows": 2171,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.0005656919674947858,
+        "pre_rs_scaling_pre": -0.0005656919674947858,
+        "pre_rs_scaling_post": -0.0005656919674947858,
+        "products_fsum_f64": -0.0005656920092604878,
+        "post_minus_fsum_f64": 4.176570200797869e-11,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 4,
+        "source_dp_slots": [
+          4
+        ],
+        "rows": 1654,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.0041456702165305614,
+        "pre_rs_scaling_pre": -0.0041456702165305614,
+        "pre_rs_scaling_post": -0.0041456702165305614,
+        "products_fsum_f64": -0.004145670576747307,
+        "post_minus_fsum_f64": 3.602167453209404e-10,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 5,
+        "source_dp_slots": [
+          5
+        ],
+        "rows": 3484,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.01605900004506111,
+        "pre_rs_scaling_pre": -0.01605900004506111,
+        "pre_rs_scaling_post": -0.01605900004506111,
+        "products_fsum_f64": -0.016059004370333696,
+        "post_minus_fsum_f64": 4.325272584537743e-09,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 6,
+        "source_dp_slots": [
+          6
+        ],
+        "rows": 3346,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.010819200426340103,
+        "pre_rs_scaling_pre": -0.010819200426340103,
+        "pre_rs_scaling_post": -0.010819200426340103,
+        "products_fsum_f64": -0.010819203180517434,
+        "post_minus_fsum_f64": 2.75417733064387e-09,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 7,
+        "source_dp_slots": [
+          7
+        ],
+        "rows": 3532,
+        "scaling_group": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "op": "AVG",
+        "factor": null,
+        "wgrad_pre": null,
+        "wgrad_post": -0.016079306602478027,
+        "pre_rs_scaling_pre": -0.016079306602478027,
+        "pre_rs_scaling_post": -0.016079306602478027,
+        "products_fsum_f64": -0.016079304873784395,
+        "post_minus_fsum_f64": -1.728693632685463e-09,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      }
+    ],
+    "ep4": [
+      {
+        "rank": 0,
+        "source_dp_slots": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "rows": 9698,
+        "scaling_group": [
+          0,
+          4
+        ],
+        "op": "SUM",
+        "factor": 0.125,
+        "wgrad_pre": null,
+        "wgrad_post": -0.01942492462694645,
+        "pre_rs_scaling_pre": -0.01942492462694645,
+        "pre_rs_scaling_post": -0.002428115578368306,
+        "products_fsum_f64": -0.019424912765734437,
+        "post_minus_fsum_f64": -1.1861212012576061e-08,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      },
+      {
+        "rank": 4,
+        "source_dp_slots": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "rows": 12016,
+        "scaling_group": [
+          0,
+          4
+        ],
+        "op": "SUM",
+        "factor": 0.125,
+        "wgrad_pre": null,
+        "wgrad_post": -0.04710324481129646,
+        "pre_rs_scaling_pre": -0.04710324481129646,
+        "pre_rs_scaling_post": -0.005887905601412058,
+        "products_fsum_f64": -0.04710318300138283,
+        "post_minus_fsum_f64": -6.18099136318051e-08,
+        "versions": {
+          "grad_output": 0,
+          "input": 0,
+          "main_post": 0,
+          "main_pre": null,
+          "weight": 0
+        }
+      }
+    ]
+  },
+  "fair_scope_accounting": [
+    {
+      "source_dp_slots": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "EP_owner_rank": 0,
+      "FSDP_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "UIDs": 9698,
+      "exact_same_original_BF16_products": true,
+      "common_offline_products_fsum_f64": -0.019424912765734437,
+      "EP_native_local_GMM_post_f32": -0.01942492462694645,
+      "FSDP_native_partial_sum_f64": -0.019424907201027963,
+      "EP_native_minus_FSDP_partial_sum_f64": -1.7425918485969305e-08,
+      "EP_native_minus_exact_products_fsum_f64": -1.1861212012576061e-08,
+      "FSDP_native_partial_sum_minus_exact_products_fsum_f64": 5.564706473393244e-09,
+      "EP_pre_rs_scaled_native_f32": -0.002428115578368306,
+      "scope_limit": "The four captured FSDP FP32 partials are added with offline f64 fsum; this is not an observed NPU sum or HCCL simulation."
+    },
+    {
+      "source_dp_slots": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "EP_owner_rank": 4,
+      "FSDP_ranks": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "UIDs": 12016,
+      "exact_same_original_BF16_products": true,
+      "common_offline_products_fsum_f64": -0.04710318300138283,
+      "EP_native_local_GMM_post_f32": -0.04710324481129646,
+      "FSDP_native_partial_sum_f64": -0.0471031772904098,
+      "EP_native_minus_FSDP_partial_sum_f64": -6.752088665962219e-08,
+      "EP_native_minus_exact_products_fsum_f64": -6.18099136318051e-08,
+      "FSDP_native_partial_sum_minus_exact_products_fsum_f64": 5.71097302781709e-09,
+      "EP_pre_rs_scaled_native_f32": -0.005887905601412058,
+      "scope_limit": "The four captured FSDP FP32 partials are added with offline f64 fsum; this is not an observed NPU sum or HCCL simulation."
+    }
+  ],
+  "conclusion_ZH": "目标 expert0 down_proj(row306,col58)首步micro0的21714个UID包含16个padding，双方X列和dY行的BF16原生编码全部一致。EP两个原生GMM输出分别覆盖DP0–3与DP4–7，必须与对应四个FSDP partial合计作局部诊断；记录的本地GMM输出差异在所选reduce-scatter之前已存在。此差异与不同本地累加分块/顺序相容，不能据此判产品数学错误、唯一kernel问题或200步主loss根因。",
+  "limits": [
+    "Only one selected gradient coordinate,firststep,micro0; not full tensor or all experts.",
+    "native_byte_differences historical field means unequal BF16 element encodings,not byte count.",
+    "Offline f64 products/fsum and sums of captured FP32 partials are diagnostic; not NPU FP32 GMM or HCCL addition-order simulation.",
+    "FSDP AVG scaling observation occurs before collective averaging; EP SUM factor0.125 observed before collective; do not compare different local scopes or infer post-RS result.",
+    "Own-topology3x8 scalar/input/initial/runtime transparency is separately reviewed by A3; these are logged scalars and CPU initial descriptors,not all gradients or internal states.",
+    "No200step repair,performance recommendation,product issue/PR or unique root-cause acceptance."
+  ],
+  "operations": "Local immutable raw/hash/schema/routing and mathematical recomputation plus new review JSON only. No SSH,Docker,NPU,collectives,source,requests,canonical or existing evidence changes."
+}

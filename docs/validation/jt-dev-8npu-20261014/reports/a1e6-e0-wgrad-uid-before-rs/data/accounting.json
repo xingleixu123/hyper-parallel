@@ -1,0 +1,320 @@
+{
+  "schema": "e0-before-rs-report-accounting-v1",
+  "product_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "host": "129",
+  "target": "model.layers.1.mlp.experts.down_proj",
+  "coordinate": {
+    "expert": 0,
+    "row": 306,
+    "column": 58
+  },
+  "step": 1,
+  "micro": 0,
+  "UID_rows": 21714,
+  "padding_rows": 16,
+  "source_dp_slots": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "native_element_encoding_differences": {
+    "X_column58": 0,
+    "dY_row306": 0
+  },
+  "fair_source_DP_groups": [
+    {
+      "source_dp_slots": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "EP_owner_rank": 0,
+      "FSDP_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "UIDs": 9698,
+      "exact_same_original_BF16_products": true,
+      "common_offline_products_fsum_f64": -0.019424912765734437,
+      "EP_native_local_GMM_post_f32": -0.01942492462694645,
+      "FSDP_native_partial_sum_f64": -0.019424907201027963,
+      "EP_native_minus_FSDP_partial_sum_f64": -1.7425918485969305e-08,
+      "EP_native_minus_exact_products_fsum_f64": -1.1861212012576061e-08,
+      "FSDP_native_partial_sum_minus_exact_products_fsum_f64": 5.564706473393244e-09,
+      "EP_pre_rs_scaled_native_f32": -0.002428115578368306,
+      "scope_limit": "The four captured FSDP FP32 partials are added with offline f64 fsum; this is not an observed NPU sum or HCCL simulation.",
+      "FSDP_error_div8": 6.955883091741555e-10,
+      "EP_error_div8": -1.4826515015720076e-09,
+      "EP_minus_FSDP_div8": -2.178239810746163e-09,
+      "FSDP_error_div8_units_1e9": 0.6955883091741555,
+      "EP_error_div8_units_1e9": -1.4826515015720076
+    },
+    {
+      "source_dp_slots": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "EP_owner_rank": 4,
+      "FSDP_ranks": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "UIDs": 12016,
+      "exact_same_original_BF16_products": true,
+      "common_offline_products_fsum_f64": -0.04710318300138283,
+      "EP_native_local_GMM_post_f32": -0.04710324481129646,
+      "FSDP_native_partial_sum_f64": -0.0471031772904098,
+      "EP_native_minus_FSDP_partial_sum_f64": -6.752088665962219e-08,
+      "EP_native_minus_exact_products_fsum_f64": -6.18099136318051e-08,
+      "FSDP_native_partial_sum_minus_exact_products_fsum_f64": 5.71097302781709e-09,
+      "EP_pre_rs_scaled_native_f32": -0.005887905601412058,
+      "scope_limit": "The four captured FSDP FP32 partials are added with offline f64 fsum; this is not an observed NPU sum or HCCL simulation.",
+      "FSDP_error_div8": 7.138716284771363e-10,
+      "EP_error_div8": -7.726239203975638e-09,
+      "EP_minus_FSDP_div8": -8.440110832452774e-09,
+      "FSDP_error_div8_units_1e9": 0.7138716284771363,
+      "EP_error_div8_units_1e9": -7.726239203975637
+    }
+  ],
+  "main_LM_first3": [
+    {
+      "step": 1,
+      "FSDP8_rank0_LM": 12.881054878234863,
+      "EP4_rank0_LM": 12.881054878234863,
+      "FSDP8_rank_range": [
+        12.881054878234863,
+        12.881054878234863
+      ],
+      "EP4_rank_range": [
+        12.881054878234863,
+        12.881054878234863
+      ],
+      "cross_topology_rankmax_abs": 0.0,
+      "own_FSDP8_200_prefix_rankmax_abs": 0.0,
+      "own_EP4_200_prefix_rankmax_abs": 0.0
+    },
+    {
+      "step": 2,
+      "FSDP8_rank0_LM": 12.84947395324707,
+      "EP4_rank0_LM": 12.84933090209961,
+      "FSDP8_rank_range": [
+        12.84947395324707,
+        12.84947395324707
+      ],
+      "EP4_rank_range": [
+        12.84933090209961,
+        12.84933090209961
+      ],
+      "cross_topology_rankmax_abs": 0.0001430511474609375,
+      "own_FSDP8_200_prefix_rankmax_abs": 0.0,
+      "own_EP4_200_prefix_rankmax_abs": 0.0
+    },
+    {
+      "step": 3,
+      "FSDP8_rank0_LM": 12.472381591796875,
+      "EP4_rank0_LM": 12.472291946411133,
+      "FSDP8_rank_range": [
+        12.472381591796875,
+        12.472381591796875
+      ],
+      "EP4_rank_range": [
+        12.472291946411133,
+        12.472291946411133
+      ],
+      "cross_topology_rankmax_abs": 8.96453857421875e-05,
+      "own_FSDP8_200_prefix_rankmax_abs": 0.0,
+      "own_EP4_200_prefix_rankmax_abs": 0.0
+    }
+  ],
+  "own_prefix_comparisons_each_arm": 24,
+  "units": {
+    "native_byte_differences": "BF16 element encodings unequal count, not bytes",
+    "error": "signed offline error versus same-UID BF16 product f64 fsum, uniformly divided by8",
+    "plot_axis": "error / 1e-9"
+  },
+  "limits": [
+    "Offline f64 sums are not NPU GMM/HCCL addition-order simulation.",
+    "Logged global scalars across8ranks are not8independent measurements.",
+    "Three steps do not accept200steps,full gradients,performance or a unique product/kernel cause."
+  ],
+  "sources": [
+    {
+      "path": "evidence/a1e6-e0-wgrad-129-causal-v3/129-global-uid-native-independent-review-v1.json",
+      "bytes": 86947,
+      "sha256": "03fb929fb7d241e5850499292f411a982c4dd5eda70eed9dbe6fed75a9b9411e"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank0.jsonl",
+      "bytes": 2231,
+      "sha256": "c28f594ecde5c9a7b2c3bfd3a8082609dd92282c98801174959fdf30eaf345c4"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank0.jsonl",
+      "bytes": 148268,
+      "sha256": "7782d6e09a62db21df62fa538f0ce6be04a11061cf8cc9b4fcc6bf98cff105fd"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank1.jsonl",
+      "bytes": 2231,
+      "sha256": "f49e956e3574520c89fafe5308b464fbeee938ad58a2e7aefc776998fe36f75c"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank1.jsonl",
+      "bytes": 148268,
+      "sha256": "6d10af9c3557c164b16a6bb0d12b1e63598349f397ae4a85bfed8e3b5fc3cbcd"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank2.jsonl",
+      "bytes": 2231,
+      "sha256": "caec6c5af40f5d9a005adb1e18aec113f431756fa6717cba8fa8129e68c25e0b"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank2.jsonl",
+      "bytes": 148268,
+      "sha256": "0552fef8f3ef4d79ceb601f0d1c690da2a7b53ce40505adac064c73cd48afebf"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank3.jsonl",
+      "bytes": 2231,
+      "sha256": "c77b26c43718711d88e62ee7fcac1dbcb79fa347f2a96e1f0194584e790593e2"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank3.jsonl",
+      "bytes": 148268,
+      "sha256": "7fefd1b8166640b6dc2c94ba3c943f1f91def33ff82b607e37df75966beb6651"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank4.jsonl",
+      "bytes": 2231,
+      "sha256": "70a902cd4cb566729cadb898dd6df701adfae8777143bd40ee4daea78267bb3f"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank4.jsonl",
+      "bytes": 148268,
+      "sha256": "98bd739f03958d4ca5a4361d0871f94688439608ece49f43123f67800e6ca2b5"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank5.jsonl",
+      "bytes": 2231,
+      "sha256": "7b5c317f5f7520016a4c456bd6df9ab354e018d47a50374a325e83571daee797"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank5.jsonl",
+      "bytes": 148268,
+      "sha256": "30b8af89f904bbf9f1e8c8aa6c1edca67396656748617375277cfcfadc5bdd0e"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank6.jsonl",
+      "bytes": 2231,
+      "sha256": "337f51d3db20b2ee866f3441e606a9b76c24a692509aabcaed822958297cc9a0"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank6.jsonl",
+      "bytes": 148268,
+      "sha256": "3ace22dbd4b7ed6b22af4b3523d2dd1f0ca66931b9eda1c8299c853bb65ebb9b"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-fsdp8-3-v3/metrics-rank7.jsonl",
+      "bytes": 2231,
+      "sha256": "db6482548049e351ca10b30da839eb9613f48ac63089c27a09d03f901f52cc58"
+    },
+    {
+      "path": "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank7.jsonl",
+      "bytes": 148268,
+      "sha256": "d93015f6fce7a5f36873ef62b53a9bdb7c5f882e9317cc283c90c234e6d59aaf"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank0.jsonl",
+      "bytes": 2220,
+      "sha256": "b02cd807d524eaa7c76f8c9caeaebc340d8b79aa3a50409ea07c853e75342aa9"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank0.jsonl",
+      "bytes": 149515,
+      "sha256": "8b9db2098958e6301ae89969fa7acbbb9b4f29286a618f89c2092a4a1f5874d9"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank1.jsonl",
+      "bytes": 2220,
+      "sha256": "a1c4902ecd0f02492da73fa68f4e5796ac548d51c860c4e96c532b809679f86a"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank1.jsonl",
+      "bytes": 149515,
+      "sha256": "0ec93d62b92d9f6eed7ef0eb46610076632c35eea33af350aa56b13a8ec5b534"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank2.jsonl",
+      "bytes": 2220,
+      "sha256": "a1a677490127ae97f8b69082e320a5e9afc4de679b294c6c0747871cdb49f9b3"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank2.jsonl",
+      "bytes": 149515,
+      "sha256": "a846acb55e0e32f894d198c707b1993db7981c57088d1d26f4ae12aa4ec4a6d0"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank3.jsonl",
+      "bytes": 2220,
+      "sha256": "87b34f37fdc05402e5c4a67956c918c47d00a14f2a870f1bc042c4e1dbd6786f"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank3.jsonl",
+      "bytes": 149515,
+      "sha256": "7d63f766db7e5d88cb616231896579f2734bc3f35589d36fe3faad01a4395ffe"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank4.jsonl",
+      "bytes": 2220,
+      "sha256": "2e0a5f9163862d7f8c75b773b20cf6d0d18a16c7e5c6d2e72ab979d45a1b7b5a"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank4.jsonl",
+      "bytes": 149515,
+      "sha256": "f2302b06ed98a0bf55a4fce4d1988c0d52a760e65f3aed4678320396b464d5f4"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank5.jsonl",
+      "bytes": 2220,
+      "sha256": "3e20aa4d56138b3f57367db4992d508882c6035886545fd0bae5b94968484ad1"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank5.jsonl",
+      "bytes": 149515,
+      "sha256": "a39e70d4b372119128caf0dc4046664095fac2e13f0372f849f621740bd16797"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank6.jsonl",
+      "bytes": 2220,
+      "sha256": "fa682dc3ed3bc54d877929590f516fb3f5ddd2fb04989f4098b3680845ce051a"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank6.jsonl",
+      "bytes": 149515,
+      "sha256": "e42d80af63c2280c7e55d22b1bde67c2693e6fdce09f7dc596eaeb725036343a"
+    },
+    {
+      "path": "runs/r129-a1e6-e0-wgrad-ep4-3-v3/metrics-rank7.jsonl",
+      "bytes": 2220,
+      "sha256": "92717f7893106966a8366a999021343c5695cb98d6319cdd3c68a8a50aa8897e"
+    },
+    {
+      "path": "runs/r129-a1e6-ep4-200-v2/metrics-rank7.jsonl",
+      "bytes": 149515,
+      "sha256": "c4fc15509975d74c631e20d0bcb247e83e6a94c611aa9740837976fcb31f1f26"
+    }
+  ],
+  "contract_sha256": "d2fd3aecbb23b51c4bee147ab20d71c7e84c7738968ca201f24f121b2b311eeb"
+}
