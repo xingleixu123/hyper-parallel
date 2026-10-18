@@ -1,0 +1,1233 @@
+{
+  "schema": "a1e6-cp4200-v2-independent-review",
+  "status": "REVIEW_COMPLETE_MAIN_LM_FAIL",
+  "reviewed_utc": "2026-10-18T05:53:19.381022+00:00",
+  "review_scope": "Independent local raw-evidence science audit; no Git, SSH, containers, NPU, publication or global coordinator state access.",
+  "evidence_integrity": "PASS",
+  "main_lm_status": "FAIL",
+  "root_cause_status": "UNRESOLVED",
+  "findings": [],
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "collection_manifests": {
+    "baseline": {
+      "path": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "files": 91,
+      "collected_bytes": 1707604,
+      "archive_sha256": "9a891331d43757af96dc636ecf700e686c0ca8bcdf2070eb6e74010a2e9cf6cf"
+    },
+    "continuous": {
+      "path": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "files": 91,
+      "collected_bytes": 3040568,
+      "archive_sha256": "09c8d1eb8b71f503bae52d8f7ebac8da7a17515665b7c0a7f102e07e23fc5dc1"
+    },
+    "cp4": {
+      "path": "evidence/129-a1e6-cp4200-v2-evidence-manifest.json",
+      "sha256": "71f701e7307ec627e73de7354b7d08004abb9493256bbd481df78c602e9f3f8b",
+      "files": 91,
+      "collected_bytes": 1800494,
+      "archive_sha256": "3c7bf8ca1a28a3d1ebf68242409406e51f749dff7543e65b96bece6eb5fa55ee"
+    }
+  },
+  "coverage": {
+    "baseline": {
+      "steps_per_rank": 200,
+      "ranks": 8,
+      "window": [
+        1,
+        200
+      ],
+      "scalar_rows": 1600,
+      "micro_batches": 1
+    },
+    "continuous": {
+      "steps_per_rank": 400,
+      "ranks": 8,
+      "window": [
+        1,
+        200
+      ],
+      "scalar_rows": 3200,
+      "micro_batches": 1
+    },
+    "cp4": {
+      "steps_per_rank": 200,
+      "ranks": 8,
+      "window": [
+        1,
+        200
+      ],
+      "scalar_rows": 1600,
+      "micro_batches": 4
+    }
+  },
+  "comparisons": {
+    "baseline": {
+      "errors": {
+        "training/total_loss": {
+          "max_abs": 0.010049819946289062,
+          "step": 148,
+          "rank": 0
+        },
+        "training/foundation_loss/lm": {
+          "max_abs": 0.009692192077636719,
+          "step": 148,
+          "rank": 0
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.003407716751098633,
+          "step": 172,
+          "rank": 0
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 0.00001039481139741838,
+          "step": 127,
+          "rank": 0
+        },
+        "training/grad_norm": {
+          "max_abs": 0.67254638671875,
+          "step": 148,
+          "rank": 0
+        }
+      },
+      "main_lm_over_005_steps": [
+        130,
+        146,
+        148,
+        164,
+        172,
+        181,
+        185,
+        190,
+        193,
+        200
+      ],
+      "scalar_pairs_per_metric": 1600,
+      "counter_pairs": 6400,
+      "input_mismatches": 0,
+      "LR_mismatches": 0,
+      "first_step": {
+        "training/total_loss": {
+          "reference": 16.809673309326172,
+          "candidate": 16.80942153930664,
+          "abs_error": 0.00025177001953125
+        },
+        "training/foundation_loss/lm": {
+          "reference": 12.881054878234863,
+          "candidate": 12.880926132202148,
+          "abs_error": 0.00012874603271484375
+        },
+        "training/foundation_loss/mtp": {
+          "reference": 3.928363800048828,
+          "candidate": 3.9282426834106445,
+          "abs_error": 0.00012111663818359375
+        },
+        "training/foundation_loss/aux": {
+          "reference": 0.00025308559997938573,
+          "candidate": 0.00025304779410362244,
+          "abs_error": 3.780587576329708e-8
+        },
+        "training/grad_norm": {
+          "reference": 22.473445892333984,
+          "candidate": 22.473007202148438,
+          "abs_error": 0.000438690185546875
+        },
+        "training/lr": {
+          "reference": 0.0001,
+          "candidate": 0.0001,
+          "abs_error": 0
+        }
+      }
+    },
+    "continuous": {
+      "errors": {
+        "training/total_loss": {
+          "max_abs": 0.010049819946289062,
+          "step": 148,
+          "rank": 0
+        },
+        "training/foundation_loss/lm": {
+          "max_abs": 0.009692192077636719,
+          "step": 148,
+          "rank": 0
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.003407716751098633,
+          "step": 172,
+          "rank": 0
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 0.00001039481139741838,
+          "step": 127,
+          "rank": 0
+        },
+        "training/grad_norm": {
+          "max_abs": 0.67254638671875,
+          "step": 148,
+          "rank": 0
+        }
+      },
+      "main_lm_over_005_steps": [
+        130,
+        146,
+        148,
+        164,
+        172,
+        181,
+        185,
+        190,
+        193,
+        200
+      ],
+      "scalar_pairs_per_metric": 1600,
+      "counter_pairs": 6400,
+      "input_mismatches": 0,
+      "LR_mismatches": 0,
+      "first_step": {
+        "training/total_loss": {
+          "reference": 16.809673309326172,
+          "candidate": 16.80942153930664,
+          "abs_error": 0.00025177001953125
+        },
+        "training/foundation_loss/lm": {
+          "reference": 12.881054878234863,
+          "candidate": 12.880926132202148,
+          "abs_error": 0.00012874603271484375
+        },
+        "training/foundation_loss/mtp": {
+          "reference": 3.928363800048828,
+          "candidate": 3.9282426834106445,
+          "abs_error": 0.00012111663818359375
+        },
+        "training/foundation_loss/aux": {
+          "reference": 0.00025308559997938573,
+          "candidate": 0.00025304779410362244,
+          "abs_error": 3.780587576329708e-8
+        },
+        "training/grad_norm": {
+          "reference": 22.473445892333984,
+          "candidate": 22.473007202148438,
+          "abs_error": 0.000438690185546875
+        },
+        "training/lr": {
+          "reference": 0.0001,
+          "candidate": 0.0001,
+          "abs_error": 0
+        }
+      }
+    }
+  },
+  "input_coherence_independently_checked": true,
+  "numerical_recipe_keys_equal_to_baseline": [
+    "model",
+    "optimizer",
+    "lr_scheduler",
+    "loss_fn",
+    "model_init_dtype",
+    "dataset",
+    "dataloader",
+    "fsdp_config",
+    "mixed_precision",
+    "activation_checkpoint",
+    "activation_swap",
+    "compile"
+  ],
+  "global_parameter_metadata_equal_all_ranks": true,
+  "runtime_flags_all_ranks_equal": true,
+  "runtime_flags": {
+    "before_trainer": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": null,
+        "FLASH_ATTENTION_DETERMINISTIC": null,
+        "CUBLAS_WORKSPACE_CONFIG": null,
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "scope": "Environment only; no backend queries"
+    },
+    "training": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": "true",
+        "FLASH_ATTENTION_DETERMINISTIC": "1",
+        "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "npu_matmul": {
+        "allow_tf32": null,
+        "allow_hf32": false,
+        "allow_bf16_reduced_precision_reduction": null
+      }
+    }
+  },
+  "global_scalar_max_rank_spread": 0,
+  "LR_pairs_checked_per_comparison": 1600,
+  "LR_mismatch_pairs": 0,
+  "constant_LR": 0.0001,
+  "executions": {
+    "baseline": {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "container_id": "431499a668c960916ef11abe2fc379ef64109a2784164c992cb56d309eb6ecb1",
+      "exit_code": 0,
+      "released": true,
+      "container_stopped_field": null,
+      "micro_batches": 1,
+      "duration_seconds": 383.04995921999216,
+      "receipt_sha256": "6b5b9bcfa9aa0fbfb1fe1b74324397f3ffc1b1a1a8dbeaeff42e09754dea968b",
+      "all_eight_card_snapshots_verified": true,
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    },
+    "continuous": {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+      "exit_code": 0,
+      "released": true,
+      "container_stopped_field": null,
+      "micro_batches": 1,
+      "duration_seconds": 610.3890903799911,
+      "receipt_sha256": "43187845ad046dbc551ff397a20fa51c245d6a6dd9e1069e63e3f19dc08109d2",
+      "all_eight_card_snapshots_verified": true,
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    },
+    "cp4": {
+      "case": "r129-a1e6-cp4-200-v2",
+      "container_id": "b538af53536ded200f8b966c50374ab8f491ad938f3a8f0f4ee3f30a6cf3d3fc",
+      "exit_code": 0,
+      "released": true,
+      "container_stopped_field": true,
+      "micro_batches": 4,
+      "duration_seconds": 536.8933910799678,
+      "receipt_sha256": "b4530193b02f450499afaafaa653e26c28670c371e27b1a8122b9ac8be2d978a",
+      "all_eight_card_snapshots_verified": true,
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    }
+  },
+  "candidate_absence_evidence": {
+    "container_id": "b538af53536ded200f8b966c50374ab8f491ad938f3a8f0f4ee3f30a6cf3d3fc",
+    "inspect_returncode": 1,
+    "stderr": "Error: No such object: b538af53536ded200f8b966c50374ab8f491ad938f3a8f0f4ee3f30a6cf3d3fc\n",
+    "absence_verified": true,
+    "created_utc": "2026-10-18T05:46:11.320758+00:00",
+    "host": "129-root",
+    "case": "r129-a1e6-cp4-200-v2",
+    "scope": "Read-only fullCID absence after reviewed guard automatic cleanup"
+  },
+  "resources": {
+    "cp4": {
+      "median_step_seconds": 1.9931213855743408,
+      "summed_step_seconds": 358.5325846672058,
+      "supervised_tokens": 3325552,
+      "supervised_tokens_per_second": 9275.452614960554,
+      "allocated_gib": 19.86618995666504,
+      "reserved_gib": 24.828125,
+      "rank0_time_underreport_steps": 0
+    },
+    "continuous": {
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.171875,
+      "rank0_time_underreport_steps": 0
+    }
+  },
+  "primary_resource_comparison": {
+    "median_time_increase_percent": 72.44136681289027,
+    "supervised_throughput_change_percent": -42.026064916440376,
+    "allocated_saved_gib": 2.166006088256836,
+    "allocated_saved_percent": 9.831094838846399,
+    "reserved_saved_gib": 2.34375
+  },
+  "initial_optimizer_layout_observations": {
+    "baseline": {
+      "scope": "rank0 initial metadata only",
+      "parameter_count": 46,
+      "local_numel": 339747840,
+      "float32_model_gib": 1.2656593322753906,
+      "optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    },
+    "continuous": {
+      "scope": "rank0 initial metadata only",
+      "parameter_count": 46,
+      "local_numel": 339747840,
+      "float32_model_gib": 1.2656593322753906,
+      "optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    },
+    "cp4": {
+      "scope": "rank0 initial metadata only",
+      "parameter_count": 46,
+      "local_numel": 339747840,
+      "float32_model_gib": 1.2656593322753906,
+      "optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        }
+      }
+    }
+  },
+  "loss_units": {
+    "lm": "unweighted logged LM",
+    "mtp": "logged weighted MTP includes coefficient 0.3; reconstructed unweighted delta = logged delta / 0.3",
+    "aux": "logged weighted auxiliary includes coefficient 0.0001; reconstructed unweighted delta = logged delta / 0.0001"
+  },
+  "unweighted_error_diagnostics": {
+    "lm": 0.009692192077636719,
+    "mtp": 0.011359055836995443,
+    "aux": 0.1039481139741838
+  },
+  "cp4_layout_interpretation_zh": "DP2×CP4、TP1、FSDP8，每步4个微批；rank0初始46项FP32 model/main元数据均为339747840元素(1.2656593322753906GiB)，与基线同份额。CP分短序列并未将持久参数按4缩小。expanded_ulysses且overlap=false，实际峰值可能受局部激活、CP通信重排/缓冲与4微批共同影响；没有阶段profiling不能定量归因。",
+  "interpretation_zh": "主LM全部200步×8rank最大差0.009692192077636719@148，10步超过0.005，首次超阈值130。首步已差0.00012874603271484375；该标量源自首次更新前前向，不能仅用后续optimizer误差积累解释，也不能据此确定算子根因。输入、CPU初态、元数据和LR一致不等于首次NPU计算参数/内部状态逐字节一致。",
+  "check_category_counts": {
+    "collection_91_files": 3,
+    "safe_unique_collection_paths": 273,
+    "collected_file_sha_size": 273,
+    "strict_collection_binding": 1,
+    "summary_input_binding": 5,
+    "fixed_clean_source": 3,
+    "editable_import_path": 3,
+    "runtime_import_source": 3,
+    "off_recompute_actual_coverage": 3,
+    "rank_step_unique_full_coverage": 24,
+    "finite_metrics": 6400,
+    "input_identity_metadata": 6400,
+    "start_complete_microbatch_contract": 24,
+    "all_rank_global_parameter_metadata": 24,
+    "all_rank_cpu_initial_identity": 24,
+    "all_rank_runtime_flags": 24,
+    "final_allocator_marker": 24,
+    "global_scalar_counter_rank_agreement": 600,
+    "global_input_rank_agreement": 600,
+    "initial_optimizer_states_empty": 3,
+    "initial_model_main_layout_identity": 3,
+    "saved_execution_identity": 3,
+    "exit_and_own_pid_release": 3,
+    "complete_eight_card_idle_release_snapshots": 9,
+    "saved_hostconfig_limits": 3,
+    "saved_device_arguments": 3,
+    "numerical_recipe_core_equal": 3,
+    "training_recipe_equal_except_duration": 3,
+    "cp4_topology": 1,
+    "cp4_dense_fsdp_eight": 1,
+    "cp4_base_plan_prefix": 1,
+    "cp4_expanded_ulysses_rule": 1,
+    "cp4_initial_parameter_persistent_shares_equal_baseline": 1,
+    "independent_scalar_maxima": 10,
+    "allrank_perstep_error_curve": 8,
+    "threshold_steps": 2,
+    "canonical_global_input_pairs": 3200,
+    "four_data_counter_pairs": 3200,
+    "lr_pairs": 3200,
+    "first_step_lm": 2,
+    "headline_main_lm_failure": 1,
+    "science_not_execution_failure": 1,
+    "unweighted_log_reconstruction": 1,
+    "allrank_resource_recomputation": 2,
+    "resource_observation_scope": 2,
+    "resource_input_pins": 2,
+    "relative_off_resource_values": 1,
+    "fullcid_absence": 1,
+    "candidate_request_identity": 1,
+    "candidate_request_nondata_pins": 9,
+    "captured_training_helpers_identical": 18,
+    "candidate_actual_config_pin": 1,
+    "frozen_data_request_pins_equal": 2,
+    "four_frozen_data_pins": 1
+  },
+  "input_sha256": {
+    "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+    "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+    "evidence/129-a1e6-cp4200-v2-evidence-manifest.json": "71f701e7307ec627e73de7354b7d08004abb9493256bbd481df78c602e9f3f8b",
+    "evidence/a1e6-cp4200-v2-strict.json": "9e884a367d3dcba9e5fec38649706b3aa7b4061da39196d8b3c7206d52299961",
+    "evidence/a1e6-cp4200-v2-summary.json": "f148611b0e2690b9d7f2edcf3ba1287caa13d98a582e86e99bdcb05fb6f605fb",
+    "runs/r129-a1e6-fsdp8-0-200-v3/integration/environment.json": "38a9675ae1e647aa8dd26eb3a397d2d03be3853cd89a55fba6198327062eb7d3",
+    "runs/r129-a1e6-fsdp8-0-200-v3/config.resolved.json": "aeb466cfdbb1bce5471fd560b66543a203161964fe21ef7e12c2cc285e4066b7",
+    "runs/r129-a1e6-fsdp8-0-200-v3/integration/check/activation_checkpoint.json": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank0.jsonl": "7782d6e09a62db21df62fa538f0ce6be04a11061cf8cc9b4fcc6bf98cff105fd",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank0.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank0.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank0.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank0.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank0.json": "138ea393131ecca3d913cd557b62e836fe0a5a42ee639fdcf19186dff14a4ca5",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank1.jsonl": "6d10af9c3557c164b16a6bb0d12b1e63598349f397ae4a85bfed8e3b5fc3cbcd",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank1.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank1.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank1.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank1.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank1.json": "192b0787367648080e7eb3b4e8321ef36ef3d9d1c0f6a87a08974e73912168e9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank2.jsonl": "0552fef8f3ef4d79ceb601f0d1c690da2a7b53ce40505adac064c73cd48afebf",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank2.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank2.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank2.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank2.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank2.json": "dfef973e89c402d26a4d0e56a6823157dff2fdf158426cfa4100731030383d57",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank3.jsonl": "7fefd1b8166640b6dc2c94ba3c943f1f91def33ff82b607e37df75966beb6651",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank3.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank3.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank3.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank3.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank3.json": "437c1359e7e60706895b7deb911743be201919ec1fffd2d7fa9beef0afd3b6db",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank4.jsonl": "98bd739f03958d4ca5a4361d0871f94688439608ece49f43123f67800e6ca2b5",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank4.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank4.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank4.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank4.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank4.json": "48913e61ac46246b15d57f6a7c0d1c4ea15fd8340d65648a2c3170c90ed7ddc2",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank5.jsonl": "30b8af89f904bbf9f1e8c8aa6c1edca67396656748617375277cfcfadc5bdd0e",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank5.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank5.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank5.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank5.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank5.json": "755eabacb06afc12e52edf3c195add267f13db803c2f302dbeed21c4fcd4bd4a",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank6.jsonl": "3ace22dbd4b7ed6b22af4b3523d2dd1f0ca66931b9eda1c8299c853bb65ebb9b",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank6.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank6.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank6.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank6.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank6.json": "c2e6239f754fcde525c364b6cd72569a13f29a2366e5c60817b734409f3286fb",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank7.jsonl": "d93015f6fce7a5f36873ef62b53a9bdb7c5f882e9317cc283c90c234e6d59aaf",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank7.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank7.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank7.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank7.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank7.json": "21c651c32c3bf85d2569886c3a3ccb8de6d4b86a74be60383fdd9079f5c1a531",
+    "runs/r129-a1e6-fsdp8-0-200-v3/integration/check/optimizer_layout_initial.json": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec",
+    "scheduling/r129-a1e6-fsdp8-0-200-v3.receipt.json": "6b5b9bcfa9aa0fbfb1fe1b74324397f3ffc1b1a1a8dbeaeff42e09754dea968b",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/integration/environment.json": "ec4408b9ccc4b09132cb23447a40aab271af02525f49d7859bb49d3c12ca49a3",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/config.resolved.json": "e0fd8bb515d7416f4efdecb6c58da9269cef2b8e1e7512deee2e0fe99107ca82",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/integration/check/activation_checkpoint.json": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank0.jsonl": "fca0e8f9261a67eb4536348636eb794434c818c42bf6fab7f85d7cec4a7cc948",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank0.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank0.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank0.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank0.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank0.json": "74967e7b682029c8b732db34246200819d971d5740ada58247be9a05e0a9d23b",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank1.jsonl": "edbaab35107c79f038fe22ff6451546914d91a87bb03b7f37e4b4ba8c7f16286",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank1.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank1.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank1.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank1.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank1.json": "46202585259751e792f7b463d443a3b2b145fa6ee06bb3fa6c66b9393cb23aef",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank2.jsonl": "77334fed31d6b4df3333f22d439961a57bab390bcb8d00e9e27b203ed578d996",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank2.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank2.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank2.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank2.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank2.json": "eaac6913b918f3fa50ce4a2327c20a734eaed89f6537dea6847fe7748870fbc4",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank3.jsonl": "bcf1f4e645ca31b11486efdc961e38c5c0a5e034d4fb7bf1ff5c8c8027653edd",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank3.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank3.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank3.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank3.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank3.json": "9a93f9e2e530da3362dc0f4ce617688fbccea4d271675ff11e89ff19ee5b6a5a",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank4.jsonl": "4ea921a8f9c6ada465028f72ba735e8f67710831af07d5231581d4ba25ffdd34",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank4.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank4.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank4.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank4.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank4.json": "273e58c6b0abf09196df18a7d5636c23c7edda7b5b923453905ab8d922f6bfac",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank5.jsonl": "f9b2f2d98522a5c5150f615eb2ec791ca63a1f0407fa6bab8e21db433d61120c",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank5.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank5.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank5.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank5.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank5.json": "a308c2c133c1817ead7efa151abc89e9bd2c8d7ac9d000c40abc841db15c0bac",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank6.jsonl": "4ab0a1dbcc8573dbf8877592b70f12161ca3c2ac66bea09ab8f35c84e5e41899",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank6.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank6.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank6.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank6.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank6.json": "fd26bc905a15121a5545ddd423622f24c8471c1d58601345e4d6aa661f957736",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank7.jsonl": "338f1e20d2e3de65e0cc9a216048bcb0b6fc7572d62fc52c4375702fb37683b0",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank7.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank7.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank7.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank7.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank7.json": "1eeb5cecaa7e4e668dea4c88eae6cf7de934bd925df3f351c33d1588e6cee782",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/integration/check/optimizer_layout_initial.json": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec",
+    "scheduling/r129-a1e6-fsdp8-continuous400-v2.receipt.json": "43187845ad046dbc551ff397a20fa51c245d6a6dd9e1069e63e3f19dc08109d2",
+    "runs/r129-a1e6-cp4-200-v2/integration/environment.json": "e7502e582c15db1cd758585e2f29224a434072975e278f9a39ced2124bb0f44b",
+    "runs/r129-a1e6-cp4-200-v2/config.resolved.json": "52984690c487e5ee5b6845029fa57ba5d4661f459a3ad39d026f6763737bbe48",
+    "runs/r129-a1e6-cp4-200-v2/integration/check/activation_checkpoint.json": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank0.jsonl": "a12cb09c02174bd4d1e23281784a9e29f6351295ad814cb416e479a77f4c919b",
+    "runs/r129-a1e6-cp4-200-v2/start-rank0.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank0.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank0.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank0.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank0.json": "feaca247c6a6a23d60dfe061e8faf2dbcfb609038558551c9282dcd4bb27b0d5",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank1.jsonl": "6711963d39ceffb308bb49b5412641ffc4bf14a7428c13b1a798cb6befcc646c",
+    "runs/r129-a1e6-cp4-200-v2/start-rank1.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank1.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank1.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank1.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank1.json": "8563a292c5ac072ecf9a34307cb0336bf544034b44d88dc4faabb2fc24614955",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank2.jsonl": "1bd0aceaf64c06663fcc1246c3099575c83ca9cdb95e11d0d007097b6fa6600d",
+    "runs/r129-a1e6-cp4-200-v2/start-rank2.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank2.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank2.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank2.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank2.json": "95bf3dc508f6df2c1d603bff71c453b147144d0ac638188663c36266eeaed959",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank3.jsonl": "32453677f3ba69cfae895f58f7936cd826687f3908a595923ed140ce379129c1",
+    "runs/r129-a1e6-cp4-200-v2/start-rank3.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank3.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank3.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank3.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank3.json": "56ffb3cc61e8a34aa6afe8f51a30df04362b50d75f887d907316ffeb76ce75b8",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank4.jsonl": "4acb644932d85a2024a10a35a14cbc738e1430a22d0c1754da43a2d2d83443f7",
+    "runs/r129-a1e6-cp4-200-v2/start-rank4.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank4.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank4.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank4.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank4.json": "47ff7db419318b6a3ed8ac30bcdb616fb9a94587e629e538fe3db71f5a75591e",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank5.jsonl": "c30012028a30a2c48d4aa408d03a6cb6bda1754833254eefa676acfca14934e1",
+    "runs/r129-a1e6-cp4-200-v2/start-rank5.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank5.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank5.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank5.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank5.json": "c490197cdc27cb7bac601a5a571d628bbc44bae898d740c28e740e047e4a7efc",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank6.jsonl": "d0c97ca8ed4fe36ec59a5bf60eb2889bb8db9ce97bd40f3315f2d715b9346078",
+    "runs/r129-a1e6-cp4-200-v2/start-rank6.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank6.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank6.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank6.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank6.json": "fb8a8c373c1751ee80abd116ec537fe3673b89310aca477e965a1bce0eff5bc7",
+    "runs/r129-a1e6-cp4-200-v2/metrics-rank7.jsonl": "b2b638b24252db13c66f50fe96c1839f81898469b6b37b4ff837d4f3f539ba28",
+    "runs/r129-a1e6-cp4-200-v2/start-rank7.json": "2ae2ff59a155094a931fc3d59c0fa90740e6b547eee5a27b86364bce6571ee9e",
+    "runs/r129-a1e6-cp4-200-v2/complete-rank7.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-cp4-200-v2/initial-state-rank7.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-cp4-200-v2/runtime-flags-rank7.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-cp4-200-v2/final-memory-rank7.json": "0e7ab42abcd1c42c4fb4928600213e9d824d41b94e4649740b7ff06d03c4b512",
+    "runs/r129-a1e6-cp4-200-v2/integration/check/optimizer_layout_initial.json": "598239f9d8cd0f56c851c5da83c32700c4e0bcbc9e12c702aa3df9099467f4b8",
+    "scheduling/r129-a1e6-cp4-200-v2.receipt.json": "b4530193b02f450499afaafaa653e26c28670c371e27b1a8122b9ac8be2d978a",
+    "evidence/a1e6-cp4200-v2-resources.json": "399f83021536077d61d550eb23bb9bb2ac6cb41e4c80db21f93989fc0ebec8bd",
+    "evidence/a1e6-fsdp8-continuous-first200-v2-resources.json": "0848d7976436eac6bcb35ad0d381d940af4ca09f30e40de3c1d4f1fa8270880b",
+    "evidence/a1e6-cp4200-v2-container-absence.json": "c6f46cc505d0d8061d60856e9e377f18fa3ed182f7b8cd9be2d8d8355697b6a7",
+    "scheduling/r129-a1e6-cp4-200-v2.request.json": "0ce73dcbe70f822b52daf2aa4641c695d7cdb2fb10359f6a17f280f09632c805",
+    "scheduling/r129-a1e6-fsdp8-0-200-v3.request.json": "279ac6b171b15b57fb67b0202a662198329b81edb6048e6a3cd6fac8240eb349",
+    "scheduling/r129-a1e6-fsdp8-continuous400-v2.request.json": "fe473fed3a8e6cac19bc8a0ea2fca389d734a33bc6fb74cc19c9057ce4e90982",
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/text_trainer.py": "79426f3fdd5f91f8b74791b45b727558637552eadc702176761ac96ce6bf3c87",
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/callbacks/environ_meter_callback.py": "f83e3fa5c5dabe37af299adb016045c2e6430abac010bef4cadc8a6189b9517d",
+    "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py": "3e01e509e10b183f78d3f2408b2a49c17fca34db756757e4f3ed30877a165a9f",
+    "figures/a1e6-cp4200-v2-loss.png": "79b5f588cc65c76d66c1634db2dea268969e729ded302317f63124037114e771",
+    "figures/a1e6-cp4200-v2-loss.svg": "0cc1f190a65274626c46df4bed1d8c2ee37412a4c200e4a745f3eaf7dd64bf25"
+  },
+  "figure_replay": {
+    "cp4": {
+      "png_byte_equal": true,
+      "png_pixel_equal": true,
+      "size": [
+        3204,
+        1404
+      ],
+      "png_sha256": "79b5f588cc65c76d66c1634db2dea268969e729ded302317f63124037114e771",
+      "svg_all_path_geometry_equal": true,
+      "svg_text_equal": true,
+      "svg_path_count": 117,
+      "svg_full_bytes_compared": false,
+      "replay_files_written": false
+    }
+  },
+  "scope_limits_zh": [
+    "训练日志中的loss/梯度范数在callback再次全局mean，八rank相同是归约标量的完整覆盖，不是八个局部前向独立相等；不按不同拓扑的同编号rank推断局部tensor身份。",
+    "initial-state为CPU模型构造后的48项记录；全局参数元数据及rank0初始optimizer布局一致，不证明首次NPU前向的完整参数/优化器/RNG/内部缓存逐字节身份。",
+    "MTP和aux的未加权误差由已记录加权值除系数得到，未单独重算内部目标；本次不宣称其全矩阵通过。",
+    "性能以21–200步全rank最大步时、同窗口有效监督token计算，显存取1–200步all-rank累计allocator峰值，不等同物理HBM驻留；单次运行且主LM失败，不能声称精度合格的性能或模块收益。",
+    "运行、双空闲检查、归属及释放结论绑定已保存的完整回执和fullCID不存在记录，本次没有新的远端查询；Privileged=true使显式Devices列表不是设备隔离保证。",
+    "本机没有这四份原始数据文件，不能独立重哈希远端数据字节；本次核对三组request的四份数据pins一致，并复算全部全局input_identity及四项计数一致。guard原执行及原始输入身份是现有证据范围。",
+    "压缩传输归档已由根处理；本次只核验收集manifest与273份原始文件，没有重新删除或把本机文件缺失作为远端删除证明。",
+    "本次仅CP4与同源FSDP8参考，不扩大为TP/EP/混合策略通过或已定位某个算子缺陷。"
+  ],
+  "source_semantics": [
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/trainer/text_trainer.py",
+      "sha256": "79426f3fdd5f91f8b74791b45b727558637552eadc702176761ac96ce6bf3c87",
+      "lines": "263–309",
+      "observation_zh": "288前向反向并在290–292累计loss，294–295再裁剪/优化器，299增加步号；首步记录来自首次更新前的前向。"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/trainer/callbacks/environ_meter_callback.py",
+      "sha256": "f83e3fa5c5dabe37af299adb016045c2e6430abac010bef4cadc8a6189b9517d",
+      "lines": "310–338",
+      "observation_zh": "步时MAX、token SUM、loss/grad mean后记日志；allrank覆盖不能扩大为局部数值相同。"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/context_parallel.py",
+      "sha256": "3e01e509e10b183f78d3f2408b2a49c17fca34db756757e4f3ed30877a165a9f",
+      "lines": "263–358",
+      "observation_zh": "CP sequence_start、global objective sum、MTP跨rank shift与投影loss token计数归一化存在；本次不据此判根因。"
+    }
+  ]
+}
