@@ -1,0 +1,2008 @@
+{
+  "schema": "a1e6-ep4200-v2-independent-review",
+  "status": "REVIEW_COMPLETE_MAIN_LM_FAIL",
+  "reviewed_utc": "2026-10-18 06:22:39 UTC",
+  "review_scope": "Independent local raw-evidence science audit; no Git, SSH, containers, NPU, publication or global coordinator state access.",
+  "evidence_integrity": "PASS",
+  "main_lm_status": "FAIL",
+  "root_cause_status": "UNRESOLVED",
+  "findings": [],
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "collection_manifests": {
+    "baseline": {
+      "path": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "files": 91,
+      "collected_bytes": 1707604,
+      "archive_sha256": "9a891331d43757af96dc636ecf700e686c0ca8bcdf2070eb6e74010a2e9cf6cf"
+    },
+    "continuous": {
+      "path": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "files": 91,
+      "collected_bytes": 3040568,
+      "archive_sha256": "09c8d1eb8b71f503bae52d8f7ebac8da7a17515665b7c0a7f102e07e23fc5dc1"
+    },
+    "ep4": {
+      "path": "evidence/129-a1e6-ep4200-v2-evidence-manifest.json",
+      "sha256": "a5a21c62ae30382f6a0854c85f28bf04d1e3e4147a33dca0f6d397cb9f88b41d",
+      "files": 91,
+      "collected_bytes": 1798041,
+      "archive_sha256": "0a2e7e7cad5026566c7bb07b544a027f0c4372c9d52be4bd74159a0b181e843c"
+    }
+  },
+  "coverage": {
+    "baseline": {
+      "steps_per_rank": 200,
+      "ranks": 8,
+      "window": [
+        1,
+        200
+      ],
+      "scalar_rows": 1600,
+      "micro_batches": 1
+    },
+    "continuous": {
+      "steps_per_rank": 400,
+      "ranks": 8,
+      "window": [
+        1,
+        200
+      ],
+      "scalar_rows": 3200,
+      "micro_batches": 1
+    },
+    "ep4": {
+      "steps_per_rank": 200,
+      "ranks": 8,
+      "window": [
+        1,
+        200
+      ],
+      "scalar_rows": 1600,
+      "micro_batches": 1
+    }
+  },
+  "comparisons": {
+    "baseline": {
+      "errors": {
+        "training/total_loss": {
+          "max_abs": 0.025789737701416016,
+          "step": 188,
+          "rank": 0
+        },
+        "training/foundation_loss/lm": {
+          "max_abs": 0.024294376373291016,
+          "step": 188,
+          "rank": 0
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.006699562072753906,
+          "step": 45,
+          "rank": 0
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 0.000011610856745392084,
+          "step": 172,
+          "rank": 0
+        },
+        "training/grad_norm": {
+          "max_abs": 0.7962799072265625,
+          "step": 148,
+          "rank": 0
+        }
+      },
+      "main_lm_over_005_steps": [
+        130,
+        146,
+        148,
+        157,
+        158,
+        167,
+        172,
+        173,
+        181,
+        188,
+        189,
+        193,
+        198,
+        199,
+        200
+      ],
+      "scalar_pairs_per_metric": 1600,
+      "counter_pairs": 6400,
+      "input_mismatches": 0,
+      "LR_mismatches": 0,
+      "first_step": {
+        "training/total_loss": {
+          "reference": 16.809673309326172,
+          "candidate": 16.809673309326172,
+          "abs_error": 0
+        },
+        "training/foundation_loss/lm": {
+          "reference": 12.881054878234863,
+          "candidate": 12.881054878234863,
+          "abs_error": 0
+        },
+        "training/foundation_loss/mtp": {
+          "reference": 3.928363800048828,
+          "candidate": 3.928363800048828,
+          "abs_error": 0
+        },
+        "training/foundation_loss/aux": {
+          "reference": 0.00025308559997938573,
+          "candidate": 0.00025308559997938573,
+          "abs_error": 0
+        },
+        "training/grad_norm": {
+          "reference": 22.473445892333984,
+          "candidate": 22.473447799682617,
+          "abs_error": 0.0000019073486328125
+        },
+        "training/lr": {
+          "reference": 0.0001,
+          "candidate": 0.0001,
+          "abs_error": 0
+        }
+      },
+      "first_nonzero_scalar_step": {
+        "training/total_loss": 2,
+        "training/foundation_loss/lm": 2,
+        "training/foundation_loss/mtp": 2,
+        "training/foundation_loss/aux": 2,
+        "training/grad_norm": 1,
+        "training/lr": null
+      }
+    },
+    "continuous": {
+      "errors": {
+        "training/total_loss": {
+          "max_abs": 0.025789737701416016,
+          "step": 188,
+          "rank": 0
+        },
+        "training/foundation_loss/lm": {
+          "max_abs": 0.024294376373291016,
+          "step": 188,
+          "rank": 0
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.006699562072753906,
+          "step": 45,
+          "rank": 0
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 0.000011610856745392084,
+          "step": 172,
+          "rank": 0
+        },
+        "training/grad_norm": {
+          "max_abs": 0.7962799072265625,
+          "step": 148,
+          "rank": 0
+        }
+      },
+      "main_lm_over_005_steps": [
+        130,
+        146,
+        148,
+        157,
+        158,
+        167,
+        172,
+        173,
+        181,
+        188,
+        189,
+        193,
+        198,
+        199,
+        200
+      ],
+      "scalar_pairs_per_metric": 1600,
+      "counter_pairs": 6400,
+      "input_mismatches": 0,
+      "LR_mismatches": 0,
+      "first_step": {
+        "training/total_loss": {
+          "reference": 16.809673309326172,
+          "candidate": 16.809673309326172,
+          "abs_error": 0
+        },
+        "training/foundation_loss/lm": {
+          "reference": 12.881054878234863,
+          "candidate": 12.881054878234863,
+          "abs_error": 0
+        },
+        "training/foundation_loss/mtp": {
+          "reference": 3.928363800048828,
+          "candidate": 3.928363800048828,
+          "abs_error": 0
+        },
+        "training/foundation_loss/aux": {
+          "reference": 0.00025308559997938573,
+          "candidate": 0.00025308559997938573,
+          "abs_error": 0
+        },
+        "training/grad_norm": {
+          "reference": 22.473445892333984,
+          "candidate": 22.473447799682617,
+          "abs_error": 0.0000019073486328125
+        },
+        "training/lr": {
+          "reference": 0.0001,
+          "candidate": 0.0001,
+          "abs_error": 0
+        }
+      },
+      "first_nonzero_scalar_step": {
+        "training/total_loss": 2,
+        "training/foundation_loss/lm": 2,
+        "training/foundation_loss/mtp": 2,
+        "training/foundation_loss/aux": 2,
+        "training/grad_norm": 1,
+        "training/lr": null
+      }
+    }
+  },
+  "input_coherence_independently_checked": true,
+  "numerical_recipe_keys_equal_to_baseline": [
+    "model",
+    "optimizer",
+    "lr_scheduler",
+    "loss_fn",
+    "model_init_dtype",
+    "dataset",
+    "dataloader",
+    "mixed_precision",
+    "activation_checkpoint",
+    "activation_swap",
+    "compile"
+  ],
+  "global_parameter_metadata_equal_all_ranks": true,
+  "runtime_flags_all_ranks_equal": true,
+  "runtime_flags": {
+    "before_trainer": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": null,
+        "FLASH_ATTENTION_DETERMINISTIC": null,
+        "CUBLAS_WORKSPACE_CONFIG": null,
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "scope": "Environment only; no backend queries"
+    },
+    "training": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": "true",
+        "FLASH_ATTENTION_DETERMINISTIC": "1",
+        "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "npu_matmul": {
+        "allow_tf32": null,
+        "allow_hf32": false,
+        "allow_bf16_reduced_precision_reduction": null
+      }
+    }
+  },
+  "global_scalar_max_rank_spread": 0,
+  "LR_pairs_checked_per_comparison": 1600,
+  "LR_mismatch_pairs": 0,
+  "constant_LR": 0.0001,
+  "executions": {
+    "baseline": {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "container_id": "431499a668c960916ef11abe2fc379ef64109a2784164c992cb56d309eb6ecb1",
+      "exit_code": 0,
+      "released": true,
+      "container_stopped_field": null,
+      "micro_batches": 1,
+      "duration_seconds": 383.04995921999216,
+      "receipt_sha256": "6b5b9bcfa9aa0fbfb1fe1b74324397f3ffc1b1a1a8dbeaeff42e09754dea968b",
+      "all_eight_card_snapshots_verified": true,
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    },
+    "continuous": {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+      "exit_code": 0,
+      "released": true,
+      "container_stopped_field": null,
+      "micro_batches": 1,
+      "duration_seconds": 610.3890903799911,
+      "receipt_sha256": "43187845ad046dbc551ff397a20fa51c245d6a6dd9e1069e63e3f19dc08109d2",
+      "all_eight_card_snapshots_verified": true,
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    },
+    "ep4": {
+      "case": "r129-a1e6-ep4-200-v2",
+      "container_id": "6283f02facdbdf2c3b59d2f061db4f691d9e8f78f5b12ec05f65c88fc080c02c",
+      "exit_code": 0,
+      "released": true,
+      "container_stopped_field": true,
+      "micro_batches": 1,
+      "duration_seconds": 406.96522226999514,
+      "receipt_sha256": "0e32b3a05f52291d197cdee12897216cc27cf8598d9704998ffc9cccf4530f19",
+      "all_eight_card_snapshots_verified": true,
+      "HostConfig": {
+        "Privileged": true,
+        "Runtime": "runc",
+        "NetworkMode": "host",
+        "PidMode": "",
+        "IpcMode": "private",
+        "Memory": 343597383680,
+        "ShmSize": 34359738368,
+        "NanoCpus": 0,
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "PidsLimit": 4096,
+        "Devices": [
+          {
+            "PathOnHost": "/dev/davinci0",
+            "PathInContainer": "/dev/davinci0",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci1",
+            "PathInContainer": "/dev/davinci1",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci2",
+            "PathInContainer": "/dev/davinci2",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci3",
+            "PathInContainer": "/dev/davinci3",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci4",
+            "PathInContainer": "/dev/davinci4",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci5",
+            "PathInContainer": "/dev/davinci5",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci6",
+            "PathInContainer": "/dev/davinci6",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci7",
+            "PathInContainer": "/dev/davinci7",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/davinci_manager",
+            "PathInContainer": "/dev/davinci_manager",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/devmm_svm",
+            "PathInContainer": "/dev/devmm_svm",
+            "CgroupPermissions": "rwm"
+          },
+          {
+            "PathOnHost": "/dev/hisi_hdc",
+            "PathInContainer": "/dev/hisi_hdc",
+            "CgroupPermissions": "rwm"
+          }
+        ]
+      }
+    }
+  },
+  "candidate_absence_evidence": {
+    "container_id": "6283f02facdbdf2c3b59d2f061db4f691d9e8f78f5b12ec05f65c88fc080c02c",
+    "absence_verified": true,
+    "inspect_returncode": 1,
+    "stderr": "Error: No such object: 6283f02facdbdf2c3b59d2f061db4f691d9e8f78f5b12ec05f65c88fc080c02c\n",
+    "created_utc": "2026-10-18T06:17:26.426798+00:00",
+    "host": "129-root",
+    "case": "r129-a1e6-ep4-200-v2"
+  },
+  "resources": {
+    "ep4": {
+      "median_step_seconds": 1.3201799392700195,
+      "summed_step_seconds": 238.0988347530365,
+      "supervised_tokens": 3325552,
+      "supervised_tokens_per_second": 13967.107413395643,
+      "allocated_gib": 21.080860137939453,
+      "reserved_gib": 26.333984375,
+      "rank0_time_underreport_steps": 0
+    },
+    "continuous": {
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.171875,
+      "rank0_time_underreport_steps": 0
+    }
+  },
+  "primary_resource_comparison": {
+    "median_time_increase_percent": 14.219653059956316,
+    "supervised_throughput_change_percent": -12.702030606756875,
+    "allocated_saved_gib": 0.9513359069824219,
+    "allocated_saved_percent": 4.317935012209972,
+    "reserved_saved_gib": 0.837890625
+  },
+  "initial_optimizer_layout_observations": {
+    "baseline": {
+      "scope": "rank0 initial metadata only",
+      "parameter_count": 46,
+      "local_numel": 339747840,
+      "float32_model_gib": 1.2656593322753906,
+      "optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    },
+    "continuous": {
+      "scope": "rank0 initial metadata only",
+      "parameter_count": 46,
+      "local_numel": 339747840,
+      "float32_model_gib": 1.2656593322753906,
+      "optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    },
+    "ep4": {
+      "scope": "rank0 initial metadata only",
+      "parameter_count": 46,
+      "local_numel": 339747840,
+      "float32_model_gib": 1.2656593322753906,
+      "optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "edp_shard",
+            "ep"
+          ],
+          "mesh_shape": [
+            2,
+            4
+          ],
+          "placements": [
+            "StridedShard(dim=0, split_factor=4)",
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            8,
+            1
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        }
+      }
+    }
+  },
+  "dense_expert_layouts": {
+    "baseline": {
+      "scope": "rank0 initial metadata and FSDP units; no compute-time all-gathered bytes",
+      "expert_parameter_count": 4,
+      "dense_parameter_count": 42,
+      "expert_local_numel": 47185920,
+      "dense_local_numel": 292561920,
+      "expert_float32_persistent_gib": 0.17578125,
+      "dense_float32_persistent_gib": 1.0898780822753906,
+      "expert_parameters": {
+        "model.layers.1.mlp.experts.down_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            5120,
+            1536
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            5120,
+            1536
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.transformer_layer.mlp.experts.down_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            5120,
+            1536
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            5120,
+            1536
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      },
+      "dense_meshes": [
+        "(['fsdp_shard'], [8])"
+      ],
+      "fsdp_units": {
+        "<root>": {
+          "backward_prefetch_targets": [],
+          "domains": {
+            "DENSE": [
+              "<root>.param[0]",
+              "<root>.param[1]",
+              "<root>.param[2]",
+              "<root>.param[3]",
+              "<root>.param[4]",
+              "<root>.param[5]",
+              "<root>.param[6]"
+            ]
+          },
+          "forward_prefetch_targets": [],
+          "parameter_count": 7
+        },
+        "model.layers.0": {
+          "backward_prefetch_targets": [],
+          "domains": {
+            "DENSE": [
+              "model.layers.0.param[0]",
+              "model.layers.0.param[10]",
+              "model.layers.0.param[1]",
+              "model.layers.0.param[2]",
+              "model.layers.0.param[3]",
+              "model.layers.0.param[4]",
+              "model.layers.0.param[5]",
+              "model.layers.0.param[6]",
+              "model.layers.0.param[7]",
+              "model.layers.0.param[8]",
+              "model.layers.0.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "model.layers.1"
+          ],
+          "parameter_count": 11
+        },
+        "model.layers.1": {
+          "backward_prefetch_targets": [
+            "model.layers.0"
+          ],
+          "domains": {
+            "DENSE": [
+              "model.layers.1.param[0]",
+              "model.layers.1.param[10]",
+              "model.layers.1.param[11]",
+              "model.layers.1.param[12]",
+              "model.layers.1.param[13]",
+              "model.layers.1.param[1]",
+              "model.layers.1.param[2]",
+              "model.layers.1.param[3]",
+              "model.layers.1.param[4]",
+              "model.layers.1.param[5]",
+              "model.layers.1.param[6]",
+              "model.layers.1.param[7]",
+              "model.layers.1.param[8]",
+              "model.layers.1.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "mtp.layers.0.transformer_layer"
+          ],
+          "parameter_count": 14
+        },
+        "mtp.layers.0.transformer_layer": {
+          "backward_prefetch_targets": [
+            "model.layers.1"
+          ],
+          "domains": {
+            "DENSE": [
+              "mtp.layers.0.transformer_layer.param[0]",
+              "mtp.layers.0.transformer_layer.param[10]",
+              "mtp.layers.0.transformer_layer.param[11]",
+              "mtp.layers.0.transformer_layer.param[12]",
+              "mtp.layers.0.transformer_layer.param[13]",
+              "mtp.layers.0.transformer_layer.param[1]",
+              "mtp.layers.0.transformer_layer.param[2]",
+              "mtp.layers.0.transformer_layer.param[3]",
+              "mtp.layers.0.transformer_layer.param[4]",
+              "mtp.layers.0.transformer_layer.param[5]",
+              "mtp.layers.0.transformer_layer.param[6]",
+              "mtp.layers.0.transformer_layer.param[7]",
+              "mtp.layers.0.transformer_layer.param[8]",
+              "mtp.layers.0.transformer_layer.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [],
+          "parameter_count": 14
+        }
+      }
+    },
+    "continuous": {
+      "scope": "rank0 initial metadata and FSDP units; no compute-time all-gathered bytes",
+      "expert_parameter_count": 4,
+      "dense_parameter_count": 42,
+      "expert_local_numel": 47185920,
+      "dense_local_numel": 292561920,
+      "expert_float32_persistent_gib": 0.17578125,
+      "dense_float32_persistent_gib": 1.0898780822753906,
+      "expert_parameters": {
+        "model.layers.1.mlp.experts.down_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            5120,
+            1536
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            5120,
+            1536
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.transformer_layer.mlp.experts.down_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            5120,
+            1536
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            5120,
+            1536
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      },
+      "dense_meshes": [
+        "(['fsdp_shard'], [8])"
+      ],
+      "fsdp_units": {
+        "<root>": {
+          "backward_prefetch_targets": [],
+          "domains": {
+            "DENSE": [
+              "<root>.param[0]",
+              "<root>.param[1]",
+              "<root>.param[2]",
+              "<root>.param[3]",
+              "<root>.param[4]",
+              "<root>.param[5]",
+              "<root>.param[6]"
+            ]
+          },
+          "forward_prefetch_targets": [],
+          "parameter_count": 7
+        },
+        "model.layers.0": {
+          "backward_prefetch_targets": [],
+          "domains": {
+            "DENSE": [
+              "model.layers.0.param[0]",
+              "model.layers.0.param[10]",
+              "model.layers.0.param[1]",
+              "model.layers.0.param[2]",
+              "model.layers.0.param[3]",
+              "model.layers.0.param[4]",
+              "model.layers.0.param[5]",
+              "model.layers.0.param[6]",
+              "model.layers.0.param[7]",
+              "model.layers.0.param[8]",
+              "model.layers.0.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "model.layers.1"
+          ],
+          "parameter_count": 11
+        },
+        "model.layers.1": {
+          "backward_prefetch_targets": [
+            "model.layers.0"
+          ],
+          "domains": {
+            "DENSE": [
+              "model.layers.1.param[0]",
+              "model.layers.1.param[10]",
+              "model.layers.1.param[11]",
+              "model.layers.1.param[12]",
+              "model.layers.1.param[13]",
+              "model.layers.1.param[1]",
+              "model.layers.1.param[2]",
+              "model.layers.1.param[3]",
+              "model.layers.1.param[4]",
+              "model.layers.1.param[5]",
+              "model.layers.1.param[6]",
+              "model.layers.1.param[7]",
+              "model.layers.1.param[8]",
+              "model.layers.1.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "mtp.layers.0.transformer_layer"
+          ],
+          "parameter_count": 14
+        },
+        "mtp.layers.0.transformer_layer": {
+          "backward_prefetch_targets": [
+            "model.layers.1"
+          ],
+          "domains": {
+            "DENSE": [
+              "mtp.layers.0.transformer_layer.param[0]",
+              "mtp.layers.0.transformer_layer.param[10]",
+              "mtp.layers.0.transformer_layer.param[11]",
+              "mtp.layers.0.transformer_layer.param[12]",
+              "mtp.layers.0.transformer_layer.param[13]",
+              "mtp.layers.0.transformer_layer.param[1]",
+              "mtp.layers.0.transformer_layer.param[2]",
+              "mtp.layers.0.transformer_layer.param[3]",
+              "mtp.layers.0.transformer_layer.param[4]",
+              "mtp.layers.0.transformer_layer.param[5]",
+              "mtp.layers.0.transformer_layer.param[6]",
+              "mtp.layers.0.transformer_layer.param[7]",
+              "mtp.layers.0.transformer_layer.param[8]",
+              "mtp.layers.0.transformer_layer.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [],
+          "parameter_count": 14
+        }
+      }
+    },
+    "ep4": {
+      "scope": "rank0 initial metadata and FSDP units; no compute-time all-gathered bytes",
+      "expert_parameter_count": 4,
+      "dense_parameter_count": 42,
+      "expert_local_numel": 47185920,
+      "dense_local_numel": 292561920,
+      "expert_float32_persistent_gib": 0.17578125,
+      "dense_float32_persistent_gib": 1.0898780822753906,
+      "expert_parameters": {
+        "model.layers.1.mlp.experts.down_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            5120,
+            1536
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            5120,
+            1536
+          ],
+          "mesh_dim_names": [
+            "edp_shard",
+            "ep"
+          ],
+          "mesh_shape": [
+            2,
+            4
+          ],
+          "placements": [
+            "StridedShard(dim=0, split_factor=4)",
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "edp_shard",
+            "ep"
+          ],
+          "mesh_shape": [
+            2,
+            4
+          ],
+          "placements": [
+            "StridedShard(dim=0, split_factor=4)",
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.transformer_layer.mlp.experts.down_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            5120,
+            1536
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            5120,
+            1536
+          ],
+          "mesh_dim_names": [
+            "edp_shard",
+            "ep"
+          ],
+          "mesh_shape": [
+            2,
+            4
+          ],
+          "placements": [
+            "StridedShard(dim=0, split_factor=4)",
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.transformer_layer.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "edp_shard",
+            "ep"
+          ],
+          "mesh_shape": [
+            2,
+            4
+          ],
+          "placements": [
+            "StridedShard(dim=0, split_factor=4)",
+            "Shard(dim=0)"
+          ]
+        }
+      },
+      "dense_meshes": [
+        "(['fsdp_shard', 'tp'], [8, 1])"
+      ],
+      "fsdp_units": {
+        "<root>": {
+          "backward_prefetch_targets": [],
+          "domains": {
+            "DENSE": [
+              "<root>.param[0]",
+              "<root>.param[1]",
+              "<root>.param[2]",
+              "<root>.param[3]",
+              "<root>.param[4]",
+              "<root>.param[5]",
+              "<root>.param[6]"
+            ]
+          },
+          "forward_prefetch_targets": [],
+          "parameter_count": 7
+        },
+        "model.layers.0": {
+          "backward_prefetch_targets": [],
+          "domains": {
+            "DENSE": [
+              "model.layers.0.param[0]",
+              "model.layers.0.param[10]",
+              "model.layers.0.param[1]",
+              "model.layers.0.param[2]",
+              "model.layers.0.param[3]",
+              "model.layers.0.param[4]",
+              "model.layers.0.param[5]",
+              "model.layers.0.param[6]",
+              "model.layers.0.param[7]",
+              "model.layers.0.param[8]",
+              "model.layers.0.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "model.layers.1"
+          ],
+          "parameter_count": 11
+        },
+        "model.layers.1": {
+          "backward_prefetch_targets": [
+            "model.layers.0"
+          ],
+          "domains": {
+            "DENSE": [
+              "model.layers.1.param[0]",
+              "model.layers.1.param[10]",
+              "model.layers.1.param[11]",
+              "model.layers.1.param[1]",
+              "model.layers.1.param[2]",
+              "model.layers.1.param[3]",
+              "model.layers.1.param[4]",
+              "model.layers.1.param[5]",
+              "model.layers.1.param[6]",
+              "model.layers.1.param[7]",
+              "model.layers.1.param[8]",
+              "model.layers.1.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "model.layers.1.mlp.experts"
+          ],
+          "parameter_count": 12
+        },
+        "model.layers.1.mlp.experts": {
+          "backward_prefetch_targets": [
+            "model.layers.1"
+          ],
+          "domains": {
+            "EXPERT": [
+              "model.layers.1.mlp.experts.param[0]",
+              "model.layers.1.mlp.experts.param[1]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "mtp.layers.0.transformer_layer"
+          ],
+          "parameter_count": 2
+        },
+        "mtp.layers.0.transformer_layer": {
+          "backward_prefetch_targets": [
+            "model.layers.1.mlp.experts"
+          ],
+          "domains": {
+            "DENSE": [
+              "mtp.layers.0.transformer_layer.param[0]",
+              "mtp.layers.0.transformer_layer.param[10]",
+              "mtp.layers.0.transformer_layer.param[11]",
+              "mtp.layers.0.transformer_layer.param[1]",
+              "mtp.layers.0.transformer_layer.param[2]",
+              "mtp.layers.0.transformer_layer.param[3]",
+              "mtp.layers.0.transformer_layer.param[4]",
+              "mtp.layers.0.transformer_layer.param[5]",
+              "mtp.layers.0.transformer_layer.param[6]",
+              "mtp.layers.0.transformer_layer.param[7]",
+              "mtp.layers.0.transformer_layer.param[8]",
+              "mtp.layers.0.transformer_layer.param[9]"
+            ]
+          },
+          "forward_prefetch_targets": [
+            "mtp.layers.0.transformer_layer.mlp.experts"
+          ],
+          "parameter_count": 12
+        },
+        "mtp.layers.0.transformer_layer.mlp.experts": {
+          "backward_prefetch_targets": [
+            "mtp.layers.0.transformer_layer"
+          ],
+          "domains": {
+            "EXPERT": [
+              "mtp.layers.0.transformer_layer.mlp.experts.param[0]",
+              "mtp.layers.0.transformer_layer.mlp.experts.param[1]"
+            ]
+          },
+          "forward_prefetch_targets": [],
+          "parameter_count": 2
+        }
+      }
+    }
+  },
+  "loss_units": {
+    "lm": "日志未加权主LM",
+    "mtp": "日志已含0.3系数；诊断delta除以0.3",
+    "aux": "日志已含0.0001系数；诊断delta除以0.0001"
+  },
+  "unweighted_error_diagnostics": {
+    "lm": 0.024294376373291016,
+    "mtp": 0.022331873575846355,
+    "aux": 0.11610856745392084
+  },
+  "ep4_layout_interpretation_zh": "TP1/CP1/PP1、DP8一微批；dense FSDP8，expert域EDP2×EP4。rank0初始metadata的42项dense和4项routed-expert分别为292561920与47185920个FP32元素，总339747840，与FSDP8基线持久份额一样。EP4与EDP2组合，总持久分片仍8；不可说EP4把持久模型参数再减至四分之一。实际expert计算物化与通信/激活开销没有阶段profiling，单次峰值收益不能归于单个模块。",
+  "interpretation_zh": "主LM全部200步×8rank最大差0.024294376373291016@188，15步超过0.005，首次超阈值130。首步主LM标量差0不能证明所有前向隐藏状态、内部loss或NPU权重相同，不能据此把后续漂移归咎optimizer。输入、CPU初态、元数据和LR一致不等于首次NPU计算参数/内部状态逐字节一致。",
+  "check_category_counts": {
+    "collection_91_files": 3,
+    "safe_unique_collection_paths": 273,
+    "collected_file_sha_size": 273,
+    "strict_collection_binding": 1,
+    "summary_input_binding": 5,
+    "fixed_clean_source": 3,
+    "editable_import_path": 3,
+    "runtime_import_source": 3,
+    "off_recompute_actual_coverage": 3,
+    "rank_step_unique_full_coverage": 24,
+    "finite_metrics": 6400,
+    "input_identity_metadata": 6400,
+    "start_complete_microbatch_contract": 24,
+    "all_rank_global_parameter_metadata": 24,
+    "all_rank_cpu_initial_identity": 24,
+    "all_rank_runtime_flags": 24,
+    "final_allocator_marker": 24,
+    "global_scalar_counter_rank_agreement": 600,
+    "global_input_rank_agreement": 600,
+    "initial_optimizer_states_empty": 3,
+    "initial_model_main_layout_identity": 3,
+    "saved_execution_identity": 3,
+    "exit_and_own_pid_release": 3,
+    "complete_eight_card_idle_release_snapshots": 9,
+    "saved_hostconfig_limits": 3,
+    "saved_device_arguments": 3,
+    "numerical_recipe_core_equal": 3,
+    "training_recipe_equal_except_duration": 3,
+    "ep4_topology": 1,
+    "ep4_dense_fsdp8_expert_fsdp2": 1,
+    "fsdp_equal_except_expert_degree": 3,
+    "ep4_same_plan_override_table": 1,
+    "ep4_trunk_mtp_EP_plan_rules": 1,
+    "ep4_initial_persistent_share_numel_equal_baseline": 1,
+    "expert_dense_parameter_counts": 3,
+    "reference_fsdp8_real_mesh": 2,
+    "dense_expert_persistent_numel": 3,
+    "ep4_expert_real_mesh": 1,
+    "ep4_dense_real_mesh": 1,
+    "ep4_six_actual_fsdp_units": 1,
+    "ep4_unit_domain_coverage": 1,
+    "independent_scalar_maxima": 10,
+    "allrank_perstep_error_curve": 8,
+    "threshold_steps": 2,
+    "canonical_global_input_pairs": 3200,
+    "four_data_counter_pairs": 3200,
+    "lr_pairs": 3200,
+    "first_step_lm": 2,
+    "headline_main_lm_failure": 1,
+    "science_not_execution_failure": 1,
+    "unweighted_log_reconstruction": 1,
+    "allrank_resource_recomputation": 2,
+    "resource_observation_scope": 2,
+    "resource_input_pins": 2,
+    "relative_off_resource_values": 1,
+    "fullcid_absence": 1,
+    "candidate_request_identity": 1,
+    "candidate_request_nondata_pins": 9,
+    "captured_training_helpers_identical": 18,
+    "candidate_actual_config_pin": 1,
+    "frozen_data_request_pins_equal": 2,
+    "four_frozen_data_pins": 1
+  },
+  "input_sha256": {
+    "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+    "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+    "evidence/129-a1e6-ep4200-v2-evidence-manifest.json": "a5a21c62ae30382f6a0854c85f28bf04d1e3e4147a33dca0f6d397cb9f88b41d",
+    "evidence/a1e6-ep4200-v2-strict.json": "21b6eae654b6a59e7a7cbd3029bc39ba4543babc624bb4c0479b5258467147f1",
+    "evidence/a1e6-ep4200-v2-summary.json": "76af64d85d311bc6fd2c04e7f00b56f76bf28970de597ca1fd29d43d555dcfae",
+    "runs/r129-a1e6-fsdp8-0-200-v3/integration/environment.json": "38a9675ae1e647aa8dd26eb3a397d2d03be3853cd89a55fba6198327062eb7d3",
+    "runs/r129-a1e6-fsdp8-0-200-v3/config.resolved.json": "aeb466cfdbb1bce5471fd560b66543a203161964fe21ef7e12c2cc285e4066b7",
+    "runs/r129-a1e6-fsdp8-0-200-v3/integration/check/activation_checkpoint.json": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank0.jsonl": "7782d6e09a62db21df62fa538f0ce6be04a11061cf8cc9b4fcc6bf98cff105fd",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank0.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank0.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank0.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank0.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank0.json": "138ea393131ecca3d913cd557b62e836fe0a5a42ee639fdcf19186dff14a4ca5",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank1.jsonl": "6d10af9c3557c164b16a6bb0d12b1e63598349f397ae4a85bfed8e3b5fc3cbcd",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank1.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank1.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank1.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank1.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank1.json": "192b0787367648080e7eb3b4e8321ef36ef3d9d1c0f6a87a08974e73912168e9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank2.jsonl": "0552fef8f3ef4d79ceb601f0d1c690da2a7b53ce40505adac064c73cd48afebf",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank2.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank2.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank2.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank2.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank2.json": "dfef973e89c402d26a4d0e56a6823157dff2fdf158426cfa4100731030383d57",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank3.jsonl": "7fefd1b8166640b6dc2c94ba3c943f1f91def33ff82b607e37df75966beb6651",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank3.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank3.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank3.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank3.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank3.json": "437c1359e7e60706895b7deb911743be201919ec1fffd2d7fa9beef0afd3b6db",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank4.jsonl": "98bd739f03958d4ca5a4361d0871f94688439608ece49f43123f67800e6ca2b5",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank4.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank4.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank4.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank4.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank4.json": "48913e61ac46246b15d57f6a7c0d1c4ea15fd8340d65648a2c3170c90ed7ddc2",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank5.jsonl": "30b8af89f904bbf9f1e8c8aa6c1edca67396656748617375277cfcfadc5bdd0e",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank5.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank5.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank5.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank5.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank5.json": "755eabacb06afc12e52edf3c195add267f13db803c2f302dbeed21c4fcd4bd4a",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank6.jsonl": "3ace22dbd4b7ed6b22af4b3523d2dd1f0ca66931b9eda1c8299c853bb65ebb9b",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank6.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank6.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank6.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank6.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank6.json": "c2e6239f754fcde525c364b6cd72569a13f29a2366e5c60817b734409f3286fb",
+    "runs/r129-a1e6-fsdp8-0-200-v3/metrics-rank7.jsonl": "d93015f6fce7a5f36873ef62b53a9bdb7c5f882e9317cc283c90c234e6d59aaf",
+    "runs/r129-a1e6-fsdp8-0-200-v3/start-rank7.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-fsdp8-0-200-v3/complete-rank7.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-fsdp8-0-200-v3/initial-state-rank7.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-0-200-v3/runtime-flags-rank7.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-0-200-v3/final-memory-rank7.json": "21c651c32c3bf85d2569886c3a3ccb8de6d4b86a74be60383fdd9079f5c1a531",
+    "runs/r129-a1e6-fsdp8-0-200-v3/integration/check/optimizer_layout_initial.json": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec",
+    "scheduling/r129-a1e6-fsdp8-0-200-v3.receipt.json": "6b5b9bcfa9aa0fbfb1fe1b74324397f3ffc1b1a1a8dbeaeff42e09754dea968b",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/integration/environment.json": "ec4408b9ccc4b09132cb23447a40aab271af02525f49d7859bb49d3c12ca49a3",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/config.resolved.json": "e0fd8bb515d7416f4efdecb6c58da9269cef2b8e1e7512deee2e0fe99107ca82",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/integration/check/activation_checkpoint.json": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank0.jsonl": "fca0e8f9261a67eb4536348636eb794434c818c42bf6fab7f85d7cec4a7cc948",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank0.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank0.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank0.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank0.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank0.json": "74967e7b682029c8b732db34246200819d971d5740ada58247be9a05e0a9d23b",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank1.jsonl": "edbaab35107c79f038fe22ff6451546914d91a87bb03b7f37e4b4ba8c7f16286",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank1.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank1.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank1.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank1.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank1.json": "46202585259751e792f7b463d443a3b2b145fa6ee06bb3fa6c66b9393cb23aef",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank2.jsonl": "77334fed31d6b4df3333f22d439961a57bab390bcb8d00e9e27b203ed578d996",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank2.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank2.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank2.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank2.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank2.json": "eaac6913b918f3fa50ce4a2327c20a734eaed89f6537dea6847fe7748870fbc4",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank3.jsonl": "bcf1f4e645ca31b11486efdc961e38c5c0a5e034d4fb7bf1ff5c8c8027653edd",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank3.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank3.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank3.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank3.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank3.json": "9a93f9e2e530da3362dc0f4ce617688fbccea4d271675ff11e89ff19ee5b6a5a",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank4.jsonl": "4ea921a8f9c6ada465028f72ba735e8f67710831af07d5231581d4ba25ffdd34",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank4.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank4.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank4.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank4.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank4.json": "273e58c6b0abf09196df18a7d5636c23c7edda7b5b923453905ab8d922f6bfac",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank5.jsonl": "f9b2f2d98522a5c5150f615eb2ec791ca63a1f0407fa6bab8e21db433d61120c",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank5.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank5.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank5.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank5.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank5.json": "a308c2c133c1817ead7efa151abc89e9bd2c8d7ac9d000c40abc841db15c0bac",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank6.jsonl": "4ab0a1dbcc8573dbf8877592b70f12161ca3c2ac66bea09ab8f35c84e5e41899",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank6.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank6.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank6.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank6.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank6.json": "fd26bc905a15121a5545ddd423622f24c8471c1d58601345e4d6aa661f957736",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/metrics-rank7.jsonl": "338f1e20d2e3de65e0cc9a216048bcb0b6fc7572d62fc52c4375702fb37683b0",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/start-rank7.json": "48dcd64f71cd1af00c20bad7887e0879f5c32783e737560c0adafcfd38a122b2",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/complete-rank7.json": "e6757d1cdcf5cf8a61cd32b08e162559becb772f5836f82af21b01ba310138b1",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/initial-state-rank7.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/runtime-flags-rank7.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/final-memory-rank7.json": "1eeb5cecaa7e4e668dea4c88eae6cf7de934bd925df3f351c33d1588e6cee782",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/integration/check/optimizer_layout_initial.json": "610b90ed4347112466b935a9779cd3703b5662b98c40322b040b5e93011b61ec",
+    "scheduling/r129-a1e6-fsdp8-continuous400-v2.receipt.json": "43187845ad046dbc551ff397a20fa51c245d6a6dd9e1069e63e3f19dc08109d2",
+    "runs/r129-a1e6-ep4-200-v2/integration/environment.json": "af9bb6de1b7d60761a98f00d80d02f190591f2bdfa14c8d195fdde089f0a03f8",
+    "runs/r129-a1e6-ep4-200-v2/config.resolved.json": "0dfd495353291c21ee3054ee65a88c91ae4bf55e805b497bae0efad6cb42ea1b",
+    "runs/r129-a1e6-ep4-200-v2/integration/check/activation_checkpoint.json": "db0265517c0c4ecaf93a30cba93fa0bf836a9c2b45c9021c924a4e37ed26ba87",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank0.jsonl": "8b9db2098958e6301ae89969fa7acbbb9b4f29286a618f89c2092a4a1f5874d9",
+    "runs/r129-a1e6-ep4-200-v2/start-rank0.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank0.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank0.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank0.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank0.json": "d9df3f69d65f9e855be2f2502aed71274c9270fa3cdaa7e6a572d10518b1bff7",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank1.jsonl": "0ec93d62b92d9f6eed7ef0eb46610076632c35eea33af350aa56b13a8ec5b534",
+    "runs/r129-a1e6-ep4-200-v2/start-rank1.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank1.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank1.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank1.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank1.json": "a6f0a16f7de8d16089fbf2053830504f1e7f0b295175b04fdf00336c9845d5a4",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank2.jsonl": "a846acb55e0e32f894d198c707b1993db7981c57088d1d26f4ae12aa4ec4a6d0",
+    "runs/r129-a1e6-ep4-200-v2/start-rank2.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank2.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank2.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank2.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank2.json": "582ab2e501c7a3e4b6b76126c3cfa10c63809991146d2a079da328d6b85f6ffc",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank3.jsonl": "7d63f766db7e5d88cb616231896579f2734bc3f35589d36fe3faad01a4395ffe",
+    "runs/r129-a1e6-ep4-200-v2/start-rank3.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank3.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank3.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank3.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank3.json": "bdeff2d467fc0ebe45ea7569eb0dd75ecf0ba7bb64b898924b59f423d8951592",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank4.jsonl": "f2302b06ed98a0bf55a4fce4d1988c0d52a760e65f3aed4678320396b464d5f4",
+    "runs/r129-a1e6-ep4-200-v2/start-rank4.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank4.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank4.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank4.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank4.json": "8965728b095365cf8615c769cf2775bc79f3b5db054e05296f4d78c74582481a",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank5.jsonl": "a39e70d4b372119128caf0dc4046664095fac2e13f0372f849f621740bd16797",
+    "runs/r129-a1e6-ep4-200-v2/start-rank5.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank5.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank5.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank5.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank5.json": "cddb0d4936372deb457d5fb3628af20bd3375fa9e6b1381dd11c3b2198821abf",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank6.jsonl": "e42d80af63c2280c7e55d22b1bde67c2693e6fdce09f7dc596eaeb725036343a",
+    "runs/r129-a1e6-ep4-200-v2/start-rank6.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank6.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank6.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank6.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank6.json": "e781368d21e0a95cc991d94fb7cf036fdc617b702ceeecc0cb5c20120efb2afe",
+    "runs/r129-a1e6-ep4-200-v2/metrics-rank7.jsonl": "c4fc15509975d74c631e20d0bcb247e83e6a94c611aa9740837976fcb31f1f26",
+    "runs/r129-a1e6-ep4-200-v2/start-rank7.json": "83837355c4259e151efaa8c30d8185dc77dc17b774ac48c232f52ce447a2a661",
+    "runs/r129-a1e6-ep4-200-v2/complete-rank7.json": "98bb484faafcb9b50e3b62186170309c4a3062e40fed14d3c4141b6ab4057aad",
+    "runs/r129-a1e6-ep4-200-v2/initial-state-rank7.json": "13c740cb4811d466bb4281a89c6eaf03afffd9727ceb340fe46e0f13c803f5fa",
+    "runs/r129-a1e6-ep4-200-v2/runtime-flags-rank7.json": "996320443d9cf62c3130e3d243ff5bab29d644c5aa7a52db35f9de9220f8ffd9",
+    "runs/r129-a1e6-ep4-200-v2/final-memory-rank7.json": "b8411769ccd8d587561fa3a79f6e6cc22eea33d209fb07337a74685c1d701af6",
+    "runs/r129-a1e6-ep4-200-v2/integration/check/optimizer_layout_initial.json": "84826235186318d3bcc6a6d95c9d14d1a08f6eeeb2a87415b291877ac42dc24f",
+    "scheduling/r129-a1e6-ep4-200-v2.receipt.json": "0e32b3a05f52291d197cdee12897216cc27cf8598d9704998ffc9cccf4530f19",
+    "runs/r129-a1e6-fsdp8-0-200-v3/integration/check/fsdp_units.json": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d",
+    "runs/r129-a1e6-fsdp8-continuous400-v2/integration/check/fsdp_units.json": "4a96ba56020631cde6e034cb2624bcee44565cdfa2d7cd12bc9354b00bf84a1d",
+    "runs/r129-a1e6-ep4-200-v2/integration/check/fsdp_units.json": "6c7de737583b79514bf443f7f78e19f22fd9139d8b6237fabea516375985f46c",
+    "evidence/a1e6-ep4200-v2-resources.json": "37acbdde6e510176fe305e7b7f65dc8b50c3f3d853ab9a9fe281d2493050e301",
+    "evidence/a1e6-fsdp8-continuous-first200-v2-resources.json": "0848d7976436eac6bcb35ad0d381d940af4ca09f30e40de3c1d4f1fa8270880b",
+    "evidence/a1e6-ep4200-v2-container-absence.json": "48af1f7ee4d9849617e238d9ee337bac8d1c2f690772070e44929a39caf032d2",
+    "scheduling/r129-a1e6-ep4-200-v2.request.json": "33d331c210995273072dd4efc912dbe7e652f79ac58f5f28a115f0463cea3c52",
+    "scheduling/r129-a1e6-fsdp8-0-200-v3.request.json": "279ac6b171b15b57fb67b0202a662198329b81edb6048e6a3cd6fac8240eb349",
+    "scheduling/r129-a1e6-fsdp8-continuous400-v2.request.json": "fe473fed3a8e6cac19bc8a0ea2fca389d734a33bc6fb74cc19c9057ce4e90982",
+    "tools/summarize_a1e6_matrix_case_v1.py": "1beb09b835bf061fe64c87fbbf48a61c4f3e0da062492eed542f895f313ebbba",
+    "tools/capture_training.py": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+    "tools/capture_a1e6_training.py": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df",
+    "tools/run_fair_a1e6_matrix_v1.sh": "449a6ba02e89e9e09c28aefec39cbc8ec5a8a39937b60958b619b2f3a7359768",
+    "tools/fair_resource_guard.py": "0ad7505b7886d17796a97ed9e034777f16bedf4baec48a42c0a97791cde91b5f",
+    "tools/all_rank_resources.py": "fb10519797206e58c4114bb3b9980d89553a0324d9188824cb26360c3104e93c",
+    "tools/plot_comparison.py": "757e2586e5ce5f98a74ec1de236a82e69400934da9ddd1a255a62ce64d956d5c",
+    "tools/strict_compare_runs.py": "086b969fa8f114748322c163bc307b2af880ccdb1093deabb08cdb1b820739fc",
+    "tools/compare_runs.py": "e49d2a68272309d39b6cd619e570c0b80e4c7b3caca8217b877f6e921dd6817d",
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/text_trainer.py": "79426f3fdd5f91f8b74791b45b727558637552eadc702176761ac96ce6bf3c87",
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/callbacks/environ_meter_callback.py": "f83e3fa5c5dabe37af299adb016045c2e6430abac010bef4cadc8a6189b9517d",
+    "fixes/latest-jt-validation-f637/hyper_parallel/distributed/mesh.py": "1fcbeb292a25f1655437adc1842a5dfd268d624ca04d5e3faeba59c98798e853",
+    "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/ep_compute.py": "b007830f41db662fbe2f4d73b8cb6626a0832f0f5b2d508e3295ba2bad2e28d4",
+    "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py": "ead7f967259864adc6c8984ce1580a4580389ca580d25fe9013e9a46ecfb0c9b",
+    "figures/a1e6-ep4200-v2-loss.png": "9bfc24a9e69179620933f36832b6eb429c813f88e7046f23228c25de9b1f430d",
+    "figures/a1e6-ep4200-v2-loss.svg": "117e7056bd5d235b330fb9635420e5d3d931a4f0d02cdc3941a74eddd3910fb5"
+  },
+  "figure_replay": {
+    "png_byte_equal": true,
+    "png_pixel_equal": true,
+    "size": [
+      3204,
+      1404
+    ],
+    "png_sha256": "9bfc24a9e69179620933f36832b6eb429c813f88e7046f23228c25de9b1f430d",
+    "svg_all_path_geometry_equal": true,
+    "svg_text_equal": true,
+    "svg_path_count": 111,
+    "svg_full_bytes_compared": false,
+    "replay_files_written": false,
+    "original_png_and_svg_visually_checked": true,
+    "visual_findings_zh": "图覆盖1–200，标题EP4与来源正确，主LM/组件误差与原文复算一致，未通过标记与诊断口径可读。"
+  },
+  "source_semantics": [
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/trainer/text_trainer.py",
+      "lines": "263–309",
+      "observation_zh": "288前向反向，290–292累加loss，294测量/处理梯度，295执行optimizer，299递增步号。首步loss及grad_norm均来自首次参数更新前的计算。",
+      "sha256": "79426f3fdd5f91f8b74791b45b727558637552eadc702176761ac96ce6bf3c87"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/trainer/callbacks/environ_meter_callback.py",
+      "lines": "310–338",
+      "observation_zh": "步时MAX、tokens SUM、loss/grad mean后记录；LR直接读取当前scheduler值。八rank归约标量一致不证明局部前向/反向张量相同。",
+      "sha256": "f83e3fa5c5dabe37af299adb016045c2e6430abac010bef4cadc8a6189b9517d"
+    },
+    {
+      "path": "tools/capture_training.py",
+      "lines": "38–56,94–97",
+      "observation_zh": "保存原native initializer后包装其返回点，对state_dict CPU张量逐项记录shape/dtype/SHA；不采首次NPU完整参数字节。",
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/jt_builder.py",
+      "lines": "124–164",
+      "observation_zh": "meta构造后先替换JT模块，142搬到CPU，144 native初始化并由helper采样，151才搬到NPU，152–162应用并行基础设施。",
+      "sha256": "ead7f967259864adc6c8984ce1580a4580389ca580d25fe9013e9a46ecfb0c9b"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/distributed/mesh.py",
+      "lines": "136–148,190–231",
+      "observation_zh": "dense域由DP×CP×TP×PP确定，FSDP dense域DP×CP；EP划分专家域并推导EDP。当前dense FSDP8，expert EDP2×EP4，与实际rank0布局一致。",
+      "sha256": "1fcbeb292a25f1655437adc1842a5dfd268d624ca04d5e3faeba59c98798e853"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/ep_compute.py",
+      "lines": "29–50",
+      "observation_zh": "JT EP通过公共build_ep_compute绑定原router、combine_routed和grouped_gemm；机制说明本身不能定位当前数值漂移根因。",
+      "sha256": "b007830f41db662fbe2f4d73b8cb6626a0832f0f5b2d508e3295ba2bad2e28d4"
+    }
+  ],
+  "summary_helper_review": {
+    "path": "tools/summarize_a1e6_matrix_case_v1.py",
+    "sha256": "1beb09b835bf061fe64c87fbbf48a61c4f3e0da062492eed542f895f313ebbba",
+    "status": "PASS_FOR_THIS_VERIFIED_EP4_INPUT_SET",
+    "AST_compile_pass": true,
+    "module_executed": false,
+    "imports": [
+      "argparse",
+      "datetime",
+      "hashlib",
+      "json",
+      "pathlib",
+      "re"
+    ],
+    "field_sources": [
+      {
+        "fields": "身份、覆盖与source前置校验",
+        "lines": "31–46",
+        "source": "strict candidate/window/ranks/findings/input/initial与clean fixed source metadata；resource case"
+      },
+      {
+        "fields": "main_lm/errors/阈值步/unweighted",
+        "lines": "50,56–62",
+        "source": "strict errors与200步step_errors；本复核另以原始8rank×200重算"
+      },
+      {
+        "fields": "first_step_lm_abs",
+        "lines": "47–49,60–61",
+        "source": "两运行rank0第一行；本复核另验证每rank从step1顺序完整且全rank首步同值"
+      },
+      {
+        "fields": "全部relative_to_off资源字段",
+        "lines": "64–70",
+        "source": "候选resources.json与continuous-first200 resources.json；不读取strict.performance或rank0 resource摘要"
+      },
+      {
+        "fields": "证据SHA",
+        "lines": "51–52,72",
+        "source": "5份输入JSON/manifest当前原文字节"
+      },
+      {
+        "fields": "写入边界",
+        "lines": "79–82",
+        "source": "只新建本case summary.json，open x；无设备、子进程、远端调用"
+      }
+    ],
+    "all_summary_static_and_derived_fields_checked": true,
+    "raw_resources_recomputed_without_summary_helper": true,
+    "raw_scalar_values_recomputed_without_summary_helper": true,
+    "frozen_capture_helpers_guard_runner_request_pins_unchanged": true,
+    "limitations_zh": [
+      "这是依赖已完成strict/resource审计的私有摘要器，不是完整验收器。它自身不重新检查所有raw rank覆盖或resource窗口/8rank input pins，也不重新验证collection每个文件。",
+      "上述依赖在本次EP4独审逐原始日志、资源窗口、273个collection文件和请求pins复核完成，故不影响当前摘要结论。不能仅凭未来摘要器返回成功就宣称其他case验收通过。",
+      "helper不读取scheduler或修改训练源码、已冻结helpers/guard/runner；本次只AST与字段来源审查，没有执行其写入main。"
+    ]
+  },
+  "environment_scope": {
+    "all_three_saved_runtime_environments_include_CANN_path": "/usr/local/Ascend/cann-9.2.0-beta.2/python/site-packages",
+    "fixed_image_receipts_match": true,
+    "live_remote_environment_queried": false
+  },
+  "first_step_interpretation_zh": "EP4首步total/LM/MTP/aux四项全局日志均零差，grad_norm从22.473445892333984变成22.473447799682617，绝对差1.9073486328125e-6；四项loss首次非零均step2。只说明首次optimizer更新前已有可见范数差，不证明全量前向、内部root grad或反向相同，也不归因optimizer或某一算子。",
+  "scope_limits_zh": [
+    "训练日志中的loss/梯度范数在callback再次全局mean；八rank相同是归约标量的完整覆盖，不是八个局部前向独立相等。首步全局loss相同不证明全量hidden或参数逐字节一致。",
+    "CPU initial由JT MLA替换后、native初始化返回时采集，早于NPU搬运、TP/EP参数切分和FSDP物化。全局参数元数据及rank0初始optimizer布局不证明首次NPU完整参数/优化器/RNG/内部状态身份。",
+    "MTP/aux未加权误差由日志加权值除0.3/0.0001得到；本次不宣称这些专项或其全矩阵通过。",
+    "性能取21–200步全rank最大callback步时及同窗口有效监督token；显存是1–200步allocator累计峰值，不是物理HBM。单次运行主LM失败，不能作为精度合格的收益或模块成本归因。",
+    "rank0布局明确dense FSDP8与expert EDP2×EP4，42+4参数；两类持久FP32本地元素数均与基线同份额。该metadata不记录每次前向真实all-gather后计算参数字节或峰值构成。",
+    "运行、双空闲与释放结论来自保存的完整回执和fullCID不存在记录；本次没有远端查询。训练HostConfig Privileged=true，显式Devices列表不是设备隔离保证。",
+    "本机没有四份原始数据文件，本次核对三组request数据SHA pins一致，并复算全部global input_identity和计数一致；不冒称重新哈希远端原始数据。",
+    "归档处理由根完成，本次只核验原始收集manifest与273文件，不重新删除。未修改源码、图、原文、scheduler，也未运行SSH/NPU或发布。",
+    "本次仅同源EP4与两份FSDP8参考，根因仍未定位，不扩大成TP/CP/其他EP或组合通过。",
+    "现有namespace映射仅为保存的诊断信息；本次不以映射存在推断实际计算占用。启动前与释放后的完整八卡实际idle快照均已核验。",
+    "本次未读取或更改全局协调器策略，没有启动新任务；不评价正在进行的EP8或新trace结果，不修改CP4/EP2公开包。"
+  ]
+}
