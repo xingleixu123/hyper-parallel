@@ -2,6 +2,8 @@
 
 [详细中文总问题单#202](https://github.com/hf1s/hyper-parallel/issues/202)关联14个独立子问题及各自单提交PR；#230已合入，其余13组PR仍为草稿。[当前中文报告](REPORT_ZH.md)是最新结论入口。当前固定源544526f7的FSDP基线、续训对独立连续400及off/full/SAC selective重算均已通过完整200步×8rank验收；[重算精度、显存与性能三图](reports/a1e6-recompute-200/README_ZH.md)记录新增两次独立运行。[当前TP2](reports/a1e6-tp2-200/README_ZH.md)及[当前TP4/CP2](reports/a1e6-tp4-cp2-200/README_ZH.md)及[当前CP4/EP2](reports/a1e6-cp4-ep2-200/README_ZH.md)及[当前EP4/EP8](reports/a1e6-ep4-ep8-200/README_ZH.md)均各完整200步×8rank，主LM最大差分别0.01203537@97、0.01165390@193、0.01872301@188、0.00969219@148、0.00931740@200、0.02429438@188、0.01350069@148，均FAIL，根因尚未定位；输入/CPU构造初态/LR一致不能替代精度通过。新增[TP2+EP2完整200步与TP4+EP4中断记录](reports/a1e6-tp2ep2-200-tp4ep4-interrupted/README_ZH.md)：TP2+EP2主LM最大差0.01246834@146、13步超0.005，仍FAIL；TP4+EP4旧v2因运行中外部占卡仅169步，其边界保持。[TP4+EP4新v3及CP2+EP2](reports/a1e6-tp4ep4-cp2ep2-200/README_ZH.md)现已各完整200步×8rank，主LM最大差0.01245499@193、0.01323891@97，分别3/7步超阈，仍FAIL；v3前169步精确重现旧v2。[TP2+CP2+EP2/EP4末组结果](reports/a1e6-tp2cp2-ep2-ep4-200/README_ZH.md)也各完整200步×8rank，主LM最大差0.01764870@188、0.01790333@97，分别7/16步超阈。预定第一轮14组矩阵已完成采集，12种并行拓扑均FAIL；后续继续具体根因定位、修复和完整回归，不能把采集结束视为精度目标已达成。18602c4及更早结果仅作历史。后续仅用125/129，201已取消；用户2026-10-18已把逐轮20分钟改为连续实验约2小时、释放后休息10分钟，入口已有部署及实际激活证据。
 
+最新[真实q_b宽度定位、两图与无Torch复算](reports/a1e6-qb-native-width-cause/README_ZH.md)：原生W/X相同，全宽重复与P零差，半宽两次稳定且逐字节重现旧TP2；对应P的两半运行时全元素最大差0.015625/0.0078125、非零3976/3798。本次3步×8rank对原FSDP训练标量/计数/input零差。证据只确认一个真实使用点的形状效应，具体kernel和完整200步根因仍未解决。
+
 下方为按当时状态保留的早期原始索引，其中英文和旧的待验证描述不覆盖上述当前中文报告；历史数据不能移用为新基点验收。
 
 # JT DeepSeek V3: eight-910B validation evidence

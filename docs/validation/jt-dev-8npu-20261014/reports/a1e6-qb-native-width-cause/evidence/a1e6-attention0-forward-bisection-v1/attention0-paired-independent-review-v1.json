@@ -1,0 +1,3240 @@
+{
+  "schema": "attention0-paired-independent-scientific-review-v1",
+  "reviewer": "current_source_delta_audit",
+  "observed_utc": "2026-10-18T07:31:51Z",
+  "status": "PASS_EVIDENCE_AND_THREE_STEP_TRANSPARENCY_WITH_NATIVE_BOUNDARY_DIFFERENCES",
+  "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "scope": "本地独立科学复核；2次已执行的attention0三步原生NPU诊断及各自原200步运行前缀；本复核未SSH、未执行容器或NPU、未修改冻结输入。",
+  "conclusion_zh": [
+    "两次诊断各自的3步×8rank与相同拓扑的原200步运行前缀完全一致：总loss、主LM、已记录MTP/aux、梯度范数、学习率、4项计数、实际输入身份、48项CPU初态及运行标志均无差异。对角线透明性通过；这不是FSDP与TP2彼此数值相同。",
+    "四个manifest合计386个原始文件已逐路径、字节数和SHA256核验。两个真实运行均exit0/released；完整CID消失回执与各自执行receipt的SHA、owner和case绑定一致。",
+    "按8个真实batch SHA、模块、输入/权重/输出阶段和全局坐标手工合并，与冻结canonicalize_run的结果一致。未按不同拓扑的相同rank编号配对。13个事件边界中，12个为可直接比较的完整状态，o_proj原生输出是另存的K分区贡献。",
+    "在已选择的完整前向边界里，首个原生字节不一致是model.layers.0.self_attn.q_b_proj输出：4722/12288个完整块不同。实际使用位置的q_b_proj输入和权重完整块全部一致，linear_qkv及kv_b_proj的输入/权重/输出也全部一致。",
+    "q_b_proj输出648个小网格样本全部相同，不能据此认定输出张量相同。o_proj输入2812/8192块不同而648个网格样本仍相同；经过实际完成归约的self_attn父模块输出2560/2560块不同，234/648个网格样本不同，所存样本网格最大绝对差0.015625。",
+    "四个投影的9128个独立逻辑权重tile跨运行完整字节一致，且均有实际模块参数UNSHARDED、无pending handle、installed storage相同的物化证据。这比仅比较CPU初态更强，但仍不等于全模型首次NPU前向参数及所有内部状态的全量身份。",
+    "以上定位的是当前固定源码、第一次更新前的被动观测边界。没有替换输出、重放GEMM或离线相加K贡献，未证明特定kernel有缺陷，也未证明该边界是后续200步loss偏差的唯一原因。"
+  ],
+  "acceptance_boundaries": {
+    "own_prefix_transparency": "PASS",
+    "complete_200_step_acceptance": "NOT_ESTABLISHED_BY_THREE_STEP_DIAGNOSTICS",
+    "main_loss_matrix_acceptance": "NOT_CHANGED",
+    "GEMM_kernel_root_cause": "UNRESOLVED",
+    "full_tensor_numerical_error_max": "NOT_RECORDED",
+    "module_performance_or_memory_ROI": "NOT_MEASURED_BY_INSTRUMENTED_DIAGNOSTICS",
+    "CPU_mock_tests_are_native_evidence": false,
+    "raw_partial_contributions_offline_reduced": false
+  },
+  "methodology_zh": [
+    "先直接读取逐rank原始metrics、initial-state、runtime-flags、start/complete及resolved config计算前缀，再重放现有strict工具。strict工具仍按其合同返回FAIL，唯一finding为不足连续200步；其weighted_status和逐项前缀误差为PASS/0，未把这一FAIL改写成最终验收通过。",
+    "实际trace均以cpu_fixture=False通过冻结纯Python合同校验；另手工按逻辑身份构造complete和contributor两套字典，验证重复tile/样本一致，并逐全局坐标比较SHA及有限数值样本。手工结果和原comparer、根已生成JSON全字段重放一致。",
+    "完整block覆盖使用原生BF16字节，activation为512×128 tile、weight为128×128 tile，边缘按真实尺寸截断。哈希不一致只能指出该块字节不同，不能给出块内具体误差位置、全张量误差最大值或排除有符号零等表示差异。",
+    "12个实际记录JSON负例均在内存拒绝，包括将K贡献改成complete、未完成物化、sharded owner、权重副本变动、缺失事件及错误K分区；这些是合同负例，不是新Torch或NPU实验。",
+    "四份数据文件本机没有副本。本复核绑定相同冻结SHA、匹配执行receipt和原基线request，检查已审核guard远端启动时的验证路径，并核对实际消费输入身份；没有声称在本机重新哈希远端训练数据。",
+    "本轮执行的容器HostConfig为Privileged=true、runc、host网络、320GiB内存、32GiB共享内存、4096 PID上限。设备列表不是隔离证明。启动前两次与释放后均有完整8卡实际空闲快照，精确自有CID已确认不存在。",
+    "原始运行source-commit精确为544526f7，source-status与source.patch为空；本机model及forward rewriter字节与trace运行时源码证明的SHA一致。版本结论仅绑定已固定镜像与本次运行记录，不把125宿主CANN版本混入。"
+  ],
+  "paired": {
+    "manual_canonical_union_matches_contract": true,
+    "manual_comparison_matches_frozen_comparer_and_root_output": true,
+    "comparison": {
+      "schema": "attention0-forward-v1-comparison",
+      "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "scope": "passive-use-point-projection-evidence",
+      "logical_batches": 8,
+      "reference_tp_size": 1,
+      "candidate_tp_size": 2,
+      "status": "COMPLETE_BOUNDARY_DIFFERENCES",
+      "first_observed_complete_difference": {
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "first_different_block": {
+          "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+          "coordinates": [
+            0,
+            512,
+            2560,
+            2688
+          ]
+        }
+      },
+      "complete_boundaries": [
+        {
+          "module": "model.layers.0.self_attn.linear_qkv",
+          "stage": "weight",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 5440,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 720,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null,
+          "unique_logical_weight_tiles": 680
+        },
+        {
+          "module": "model.layers.0.self_attn.linear_qkv",
+          "stage": "input",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 2560,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 648,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null
+        },
+        {
+          "module": "model.layers.0.self_attn.linear_qkv",
+          "stage": "output",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 1088,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 720,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null
+        },
+        {
+          "module": "model.layers.0.self_attn.q_b_proj",
+          "stage": "weight",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 18432,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 936,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null,
+          "unique_logical_weight_tiles": 2304
+        },
+        {
+          "module": "model.layers.0.self_attn.q_b_proj",
+          "stage": "input",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 768,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 936,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null
+        },
+        {
+          "module": "model.layers.0.self_attn.q_b_proj",
+          "stage": "output",
+          "logical_batches": 8,
+          "status": "NATIVE_BYTE_DIFFERENCE",
+          "batch_block_comparisons": 12288,
+          "different_batch_blocks": 4722,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 648,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": {
+            "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+            "coordinates": [
+              0,
+              512,
+              2560,
+              2688
+            ]
+          }
+        },
+        {
+          "module": "model.layers.0.self_attn.kv_b_proj",
+          "stage": "weight",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 8192,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 360,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null,
+          "unique_logical_weight_tiles": 1024
+        },
+        {
+          "module": "model.layers.0.self_attn.kv_b_proj",
+          "stage": "input",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 256,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 360,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null
+        },
+        {
+          "module": "model.layers.0.self_attn.kv_b_proj",
+          "stage": "output",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 16384,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 648,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null
+        },
+        {
+          "module": "model.layers.0.self_attn.o_proj",
+          "stage": "weight",
+          "logical_batches": 8,
+          "status": "EXACT_NATIVE_BYTES",
+          "batch_block_comparisons": 40960,
+          "different_batch_blocks": 0,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 648,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": null,
+          "unique_logical_weight_tiles": 5120
+        },
+        {
+          "module": "model.layers.0.self_attn.o_proj",
+          "stage": "input",
+          "logical_batches": 8,
+          "status": "NATIVE_BYTE_DIFFERENCE",
+          "batch_block_comparisons": 8192,
+          "different_batch_blocks": 2812,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 648,
+          "different_grid_samples": 0,
+          "sample_grid_max_abs_difference": 0,
+          "first_different_block": {
+            "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+            "coordinates": [
+              0,
+              512,
+              1792,
+              1920
+            ]
+          }
+        },
+        {
+          "module": "model.layers.0.self_attn",
+          "stage": "output",
+          "logical_batches": 8,
+          "status": "NATIVE_BYTE_DIFFERENCE",
+          "batch_block_comparisons": 2560,
+          "different_batch_blocks": 2560,
+          "dtype_pairs": [
+            [
+              "torch.bfloat16",
+              "torch.bfloat16"
+            ]
+          ],
+          "sample_grid_comparisons": 648,
+          "different_grid_samples": 234,
+          "sample_grid_max_abs_difference": 0.015625,
+          "first_different_block": {
+            "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+            "coordinates": [
+              0,
+              512,
+              0,
+              128
+            ]
+          }
+        }
+      ],
+      "o_proj_raw_contributors": {
+        "status": "KEPT_SEPARATE_NOT_REDUCED_OR_PAIRED_AS_REPLICAS",
+        "reference_states": 8,
+        "candidate_states": 16,
+        "reference_k_partitions": [
+          [
+            0,
+            16384
+          ]
+        ],
+        "candidate_k_partitions": [
+          [
+            0,
+            8192
+          ],
+          [
+            8192,
+            16384
+          ]
+        ]
+      },
+      "own_prefix_transparency": "REQUIRES_SEPARATE_THREE_STEP_SCALAR_INPUT_RUNTIME_REVIEW",
+      "root_cause": "UNRESOLVED",
+      "limits": [
+        "Sample-grid numerical maxima are not full-tensor numerical maxima.",
+        "Native-byte differences locate observed boundaries and do not establish a causal kernel.",
+        "Raw o_proj contributions have different K partitions; no offline sum or GEMM replay is performed."
+      ]
+    },
+    "per_batch_boundary_counts": [
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 680,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 320,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.linear_qkv",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 136,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 2304,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 96,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 606,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2560,
+          2688
+        ]
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 606,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2560,
+          2688
+        ]
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 553,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2560,
+          2688
+        ]
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 595,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2560,
+          2688
+        ]
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 610,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2560,
+          2688
+        ]
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 612,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2560,
+          2688
+        ]
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 593,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2560,
+          2688
+        ]
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.q_b_proj",
+        "stage": "output",
+        "different_blocks": 547,
+        "compared_blocks": 1536,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          2688,
+          2816
+        ]
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "input",
+        "different_blocks": 0,
+        "compared_blocks": 32,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.kv_b_proj",
+        "stage": "output",
+        "different_blocks": 0,
+        "compared_blocks": 2048,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "weight",
+        "different_blocks": 0,
+        "compared_blocks": 5120,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": null
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 366,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1792,
+          1920
+        ]
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 374,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1792,
+          1920
+        ]
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 314,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1664,
+          1792
+        ]
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 355,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1792,
+          1920
+        ]
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 369,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1664,
+          1792
+        ]
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 360,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1664,
+          1792
+        ]
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 366,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1792,
+          1920
+        ]
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn.o_proj",
+        "stage": "input",
+        "different_blocks": 308,
+        "compared_blocks": 1024,
+        "different_grid_samples": 0,
+        "sample_grid_max_abs_difference": 0,
+        "first_different_block": [
+          0,
+          512,
+          1792,
+          1920
+        ]
+      },
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 27,
+        "sample_grid_max_abs_difference": 0.001953125,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 30,
+        "sample_grid_max_abs_difference": 0.00390625,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 25,
+        "sample_grid_max_abs_difference": 0.0078125,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 38,
+        "sample_grid_max_abs_difference": 0.0078125,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 30,
+        "sample_grid_max_abs_difference": 0.015625,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 27,
+        "sample_grid_max_abs_difference": 0.001953125,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 29,
+        "sample_grid_max_abs_difference": 0.00390625,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "module": "model.layers.0.self_attn",
+        "stage": "output",
+        "different_blocks": 320,
+        "compared_blocks": 320,
+        "different_grid_samples": 28,
+        "sample_grid_max_abs_difference": 0.00390625,
+        "first_different_block": [
+          0,
+          512,
+          0,
+          128
+        ]
+      }
+    ],
+    "logical_pairing": [
+      {
+        "batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+        "reference": [
+          {
+            "rank": 2,
+            "dp": 2,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 4,
+            "dp": 2,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          },
+          {
+            "rank": 5,
+            "dp": 2,
+            "tp": 1,
+            "micro": 0,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "batch_sha256": "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+        "reference": [
+          {
+            "rank": 3,
+            "dp": 3,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 6,
+            "dp": 3,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          },
+          {
+            "rank": 7,
+            "dp": 3,
+            "tp": 1,
+            "micro": 0,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "batch_sha256": "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+        "reference": [
+          {
+            "rank": 7,
+            "dp": 7,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 6,
+            "dp": 3,
+            "tp": 0,
+            "micro": 1,
+            "step": 1
+          },
+          {
+            "rank": 7,
+            "dp": 3,
+            "tp": 1,
+            "micro": 1,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "batch_sha256": "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+        "reference": [
+          {
+            "rank": 6,
+            "dp": 6,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 4,
+            "dp": 2,
+            "tp": 0,
+            "micro": 1,
+            "step": 1
+          },
+          {
+            "rank": 5,
+            "dp": 2,
+            "tp": 1,
+            "micro": 1,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "batch_sha256": "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+        "reference": [
+          {
+            "rank": 0,
+            "dp": 0,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 0,
+            "dp": 0,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          },
+          {
+            "rank": 1,
+            "dp": 0,
+            "tp": 1,
+            "micro": 0,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "batch_sha256": "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+        "reference": [
+          {
+            "rank": 1,
+            "dp": 1,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 2,
+            "dp": 1,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          },
+          {
+            "rank": 3,
+            "dp": 1,
+            "tp": 1,
+            "micro": 0,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "batch_sha256": "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+        "reference": [
+          {
+            "rank": 4,
+            "dp": 4,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 0,
+            "dp": 0,
+            "tp": 0,
+            "micro": 1,
+            "step": 1
+          },
+          {
+            "rank": 1,
+            "dp": 0,
+            "tp": 1,
+            "micro": 1,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "batch_sha256": "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7",
+        "reference": [
+          {
+            "rank": 5,
+            "dp": 5,
+            "tp": 0,
+            "micro": 0,
+            "step": 1
+          }
+        ],
+        "candidate": [
+          {
+            "rank": 2,
+            "dp": 1,
+            "tp": 0,
+            "micro": 1,
+            "step": 1
+          },
+          {
+            "rank": 3,
+            "dp": 1,
+            "tp": 1,
+            "micro": 1,
+            "step": 1
+          }
+        ]
+      }
+    ],
+    "all_four_use_point_weights_exact_native_bytes": true,
+    "unique_weight_tiles_compared": 9128,
+    "CPU_initial_state_cross_run_mismatch_ranks": [],
+    "runtime_flags_cross_run_mismatch_ranks": [],
+    "cross_run_first3_scalar_differences": [
+      {
+        "step": 1,
+        "global_input_sha256": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+        "abs_differences": {
+          "training/total_loss": 0.0006732940673828125,
+          "training/foundation_loss/lm": 0.0004949569702148438,
+          "training/foundation_loss/mtp": 0.00017690658569335938,
+          "training/foundation_loss/aux": 1.0622898116707802e-08,
+          "training/grad_norm": 0.00041961669921875,
+          "training/lr": 0
+        }
+      },
+      {
+        "step": 2,
+        "global_input_sha256": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+        "abs_differences": {
+          "training/total_loss": 0.0004825592041015625,
+          "training/foundation_loss/lm": 1.33514404296875e-05,
+          "training/foundation_loss/mtp": 0.0004999637603759766,
+          "training/foundation_loss/aux": 2.967135515064001e-08,
+          "training/grad_norm": 0.0018949508666992188,
+          "training/lr": 0
+        }
+      },
+      {
+        "step": 3,
+        "global_input_sha256": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25",
+        "abs_differences": {
+          "training/total_loss": 0.00023651123046875,
+          "training/foundation_loss/lm": 0.00022220611572265625,
+          "training/foundation_loss/mtp": 1.6689300537109375e-05,
+          "training/foundation_loss/aux": 3.466266207396984e-08,
+          "training/grad_norm": 0.0002117156982421875,
+          "training/lr": 0
+        }
+      }
+    ]
+  },
+  "source_locations": [
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+      "line": 221,
+      "meaning": "JTMLA.project_latent_inputs，linear_qkv调用在227行。"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+      "line": 260,
+      "meaning": "q_b_proj调用后才reshape；本次首差为此nn.Linear输出边界，输入已包含先前norm/gather。"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+      "line": 267,
+      "meaning": "kv_b_proj调用输出在本轮8batch均完全一致。"
+    },
+    {
+      "path": "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+      "line": 301,
+      "meaning": "o_proj原生返回；TP2原生贡献与外层实际完成归约后的父模块hook输出分开保存。"
+    },
+    {
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/native_attention0_trace.py",
+      "line": 203,
+      "meaning": "MaterializationBinding.check：实际owner/参数安装与storage物化证据。"
+    },
+    {
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/native_attention0_trace.py",
+      "line": 240,
+      "meaning": "summarize：有界原生tile SHA与小网格；不能还原全部数值误差。"
+    },
+    {
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/native_attention0_trace.py",
+      "line": 389,
+      "meaning": "前置hook依次采W/X；输出hook在410行；均不替换原始Tensor/tuple返回。"
+    },
+    {
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/capture_attention0_forward_training.py",
+      "line": 79,
+      "meaning": "_runtime_layout检查真实编译TP计划、模块与rewriter源码，区分Partial与完成桥接。"
+    },
+    {
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/attention0_contract.py",
+      "line": 195,
+      "meaning": "canonicalize_run严格校验8rank拓扑、生命周期、13边界、8唯一batch、物化及全tile覆盖。"
+    }
+  ],
+  "audit_execution_notes": [
+    "First in-memory comparison against serialized root JSON used Python tuple K-partitions versus JSON arrays and failed. Normalized replay through JSON before equality; no input/tool/root report modified."
+  ],
+  "binding_count": 418,
+  "verified_manifest_file_count": 386,
+  "prefix_runs": [
+    {
+      "case": "r129-a1e6-attention0-forward-fsdp8-3-v1",
+      "reference": "r129-a1e6-fsdp8-0-200-v3",
+      "status": "PASS_EXACT_THREE_STEP_PREFIX_NOT_200_ACCEPTANCE",
+      "rank_step_pairs": 24,
+      "scalar_field_comparisons": 144,
+      "counter_comparisons": 96,
+      "max_abs_differences": {
+        "training/total_loss": 0,
+        "training/foundation_loss/lm": 0,
+        "training/foundation_loss/mtp": 0,
+        "training/foundation_loss/aux": 0,
+        "training/grad_norm": 0,
+        "training/lr": 0,
+        "data/consumed_tokens": 0,
+        "data/consumed_samples": 0,
+        "data/step_tokens": 0,
+        "data/step_samples": 0
+      },
+      "input_identity_mismatches": 0,
+      "CPU_initial_state_mismatch_ranks": [],
+      "CPU_initial_entries_each_rank": 48,
+      "runtime_mismatch_ranks": [],
+      "start_mismatch_ranks_excluding_train_iters": [],
+      "resolved_config_differences": [
+        {
+          "path": "checkpoint.checkpoint_dir",
+          "reference": "/work/checkpoints/r129-a1e6-fsdp8-0-200-v3",
+          "candidate": "/work/checkpoints/r129-a1e6-attention0-forward-fsdp8-3-v1"
+        },
+        {
+          "path": "checkpoint.save_ckpt",
+          "reference": true,
+          "candidate": false
+        },
+        {
+          "path": "training.train_iters",
+          "reference": 200,
+          "candidate": 3
+        }
+      ],
+      "first3_rank0_scalars": [
+        {
+          "step": 1,
+          "training/total_loss": 16.809673309326172,
+          "training/grad_norm": 22.473445892333984,
+          "training/lr": 0.0001,
+          "training/foundation_loss/aux": 0.00025308559997938573,
+          "training/foundation_loss/lm": 12.881054878234863,
+          "training/foundation_loss/mtp": 3.928363800048828,
+          "data/step_tokens": 32573,
+          "data/consumed_tokens": 32573,
+          "data/step_samples": 8,
+          "data/consumed_samples": 8,
+          "input_identity": {
+            "global_sha256": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+            "rank_count": 8,
+            "micro_steps": 1
+          }
+        },
+        {
+          "step": 2,
+          "training/total_loss": 16.733718872070312,
+          "training/grad_norm": 8.05288314819336,
+          "training/lr": 0.0001,
+          "training/foundation_loss/aux": 0.00022268577595241368,
+          "training/foundation_loss/lm": 12.84947395324707,
+          "training/foundation_loss/mtp": 3.8840198516845703,
+          "data/step_tokens": 21239,
+          "data/consumed_tokens": 53812,
+          "data/step_samples": 8,
+          "data/consumed_samples": 16,
+          "input_identity": {
+            "global_sha256": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+            "rank_count": 8,
+            "micro_steps": 1
+          }
+        },
+        {
+          "step": 3,
+          "training/total_loss": 16.31749725341797,
+          "training/grad_norm": 13.126752853393555,
+          "training/lr": 0.0001,
+          "training/foundation_loss/aux": 0.00024044487508945167,
+          "training/foundation_loss/lm": 12.472381591796875,
+          "training/foundation_loss/mtp": 3.8448736667633057,
+          "data/step_tokens": 24848,
+          "data/consumed_tokens": 78660,
+          "data/step_samples": 8,
+          "data/consumed_samples": 24,
+          "input_identity": {
+            "global_sha256": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25",
+            "rank_count": 8,
+            "micro_steps": 1
+          }
+        }
+      ],
+      "strict_tool_replay": {
+        "status": "FAIL",
+        "weighted_status": "PASS",
+        "findings": [
+          "Final acceptance requires exactly 200 consecutive steps"
+        ],
+        "unweighted_error_diagnostics": {
+          "lm": 0,
+          "mtp": 0,
+          "aux": 0
+        },
+        "coefficients": {
+          "mtp_loss_factor": 0.3,
+          "moe_aux_loss_coeff": 0.0001
+        },
+        "errors": {
+          "training/total_loss": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/foundation_loss/lm": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/foundation_loss/mtp": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/foundation_loss/aux": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/grad_norm": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          }
+        }
+      },
+      "canonical": {
+        "status": "PASS",
+        "scope": "native-candidate",
+        "tp_size": 1,
+        "logical_batches": 8,
+        "physical_records_per_rank": {
+          "0": 17,
+          "1": 17,
+          "2": 17,
+          "3": 17,
+          "4": 17,
+          "5": 17,
+          "6": 17,
+          "7": 17
+        },
+        "event_order_count": 13,
+        "complete_states": 96,
+        "contributors_kept_separate": 8,
+        "unique_logical_weight_tiles": 9128,
+        "materialization_proofs": 32,
+        "events": [
+          {
+            "module": "model.layers.0.self_attn.linear_qkv",
+            "stage": "weight",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                2112,
+                0,
+                5120
+              ],
+              "logical_shape": [
+                2112,
+                5120
+              ],
+              "semantics": "weight"
+            },
+            "blocks_per_record": [
+              680
+            ],
+            "grid_samples_per_record": [
+              90
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.linear_qkv",
+            "stage": "input",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                5120
+              ],
+              "logical_shape": [
+                4096,
+                5120
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              320
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.linear_qkv",
+            "stage": "output",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                2112
+              ],
+              "logical_shape": [
+                4096,
+                2112
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              136
+            ],
+            "grid_samples_per_record": [
+              90
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.q_b_proj",
+            "stage": "weight",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                24576,
+                0,
+                1536
+              ],
+              "logical_shape": [
+                24576,
+                1536
+              ],
+              "semantics": "weight"
+            },
+            "blocks_per_record": [
+              2304
+            ],
+            "grid_samples_per_record": [
+              117
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.q_b_proj",
+            "stage": "input",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                1536
+              ],
+              "logical_shape": [
+                4096,
+                1536
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              96
+            ],
+            "grid_samples_per_record": [
+              117
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.q_b_proj",
+            "stage": "output",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                24576
+              ],
+              "logical_shape": [
+                4096,
+                24576
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              1536
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.kv_b_proj",
+            "stage": "weight",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                32768,
+                0,
+                512
+              ],
+              "logical_shape": [
+                32768,
+                512
+              ],
+              "semantics": "weight"
+            },
+            "blocks_per_record": [
+              1024
+            ],
+            "grid_samples_per_record": [
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.kv_b_proj",
+            "stage": "input",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                512
+              ],
+              "logical_shape": [
+                4096,
+                512
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              32
+            ],
+            "grid_samples_per_record": [
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.kv_b_proj",
+            "stage": "output",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                32768
+              ],
+              "logical_shape": [
+                4096,
+                32768
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              2048
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.o_proj",
+            "stage": "weight",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                5120,
+                0,
+                16384
+              ],
+              "logical_shape": [
+                5120,
+                16384
+              ],
+              "semantics": "weight"
+            },
+            "blocks_per_record": [
+              5120
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.o_proj",
+            "stage": "input",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                16384
+              ],
+              "logical_shape": [
+                4096,
+                16384
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              1024
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.o_proj",
+            "stage": "output",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                5120
+              ],
+              "contributor_k": [
+                0,
+                16384
+              ],
+              "logical_shape": [
+                4096,
+                5120
+              ],
+              "semantics": "k_partition_contribution"
+            },
+            "blocks_per_record": [
+              320
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn",
+            "stage": "output",
+            "row_count": 8,
+            "region": {
+              "bounds": [
+                0,
+                4096,
+                0,
+                5120
+              ],
+              "logical_shape": [
+                4096,
+                5120
+              ],
+              "semantics": "complete"
+            },
+            "blocks_per_record": [
+              320
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          }
+        ],
+        "batch_identities": [
+          "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+          "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+          "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+          "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+          "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+          "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+          "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+          "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7"
+        ],
+        "total_complete_blocks": 117120,
+        "total_contributor_blocks": 2560
+      },
+      "actual_physical_metadata_checked": 104,
+      "actual_record_JSON_negative_tests": [
+        {
+          "name": "o_proj raw K contribution cannot become complete",
+          "result": "REJECTED",
+          "reason": "Saved semantics differs from the actual coordinate contract"
+        },
+        {
+          "name": "materialization pending handle rejected",
+          "result": "REJECTED",
+          "reason": "Weight has no completed, installed, use-point materialization proof"
+        },
+        {
+          "name": "materialization sharded owner rejected",
+          "result": "REJECTED",
+          "reason": "Weight has no completed, installed, use-point materialization proof"
+        },
+        {
+          "name": "DP weight replica mismatch rejected",
+          "result": "REJECTED",
+          "reason": "Materialized weight changed across DP/microbatch copies"
+        },
+        {
+          "name": "missing boundary rejected",
+          "result": "REJECTED",
+          "reason": "Incomplete, duplicate or reordered boundary lifecycle"
+        },
+        {
+          "name": "altered K contributor rejected",
+          "result": "REJECTED",
+          "reason": "Wrong Partial K contributor"
+        }
+      ],
+      "local_nondata_input_pins_rehashed": 14,
+      "dataset_pin_scope": [
+        {
+          "path": "data/sft_data_4k/SOURCE_INDEX.jsonl",
+          "sha256": "34978f670d9b9cca68eea5935f96b2e46e8876473e77970fe0bbc18a84e3660b",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        },
+        {
+          "path": "data/sft_data_4k/data-00000-of-00001.arrow",
+          "sha256": "cb7e146388ff5de09cafe50bb57c060265038ecabd2f343fa9114c05f3b678f1",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        },
+        {
+          "path": "data/sft_data_4k/dataset_info.json",
+          "sha256": "5a36710bc182d24a0b3a03c391ad41cfed859fff8dd774b2fa30ebfc897129a0",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        },
+        {
+          "path": "data/sft_data_4k/state.json",
+          "sha256": "6d32594943adceeef6fd2dba11c02e679c85f73e32aeea9d176c3fc12d63ccbb",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        }
+      ],
+      "actual_idle_and_release_snapshots": {
+        "before": {
+          "complete": true,
+          "idle_devices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "pids": {
+            "0": [],
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": []
+          },
+          "max_core": 0,
+          "max_hbm_mib": 3438
+        },
+        "reference_actual_idle_recheck": {
+          "complete": true,
+          "idle_devices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "pids": {
+            "0": [],
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": []
+          },
+          "max_core": 0,
+          "max_hbm_mib": 3438
+        },
+        "after": {
+          "complete": true,
+          "idle_devices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "pids": {
+            "0": [],
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": []
+          },
+          "max_core": 0,
+          "max_hbm_mib": 3437
+        }
+      }
+    },
+    {
+      "case": "r129-a1e6-attention0-forward-tp2-3-v1",
+      "reference": "r129-a1e6-tp2-200-v2",
+      "status": "PASS_EXACT_THREE_STEP_PREFIX_NOT_200_ACCEPTANCE",
+      "rank_step_pairs": 24,
+      "scalar_field_comparisons": 144,
+      "counter_comparisons": 96,
+      "max_abs_differences": {
+        "training/total_loss": 0,
+        "training/foundation_loss/lm": 0,
+        "training/foundation_loss/mtp": 0,
+        "training/foundation_loss/aux": 0,
+        "training/grad_norm": 0,
+        "training/lr": 0,
+        "data/consumed_tokens": 0,
+        "data/consumed_samples": 0,
+        "data/step_tokens": 0,
+        "data/step_samples": 0
+      },
+      "input_identity_mismatches": 0,
+      "CPU_initial_state_mismatch_ranks": [],
+      "CPU_initial_entries_each_rank": 48,
+      "runtime_mismatch_ranks": [],
+      "start_mismatch_ranks_excluding_train_iters": [],
+      "resolved_config_differences": [
+        {
+          "path": "checkpoint.checkpoint_dir",
+          "reference": "/work/checkpoints/r129-a1e6-tp2-200-v2",
+          "candidate": "/work/checkpoints/r129-a1e6-attention0-forward-tp2-3-v1"
+        },
+        {
+          "path": "training.train_iters",
+          "reference": 200,
+          "candidate": 3
+        }
+      ],
+      "first3_rank0_scalars": [
+        {
+          "step": 1,
+          "training/total_loss": 16.80900001525879,
+          "training/grad_norm": 22.473865509033203,
+          "training/lr": 0.0001,
+          "training/foundation_loss/aux": 0.000253074977081269,
+          "training/foundation_loss/lm": 12.880559921264648,
+          "training/foundation_loss/mtp": 3.9281868934631348,
+          "data/step_tokens": 32573,
+          "data/consumed_tokens": 32573,
+          "data/step_samples": 8,
+          "data/consumed_samples": 8,
+          "input_identity": {
+            "global_sha256": "40da007bfdb553cda1bd319f6f37315c8b943f1b80faf562e78a852c337f8856",
+            "rank_count": 8,
+            "micro_steps": 2
+          }
+        },
+        {
+          "step": 2,
+          "training/total_loss": 16.734201431274414,
+          "training/grad_norm": 8.05098819732666,
+          "training/lr": 0.0001,
+          "training/foundation_loss/aux": 0.00022265610459726304,
+          "training/foundation_loss/lm": 12.84946060180664,
+          "training/foundation_loss/mtp": 3.8845198154449463,
+          "data/step_tokens": 21239,
+          "data/consumed_tokens": 53812,
+          "data/step_samples": 8,
+          "data/consumed_samples": 16,
+          "input_identity": {
+            "global_sha256": "2828ad80c790b79dc07bdc1378bd0a2774fd1a6b92bc98d4167e0a3608c50985",
+            "rank_count": 8,
+            "micro_steps": 2
+          }
+        },
+        {
+          "step": 3,
+          "training/total_loss": 16.317733764648438,
+          "training/grad_norm": 13.126541137695312,
+          "training/lr": 0.0001,
+          "training/foundation_loss/aux": 0.00024047953775152564,
+          "training/foundation_loss/lm": 12.472603797912598,
+          "training/foundation_loss/mtp": 3.8448903560638428,
+          "data/step_tokens": 24848,
+          "data/consumed_tokens": 78660,
+          "data/step_samples": 8,
+          "data/consumed_samples": 24,
+          "input_identity": {
+            "global_sha256": "d6daaa3b669d4c8a88f5f86b9579defeca33afeb6d55d917dd5c33536a76cf25",
+            "rank_count": 8,
+            "micro_steps": 2
+          }
+        }
+      ],
+      "strict_tool_replay": {
+        "status": "FAIL",
+        "weighted_status": "PASS",
+        "findings": [
+          "Final acceptance requires exactly 200 consecutive steps"
+        ],
+        "unweighted_error_diagnostics": {
+          "lm": 0,
+          "mtp": 0,
+          "aux": 0
+        },
+        "coefficients": {
+          "mtp_loss_factor": 0.3,
+          "moe_aux_loss_coeff": 0.0001
+        },
+        "errors": {
+          "training/total_loss": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/foundation_loss/lm": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/foundation_loss/mtp": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/foundation_loss/aux": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          },
+          "training/grad_norm": {
+            "max_abs": 0,
+            "step": 1,
+            "rank": 0
+          }
+        }
+      },
+      "canonical": {
+        "status": "PASS",
+        "scope": "native-candidate",
+        "tp_size": 2,
+        "logical_batches": 8,
+        "physical_records_per_rank": {
+          "0": 31,
+          "1": 31,
+          "2": 31,
+          "3": 31,
+          "4": 31,
+          "5": 31,
+          "6": 31,
+          "7": 31
+        },
+        "event_order_count": 13,
+        "complete_states": 96,
+        "contributors_kept_separate": 16,
+        "unique_logical_weight_tiles": 9128,
+        "materialization_proofs": 64,
+        "events": [
+          {
+            "module": "model.layers.0.self_attn.linear_qkv",
+            "stage": "weight",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  2112,
+                  0,
+                  5120
+                ],
+                "logical_shape": [
+                  2112,
+                  5120
+                ],
+                "semantics": "weight"
+              }
+            ],
+            "blocks_per_record": [
+              680
+            ],
+            "grid_samples_per_record": [
+              90
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.linear_qkv",
+            "stage": "input",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  2048,
+                  0,
+                  5120
+                ],
+                "logical_shape": [
+                  4096,
+                  5120
+                ],
+                "semantics": "complete"
+              },
+              {
+                "bounds": [
+                  2048,
+                  4096,
+                  0,
+                  5120
+                ],
+                "logical_shape": [
+                  4096,
+                  5120
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              160
+            ],
+            "grid_samples_per_record": [
+              36,
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.linear_qkv",
+            "stage": "output",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  2048,
+                  0,
+                  2112
+                ],
+                "logical_shape": [
+                  4096,
+                  2112
+                ],
+                "semantics": "complete"
+              },
+              {
+                "bounds": [
+                  2048,
+                  4096,
+                  0,
+                  2112
+                ],
+                "logical_shape": [
+                  4096,
+                  2112
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              68
+            ],
+            "grid_samples_per_record": [
+              40,
+              50
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.q_b_proj",
+            "stage": "weight",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  12288,
+                  0,
+                  1536
+                ],
+                "logical_shape": [
+                  24576,
+                  1536
+                ],
+                "semantics": "weight"
+              },
+              {
+                "bounds": [
+                  12288,
+                  24576,
+                  0,
+                  1536
+                ],
+                "logical_shape": [
+                  24576,
+                  1536
+                ],
+                "semantics": "weight"
+              }
+            ],
+            "blocks_per_record": [
+              1152
+            ],
+            "grid_samples_per_record": [
+              52,
+              65
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.q_b_proj",
+            "stage": "input",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  0,
+                  1536
+                ],
+                "logical_shape": [
+                  4096,
+                  1536
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              96
+            ],
+            "grid_samples_per_record": [
+              117
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.q_b_proj",
+            "stage": "output",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  0,
+                  12288
+                ],
+                "logical_shape": [
+                  4096,
+                  24576
+                ],
+                "semantics": "complete"
+              },
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  12288,
+                  24576
+                ],
+                "logical_shape": [
+                  4096,
+                  24576
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              768
+            ],
+            "grid_samples_per_record": [
+              36,
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.kv_b_proj",
+            "stage": "weight",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  16384,
+                  0,
+                  512
+                ],
+                "logical_shape": [
+                  32768,
+                  512
+                ],
+                "semantics": "weight"
+              },
+              {
+                "bounds": [
+                  16384,
+                  32768,
+                  0,
+                  512
+                ],
+                "logical_shape": [
+                  32768,
+                  512
+                ],
+                "semantics": "weight"
+              }
+            ],
+            "blocks_per_record": [
+              512
+            ],
+            "grid_samples_per_record": [
+              20,
+              25
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.kv_b_proj",
+            "stage": "input",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  0,
+                  512
+                ],
+                "logical_shape": [
+                  4096,
+                  512
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              32
+            ],
+            "grid_samples_per_record": [
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.kv_b_proj",
+            "stage": "output",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  0,
+                  16384
+                ],
+                "logical_shape": [
+                  4096,
+                  32768
+                ],
+                "semantics": "complete"
+              },
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  16384,
+                  32768
+                ],
+                "logical_shape": [
+                  4096,
+                  32768
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              1024
+            ],
+            "grid_samples_per_record": [
+              36,
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.o_proj",
+            "stage": "weight",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  5120,
+                  0,
+                  8192
+                ],
+                "logical_shape": [
+                  5120,
+                  16384
+                ],
+                "semantics": "weight"
+              },
+              {
+                "bounds": [
+                  0,
+                  5120,
+                  8192,
+                  16384
+                ],
+                "logical_shape": [
+                  5120,
+                  16384
+                ],
+                "semantics": "weight"
+              }
+            ],
+            "blocks_per_record": [
+              2560
+            ],
+            "grid_samples_per_record": [
+              36,
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": true
+          },
+          {
+            "module": "model.layers.0.self_attn.o_proj",
+            "stage": "input",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  0,
+                  8192
+                ],
+                "logical_shape": [
+                  4096,
+                  16384
+                ],
+                "semantics": "complete"
+              },
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  8192,
+                  16384
+                ],
+                "logical_shape": [
+                  4096,
+                  16384
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              512
+            ],
+            "grid_samples_per_record": [
+              36,
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn.o_proj",
+            "stage": "output",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  0,
+                  5120
+                ],
+                "contributor_k": [
+                  0,
+                  8192
+                ],
+                "logical_shape": [
+                  4096,
+                  5120
+                ],
+                "semantics": "k_partition_contribution"
+              },
+              {
+                "bounds": [
+                  0,
+                  4096,
+                  0,
+                  5120
+                ],
+                "contributor_k": [
+                  8192,
+                  16384
+                ],
+                "logical_shape": [
+                  4096,
+                  5120
+                ],
+                "semantics": "k_partition_contribution"
+              }
+            ],
+            "blocks_per_record": [
+              320
+            ],
+            "grid_samples_per_record": [
+              81
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          },
+          {
+            "module": "model.layers.0.self_attn",
+            "stage": "output",
+            "row_count": 16,
+            "regions": [
+              {
+                "bounds": [
+                  0,
+                  2048,
+                  0,
+                  5120
+                ],
+                "logical_shape": [
+                  4096,
+                  5120
+                ],
+                "semantics": "complete"
+              },
+              {
+                "bounds": [
+                  2048,
+                  4096,
+                  0,
+                  5120
+                ],
+                "logical_shape": [
+                  4096,
+                  5120
+                ],
+                "semantics": "complete"
+              }
+            ],
+            "blocks_per_record": [
+              160
+            ],
+            "grid_samples_per_record": [
+              36,
+              45
+            ],
+            "weight_replicas_byte_hash_and_grid_equal": null
+          }
+        ],
+        "batch_identities": [
+          "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+          "27fd5581aa7a8eef9a8b30e72f23182912101a1ac73e08ab192811985aa9cfb8",
+          "6e29c41f6ba069008e4d6315467190571136bac4fe367de984dbb85ffb711f95",
+          "934f65fbcc4b7b14bf6a714f29de3328712baab61088f23318d6c892ca3d7605",
+          "bc1e16d797859559855395f1d5597199f9d4ad5f86d6c6c8c53cf1c24c418332",
+          "bc58263ddba34bc3ee5688c3d0d5c758c3a621986adf4ead7957eb62e4888e2e",
+          "ce3804d22b051d88cdf066c018ce4eff9392b346ad5eadd83527f3a0a02a4fe4",
+          "ed12c686220cb35de4406bf0ae0c5ac019d1b33d81849b4c164858f9f1b651e7"
+        ],
+        "total_complete_blocks": 117120,
+        "total_contributor_blocks": 5120
+      },
+      "actual_physical_metadata_checked": 208,
+      "actual_record_JSON_negative_tests": [
+        {
+          "name": "o_proj raw K contribution cannot become complete",
+          "result": "REJECTED",
+          "reason": "Saved semantics differs from the actual coordinate contract"
+        },
+        {
+          "name": "materialization pending handle rejected",
+          "result": "REJECTED",
+          "reason": "Weight has no completed, installed, use-point materialization proof"
+        },
+        {
+          "name": "materialization sharded owner rejected",
+          "result": "REJECTED",
+          "reason": "Weight has no completed, installed, use-point materialization proof"
+        },
+        {
+          "name": "DP weight replica mismatch rejected",
+          "result": "REJECTED",
+          "reason": "Replica/TP overlap block mismatch"
+        },
+        {
+          "name": "missing boundary rejected",
+          "result": "REJECTED",
+          "reason": "Incomplete, duplicate or reordered boundary lifecycle"
+        },
+        {
+          "name": "altered K contributor rejected",
+          "result": "REJECTED",
+          "reason": "Wrong Partial K contributor"
+        }
+      ],
+      "local_nondata_input_pins_rehashed": 14,
+      "dataset_pin_scope": [
+        {
+          "path": "data/sft_data_4k/SOURCE_INDEX.jsonl",
+          "sha256": "34978f670d9b9cca68eea5935f96b2e46e8876473e77970fe0bbc18a84e3660b",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        },
+        {
+          "path": "data/sft_data_4k/data-00000-of-00001.arrow",
+          "sha256": "cb7e146388ff5de09cafe50bb57c060265038ecabd2f343fa9114c05f3b678f1",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        },
+        {
+          "path": "data/sft_data_4k/dataset_info.json",
+          "sha256": "5a36710bc182d24a0b3a03c391ad41cfed859fff8dd774b2fa30ebfc897129a0",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        },
+        {
+          "path": "data/sft_data_4k/state.json",
+          "sha256": "6d32594943adceeef6fd2dba11c02e679c85f73e32aeea9d176c3fc12d63ccbb",
+          "verification": "same frozen SHA in candidate execution receipt and baseline request; actual candidate remote startup guard verified bytes; no local dataset copy rehashed"
+        }
+      ],
+      "actual_idle_and_release_snapshots": {
+        "before": {
+          "complete": true,
+          "idle_devices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "pids": {
+            "0": [],
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": []
+          },
+          "max_core": 0,
+          "max_hbm_mib": 3438
+        },
+        "reference_actual_idle_recheck": {
+          "complete": true,
+          "idle_devices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "pids": {
+            "0": [],
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": []
+          },
+          "max_core": 0,
+          "max_hbm_mib": 3437
+        },
+        "after": {
+          "complete": true,
+          "idle_devices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "pids": {
+            "0": [],
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": []
+          },
+          "max_core": 0,
+          "max_hbm_mib": 3438
+        }
+      }
+    }
+  ],
+  "execution_summary": [
+    {
+      "case": "r129-a1e6-attention0-forward-fsdp8-3-v1",
+      "host": "129",
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "exit_code": 0,
+      "released": true,
+      "attempted": true,
+      "container_stopped": true,
+      "duration_seconds": 142.37490955000976,
+      "reason": null,
+      "receipt_validator": "PASS"
+    },
+    {
+      "case": "r129-a1e6-attention0-forward-tp2-3-v1",
+      "host": "129",
+      "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+      "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+      "exit_code": 0,
+      "released": true,
+      "attempted": true,
+      "container_stopped": true,
+      "duration_seconds": 143.33155320998048,
+      "reason": null,
+      "receipt_validator": "PASS"
+    }
+  ],
+  "exact_own_container_absence_verified_all": true,
+  "public_extract": {
+    "source": "evidence/a1e6-attention0-forward-bisection-v1/attention0-paired-independent-review-v1.json",
+    "source_identity": {
+      "bytes": 190401,
+      "sha256": "b06598d2a7fca720202d4ab9bd8d304f0fb64393d67839e1785e3a3da4d7c14a"
+    },
+    "mode": "safe_scientific_extract",
+    "retained_top_level_fields": [
+      "schema",
+      "reviewer",
+      "observed_utc",
+      "status",
+      "source_commit",
+      "image",
+      "scope",
+      "conclusion_zh",
+      "acceptance_boundaries",
+      "methodology_zh",
+      "paired",
+      "source_locations",
+      "audit_execution_notes",
+      "binding_count",
+      "verified_manifest_file_count",
+      "prefix_runs",
+      "execution_summary",
+      "exact_own_container_absence_verified_all"
+    ],
+    "note_zh": "保留科学配对/全部数值/前缀和执行摘要；省略386原件私有bindings、owner/CID/完整资源快照及完整回执。不是本包独立发布审核。",
+    "not_full_original": true
+  }
+}

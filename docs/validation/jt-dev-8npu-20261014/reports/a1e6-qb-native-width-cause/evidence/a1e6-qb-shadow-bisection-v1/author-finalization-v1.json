@@ -1,0 +1,166 @@
+{
+  "acceptance_pending": [
+    "independent final code/fixture review",
+    "bounded real Torch CPU 13 exact tests",
+    "root NPU input review",
+    "fresh native run",
+    "own three-step all-rank prefix transparency",
+    "complete native tile comparison to old actual TP2 target"
+  ],
+  "author_actions": {
+    "NPU_run": false,
+    "SSH": false,
+    "container_run": false,
+    "deployment": false,
+    "guard_or_request_write": false,
+    "old_file_modifications": false
+  },
+  "author_validation": {
+    "Torch_imported": false,
+    "path": "author-static-and-json-v2.json",
+    "sha256": "e218d3d78bcb19b26ab82076ca9093a7776e2ec2c48119d48696fd600dcbde76",
+    "static": "PASS",
+    "synthetic_json_count": 17
+  },
+  "bound_excludes": [
+    "Python/hash JSON",
+    "framework tensors already live",
+    "unknown backend workspace",
+    "allocator reserved cache"
+  ],
+  "candidate_files_including_manifest_and_receipt": 10,
+  "cpu_wrapper_input_count": 9,
+  "cpu_wrapper_inputs": [
+    {
+      "bytes": 4853,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/capture_qb_shadow_training.py",
+      "role": "new-candidate",
+      "sha256": "d744d238d12f574a222a67043b7b155c0036514a576f62474292c3ca78750f1b"
+    },
+    {
+      "bytes": 25159,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/check_qb_shadow_cpu.py",
+      "role": "new-candidate",
+      "sha256": "28c4ae59175e58148545131ecd6335841a755617982c3ce7129416a2c7e439cc"
+    },
+    {
+      "bytes": 8001,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/compare_qb_shadow.py",
+      "role": "new-candidate",
+      "sha256": "decad15678741af6317b5af46e3a0c296284646b112a2d7ee091a165017e4f61"
+    },
+    {
+      "bytes": 27749,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/native_qb_shadow.py",
+      "role": "new-candidate",
+      "sha256": "4b43fe902981394687fe54fb10e41373d1b8259c6f85267b292fcef5272a8222"
+    },
+    {
+      "bytes": 17722,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/qb_shadow_contract.py",
+      "role": "new-candidate",
+      "sha256": "9f67ef1cf3c8983f3113d9de0ba3a4c8bc7d0db067b42552c76a643d54206e7d"
+    },
+    {
+      "bytes": 18406,
+      "name": "attention0_contract",
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/attention0_contract.py",
+      "role": "unchanged-frozen-dependency",
+      "sha256": "f3722477073c81c54844dafd18b2a5e2f08a9250757bec87cea50544cec33d4c"
+    },
+    {
+      "bytes": 24122,
+      "name": "native_attention0_trace",
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/native_attention0_trace.py",
+      "role": "unchanged-frozen-dependency",
+      "sha256": "a60cd571e4f9fa10915994726c950499e817344a8ceabc9712cb4a45c766506f"
+    },
+    {
+      "bytes": 10435,
+      "name": "capture_attention0_forward_training",
+      "path": "evidence/a1e6-attention0-forward-bisection-v1/tools/capture_attention0_forward_training.py",
+      "role": "unchanged-frozen-dependency",
+      "sha256": "03bdb08e4e358401bb0d0a82a8d94f017bfaa11090af2b00d5a2bb41e5f7d6e0"
+    },
+    {
+      "bytes": 23366,
+      "name": "native_b8f",
+      "path": "evidence/a1e6-native-forward-bisection-v1/tools/native_forward_trace.py",
+      "role": "unchanged-frozen-dependency",
+      "sha256": "b8f16b43b9a8ce1b624d786979b986a4835f9d729aa08bf97fc1bbab17e81b6e"
+    }
+  ],
+  "created_utc": "2026-10-18T08:12:34.857722+00:00",
+  "explicit_budget_bytes": {
+    "CPU_native_slabs": 50331648,
+    "CPU_tile_scratch": 4194304,
+    "CPU_total_tensors": 54525952,
+    "additional_active_NPU_output": 201326592
+  },
+  "first_stage_scope": "full-N repeat calibration then each original-weight half-N row view twice; no clone/2D/FP32",
+  "manifest": {
+    "bytes": 1554,
+    "path": "manifest.json",
+    "sha256": "a41a3d2e62bae3a99c27542258080d47a9792af79df1426890a9851b56a18766"
+  },
+  "manifest_covered_files": 8,
+  "native_production_Y_start": "Complete original P native tile SHA before any shadow F.linear; equal at calibration and end",
+  "planned_native_case_only": {
+    "case": "r129-a1e6-qb-shadow-fsdp8-3-v1",
+    "module": "model.layers.0.self_attn.q_b_proj",
+    "port": 30428,
+    "shape_S_K_N": [
+      4096,
+      1536,
+      24576
+    ],
+    "target_batch_sha256": "17c01af6623ce2bf41d8e786abba55318ea40f8595ba027303d4d797d8349113",
+    "target_micro": 0,
+    "target_rank": 2,
+    "target_step": 1
+  },
+  "real_torch_cpu": {
+    "authored_count": 13,
+    "status": "NOT_RUN",
+    "testnames": [
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_three_step_forward_backward_and_updates_are_exact",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_original_object_graph_rng_versions_and_temporary_lifetimes",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_full_calibration_failure_never_calls_half_width",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_full_numeric_half_statistics_and_global_offsets",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_half_repeat_instability_stays_an_unaccepted_diagnostic",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_slab_and_native_serialization_budget_guards",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_fifo_missing_duplicate_and_deferred_inputs_close_cleanly",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_materialization_layout_and_nonfinite_fail_closed",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_original_forward_exception_preserves_object_and_outer_cleanup",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_complete_json_and_synthetic_old_tp_native_tiles",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_json_missing_overlap_target_and_same_hash_numeric_conflicts",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_runtime_scope_restart_and_exclusive_output_are_rejected",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_hook_returns_and_actual_capture_finally_are_explicit"
+    ]
+  },
+  "runtime_new_tools": [
+    {
+      "bytes": 4853,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/capture_qb_shadow_training.py",
+      "role": "new-candidate",
+      "sha256": "d744d238d12f574a222a67043b7b155c0036514a576f62474292c3ca78750f1b"
+    },
+    {
+      "bytes": 27749,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/native_qb_shadow.py",
+      "role": "new-candidate",
+      "sha256": "4b43fe902981394687fe54fb10e41373d1b8259c6f85267b292fcef5272a8222"
+    },
+    {
+      "bytes": 17722,
+      "path": "evidence/a1e6-qb-shadow-bisection-v1/tools/qb_shadow_contract.py",
+      "role": "new-candidate",
+      "sha256": "9f67ef1cf3c8983f3113d9de0ba3a4c8bc7d0db067b42552c76a643d54206e7d"
+    }
+  ],
+  "schema": "qb-shadow-author-finalization-v1",
+  "scientific_limit": "Boundary localization and a shadow mechanism result cannot establish a specific kernel or repaired training root cause.",
+  "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "status": "FROZEN_LOCAL_CANDIDATE_STATIC_JSON_PASS_REAL_TORCH_CPU_NPU_PENDING",
+  "target_success_path_slab_copy_calls": 108
+}

@@ -1,0 +1,30 @@
+{
+  "before_trainer": {
+    "environment": {
+      "CLOSE_MATMUL_K_SHIFT": null,
+      "NCCL_DETERMINISTIC": null,
+      "FLASH_ATTENTION_DETERMINISTIC": null,
+      "CUBLAS_WORKSPACE_CONFIG": null,
+      "PYTHONHASHSEED": "42",
+      "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+    },
+    "scope": "Environment only; no backend queries"
+  },
+  "training": {
+    "environment": {
+      "CLOSE_MATMUL_K_SHIFT": null,
+      "NCCL_DETERMINISTIC": "true",
+      "FLASH_ATTENTION_DETERMINISTIC": "1",
+      "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+      "PYTHONHASHSEED": "42",
+      "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+    },
+    "deterministic_algorithms": true,
+    "deterministic_warn_only": false,
+    "npu_matmul": {
+      "allow_tf32": null,
+      "allow_hf32": false,
+      "allow_bf16_reduced_precision_reduction": null
+    }
+  }
+}

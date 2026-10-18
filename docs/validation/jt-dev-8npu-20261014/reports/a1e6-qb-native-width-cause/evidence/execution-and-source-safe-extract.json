@@ -1,0 +1,64 @@
+{
+  "schema": "qb-native-width-execution-safe-extract-v1",
+  "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "native_runs": [
+    {
+      "case": "r129-a1e6-attention0-forward-fsdp8-3-v1",
+      "exit_code": 0,
+      "released": true,
+      "exact_own_container_absence_verified": true
+    },
+    {
+      "case": "r129-a1e6-attention0-forward-tp2-3-v1",
+      "exit_code": 0,
+      "released": true,
+      "exact_own_container_absence_verified": true
+    },
+    {
+      "case": "r129-a1e6-qb-shadow-fsdp8-3-v1",
+      "exit_code": 0,
+      "released": true,
+      "exact_own_container_absence_verified": true
+    }
+  ],
+  "source_guard_bindings": {
+    "evidence/a1e6-qb-shadow-bisection-v1/draft/tools/fair_qb_shadow_guard.py": {
+      "bytes": 38163,
+      "sha256": "dc5fb4ed157812eb63c4b6c9d7dea455787400517675166a1e28fa190ada6cda"
+    },
+    "evidence/a1e6-qb-shadow-bisection-v1/draft/tools/run_fair_a1e6_qb_shadow_v1.sh": {
+      "bytes": 2440,
+      "sha256": "31f16824ead88111905236ef53aab341151edfb2bc67fbfbc75c437dd3c022c9"
+    },
+    "evidence/a1e6-qb-shadow-bisection-v1/own-container-absence-v1.json": {
+      "bytes": 586,
+      "sha256": "08fc0320b0b0b28be8ff84b0e85b7af0e5d5b953f4e75a6af206fb30eebe1903"
+    },
+    "scheduling/r129-a1e6-qb-shadow-fsdp8-3-v1.request.json": {
+      "bytes": 3221,
+      "sha256": "9212b77a6fd7951fcd67e74f528b3b8091937f10cf619bb1428bdf0e4d0cb1a7"
+    }
+  },
+  "limits_zh": [
+    "这里只公开已核验摘要与完整原件SHA，不公开完整guard/request/receipt或自有完整CID。",
+    "共享机实际空闲双检、owner与完整CID绑定、超时及释放由私有原回执和独立科学review核验；公开摘要不能代替原始资源监控记录。",
+    "数据文件未由本地公开包重哈希；原guard设备前实读pin和三份trace receipt一致，不把CPU元数据当NPU数据读取。"
+  ],
+  "public_extract": {
+    "source": "evidence/a1e6-qb-shadow-bisection-v1/qb-shadow-native-independent-review-v1.json",
+    "source_identity": {
+      "bytes": 99366,
+      "sha256": "dde5ddcb3fec0ee29a02b41ca39f585aea9df48b973f01c70e768a0798bd1dda"
+    },
+    "mode": "safe_scientific_extract",
+    "retained_top_level_fields": [
+      "schema",
+      "source_commit",
+      "native_runs",
+      "source_guard_bindings",
+      "limits_zh"
+    ],
+    "note_zh": "仅独立review里已核验的执行/guard/request/释放SHA摘要；省略完整容器身份和环境路径。",
+    "not_full_original": true
+  }
+}

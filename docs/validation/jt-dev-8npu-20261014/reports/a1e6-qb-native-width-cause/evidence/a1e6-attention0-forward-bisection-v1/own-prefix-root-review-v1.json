@@ -1,0 +1,272 @@
+{
+  "schema": "attention0-own-prefix-root-review-v1",
+  "status": "PASS_THREE_STEP_TRANSPARENCY_NOT_200_ACCEPTANCE",
+  "observed_utc": "2026-10-18T07:29:01.933206+00:00",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "tool_sha256": {
+    "prefix": "77cdd085b2c7ef0308efb9cfc4f8b666ea5cc1ba2a0cbd682d9e60dae161a8a5",
+    "contract": "f3722477073c81c54844dafd18b2a5e2f08a9250757bec87cea50544cec33d4c"
+  },
+  "limits": [
+    "Hidden observations cover optimizer step1; exact scalar/input/counter transparency covers steps1-3 only.",
+    "Diagnostic timing/memory excluded from performance.",
+    "CPU initial hashes precede device/TP/FSDP; use-point weights cover only observed layer0 projections.",
+    "Raw o_proj K contributors remain separate, no numerical replay or causal intervention performed."
+  ],
+  "root_validation_correction": "Initial in-memory check expected all three config differences for both cases; actual original TP2 already has save_ckpt=false, so TP2 correctly has only train_iters and checkpoint_dir differences. That check stopped before writing a receipt.",
+  "paired_comparison_sha256": "f5692ff96b0615fc81b9249923dffe1266d1a14e5091a51664523f6a574a0d33",
+  "runs": {
+    "fsdp8": {
+      "case": "r129-a1e6-attention0-forward-fsdp8-3-v1",
+      "original": "r129-a1e6-fsdp8-0-200-v3",
+      "transparent": {
+        "status": "PASS",
+        "exact_equality_required": true,
+        "steps": [
+          1,
+          3
+        ],
+        "ranks": 8,
+        "metrics": {
+          "training/total_loss": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/foundation_loss/lm": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/foundation_loss/mtp": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/foundation_loss/aux": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/grad_norm": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/lr": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/step_tokens": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/step_samples": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/consumed_tokens": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/consumed_samples": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          }
+        },
+        "input_identity_mismatch_pairs": 0,
+        "excluded": [
+          "performance/*",
+          "memory/*"
+        ],
+        "scope": "Each topology against its own original prefix"
+      },
+      "CPU_initial_state_and_runtime_exact_all_ranks": true,
+      "start_metadata_equal_except_train_iters": true,
+      "config_differences": [
+        {
+          "path": "/training/train_iters",
+          "left": 200,
+          "right": 3
+        },
+        {
+          "path": "/checkpoint/save_ckpt",
+          "left": true,
+          "right": false
+        },
+        {
+          "path": "/checkpoint/checkpoint_dir",
+          "left": "/work/checkpoints/r129-a1e6-fsdp8-0-200-v3",
+          "right": "/work/checkpoints/r129-a1e6-attention0-forward-fsdp8-3-v1"
+        }
+      ],
+      "native_contract": {
+        "status": "PASS_NATIVE_NPU_METADATA_NOT_CPU_FIXTURE",
+        "tp_size": 1,
+        "logical_batches": 8,
+        "complete_states": 96,
+        "raw_o_k_contributors": 8,
+        "unique_weight_tiles": 9128
+      }
+    },
+    "tp2": {
+      "case": "r129-a1e6-attention0-forward-tp2-3-v1",
+      "original": "r129-a1e6-tp2-200-v2",
+      "transparent": {
+        "status": "PASS",
+        "exact_equality_required": true,
+        "steps": [
+          1,
+          3
+        ],
+        "ranks": 8,
+        "metrics": {
+          "training/total_loss": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/foundation_loss/lm": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/foundation_loss/mtp": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/foundation_loss/aux": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/grad_norm": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "training/lr": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/step_tokens": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/step_samples": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/consumed_tokens": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          },
+          "data/consumed_samples": {
+            "pairs": 24,
+            "max_abs": 0.0,
+            "step": 1,
+            "rank": 0,
+            "mismatching_pairs": 0
+          }
+        },
+        "input_identity_mismatch_pairs": 0,
+        "excluded": [
+          "performance/*",
+          "memory/*"
+        ],
+        "scope": "Each topology against its own original prefix"
+      },
+      "CPU_initial_state_and_runtime_exact_all_ranks": true,
+      "start_metadata_equal_except_train_iters": true,
+      "config_differences": [
+        {
+          "path": "/training/train_iters",
+          "left": 200,
+          "right": 3
+        },
+        {
+          "path": "/checkpoint/checkpoint_dir",
+          "left": "/work/checkpoints/r129-a1e6-tp2-200-v2",
+          "right": "/work/checkpoints/r129-a1e6-attention0-forward-tp2-3-v1"
+        }
+      ],
+      "native_contract": {
+        "status": "PASS_NATIVE_NPU_METADATA_NOT_CPU_FIXTURE",
+        "tp_size": 2,
+        "logical_batches": 8,
+        "complete_states": 96,
+        "raw_o_k_contributors": 16,
+        "unique_weight_tiles": 9128
+      }
+    }
+  },
+  "public_extract": {
+    "source": "evidence/a1e6-attention0-forward-bisection-v1/own-prefix-root-review-v1.json",
+    "source_identity": {
+      "bytes": 12343,
+      "sha256": "fa343962995d402e0899b871bc826125c0da295a8b5403f77125b010981ae9fe"
+    },
+    "mode": "safe_scientific_extract",
+    "retained_top_level_fields": [
+      "schema",
+      "status",
+      "observed_utc",
+      "source",
+      "tool_sha256",
+      "limits",
+      "root_validation_correction",
+      "paired_comparison_sha256",
+      "runs"
+    ],
+    "note_zh": "保留每拓扑全部前三步标量/输入/计数结果、初态/runtime/start、配置差异和native合同；省略完整私有manifest绑定/trace路径/容器身份。",
+    "not_full_original": true
+  }
+}

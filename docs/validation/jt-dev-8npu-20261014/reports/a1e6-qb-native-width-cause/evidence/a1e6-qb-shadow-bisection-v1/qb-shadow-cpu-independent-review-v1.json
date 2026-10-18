@@ -1,0 +1,123 @@
+{
+  "schema": "qb-shadow-real-cpu-independent-review-v1",
+  "created_utc": "2026-10-18T08:32:08.889667+00:00",
+  "status": "PASS_REAL_TORCH_CPU_13_ONLY",
+  "findings": [],
+  "review_scope": "Independent local read-only verification of four retained original CPU files, deployment/freeze/wrapper receipts, exact test identities and isolation/cleanup. No SSH, containers, NPU, Git or state/lock access.",
+  "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "source_clean_snapshots": [
+    "preflight",
+    "before_start_inputs",
+    "after_tests_inputs"
+  ],
+  "wrapper_path": "evidence/a1e6-qb-shadow-bisection-v1/tools/run_qb_shadow_cpu_container_v2.py",
+  "wrapper_SHA256": "cfebe2da9463cbf058dba0ac890a234b7b77c5f7d067d63b4e84c451e23382e6",
+  "frozen_author_finalization_SHA256": "bc41bfeb16eb4f7b7354aa339bf3dd0dee55d3b210e33b9e3d91843b76768b10",
+  "wrapper_static_independent_review_SHA256": "5a4daf60cb11ac90a5b02f401e3020f40dd3cb94ecb3421ad4bba3842e8f7276",
+  "real_CPU": {
+    "torch_version": "2.12.0+cpu",
+    "test_count": 13,
+    "test_names": [
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_complete_json_and_synthetic_old_tp_native_tiles",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_fifo_missing_duplicate_and_deferred_inputs_close_cleanly",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_full_calibration_failure_never_calls_half_width",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_full_numeric_half_statistics_and_global_offsets",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_half_repeat_instability_stays_an_unaccepted_diagnostic",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_hook_returns_and_actual_capture_finally_are_explicit",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_json_missing_overlap_target_and_same_hash_numeric_conflicts",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_materialization_layout_and_nonfinite_fail_closed",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_original_forward_exception_preserves_object_and_outer_cleanup",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_original_object_graph_rng_versions_and_temporary_lifetimes",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_runtime_scope_restart_and_exclusive_output_are_rejected",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_slab_and_native_serialization_budget_guards",
+      "check_qb_shadow_cpu.QBShadowCPUTests.test_three_step_forward_backward_and_updates_are_exact"
+    ],
+    "no_failures_errors_skips": true,
+    "stderr_exact_13_ok_identities": true,
+    "stderr_tests_elapsed_seconds": 0.284,
+    "stdout_empty": true,
+    "torch_npu_loaded": false,
+    "wrapper_elapsed_seconds": 3.5864417552948,
+    "scope": "Small CPU float64 Linear, synthetic HSDP owners, pure JSON/AST contracts and three-step SGD fixtures; not actual JT/NPU training."
+  },
+  "verified_snapshot": {
+    "all9_pins_rehashed": true,
+    "pins": {
+      "evidence/a1e6-qb-shadow-bisection-v1/tools/capture_qb_shadow_training.py": "d744d238d12f574a222a67043b7b155c0036514a576f62474292c3ca78750f1b",
+      "evidence/a1e6-qb-shadow-bisection-v1/tools/check_qb_shadow_cpu.py": "28c4ae59175e58148545131ecd6335841a755617982c3ce7129416a2c7e439cc",
+      "evidence/a1e6-qb-shadow-bisection-v1/tools/compare_qb_shadow.py": "decad15678741af6317b5af46e3a0c296284646b112a2d7ee091a165017e4f61",
+      "evidence/a1e6-qb-shadow-bisection-v1/tools/native_qb_shadow.py": "4b43fe902981394687fe54fb10e41373d1b8259c6f85267b292fcef5272a8222",
+      "evidence/a1e6-qb-shadow-bisection-v1/tools/qb_shadow_contract.py": "9f67ef1cf3c8983f3113d9de0ba3a4c8bc7d0db067b42552c76a643d54206e7d",
+      "evidence/a1e6-attention0-forward-bisection-v1/tools/attention0_contract.py": "f3722477073c81c54844dafd18b2a5e2f08a9250757bec87cea50544cec33d4c",
+      "evidence/a1e6-attention0-forward-bisection-v1/tools/native_attention0_trace.py": "a60cd571e4f9fa10915994726c950499e817344a8ceabc9712cb4a45c766506f",
+      "evidence/a1e6-attention0-forward-bisection-v1/tools/capture_attention0_forward_training.py": "03bdb08e4e358401bb0d0a82a8d94f017bfaa11090af2b00d5a2bb41e5f7d6e0",
+      "evidence/a1e6-native-forward-bisection-v1/tools/native_forward_trace.py": "b8f16b43b9a8ce1b624d786979b986a4835f9d729aa08bf97fc1bbab17e81b6e"
+    },
+    "compiled_from_verified_snapshot": true,
+    "frozen_module_names": [
+      "qb_shadow_contract",
+      "compare_qb_shadow",
+      "native_qb_shadow",
+      "check_qb_shadow_cpu"
+    ],
+    "boundary": "Four new executable modules are compiled from the nine verified byte snapshots. Capture inputs are fingerprinted/AST inputs, not executed by CPU. Later AST reads are separately pinned RO-file reads, not claimed to use the cached object."
+  },
+  "collection_SHA256": "dc09a22523e2a142d31f313e490d37b5e00c47a66148c33704aff84b4423c16d",
+  "limits_zh": [
+    "本结论只确认真实Torch CPU 13项测试、输入身份、隔离和清理证据通过；不是NPU实验。",
+    "CPU合成HSDP owner不是实际生产HSDP物化或DTensor/collective验证；float64小矩阵不验证原生BF16 M4096/K1536/N24576算子精度。",
+    "未测量NPU额外192MiB输出或后端workspace峰值，CPU限额与tile负例不替代真实设备预算观测。",
+    "不构成三步原训练透明性、旧TP2全量native hash复现、具体kernel根因、修复正确性或完整200步验收。",
+    "本机未重新运行Torch测试或启动容器；独立核验的是root实际采集的原始stdout/stderr/tests/receipt。"
+  ],
+  "container_summary": {
+    "timeout_seconds": 240,
+    "attach_exit_code": 0,
+    "exit_code": 0,
+    "OOMKilled": false,
+    "running": false,
+    "docker_rm_output_matches_exact_id": true,
+    "removed_verified": true,
+    "own_container_killed": false,
+    "Entrypoint_evidence_scope": "Saved Config intentionally contains only Labels and whitelisted Env; it does not independently retain Entrypoint. The exact pinned validator checks raw inspect before its redacted snapshot, and the saved create command binds the Python entrypoint. Do not present this as a separate saved raw Config.Entrypoint readback.",
+    "inherited_image_labels_scope": "Additional jt.* image labels are retained as metadata; clean544 and the nine pinned CPU tools bind this execution, not the historical commit string in image labels.",
+    "isolation_contract": {
+      "runtime": "runc",
+      "devices": [],
+      "privileged": false,
+      "network": "none",
+      "memory_bytes": 8589934592,
+      "CPU_count": 4,
+      "pid_limit": 256,
+      "read_only_root": true
+    }
+  },
+  "public_extract": {
+    "source": "evidence/a1e6-qb-shadow-bisection-v1/qb-shadow-cpu-independent-review-v1.json",
+    "source_identity": {
+      "bytes": 31213,
+      "sha256": "a8968a9f9318fc5172d16211b08c6bc0b14e68578ae47faf098f0ebd565e9980"
+    },
+    "mode": "safe_scientific_extract",
+    "retained_top_level_fields": [
+      "schema",
+      "created_utc",
+      "status",
+      "findings",
+      "review_scope",
+      "source_commit",
+      "source_clean_snapshots",
+      "wrapper_path",
+      "wrapper_SHA256",
+      "frozen_author_finalization_SHA256",
+      "wrapper_static_independent_review_SHA256",
+      "real_CPU",
+      "verified_snapshot",
+      "collection_SHA256",
+      "limits_zh",
+      "container_summary"
+    ],
+    "note_zh": "保留真实13项CPU身份/结果/冻结输入和隔离清理结论；省略owner/CID、宿主内存/盘余量、挂载本机路径和私有完整回执。Config.Entrypoint未独立存原文的边界原样保留。",
+    "not_full_original": true
+  }
+}

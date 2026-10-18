@@ -1,0 +1,68 @@
+{
+  "schema": "qb-native-width-plot-independent-review-v1",
+  "status": "PASS",
+  "observed_utc": "2026-10-18T09:00:26.531636+00:00",
+  "inputs": {
+    "evidence/a1e6-qb-shadow-bisection-v1/qb-shadow-native-independent-review-v1.json": {
+      "sha256": "dde5ddcb3fec0ee29a02b41ca39f585aea9df48b973f01c70e768a0798bd1dda",
+      "bytes": 99366
+    },
+    "evidence/a1e6-qb-shadow-bisection-v1/paired-comparison-v1.json": {
+      "sha256": "efa6c428006b21d9bfaf9c0e89ec31a2aef9c34bc38d7baf17ab80037293b52e",
+      "bytes": 10236
+    },
+    "evidence/a1e6-qb-shadow-bisection-v1/own-prefix-root-review-v1.json": {
+      "sha256": "7aab607a0ec1c4878b742cf9cd2439e5ba4cd186b1d8c1a875ebddbce1329aba",
+      "bytes": 44170
+    },
+    "evidence/a1e6-qb-shadow-bisection-v1/tools/plot_qb_native_width_v1.py": {
+      "sha256": "8c5f0544b7446e7724f1f2a23dbbe8cd601d1fb2f11a9395de9251231220a314",
+      "bytes": 6282
+    },
+    "evidence/a1e6-qb-shadow-bisection-v1/figures/qb-native-width-shadow-v1.png": {
+      "sha256": "af0076ae942b7e7dd90e473f5ad7761474ce9c834773c2b18e9d1dab49b77b04",
+      "bytes": 245464
+    },
+    "evidence/a1e6-qb-shadow-bisection-v1/figures/qb-native-width-shadow-v1.svg": {
+      "sha256": "da31dc1cc9730851b4930659bcf0d8dc221a1dd0002c51be64712ddb31babf37",
+      "bytes": 18416
+    }
+  },
+  "plot_replay": {
+    "execution": "Exact pinned source compiled from bytes; main executed with only output I/O redirected to RAM; no disk replay files",
+    "PNG_bytes_equal": true,
+    "PNG_RGBA_pixels_equal": true,
+    "PNG_dimensions": [
+      2720,
+      1440
+    ],
+    "SVG_full_tree_equal_after_auto_id_and_date_normalization": true,
+    "actual_PNG_visually_inspected": true
+  },
+  "values": {
+    "full_native_P_R_different_blocks": 0,
+    "full_native_P_R_compared_blocks": 1536,
+    "half_compared_elements_each": 50331648,
+    "half0_nonzero": 3976,
+    "half1_nonzero": 3798,
+    "sum_nonzero": 7774,
+    "half0_runtime_full_element_max_abs": 0.015625,
+    "half1_runtime_full_element_max_abs": 0.0078125,
+    "repeat1_repeat2_native_differences": 0,
+    "all_four_repeats_match_old_TP2_native_blocks": true,
+    "three_step_8rank_own_prefix_transparency": "PASS"
+  },
+  "limits_zh": [
+    "3976/3798及数值最大差是新shadow运行时有界slab全元素统计；本图审核没有从旧TP哈希离线重建全部数值。",
+    "旧TP2对应的全部原生tile按真实batch及全局feature坐标匹配；不是同号rank比较。",
+    "一个真实q_b使用点的执行形状足以重现该局部差异，未识别具体kernel、未解决完整200步漂移、未产生产品修复PR。",
+    "图不画0.005 loss验收线；3步×8rank日志透明性不代表200步或完整梯度张量通过。"
+  ],
+  "side_effects": {
+    "SSH": false,
+    "containers": false,
+    "NPU": false,
+    "Git": false,
+    "replay_files_created": false
+  }
+}

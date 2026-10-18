@@ -1,0 +1,154 @@
+{
+  "schema": "qb-shadow-own-prefix-root-review-v1",
+  "status": "PASS_THREE_STEP_ALL_RANK_TRANSPARENCY_NOT_200_ACCEPTANCE",
+  "observed_utc": "2026-10-18T08:44:02.178088+00:00",
+  "case": "r129-a1e6-qb-shadow-fsdp8-3-v1",
+  "original": "r129-a1e6-fsdp8-0-200-v3",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "manifest_files_reverified": 197,
+  "transparent": {
+    "status": "PASS",
+    "exact_equality_required": true,
+    "steps": [
+      1,
+      3
+    ],
+    "ranks": 8,
+    "metrics": {
+      "training/total_loss": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "training/foundation_loss/lm": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "training/foundation_loss/mtp": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "training/foundation_loss/aux": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "training/grad_norm": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "training/lr": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "data/step_tokens": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "data/step_samples": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "data/consumed_tokens": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      },
+      "data/consumed_samples": {
+        "pairs": 24,
+        "max_abs": 0.0,
+        "step": 1,
+        "rank": 0,
+        "mismatching_pairs": 0
+      }
+    },
+    "input_identity_mismatch_pairs": 0,
+    "excluded": [
+      "performance/*",
+      "memory/*"
+    ],
+    "scope": "Each topology against its own original prefix"
+  },
+  "CPU_constructed_initial_runtime_and_start_except_train_iters_equal_all_ranks": true,
+  "config_differences": [
+    {
+      "path": "/checkpoint/checkpoint_dir",
+      "reference": "/work/checkpoints/r129-a1e6-fsdp8-0-200-v3",
+      "candidate": "/work/checkpoints/r129-a1e6-qb-shadow-fsdp8-3-v1"
+    },
+    {
+      "path": "/checkpoint/save_ckpt",
+      "reference": true,
+      "candidate": false
+    },
+    {
+      "path": "/training/train_iters",
+      "reference": 200,
+      "candidate": 3
+    }
+  ],
+  "native_shadow_status": "N_WIDTH_SHADOW_REPRODUCES_OLD_TP2_NATIVE_BYTES",
+  "scientific_limits": [
+    "One projection and batch; no named kernel identification",
+    "Only CPU construction initialization and observed use point X/W are bound; not byte equality of all optimizer/RNG internals",
+    "Short own-prefix transparency is not 200-step acceptance",
+    "Resource measurements have extra instrumentation and are not performance gains"
+  ],
+  "completion": {
+    "ranks": 8,
+    "global_step": 3,
+    "exit_code": 0,
+    "released": true,
+    "duration_seconds": 142.58773749996908,
+    "exact_absence_verified": true
+  },
+  "public_extract": {
+    "source": "evidence/a1e6-qb-shadow-bisection-v1/own-prefix-root-review-v1.json",
+    "source_identity": {
+      "bytes": 44170,
+      "sha256": "7aab607a0ec1c4878b742cf9cd2439e5ba4cd186b1d8c1a875ebddbce1329aba"
+    },
+    "mode": "safe_scientific_extract",
+    "retained_top_level_fields": [
+      "schema",
+      "status",
+      "observed_utc",
+      "case",
+      "original",
+      "source",
+      "manifest_files_reverified",
+      "transparent",
+      "CPU_constructed_initial_runtime_and_start_except_train_iters_equal_all_ranks",
+      "config_differences",
+      "native_shadow_status",
+      "scientific_limits",
+      "completion"
+    ],
+    "note_zh": "保留全部科学透明性/配置/完成结果，省略input_bindings及自有完整容器ID。",
+    "not_full_original": true
+  }
+}
