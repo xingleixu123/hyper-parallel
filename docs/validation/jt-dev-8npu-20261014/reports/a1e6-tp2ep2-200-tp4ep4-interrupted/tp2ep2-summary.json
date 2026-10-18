@@ -1,0 +1,92 @@
+{
+  "schema": "a1e6-tp2ep2200-v2-summary",
+  "created_utc": "2026-10-18T06:34:37.409779+00:00",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "candidate": "r129-a1e6-tp2ep2-200-v2",
+  "reference": "r129-a1e6-fsdp8-0-200-v3",
+  "steps": [
+    1,
+    200
+  ],
+  "ranks": 8,
+  "main_lm_status": "FAIL",
+  "strict_all_component_status": "FAIL",
+  "root_cause_status": "UNRESOLVED",
+  "main_lm": {
+    "max_abs": 0.012468338012695312,
+    "step": 146,
+    "rank": 0
+  },
+  "main_lm_over_005_steps": [
+    81,
+    83,
+    97,
+    126,
+    130,
+    134,
+    135,
+    146,
+    148,
+    153,
+    189,
+    193,
+    200
+  ],
+  "first_step_lm_abs": 0.0004949569702148438,
+  "errors": {
+    "training/total_loss": {
+      "max_abs": 0.012102127075195312,
+      "step": 200,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.012468338012695312,
+      "step": 146,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.0062408447265625,
+      "step": 98,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 2.0988256437703967e-05,
+      "step": 200,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.7076635360717773,
+      "step": 148,
+      "rank": 0
+    }
+  },
+  "unweighted_diagnostics": {
+    "lm": 0.012468338012695312,
+    "mtp": 0.020802815755208336,
+    "aux": 0.20988256437703967
+  },
+  "integrity": {
+    "findings": [],
+    "input_mismatch_count": 0,
+    "cpu_initial_mismatches": []
+  },
+  "relative_to_off": {
+    "median_time_increase_percent": 58.94663831408911,
+    "supervised_throughput_change_percent": -37.08690300114655,
+    "allocated_saved_gib": 6.220156669616699,
+    "allocated_saved_percent": 28.232122921084667,
+    "reserved_saved_gib": 9.99609375
+  },
+  "inputs": {
+    "evidence/a1e6-tp2ep2200-v2-strict.json": "98faf71929e7a51436955d8ba5b0b5f7ed4be64336cec727a5a39843eaaa6cfb",
+    "evidence/a1e6-tp2ep2200-v2-resources.json": "10da98a31819331d097494aced84da10796f9a1be9dea224a9932a5ded175de2",
+    "evidence/129-a1e6-tp2ep2200-v2-evidence-manifest.json": "fb4ef41adb286091a7e40e1917d9835ea11a38f0f8e0aa389410be32820cf9ab",
+    "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+    "evidence/a1e6-fsdp8-continuous-first200-v2-resources.json": "0848d7976436eac6bcb35ad0d381d940af4ca09f30e40de3c1d4f1fa8270880b"
+  },
+  "limitations": [
+    "Global scalar logs are not independent local losses; gradient norm is not tensor identity.",
+    "CPU initial is after JT MLA replacement but before device conversion/TP/FSDP; not full NPU state.",
+    "Single-run allrankMAX callback timing includes common evidence overhead; allocator peaks not physicalHBM."
+  ]
+}
