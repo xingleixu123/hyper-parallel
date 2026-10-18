@@ -1,0 +1,79 @@
+{
+  "schema": "explicit-public-independent-review-extract-v1",
+  "original_review_sha256": "0805ee1da6586af498a6e16123fdcbbf953b7915476e45bca95438e222388182",
+  "original_review_bytes": 140403,
+  "original_raw_retained_privately": true,
+  "transformation": "Selected scientific conclusions/integrity/scope; private operator paths,fullCID,harness and control records omitted. This is not the original raw review.",
+  "review": {
+    "schema": "ep-stepbind-native-scientific-independent-review-v1",
+    "role": "独立科学复核；未参与被审探针/控制面作者工作",
+    "created_utc": "2026-10-18T16:08:02.608Z",
+    "status": "PASS_FULL31_SELECTED_NATIVE_AND_EXACT_CROSS_HOST3_PREFIX_ONLY",
+    "case": "r125-a1e6-ep-stepbind-ep4-3-v1",
+    "findings": [],
+    "conclusion_zh": [
+      "125 EP4 三步原生探针正常完成；111份原件及129 EP4历史200步的91份参考原件共202份逐文件SHA复核通过。",
+      "默认D/E/Q完整31角色通过，另按全局专家与切片坐标独立重建860个slab引用；73,789,440个FP32值（含重复阶段引用）全部有限，SHA与完整逻辑覆盖正确。",
+      "对129同源EP4完整200步前3步的144项日志标量、96项计数、24项全局输入身份、384项CPU初态记录和8份runtime标志严格零差。",
+      "这是完整选中窗口的三步证据；不是125同机无探针对照，不是125完整200步验收，也不证明全部专家/完整Q矩阵或产品根因。"
+    ],
+    "independent_physical_view_check": {
+      "status": "PASS_ALL_SELECTED_NPU_FP32_STORAGE_VIEWS",
+      "selected_value_metadata_rows_this_arm": 248,
+      "additional_same125_two_arm_check_rows": {
+        "value_metadata_rows": 496,
+        "nonzero_storage_offsets": 0,
+        "all_NPU_FP32_storage_bounds": true
+      },
+      "nonzero_storage_offset_rows": 0,
+      "method": "从实际value_metadata的shape/stride/storage_offset/data_ptr/storage_data_ptr/storage_bytes逐项检查；不走CPU fixture。"
+    },
+    "reviewed_actual_native_scope": {
+      "D": "model.layers.0.input_layernorm.weight；全部5120元素，12角色。",
+      "E": "model.layers.1.mlp.experts.down_proj；仅global expert0的完整5120×1536矩阵，9角色。",
+      "Q": "model.layers.0.self_attn.q_b_proj.weight；前192×1536窗口，10角色，不是完整矩阵。",
+      "owner_coverage": "三目标metadata的逻辑owner0–7全覆盖，不等于采集8个专家的全部数值。",
+      "dense_mapping": "D/Q按实际[fsdp_shard,tp]=[8,1]及placements/owner坐标重建；TP singleton不是多卡TP。",
+      "expert_mapping": "E按[edp_shard,ep]=[2,4]、StridedShard(0,split_factor4)+Shard0还原，global expert=2*EP坐标+EDP坐标；不按物理rank直接相减。",
+      "native_values": "31角色，860逻辑slab引用，295157760逻辑字节；130658304物理native字节经内容去重后保存，唯一引用区间完整覆盖8个blob。",
+      "G0_semantics": "actual all_grad与original norm输入角色分别核验；该臂原位别名、无Partial/flatten temporary。只观察原coalescer，不新增通信。",
+      "actual_consumers": "D为实际AdamW消费点；E/Q为实际Muon step调用帧462及owned_records顺序/逐元素身份，installed LRScheduler wrapper来源绑定，无consumer_unproven。",
+      "lifecycle": "8rank三步完成；首步B0/G0/N2/G1/G2/U0/U1/U2各一次；46项norm覆盖trainable inventory；router/QK边界及wrappers_remaining0。",
+      "state_limit": "首次更新前G2 missing state为预期；G2/U2 state_metadata_only不是完整状态原文，只有显式记录G3/U0 state为选中native值。"
+    },
+    "transparency_boundary": {
+      "reference_case": "r129-a1e6-ep4-200-v2",
+      "observed": "3步×8rank，6项标量共144对，4计数96对，24输入，384 CPU state entry对、16初态文件、8runtime对，全部0差。",
+      "CPU_initial": "48项完整CPU state_dict哈希在JT MLA替换/初始化之后、TP/FSDP/NPU与dtype转换之前；不代替实际NPU物化权重全量证据。",
+      "numeric_logs": "total、主LM、加权MTP/aux、梯度范数、LR；8rank记录为全局logger副本，不是8独立统计样本。",
+      "recipe": "与129 EP4参考仅train_iters=3和新checkpoint目录不同；fresh step0，无续训。",
+      "unavailable": "未提供125同机无observer基线或125完整200步；instrumented timing/memory不用于性能结论。"
+    },
+    "limits": [
+      "选中native窗口完整不等于全部梯度、全部专家或完整Q矩阵。",
+      "三步日志透明的跨机对照不替代125同机无observer或完整200步。",
+      "数值差异按各阶段解释；梯度差不能套用主LM 0.005门槛。",
+      "未确认kernel/归约/优化器产品缺陷，未作产品PR或200步修复验收。",
+      "没有性能收益结论。"
+    ],
+    "evidence_integrity_summary": {
+      "status": "PASS_SINGLE_ARM_FULL31_NATIVE_AND_CROSS_HOST3_PREFIX_ONLY",
+      "manifest_results": [
+        {
+          "case": "r125-a1e6-ep-stepbind-ep4-3-v1",
+          "files": 111,
+          "all_SHA_match": true,
+          "raw_bytes": 133077351,
+          "manifest_sha256": "4bfb2174831e872152f3f2a07190a25f57f6ccc096c7ac759382146742962831"
+        },
+        {
+          "case": "r129-a1e6-ep4-200-v2",
+          "files": 91,
+          "all_SHA_match": true,
+          "manifest_sha256": "a5a21c62ae30382f6a0854c85f28bf04d1e3e4147a33dca0f6d397cb9f88b41d"
+        }
+      ],
+      "raw_manifest_files_verified": 202
+    }
+  }
+}

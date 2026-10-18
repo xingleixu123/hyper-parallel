@@ -1,0 +1,2300 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
+# Copyright 2026 Huawei Technologies Co., Ltd
+#
+# Modification points:
+# 1. Replace all interfaces with MindSpore Transformers'.
+# 2. Add some input parameters for MindSpore Transformers.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+"""GPT model parallelization for MindFormers PyNative MCore architecture.
+
+Applies parallelism strategies in TorchTitan order:
+  1. Tensor Parallelism (TP)   - if enabled (NotImplemented)
+  2. Context Parallelism (CP)  - if enabled (NotImplemented)
+  3. Activation Checkpointing  - if enabled (NotImplemented)
+  4. FSDP/HSDP                 - if enabled
+
+This module is the single source of truth for GPT-family model parallelization.
+"""
+
+import os
+from typing import Any, List
+
+import mindspore as ms
+from mindspore import nn, Parameter, Tensor
+from mindspore.ops.communication import set_comm_ops_inplace
+from mindspore.ops.operations.nn_ops import FlashAttentionScore
+from mindspore.mint.distributed import get_rank, all_gather, new_group
+
+from hyper_parallel import DeviceMesh
+from hyper_parallel.core.dtensor.dtensor import DTensor, distribute_tensor
+from hyper_parallel.core.dtensor.placement_types import Replicate, Shard
+from hyper_parallel.core.fully_shard.api import (
+    fully_shard,
+    MixedPrecisionPolicy,
+    HSDPModule,
+)
+from hyper_parallel.core.fully_shard.utils import OffloadPolicy, CPUOffloadPolicy
+
+from mindformers.pynative.distributed.fsdp import (
+    get_fsdp_reshard_after_forward_policy,
+    disable_fsdp_gradient_division,
+)
+from mindformers.pynative.distributed.style import (
+    ParallelStyle,
+    ColwiseParallel,
+    AllGather,
+    ShardTensor,
+    PrepareModuleInput,
+    PrepareModuleOutput,
+    PrepareModuleInputOutput,
+    RowwiseParallel,
+    SequenceParallel,
+)
+from mindformers.pynative.distributed.mc2_style import (
+    MC2ColwiseParallel,
+    MC2RowwiseParallel,
+)
+from mindformers.pynative.distributed.context_parallel import (
+    apply_context_parallel_model_io,
+    build_context_parallel_attention_style,
+)
+from mindformers.pynative.distributed.csa_context_parallel import DSv4HybridAttentionContextParallel
+from mindformers.pynative.distributed.activation_checkpoint import apply_ac
+from mindformers.pynative.layers.layer_norm import FusedLayerNorm, FusedRMSNorm
+from mindformers.pynative.distributed.tensor_parallel import NoParallel
+from mindformers.pynative.distributed.expert_parallel import (
+    ExpertParallel,
+    DeredundancyExpertParallel,
+)
+from mindformers.pynative.distributed.ep_overlap import OverlapExpertParallel
+from mindformers.pynative.distributed.pipeline_parallel import PpLayerSetting, StageModelBuilder, _create_schedule, _infer_schedule_type
+from mindformers.pynative.pet.lora_adapter import build_lora_model
+from mindformers.pynative.pet.utils import is_lora_a_param_name
+from mindformers.pynative.distributed.parallelize import parallelize_module
+from mindformers.pynative.distributed.utils import get_loss_sense
+from mindformers.pynative.layers.flash_attention import FlashAttention
+from mindformers.pynative.base_models.gpt.gpt_model import GPTModel
+from mindformers.pynative.transformers.experimental_attention_variant.deepseek_v4_hybrid_attention import (
+    DSv4HybridSelfAttention,
+)
+from mindformers.pynative.transformers.experimental_attention_variant.dsa_attention import (
+    DSASelfAttention,
+)
+from mindformers.pynative.transformers.multi_latent_attention import MLASelfAttention
+from mindformers.pynative.transformers.mlp import MLP
+from mindformers.pynative.transformers.moe.moe_layer import MoELayer
+from mindformers.pynative.transformers.moe.moe_utils import set_moe_aux_loss_group_info
+from mindformers.pynative.transformers.experimental_attention_variant.csa import CompressedSparseAttention
+from mindformers.pynative.transformers.experimental_attention_variant.dsa import DSAttention
+from mindformers.tools.logger import logger
+
+__all__ = ["parallelize_gptmodel"]
+
+_DTYPE_MAP = {"float16": ms.float16, "float32": ms.float32, "bfloat16": ms.bfloat16}
+
+_LAYER_FSDP_PARAM_RULES = {
+    "attn_hc.mapping_proj.weight": {"shard_dim": 1},
+    "attn_hc.alpha_pre": {"replicate": True},
+    "attn_hc.alpha_post": {"replicate": True},
+    "attn_hc.alpha_res": {"replicate": True},
+    "attn_hc.bias": {"replicate": True},
+    "ffn_hc.mapping_proj.weight": {"shard_dim": 1},
+    "ffn_hc.alpha_pre": {"replicate": True},
+    "ffn_hc.alpha_post": {"replicate": True},
+    "ffn_hc.alpha_res": {"replicate": True},
+    "ffn_hc.bias": {"replicate": True},
+}
+
+_HC_HEAD_FSDP_PARAM_RULES = {
+    "hc_fn.weight": {"shard_dim": 1},
+    "hc_base": {"replicate": True},
+    "hc_scale": {"replicate": True},
+}
+
+_MTP_FSDP_PARAM_RULES = {
+    **{f"transformer_layer.{name}": rule for name, rule in _LAYER_FSDP_PARAM_RULES.items()},
+    **{f"hc_head.{name}": rule for name, rule in _HC_HEAD_FSDP_PARAM_RULES.items()},
+}
+
+
+# ---------------------------------------------------------------------------
+# GPT-specific helpers
+# ---------------------------------------------------------------------------
+
+
+def _unwrap_gptmodel(model: nn.Cell) -> nn.Cell:
+    """Unwrap GPTModel from standard wrappers.
+
+    Uses MindSpore's cells_and_names() to locate GPTModel within the model
+    hierarchy. This avoids hard-coding wrapper attribute names.
+    """
+    if isinstance(model, GPTModel):
+        return model
+
+    gpt_models = [
+        m for _, m in model.cells_and_names()
+        if isinstance(m, GPTModel)
+    ]
+
+    if not gpt_models:
+        raise ValueError(
+            f"No GPTModel found in {type(model).__name__}. "
+            f"apply_fsdp_to_gptmodel only supports GPT-family models."
+        )
+
+    return gpt_models[0]
+
+
+def _setup_mtp_embedding_grad_sync(model_parts, parallel_dims):
+    """Tag the MTP-shared input embedding for cross-PP-stage gradient sync.
+
+    Under PP + MTP, the input embedding is replicated on stage 0 (main forward)
+    and the last stage (MTP block reuses it for shifted tokens). Unlike the
+    single-card baseline where one tensor receives ``main_grad + mtp_grad``,
+    each PP copy only sees its own partial gradient, so without sync the two
+    copies drift apart and the MTP loss diverges.
+
+    This builds a process group over the embedding-owning PP ranks (per
+    dp/tp/cp/ep coordinate) and tags the local ``word_embeddings.weight`` with
+    the group, replica count, and canonical source rank. After delayed
+    initialization the trainer broadcasts the source rank's local embedding
+    shard to the other PP copy. The grad-norm helper
+    (``_calculate_global_grad_norm`` -> ``_get_grad_factor``) then all-reduces
+    the tagged gradient and counts the replicated embedding exactly once.
+
+    ``model_parts`` is the full list of virtual-pipeline chunks owned by this
+    rank. Under interleaving the main and MTP embeddings live in different
+    chunks on different PP stages, so ownership must be aggregated across ALL
+    chunks: per-chunk detection would make each ``all_gather`` see at most one
+    owner, ``embed_ranks`` would never reach length 2, and the sync group would
+    never form -- silently reintroducing the MTP drift described above.
+    """
+    if parallel_dims is None or not parallel_dims.pp_enabled:
+        return
+
+    if not isinstance(model_parts, (list, tuple)):
+        model_parts = [model_parts]
+    if not model_parts:
+        return
+
+    cfg = _unwrap_gptmodel(model_parts[0]).get_gpt_transformer_config()
+    if not getattr(cfg, "mtp_num_layers", 0):
+        return
+
+    # Locate this rank's input-embedding weight(s) across ALL chunks it owns
+    # (present on stage 0 and the MTP stage). With interleaving the main and MTP
+    # embeddings sit in separate chunks, so we must scan every part -- not just
+    # one -- to detect that this rank owns an embedding at all.
+    embed_weights = [
+        param
+        for part in model_parts
+        for name, param in part.parameters_and_names()
+        if name.endswith("embedding.word_embeddings.weight")
+    ]
+
+    pp_mesh = parallel_dims.get_mesh("pp")
+    pp_ranks = pp_mesh.get_rank_list_along_axis("pp")  # global ranks on this PP line
+    local_rank = get_rank()
+    owns_embedding = 1 if embed_weights else 0
+
+    # Exchange the ownership flag over the PP group so every rank on the line
+    # derives the SAME ``embed_ranks`` (required for a consistent ``new_group``).
+    flag = Tensor([owns_embedding], dtype=ms.int32)
+    gathered = [Tensor([0], dtype=ms.int32) for _ in pp_ranks]
+    all_gather(gathered, flag, group=pp_mesh.get_group())
+    embed_ranks = [
+        int(r) for r, g in zip(pp_ranks, gathered) if int(g.asnumpy()[0]) == 1
+    ]
+
+    if len(embed_ranks) <= 1:
+        # Single embedding owner on this line (MTP stage == stage 0, or MTP
+        # disabled): nothing to sync.
+        return
+
+    # Only member ranks create/join the communicator; middle PP stages must NOT
+    # call ``new_group`` with these ranks or HCCL raises "group doesn't contain
+    # the global rank".
+    if local_rank not in embed_ranks:
+        return
+
+    group = new_group(ranks=embed_ranks)
+    for weight in embed_weights:
+        weight._embedding_grad_sync_group = group
+        weight._embedding_grad_sync_size = len(embed_ranks)
+        # ``to_empty()`` / ``init_states()`` run after parallelization and
+        # initialize each PP copy independently. Remember the same canonical
+        # owner used by checkpoint replica metadata so the trainer can
+        # broadcast the initialized local shard before creating the optimizer.
+        weight._embedding_sync_src_rank = embed_ranks[0]
+    logger.info(
+        "[MTP-EmbedSync] rank %d tagged %d embedding weight(s) for grad-sync group %s",
+        local_rank, len(embed_weights), embed_ranks,
+    )
+
+
+def is_norm_module(module):
+    """Return True when module is a norm or an activation wrapper around a norm."""
+    if isinstance(module, (FusedLayerNorm, FusedRMSNorm)):
+        return True
+    unwrapped = getattr(module, "unwrap_cell", None)
+    if unwrapped is not None:
+        return isinstance(unwrapped, (FusedLayerNorm, FusedRMSNorm))
+    return False
+
+
+def _layer_inner_hsdp_modules(layer: nn.Cell) -> List[nn.Cell]:
+    """Return all FSDP-wrapped sub-modules nested inside a layer (excluding the layer itself)."""
+    if not layer:
+        return []
+    return [m for _, m in layer.cells_and_names() if isinstance(m, HSDPModule) and m is not layer]
+
+
+def _setup_gpt_prefetch(
+        embedding: nn.Cell,
+        transformer_layers: List[nn.Cell],
+        tail_modules: List[nn.Cell],
+) -> None:
+    """Set up forward and backward prefetch chains for GPT FSDP modules.
+
+    Each layer additionally prefetches its own inner fully_shard-wrapped MoE
+    experts so their all-gathers can overlap with the layer's forward/backward.
+    """
+    if not transformer_layers:
+        return
+
+    if tail_modules is None:
+        logger.warning(
+            "No final_layernorm or output_layer found for prefetch setup. "
+            "Prefetch chain will be incomplete."
+        )
+    if embedding is None:
+        logger.warning("No embedding found for prefetch setup.")
+
+    # --- Forward prefetch: embedding -> layer[0] -> ... -> [final_layernorm, output_layer] ---
+    if embedding is not None and isinstance(embedding, HSDPModule):
+        targets = _layer_inner_hsdp_modules(transformer_layers[0])
+        targets.append(transformer_layers[0])
+        embedding.set_modules_to_forward_prefetch(targets)
+
+    next_layers = transformer_layers[1:] + [None]
+    for layer, next_layer in zip(transformer_layers, next_layers):
+        if not isinstance(layer, HSDPModule):
+            continue
+        targets = _layer_inner_hsdp_modules(next_layer)
+        if next_layer is not None:
+            targets.append(next_layer)
+        elif tail_modules is not None:
+            targets.extend(tail_modules)
+        if targets:
+            layer.set_modules_to_forward_prefetch(targets)
+
+    # --- Backward prefetch: output_layer -> layer[N-1] -> ... -> embedding ---
+    reversed_layers = list(reversed(transformer_layers))
+    prev_layers = reversed_layers[1:] + [None]
+
+    if tail_modules and isinstance(tail_modules[-1], HSDPModule):
+        tail_modules[-1].set_modules_to_backward_prefetch([reversed_layers[0]])
+
+    for layer, prev_layer in zip(reversed_layers, prev_layers):
+        if not isinstance(layer, HSDPModule):
+            continue
+        targets = _layer_inner_hsdp_modules(prev_layer)
+        if prev_layer is not None:
+            targets.append(prev_layer)
+        elif embedding is not None and isinstance(embedding, HSDPModule):
+            targets.append(embedding)
+        if targets:
+            layer.set_modules_to_backward_prefetch(targets)
+
+
+def _distribute_param(module, param_name, device_mesh, placements):
+    """
+    Distribute a parameter of a module across a device mesh.
+
+    Args:
+        module: The module containing the parameter.
+        param_name (str): Name of the parameter to distribute.
+        device_mesh: The target device mesh for distribution.
+        placements: Placement strategy for the distributed tensor.
+
+    Raises:
+        ValueError: If the module does not have the specified parameter.
+    """
+    # Ensure the parameter exists in the module
+    if not hasattr(module, param_name):
+        raise ValueError(f"Parameter '{param_name}' not found in module.")
+
+    # Retrieve the original parameter
+    param = getattr(module, param_name)
+
+    # Replace it with a distributed version wrapped as a Parameter
+    setattr(
+        module,
+        param_name,
+        Parameter(
+            distribute_tensor(
+                param,
+                device_mesh=device_mesh,
+                placements=placements
+            ),
+            name=param.name,
+            requires_grad=param.requires_grad
+        )
+    )
+
+
+def _collect_module_replicate_params(module, shard_size):
+    """Collect parameters from a module that cannot be evenly FSDP-sharded on dim 0.
+
+    This helper is for modules that are not standard transformer decoder layers
+    (e.g. embedding and output_layer). It checks only shape divisibility.
+    """
+    replicate_params = []
+    for param_name, param in module.parameters_and_names():
+        if isinstance(param, DTensor):
+            shape = param.local_shape
+        else:
+            shape = param.shape
+        if shape[0] % shard_size != 0:
+            replicate_params.append(param)
+            logger.warning("The shape[0]=%s of parameter %s is not divisible by "
+                           "data_parallel_shard or dense_fsdp_shard_size which is %s, "
+                           "then this parameter will not be applied fsdp.", shape[0], param_name, shard_size)
+    return replicate_params
+
+
+def _split_fsdp_replicate_params(module, replicate_params, explicit_ignored_params=()):
+    """Split frozen or explicitly ignored parameters from managed replicas.
+
+    Replicated parameters that still require gradients remain managed by FSDP and
+    participate in gradient synchronization. Frozen parameters and known runtime
+    state bypass the FSDP lifecycle entirely. Explicit ignores inherited from an
+    outer wrapper are limited to parameters owned by this module.
+    """
+    replicate_params = list(replicate_params or ())
+    module_param_ids = {id(param) for _, param in module.parameters_and_names()}
+    ignored_params = {
+        param
+        for param in replicate_params
+        if id(param) in module_param_ids and not getattr(param, "requires_grad", True)
+    }
+    ignored_params.update(
+        param
+        for param in (explicit_ignored_params or ())
+        if id(param) in module_param_ids
+    )
+    ignored_ids = {id(param) for param in ignored_params}
+    managed_replicates = [
+        param for param in replicate_params if id(param) not in ignored_ids
+    ]
+    return ignored_params, managed_replicates
+
+
+def _build_fsdp_policy(
+    module,
+    shard_size,
+    param_rules=None,
+    ignored_params=None,
+):
+    """Build a module's shard-placement callback and replicated parameter list.
+
+    ``param_rules`` maps module-relative parameter names to either ``shard_dim``
+    or ``replicate``. Parameters without a rule use the default ``Shard(0)``.
+    Parameters in ``ignored_params`` are excluded from both the placement plan and
+    the managed replicated list; they remain outside the fully-shard lifecycle.
+    """
+    param_rules = {} if param_rules is None else param_rules
+    ignored_param_ids = {
+        id(param) for param in (ignored_params or ())
+    }
+    placement_overrides = {}
+    replicate_params = []
+
+    for param_name, param in module.parameters_and_names():
+        if id(param) in ignored_param_ids:
+            continue
+        rule = param_rules.get(param_name, {})
+        unknown_keys = rule.keys() - {"shard_dim", "replicate"}
+        if unknown_keys:
+            raise ValueError(f"Unsupported FSDP rule keys for {param_name}: {sorted(unknown_keys)}")
+        if rule.get("replicate", False) and "shard_dim" in rule:
+            raise ValueError(f"FSDP rule for {param_name} cannot set both replicate and shard_dim")
+        if rule.get("replicate", False):
+            replicate_params.append(param)
+            continue
+
+        shard_dim = rule.get("shard_dim", 0)
+        if "shard_dim" in rule:
+            placement_overrides[id(param)] = Shard(shard_dim)
+
+        shape = param.local_shape if isinstance(param, DTensor) else param.shape
+        normalized_dim = shard_dim if shard_dim >= 0 else shard_dim + len(shape)
+        if shape[normalized_dim] % shard_size != 0:
+            # Dense LoRA A is shaped ``(rank, input_size)``.  The generic
+            # default (Shard(0)) accidentally makes its storage policy depend
+            # on whether the low-rank dimension is divisible by the FSDP
+            # degree: rank=8 shards on DP8, while rank=4 falls back to a fully
+            # replicated parameter.  Prefer the non-rank matrix dimension when
+            # no explicit rule was supplied, matching the expert-LoRA policy.
+            if (
+                "shard_dim" not in rule
+                and is_lora_a_param_name(param_name)
+                and len(shape) == 2
+                and shape[1] % shard_size == 0
+            ):
+                placement_overrides[id(param)] = Shard(1)
+                continue
+            replicate_params.append(param)
+            placement_overrides.pop(id(param), None)
+            logger.warning("The shape[%s]=%s of parameter %s is not divisible by "
+                           "data_parallel_shard or dense_fsdp_shard_size which is %s, "
+                           "then this parameter will not be applied fsdp.",
+                           normalized_dim, shape[normalized_dim], param_name, shard_size)
+
+    unique_params = []
+    seen = set()
+    for param in replicate_params:
+        if id(param) not in seen and id(param) not in ignored_param_ids:
+            seen.add(id(param))
+            unique_params.append(param)
+    if not placement_overrides:
+        return None, unique_params
+
+    def shard_plan(param):
+        return placement_overrides.get(id(param))
+
+    return shard_plan, unique_params
+
+
+def _build_expert_fsdp_policy(experts, shard_size):
+    """Prefer expert sharding and never shard a LoRA rank dimension."""
+    param_rules = {}
+    for param_name, param in experts.parameters_and_names():
+        if param_name not in (
+                "weight1", "weight2", "weight1_lora_a", "weight1_lora_b",
+                "weight2_lora_a", "weight2_lora_b"):
+            continue
+        shape = param.local_shape if isinstance(param, DTensor) else param.shape
+        if len(shape) != 3:
+            raise ValueError(
+                f"Grouped expert parameter {param_name} must be 3D, but got shape={shape}")
+        if shape[0] % shard_size == 0:
+            param_rules[param_name] = {"shard_dim": 0}
+        else:
+            fallback_dim = 2 if param_name.endswith("_lora_b") else 1
+            if shape[fallback_dim] % shard_size == 0:
+                param_rules[param_name] = {"shard_dim": fallback_dim}
+            else:
+                param_rules[param_name] = {"replicate": True}
+                logger.warning("Grouped expert parameter %s cannot be safely FSDP-sharded by %s.",
+                               param_name, shard_size)
+    return _build_fsdp_policy(experts, shard_size, param_rules=param_rules)
+
+
+def _tag_warmup_indexer_grad_sync(layers, mtp, grad_mesh):
+    """Mark the DSA warm-up indexer weights so their gradients regain a DTensor layout.
+
+    :func:`_collect_layer_fsdp_ignored_params` keeps these weights out of FSDP so a per-layer
+    backward fired mid-forward cannot trip the unshard/reshard lifecycle. The parameters stay
+    ``Replicate()`` DTensors on the TP mesh (``_dsa_attention_layer_plan`` puts them there),
+    but *only FSDP re-wraps a gradient as a DTensor* -- an ignored parameter's ``.grad`` comes
+    back as a bare Tensor, and the layout that says "sum me over these meshes, then I am
+    replicated" is lost. Muon then classifies it as ``local_2d`` purely because
+    ``isinstance(grad, DTensor)`` is False.
+
+    Rather than hand-rolling the reductions (an all-reduce per mesh) plus a hand-maintained
+    replica count for the grad-norm, tag the mesh the gradient must be summed over and let
+    ``_maybe_sync_warmup_indexer_grad`` restate it declaratively: the raw per-rank gradient is
+    ``Partial()`` on that mesh, and redistributing it to ``Replicate()`` is exactly the
+    reduction. ``_get_grad_factor`` then reads the replica count off the placements by itself.
+
+    Every such weight also gets ``_warmup_layerwise_grad``. That marker, not the mesh, is what
+    the trainer's ``zero_grad`` keys off: FSDP walks only its *managed* parameters, so these
+    have to be cleared by hand every step, and that is true even when there is no mesh to
+    reduce over. Under pure pipeline parallelism (dp = tp = 1) ``grad_mesh`` is ``None`` and
+    conflating the two left the gradients accumulating across steps -- the global grad norm
+    then drifted toward 2x the single-stage value by step 100.
+    """
+    all_layers = list(layers)
+    if mtp is not None:
+        all_layers.extend(mtp_layer.transformer_layer for mtp_layer in mtp.layers)
+
+    tagged = 0
+    for layer in all_layers:
+        if not getattr(layer, "layerwise_warmup_backward", False):
+            continue
+        self_attention = getattr(layer, "self_attention", None)
+        core_attention = getattr(self_attention, "core_attention", None)
+        indexer = getattr(core_attention, "indexer", None)
+        if indexer is None:
+            continue
+        for param in indexer.get_parameters():
+            param._warmup_layerwise_grad = True
+            if grad_mesh is not None and grad_mesh.size() > 1:
+                param._warmup_grad_mesh = grad_mesh
+            tagged += 1
+    return tagged
+
+
+def _collect_layer_fsdp_ignored_params(layer):
+    """Collect mutable runtime state that FSDP must leave unmanaged.
+
+    MoE counters and lookup state are updated by forward or training-step callback
+    code. QK-clip's ``max_logits_val`` is a forward statistic synchronized over
+    DP/CP explicitly. Keeping this state outside FSDP preserves its original TP/EP
+    layout and avoids FSDP gradient and lifecycle handling.
+    """
+    ignored_params = set()
+    mlp = getattr(layer, "mlp", None)
+    if mlp is not None:
+        tokens_per_expert = getattr(mlp, "tokens_per_expert", None)
+        if tokens_per_expert is not None:
+            ignored_params.add(tokens_per_expert)
+
+        if getattr(mlp, "enable_expert_bias", False):
+            expert_bias = getattr(mlp, "expert_bias", None)
+            if expert_bias is not None:
+                ignored_params.add(expert_bias)
+
+        router = getattr(mlp, "router", None)
+        if router is not None:
+            for param_name in ("tid2eid", "global_tokens_per_expert", "ga_steps"):
+                param = getattr(router, param_name, None)
+                if param is not None:
+                    ignored_params.add(param)
+
+    self_attention = getattr(layer, "self_attention", None)
+    core_attention = getattr(self_attention, "core_attention", None)
+    max_logits_val = getattr(core_attention, "max_logits_val", None)
+    if max_logits_val is not None:
+        ignored_params.add(max_logits_val)
+
+    if getattr(layer, "layerwise_warmup_backward", False):
+        # Per-layer warm-up backward makes this layer's indexer gradients land while the block
+        # is still running later layers' forwards. For an FSDP-managed parameter that fires
+        # the owning cell's backward pre-hook, which unshards it mid-forward and aborts on
+        # device. Leaving the indexer unmanaged avoids that; the DP reduction FSDP would have
+        # done for it is issued explicitly instead (see ``_tag_warmup_indexer_grad_sync``).
+        indexer = getattr(core_attention, "indexer", None)
+        if indexer is not None:
+            for param in indexer.get_parameters():
+                ignored_params.add(param)
+
+    return ignored_params
+
+
+def _build_layer_fsdp_policy(layer, shard_size):
+    """Build one transformer layer's complete FSDP policy."""
+    ignored_params = _collect_layer_fsdp_ignored_params(layer)
+
+    return _build_fsdp_policy(
+        layer,
+        shard_size,
+        param_rules=_LAYER_FSDP_PARAM_RULES,
+        ignored_params=ignored_params,
+    )
+
+
+def _build_mtp_fsdp_policy(mtp_layer, shard_size):
+    """Build one outer MTP unit's policy, including its transformer layer and mHC head."""
+    ignored_params = _collect_layer_fsdp_ignored_params(
+        mtp_layer.transformer_layer
+    )
+    return _build_fsdp_policy(
+        mtp_layer,
+        shard_size,
+        param_rules=_MTP_FSDP_PARAM_RULES,
+        ignored_params=ignored_params,
+    )
+
+
+def _build_hc_head_fsdp_policy(hc_head, shard_size):
+    """Build root-owned mHC head policy without creating a dedicated wrapper."""
+    if hc_head is None:
+        return None, []
+    return _build_fsdp_policy(
+        hc_head,
+        shard_size,
+        param_rules=_HC_HEAD_FSDP_PARAM_RULES,
+    )
+
+
+# LoRA adapter layouts keyed by the target module's base TP role. Only the non-default
+# placement is listed: distribute_module replicates every other (trainable) param, so a
+# colwise base needs only lora_b sharded on the out-dim, a rowwise base only lora_a on the
+# in-dim, and a NoParallel base only its frozen weight pinned to Replicate (else, being
+# frozen and absent from any plan, it would stay a plain Tensor). Centralising this here
+# keeps the generic ParallelStyle LoRA-agnostic.
+_LORA_ROLE_LAYOUTS = {
+    "self_attention.linear_qkv": {"weight": (Replicate(),)},
+    "self_attention.linear_kvb": {"lora_b": (Shard(0),)},
+    "self_attention.linear_qb": {"lora_b": (Shard(0),)},
+    "self_attention.linear_proj": {"lora_a": (Shard(1),)},
+    "mlp.linear_fc1": {"lora_b": (Shard(0),)},
+    "mlp.linear_fc2": {"lora_a": (Shard(1),)},
+    "mlp.shared_experts.linear_fc1": {"lora_b": (Shard(0),)},
+    "mlp.shared_experts.linear_fc2": {"lora_a": (Shard(1),)},
+}
+
+
+def _attach_lora_layouts(transformer_layer, layer_plan):
+    """Attach LoRA adapter layouts to each target module's ParallelStyle (model-side).
+
+    Sets a generic ``extra_param_layouts`` on the style so the style itself stays
+    LoRA-agnostic; the style merges it into its sharding plan only for params the module
+    actually has. No-op for a module without an adapter (non-LoRA run).
+    """
+    for name, extra in _LORA_ROLE_LAYOUTS.items():
+        style = layer_plan.get(name)
+        sub = transformer_layer
+        for part in name.split("."):
+            sub = getattr(sub, part, None)
+        if style is not None and getattr(sub, "lora_a", None) is not None:
+            style.extra_param_layouts = extra
+
+
+def _get_dsv4_tp_shard_plan(transformer_layer, shard_plans, distribute_param_plan):
+    """get dsv4 tp plan"""
+    # Fused CSA kernel has CANN shape constraints and no TP benefit from head-sharding
+    # non-fused small-op path does benefit.
+    sp_layout, norm_plan, _, _ = shard_plans
+    rope_freqs_layout = Replicate() if transformer_layer.self_attention.config.apply_rope_fusion else None
+    core_attn = transformer_layer.self_attention.core_attention
+    csa_q_layout = Replicate() # currently csa doesn't apply tp
+    attn_sink_plan = Replicate()
+    dsv4_core_attn_plan = PrepareModuleInputOutput(
+        # q, key, x, q_compressed
+        input_layouts=(Replicate(), Replicate(), Replicate(), Replicate()),
+        desired_input_layouts=(csa_q_layout, Replicate(), Replicate(), Replicate()),
+        output_layouts=(csa_q_layout,),
+        desired_output_layouts=(Replicate(),),
+        use_local_input=True,
+        use_local_output=False,
+    )
+    unfused_indexer_loss_plan = PrepareModuleInputOutput(
+        input_layouts=(Replicate(),),
+        desired_input_layouts=(Replicate(),),
+        output_layouts=(Replicate(),),
+        desired_output_layouts=(Replicate(),),
+        use_local_output=False,
+    )
+    layer_plan = {
+        "input_layernorm": norm_plan,
+        # Input: SP Shard(0) → Replicate (attention internals)
+        # Output: Replicate → SP Shard(0) (so output_cell h_post/x dims match)
+        "self_attention": PrepareModuleInputOutput(
+            input_layouts=(sp_layout,),
+            desired_input_layouts=(Replicate(),),
+            output_layouts=(Replicate(),),
+            desired_output_layouts=(sp_layout,),
+            use_local_output=False,
+        ),
+        # --- Q path ---
+        "self_attention.linear_q_down_proj": NoParallel(use_local_output=False),
+        "self_attention.q_layernorm": NoParallel(use_local_output=False),
+        "self_attention.linear_q_up_proj": ColwiseParallel(
+            output_layouts=Replicate(), use_local_output=False,
+        ),
+        # --- KV path (single shared head) ---
+        "self_attention.linear_kv_proj": NoParallel(use_local_output=False),
+        "self_attention.kv_layernorm": NoParallel(use_local_output=False),
+        # --- Core attention ---
+        "self_attention.core_attention": dsv4_core_attn_plan,
+        # --- Output projection ---
+        "self_attention.linear_proj": NoParallel(use_local_output=False),
+        "pre_mlp_layernorm": norm_plan,
+        "self_attention.apply_rotary_emb": PrepareModuleInputOutput(
+            input_layouts=(Replicate(), rope_freqs_layout, None),
+            desired_input_layouts=(Replicate(), rope_freqs_layout, None),
+            output_layouts=(Replicate(),),
+            desired_output_layouts=(Replicate(),),
+            use_local_output=False,
+        ),
+    }
+    if getattr(core_attn, "unfused_indexer_loss", None) is not None:
+        layer_plan["self_attention.core_attention.unfused_indexer_loss.post_head_sum"] = unfused_indexer_loss_plan
+    distribute_param_plan.append([transformer_layer.self_attention.core_attention, "attn_sink", (attn_sink_plan,)])
+    distribute_param_plan.append([transformer_layer.self_attention, "linear_o_group_proj", (Replicate(),)])
+    distribute_param_plan.append([transformer_layer.self_attention, "q_rms_gamma", (Replicate(),)])
+    return layer_plan, distribute_param_plan
+
+
+def _configure_local_fa(core_attention, world):
+    """Rebuild FlashAttentionScore with the local head count (n/t) for the TP flow.
+
+    The DTensor flow fed FA a head-sharded DTensor whose logical head dim is the
+    global ``num_attention_heads``; the local flow feeds a plain tensor holding only
+    this rank's ``n/t`` heads, so ``head_num`` must be the local count.
+    """
+    if not isinstance(core_attention, FlashAttention) or world == 1:
+        return
+    if core_attention.head_num % world != 0:
+        raise ValueError(
+            f"num_attention_heads ({core_attention.head_num}) must be divisible by the "
+            f"TP degree ({world}) for the local FlashAttention flow.")
+    core_attention.head_num = core_attention.head_num // world
+    core_attention.flash_attention = FlashAttentionScore(
+        head_num=core_attention.head_num,
+        scale_value=core_attention.scalar_value,
+        pre_tokens=core_attention.pre_tokens,
+        next_tokens=core_attention.next_tokens,
+        inner_precise=core_attention.inner_precise,
+        input_layout=core_attention.input_layout,
+        sparse_mode=core_attention.sparse_mode,
+    )
+
+
+def _configure_dsa_local_fa(core_attention, world):
+    """Rebuild DSA dense FlashAttention for the local TP head count."""
+    if not isinstance(core_attention, DSAttention) or world == 1:
+        return
+    if core_attention.head_num % world != 0:
+        raise ValueError(
+            f"num_attention_heads ({core_attention.head_num}) must be divisible by the "
+            f"TP degree ({world}) for DSA head parallelism."
+        )
+    core_attention.head_num = core_attention.head_num // world
+    if core_attention.sparse_loss:
+        return
+    dense_attention = core_attention.dense_flash_attention
+    dense_attention.head_num = core_attention.head_num
+    dense_attention.flash_attention = FlashAttentionScore(
+        head_num=dense_attention.head_num,
+        scale_value=dense_attention.softmax_scale,
+        pre_tokens=2147483647,
+        next_tokens=0,
+        inner_precise=0,
+        input_layout=dense_attention.input_layout,
+        sparse_mode=dense_attention.sparse_mode,
+    )
+
+
+def _mla_attention_layer_plan(self_attn, tp_mesh, enable_mc2=False):
+    """Run MLA compression on the sequence shard and gather only projected Q/K/V."""
+    _configure_local_fa(self_attn.core_attention, tp_mesh.size())
+    colwise = MC2ColwiseParallel if enable_mc2 else ColwiseParallel
+    rowwise = MC2RowwiseParallel() if enable_mc2 else RowwiseParallel()
+    plan = {
+        "self_attention.linear_qkv": SequenceParallel(sequence_dim=0),
+        "self_attention.k_layernorm": SequenceParallel(sequence_dim=0),
+        "self_attention.linear_kvb": colwise(gather_input=True),
+        "self_attention.linear_proj": rowwise,
+        "self_attention.apply_rotary_emb_k": PrepareModuleInput(
+            input_transforms=(AllGather(0), None),
+        ),
+    }
+    if self_attn.config.q_lora_rank is not None:
+        plan["self_attention.linear_qb"] = colwise(gather_input=True)
+        plan["self_attention.q_layernorm"] = SequenceParallel(sequence_dim=0)
+    return plan
+
+
+def _gqa_attention_layer_plan(self_attn, tp_mesh, enable_mc2=False):
+    """Layer-plan entries for standard GQA / MHA self-attention (Qwen3, GLM4, TeleChat3).
+
+    The fused QKV projection (``linear_qkv``) is colwise: its ``Shard(0)`` split follows
+    the group-interleaved weight layout ``[g0_q..q k v | g1_q..q k v | ...]``, so each TP
+    rank owns whole query-groups (requires ``tp`` to divide ``num_query_groups``). Under
+    SP its pre-hook all-gathers the sequence-sharded input before the local matmul. The
+    o-projection (``linear_proj``) is rowwise (reduce-scatter back to the shard). The
+    optional per-head q/k RMSNorm (Qwen3) run local on the head-sharded activations and
+    replicate their ``head_dim`` weight, whose gradient reduces over TP like the other
+    norms (SequenceParallel).
+    """
+    _configure_local_fa(self_attn.core_attention, tp_mesh.size())
+    colwise = MC2ColwiseParallel() if enable_mc2 else ColwiseParallel(gather_input=True)
+    rowwise = MC2RowwiseParallel() if enable_mc2 else RowwiseParallel()
+    plan = {
+        "self_attention.linear_qkv": colwise,
+        "self_attention.linear_proj": rowwise,
+    }
+    if getattr(self_attn, "q_layernorm", None) is not None:
+        plan["self_attention.q_layernorm"] = SequenceParallel(sequence_dim=0)
+    if getattr(self_attn, "k_layernorm", None) is not None:
+        plan["self_attention.k_layernorm"] = SequenceParallel(sequence_dim=0)
+    return plan
+
+
+class _DSv4QUpParallel(ParallelStyle):
+    """Column-shard Q-up while reducing its replicated input gradient."""
+
+    def _apply(self, module, device_mesh):
+        # Shard -> AllGather is an identity in forward.  Its backward is
+        # AllGather -> ReduceScatter, which sums the Q-up column-shard partials.
+        module = PrepareModuleInput(input_transforms=ShardTensor(0))._apply(
+            module, device_mesh
+        )
+        return ColwiseParallel(gather_input=True, gather_output=True)._apply(
+            module, device_mesh
+        )
+
+
+def _dsv4_attention_layer_plan(self_attn, tp_mesh):
+    """Build the Local-TP plan for DSV4 hybrid fused attention.
+
+    Fused CSA's indexer KL target aggregates attention probabilities over all
+    query heads before normalisation, so head-local CSA calls are not
+    mathematically decomposable.  Keep CSA/indexer/output projection replicated
+    and use TP only for Q-up, gathering its head shards before CSA.  The whole
+    attention receives a gathered sequence and returns the local sequence
+    shard, preserving sequence parallelism without changing the fused loss.
+    """
+    world = tp_mesh.size()
+    if self_attn.query_projection_size % world != 0:
+        raise ValueError(
+            f"query_projection_size ({self_attn.query_projection_size}) must be "
+            f"divisible by TP degree ({world}) for DSV4 Q-up projection."
+        )
+
+    plan = {
+        "self_attention": PrepareModuleInputOutput(
+            # Output-shard backward reconstructs the same complete CSA output
+            # gradient on every TP rank.  Therefore input backward must select
+            # the local sequence gradient, not reduce identical copies again.
+            input_transforms=AllGather(0, reduce_grad=False),
+            output_transforms=ShardTensor(0),
+        ),
+        "self_attention.linear_q_up_proj": _DSv4QUpParallel(),
+    }
+
+    core_attention = self_attn.core_attention
+    indexer = getattr(core_attention, "indexer", None)
+    if indexer is not None:
+        plan["self_attention.core_attention.indexer"] = SequenceParallel(
+            sequence_dim=0
+        )
+
+    # Full CSA runs on every TP rank, so all of its parameters except Q-up and
+    # the indexer hold identical already-global gradients.  Keep the count on
+    # the cell for propagation after FSDP replaces the Parameter objects.
+    setattr(self_attn, "_tp_full_attention_replica_count", world)
+
+    distribute_param_plan = []
+    return plan, distribute_param_plan
+
+
+def _tag_dsv4_tp_replicated_grad_norm_params(model):
+    """Tag replicated DSV4 attention parameters for global grad-norm de-duplication."""
+    for _, cell in model.cells_and_names():
+        replica_count = getattr(cell, "_tp_full_attention_replica_count", 1)
+        if replica_count <= 1:
+            continue
+        for param_name, param in cell.parameters_and_names():
+            if param_name.startswith("linear_q_up_proj."):
+                continue
+            if param_name.startswith("core_attention.indexer."):
+                continue
+            setattr(param, "_grad_norm_replica_count", replica_count)
+
+
+def _dsa_attention_layer_plan(self_attn, tp_mesh, enable_mc2=False):
+    """Build head-parallel DSA while keeping the Lightning Indexer replicated."""
+    world = tp_mesh.size()
+    if self_attn.num_attention_heads % world != 0:
+        raise ValueError(
+            f"num_attention_heads ({self_attn.num_attention_heads}) must be divisible by "
+            f"the TP degree ({world}) for DSA head parallelism."
+        )
+
+    _configure_dsa_local_fa(self_attn.core_attention, world)
+    plan = _mla_attention_layer_plan(self_attn, tp_mesh, enable_mc2)
+
+    if self_attn.core_attention.indexer is None:
+        # Shared layer under DSA indexer Top-K sharing: it owns no indexer and no indexer
+        # loss, so there is nothing to gather for them and no indexer parameters to place.
+        # Everything else in the MLA plan still applies.
+        return plan, []
+
+    # linear_qkv deliberately stays sequence-parallel.  Install one pre-hook on
+    # the real Indexer boundary so the duplicated Indexer alone reconstructs its
+    # full-sequence x/q inputs. Q/KV up-projections independently gather their
+    # sequence input and emit only this rank's head shard.
+    plan["self_attention.core_attention.indexer"] = PrepareModuleInput(
+        input_transforms=(
+            AllGather(0, reduce_grad=False),
+            AllGather(0, reduce_grad=False),
+            None, None, None,
+        )
+    )
+
+    # Hyper-Parallel r1.0.0's fused loss does not expose the per-rank teacher
+    # probability after its local-head sum. Gather only its head-bearing inputs
+    # so the kernel observes the TP=1 teacher; attention compute/output remain
+    # local-head and linear_proj still performs the TP reduce-scatter.
+    query_head_dim = 1 if self_attn.use_tnd else 2
+    if self_attn.sparse_loss:
+        softmax_head_dim = 2 if self_attn.use_tnd else 3
+        # Sparse attention consumes the normalized latent KV directly. Compose
+        # its sequence gather with k_layernorm's existing SequenceParallel
+        # parameter semantics instead of inserting an IdentityOp in forward.
+        plan["self_attention.k_layernorm"] = SequenceParallel(sequence_dim=0)
+    else:
+        softmax_head_dim = 0 if self_attn.use_tnd else 1
+    gather_query_head = AllGather(query_head_dim, reduce_grad=False)
+    gather_softmax_head = AllGather(softmax_head_dim, reduce_grad=False)
+    gather_key_head = None if self_attn.sparse_loss else AllGather(
+        query_head_dim, reduce_grad=False
+    )
+    # The fused r1.0.0 loss reconstructs the teacher from Q/K and softmax stats.
+    # Gather only its head-bearing arguments in a pre-hook on the real fused-loss
+    # boundary.  Query/key RoPE are split before this call and therefore need the
+    # same head transform as their corresponding nope tensors.
+    plan["self_attention.core_attention.indexer_loss.compute_indexer_loss"] = PrepareModuleInput(
+        input_transforms=(
+            gather_query_head, gather_key_head,
+            None, None, None, None,
+            gather_softmax_head, gather_softmax_head,
+            AllGather(query_head_dim, reduce_grad=False),
+            gather_key_head,
+        )
+    )
+    # Keep the duplicated Indexer parameters on the formal TP mesh. FSDP will
+    # compose its shard placement with this Replicate placement, so runtime,
+    # optimizer, and checkpoint metadata all share one layout source of truth.
+    distribute_param_plan = []
+    seen_params = set()
+    for _, module in self_attn.core_attention.indexer.cells_and_names():
+        for param_name, param in module.parameters_and_names(expand=False):
+            if id(param) in seen_params:
+                continue
+            seen_params.add(id(param))
+            distribute_param_plan.append([module, param_name, (Replicate(),)])
+    return plan, distribute_param_plan
+
+
+def _dense_mlp_layer_plan(enable_mc2=False):
+    """Return the complete local TP plan for a dense MLP."""
+    colwise = MC2ColwiseParallel() if enable_mc2 else ColwiseParallel(gather_input=True)
+    rowwise = MC2RowwiseParallel() if enable_mc2 else RowwiseParallel()
+    return {
+        "mlp.linear_fc1": colwise,
+        "mlp.linear_fc2": rowwise,
+    }
+
+
+def _apply_layers_tp(
+    transformer_layer,
+    tp_mesh,
+    enable_ep,
+    enable_mc2=False,
+):
+    """Apply local (to_local) tensor + sequence parallelism to one GPT transformer layer.
+
+    The whole layer runs on plain, sequence-sharded local tensors; the tensor-parallel
+    collectives are hand-written in the style forward hooks (colwise pre-hook all-gather,
+    rowwise post-hook reduce-scatter) plus the MLA ``k_pe`` all-gather inside the module.
+    Weights stay sharded DTensors (FSDP / checkpoint unchanged), localised at compute.
+    """
+    world = tp_mesh.size()
+    self_attn = transformer_layer.self_attention
+    is_dsv4 = isinstance(self_attn, DSv4HybridSelfAttention)
+    is_mla = isinstance(self_attn, MLASelfAttention)
+    is_dsa = isinstance(self_attn, DSASelfAttention)
+    if is_mla and self_attn.config.q_lora_rank is None:
+        # Without q compression, q comes straight out of linear_qkv (sequence-sharded, not
+        # head-sharded) with no colwise up-projection to all-gather it, so SP-native MLA
+        # cannot form the full-sequence query.
+        raise NotImplementedError("Local sequence-parallel MLA requires q_lora_rank (q compression).")
+    if not is_mla and not is_dsv4:
+        # Standard GQA/MHA: the fused QKV is colwise-sharded along the group-interleaved
+        # output dim, so each rank must own whole query-groups.
+        num_kv_groups = self_attn.kv_num_heads
+        if num_kv_groups % world != 0:
+            raise ValueError(
+                f"num_query_groups ({num_kv_groups}) must be divisible by the TP degree "
+                f"({world}) for the local GQA flow (fused-QKV colwise split)."
+            )
+
+    # Block-level norms run local on the sequence shard (Replicate weights, no collective);
+    # the attention-internal projections/norms are dispatched by attention type (MLA vs GQA).
+    layer_plan = {
+        "input_layernorm": SequenceParallel(sequence_dim=0),
+        "pre_mlp_layernorm": SequenceParallel(sequence_dim=0),
+    }
+    if getattr(transformer_layer, "attn_hc", None) is not None:
+        layer_plan.update({
+            "attn_hc": SequenceParallel(sequence_dim=0),
+            "ffn_hc": SequenceParallel(sequence_dim=0),
+        })
+    distribute_param_plan = []
+    if is_dsv4:
+        dsv4_plan, dsv4_params = _dsv4_attention_layer_plan(self_attn, tp_mesh)
+        layer_plan.update(dsv4_plan)
+        distribute_param_plan.extend(dsv4_params)
+    elif is_dsa:
+        dsa_plan, dsa_params = _dsa_attention_layer_plan(self_attn, tp_mesh, enable_mc2)
+        layer_plan.update(dsa_plan)
+        distribute_param_plan.extend(dsa_params)
+    elif is_mla:
+        layer_plan.update(_mla_attention_layer_plan(self_attn, tp_mesh, enable_mc2))
+    else:
+        layer_plan.update(_gqa_attention_layer_plan(self_attn, tp_mesh, enable_mc2))
+
+    # Dense MLP.
+    if isinstance(transformer_layer.mlp, MLP):
+        layer_plan.update(_dense_mlp_layer_plan(enable_mc2))
+
+    # MoE: the router runs on local tokens (gate weight to_local'd in its construct).
+    if isinstance(transformer_layer.mlp, MoELayer):
+        router = transformer_layer.mlp.router
+        # Hidden states are sequence-sharded under Local TP.  Hash routing must
+        # consume the matching token-id shard instead of the full input_ids,
+        # otherwise its [tokens, top_k] expert map no longer matches the local
+        # router logits.
+        layer_plan["mlp"] = PrepareModuleInput(
+            input_kwarg_transforms={"input_ids": ShardTensor(1)}
+        )
+        if getattr(router, "aux_loss_type", None) == "global_aux_loss":
+            raise NotImplementedError("Local TP flow does not support global_aux_loss routing yet.")
+        # Match the baseline parameter placements even for non-trainable MoE state.
+        distribute_param_plan.append([router, "weight", (Replicate(),)])
+        distribute_param_plan.append([transformer_layer.mlp, "tokens_per_expert", (Replicate(),)])
+        if getattr(transformer_layer.mlp, "enable_expert_bias", False):
+            distribute_param_plan.append([transformer_layer.mlp, "expert_bias", (Replicate(),)])
+        if not enable_ep:
+            experts = transformer_layer.mlp.experts
+            for param_name in (
+                    "weight1", "weight2", "weight1_lora_a", "weight1_lora_b",
+                    "weight2_lora_a", "weight2_lora_b"):
+                if hasattr(experts, param_name):
+                    distribute_param_plan.append([experts, param_name, (Replicate(),)])
+
+    # Routed and shared experts both keep the SP token shard. Shared-expert
+    # parameters are replicated over TP, so its fc1/fc2 and optional gate compute
+    # locally without sequence collectives.
+    shared_experts = getattr(transformer_layer.mlp, "shared_experts", None)
+    if shared_experts is not None:
+        layer_plan["mlp.shared_experts"] = SequenceParallel(sequence_dim=0)
+
+    for sub_module, param_name, sub_plan in distribute_param_plan:
+        _distribute_param(sub_module, param_name=param_name, device_mesh=tp_mesh, placements=sub_plan)
+
+    _attach_lora_layouts(transformer_layer, layer_plan)
+    parallelize_module(module=transformer_layer, device_mesh=tp_mesh, parallelize_plan=layer_plan)
+    if is_dsa and self_attn.sparse_loss:
+        # Keep k_layernorm's SequenceParallel parameter layout and attach the
+        # sparse-KV sequence gather directly to the real norm output boundary.
+        PrepareModuleOutput(output_transforms=AllGather(0))._apply(
+            self_attn.k_layernorm, tp_mesh
+        )
+
+def apply_non_moe_tp(
+        model: nn.Cell,
+        tp_mesh: DeviceMesh,
+        enable_ep: bool = False,
+        enable_mc2: bool = False,
+):
+    """Apply local (to_local) tensor + sequence parallelism to the whole GPTModel forward.
+
+    Every forward module runs on plain, sequence-sharded local tensors; the tensor-parallel
+    collectives are hand-written in forward hooks. Weights stay sharded DTensors (FSDP /
+    checkpoint unchanged) and are localised at compute -- DTensor never appears in the forward.
+    """
+    world = tp_mesh.size()
+    rank = tp_mesh.get_local_rank()
+    group = tp_mesh.get_group()
+
+    # 1. Embedding: vocab-parallel local gather + reduce onto the sequence shard.
+    if hasattr(model.model, "embedding"):
+        parallelize_module(
+            model.model.embedding,
+            tp_mesh,
+            {
+                "word_embeddings": RowwiseParallel()
+            },
+        )
+
+    # 2. Final norm: local RMSNorm on the sequence shard (Replicate weight, no collective).
+    if getattr(model.model.decoder, "final_layernorm", None):
+        SequenceParallel(sequence_dim=0)._apply(model.model.decoder.final_layernorm, tp_mesh)
+
+    # 3. Output layer (LM head): colwise; the output stays vocab-sharded local for the loss.
+    if hasattr(model.model, "output_layer"):
+        ColwiseParallel(gather_input=True)._apply(model.model.output_layer, tp_mesh)
+
+    # 4. Loss: vocab-parallel CE on the local vocab slice (pass the TP metadata).
+    loss = getattr(model.model, "loss", None)
+    if loss is not None and world > 1:
+        loss.enable_vocab_parallel(group, rank, world)
+
+    # 5. Decoder layers.
+    for transformer_layer in model.model.decoder.layers:
+        _apply_layers_tp(
+            transformer_layer, tp_mesh, enable_ep, enable_mc2=enable_mc2)
+
+    # 6. MTP outer modules and inner transformer layers. Match graph mode for eh_proj:
+    # keep its parameters replicated and compute directly on the local sequence shard.
+    # The inner MLA+MoE layer uses the same local plan as the decoder layers.
+    mtp = getattr(model.model, "mtp", None)
+    if mtp is not None:
+        for layer in mtp.layers:
+            parallelize_module(
+                layer,
+                tp_mesh,
+                {
+                    "enorm": SequenceParallel(sequence_dim=0),
+                    "hnorm": SequenceParallel(sequence_dim=0),
+                    "eh_proj": SequenceParallel(sequence_dim=0),
+                    "final_layernorm": SequenceParallel(sequence_dim=0),
+                },
+            )
+            _apply_layers_tp(
+                layer.transformer_layer, tp_mesh, enable_ep, enable_mc2=enable_mc2)
+
+    logger.info(
+        "Applied local (to_local) Tensor + Sequence Parallelism to the model "
+        "(MC2 fusion %s).", "ENABLED" if enable_mc2 else "disabled")
+
+
+def apply_moe_ep_tp(
+        model: nn.Cell,
+        tp_mesh: DeviceMesh = None,
+        ep_mesh: DeviceMesh = None,
+        moe_token_dispatcher_type: str = "all_to_all",
+        npu_nums_per_device: int = 8,
+        expert_async_d2h: bool = False,
+        use_safe_tokens: bool = True,
+):
+    """
+    Apply Expert Parallelism (EP) and Tensor Parallelism (TP) to MoE layers in model.
+
+ 	Args:
+        model (nn.Cell): The model to be parallelized.
+        tp_mesh (DeviceMesh): The device mesh for tensor parallelism.
+        ep_mesh (DeviceMesh): The device mesh for expert parallelism.
+        moe_token_dispatcher_type (str): The type of token dispatcher for MoE.
+        npu_nums_per_device (int): The number of NPUs per device.
+        expert_async_d2h (bool): Whether to overlap dispatch counts D2H with token permutation.
+        use_safe_tokens (bool): Whether to prepend zero-probability safe tokens before dispatch.
+
+ 	MoE layer structure:
+        - mlp.experts.weight1: Expert FFN first layer weights
+        - mlp.experts.weight2: Expert FFN second layer weights
+        - mlp.router.weight: Router/gate weights
+        - mlp.shared_experts.linear_fc1.weight: Shared expert FFN first layer
+        - mlp.shared_experts.linear_fc2.weight: Shared expert FFN second layer
+        - mlp.tokens_per_expert: Token distribution tracking
+
+    Returns:
+        nn.Cell: The parallelized model.
+    """
+
+    if tp_mesh is None and ep_mesh is None:
+        raise ValueError("At least one of ep_mesh or tp_mesh must be provided.")
+
+    transformer_layers = list(model.model.decoder.layers)
+    if getattr(model.model, "mtp", None) is not None:
+        transformer_layers.extend(
+            mtp_layer.transformer_layer for mtp_layer in model.model.mtp.layers
+        )
+
+    for transformer_block in transformer_layers:
+        if not hasattr(transformer_block.mlp, 'experts'):
+            continue
+
+        # ============ Apply EP to Experts ============
+        # Determine which mesh and plan to use for experts
+        experts_mesh = ep_mesh
+        if ep_mesh is None:
+            # No EP, use TP for experts (TensorParallel on expert weights)
+            experts_mesh = tp_mesh
+
+        set_comm_ops_inplace(False)
+        # Apply TP to experts: shard along the hidden dimension
+        if moe_token_dispatcher_type == "alltoall":
+            experts_plan = ExpertParallel(model.model.config.moe_permute_fusion,
+                                          async_d2h=expert_async_d2h,
+                                          use_safe_tokens=use_safe_tokens)
+        elif moe_token_dispatcher_type == "alltoall_deredundancy":
+            experts_plan = DeredundancyExpertParallel(
+                npu_nums_per_device,
+                use_safe_tokens=use_safe_tokens,
+            )
+        else:
+            raise ValueError(
+                f"Unsupported moe_token_dispatcher_type: '{moe_token_dispatcher_type}'. "
+                "Expected 'alltoall' or 'alltoall_deredundancy'."
+            )
+        if hasattr(transformer_block.mlp, 'experts') and experts_mesh is not None:
+            parallelize_module(
+                module=transformer_block.mlp.experts,
+                device_mesh=experts_mesh,
+                parallelize_plan=experts_plan,
+            )
+
+    return model
+
+
+def apply_moe_ep_overlap_tp(
+        model,
+        overlap,
+        tp_mesh=None,
+        ep_mesh=None,
+        moe_token_dispatcher_type: str = "alltoall",
+        expert_async_d2h: bool = False,
+        use_safe_tokens: bool = True,
+):
+    """Apply EP with comm/compute overlap hooks to MoE layers in all pipeline model parts.
+
+    Wraps every MoE layer's ``experts`` module with :class:`OverlapExpertParallel`
+    (instead of plain :class:`ExpertParallel`) and tags the **last MoE layer in
+    each pipeline stage** with ``is_last_layer=True`` so its closing D hook is
+    ``"D_LAST"``.  The CHUNK_START / CHUNK_END bracketing happens at the
+    OVERLAP_B_F callback level (:func:`_make_overlap_b_f_callback`), covering
+    the whole ``forward_one_chunk`` record including embedding and lm-head/loss.
+
+    This function is called once per call to :func:`apply_pp` when
+    ``parallelism.pipeline_parallel_overlap_b_f`` is ``True`` and
+    ``moe_token_dispatcher_type`` is ``"alltoall"``.
+
+    Args:
+        model:     Single pipeline-stage model (``nn.Cell``).
+        overlap:   Shared
+                   :class:`~hyper_parallel.core.pipeline_parallel.comm_compute_overlap.CommComputeOverlap`
+                   instance for this rank (one per rank, shared across all chunks).
+        tp_mesh:   TP device mesh (passed through to EP mesh selection).
+        ep_mesh:   EP device mesh.
+        moe_token_dispatcher_type: Must be ``"alltoall"``; overlap is only
+                   supported for the standard all-to-all dispatcher.
+        expert_async_d2h: Whether to overlap dispatch counts D2H with token permutation.
+        use_safe_tokens: Whether to prepend zero-probability safe tokens before dispatch.
+
+    Returns:
+        ``model`` (mutated in place).
+    """
+    if moe_token_dispatcher_type != "alltoall":
+        raise ValueError(
+            f"EP comm/compute overlap only supports moe_token_dispatcher_type='alltoall', "
+            f"got '{moe_token_dispatcher_type}'."
+        )
+
+    if ep_mesh is None and tp_mesh is None:
+        raise ValueError("At least one of ep_mesh or tp_mesh must be provided.")
+
+    experts_mesh = ep_mesh if ep_mesh is not None else tp_mesh
+    coordinator = overlap.coordinator
+
+    transformer_layers = list(model.model.decoder.layers)
+    if getattr(model.model, "mtp", None) is not None:
+        transformer_layers.extend(
+            mtp_layer.transformer_layer for mtp_layer in model.model.mtp.layers
+        )
+
+    # Collect MoE layers to apply overlap strategy
+    moe_layers = [
+        layer for layer in transformer_layers
+        if hasattr(layer.mlp, "experts")
+    ]
+    last_idx = len(moe_layers) - 1
+
+    # Expert weights live on the meta device during model build; sharding them
+    # into DTensors must happen under the meta DeviceCtx (same as the baseline
+    # apply_moe_ep_tp path). The CHUNK hook registration below is Python-level
+    # and must stay OUTSIDE the meta context.
+    with ms.DeviceCtx("meta"):
+        for idx, layer in enumerate(moe_layers):
+            is_last = idx == last_idx
+            strategy = OverlapExpertParallel(
+                coordinator=coordinator,
+                is_last_layer=is_last,
+                # Honor the yaml fusion flag (same as the non-overlap apply_moe_ep_tp
+                # path). Verified bit-identical to manual permute under overlap on
+                # pp2/ep2 + recompute:full + MTP; other overlap variants (interleaved
+                # pp, no-recompute, larger ep) not yet A/B'd.
+                moe_permute_fusion=model.model.config.moe_permute_fusion,
+                async_d2h=expert_async_d2h,
+                use_safe_tokens=use_safe_tokens,
+            )
+            parallelize_module(
+                module=layer.mlp.experts,
+                device_mesh=experts_mesh,
+                parallelize_plan=strategy,
+            )
+
+    # CHUNK_START / CHUNK_END bracketing is done at the OVERLAP_B_F callback
+    # level (see _make_overlap_b_f_callback) rather than via decoder Cell
+    # hooks: the decoder boundary leaves preprocess/embedding (entry) and
+    # lm-head/loss (exit) recording OUTSIDE the bracket, concurrent with the
+    # BWD thread's loss.bwd/lm-head.bwd replay — MS PyNative does not support
+    # concurrent FWD-record + BWD-replay and corrupts memory/grads.
+    return model
+
+
+# ---------------------------------------------------------------------------
+# GPT FSDP implementation
+# ---------------------------------------------------------------------------
+
+def _resolve_dense_fsdp_config(parallelism, base_fsdp_config, parallel_dims):
+    """Resolve the FSDP config + shard degree for dense (non-expert) weights.
+
+    Reads ``parallelism.dense_fsdp_shard_size``. When it is unset (``None``) or equal to
+    the full fsdp domain (``dp_shard * cp``), returns ``(base_fsdp_config, full_degree)``
+    unchanged -- the default, pre-feature behavior. Otherwise returns a copy of
+    ``base_fsdp_config`` whose ``mesh`` is the reduced ``[replicate, shard]`` sub-mesh
+    (see :meth:`ParallelDims.get_fsdp_shard_mesh`), together with the reduced shard
+    degree ``k``. The degree is fed to :func:`_build_layer_fsdp_policy` so params
+    whose selected shard dim is not divisible by ``k`` are replicated rather than sharded.
+
+    Only dense weights consume the returned config; routed experts keep their own
+    ``efsdp_config`` and are not affected.
+    """
+    full_degree = parallel_dims.fsdp
+    shard_size = getattr(parallelism, "dense_fsdp_shard_size", None)
+    if shard_size is None or shard_size == full_degree:
+        return base_fsdp_config, full_degree
+    dense_mesh = parallel_dims.get_fsdp_shard_mesh(shard_size)
+    return {**base_fsdp_config, "mesh": dense_mesh}, shard_size
+
+
+def apply_fsdp(
+        model: nn.Cell,
+        parallel_dims: Any,
+        parallelism: Any,
+) -> None:
+    """Apply FSDP/HSDP to a GPT model.
+
+    Directly operates on GPT model structure (embedding -> decoder.layers ->
+    final_layernorm + output_layer -> root).
+
+    Gradients are always accumulated and reduced in fp32: the HSDP mixed-precision
+    policy reduces in fp32 (``reduce_dtype=float32``) and accumulates the reduced
+    gradient onto a fp32 ``param.main_grad`` buffer
+    (``apply_grad_on_fp32_main_grad=True``), aligning with Megatron-LM.
+
+    Args:
+        model: The GPTModel instance.
+        parallel_dims: ParallelDims instance.
+        parallelism: Parallelism configuration.
+    """
+    logger.info("Applying FSDP/HSDP to GPT model...")
+
+    # Unwrap to GPTModel
+    gpt_model = _unwrap_gptmodel(model)
+
+    # --- Resolve dp_mesh ---
+    # The ``fsdp`` axis already folds ``cp`` (fsdp = dp_shard * cp), so CP needs
+    # no special-casing here: when dp_replicate is on we shard over the 2D
+    # [dp_replicate, fsdp] HSDP mesh, otherwise over the 1D fsdp mesh. Folding CP
+    # into a single ``cp_enabled`` branch would have dropped dp_replicate on
+    # HSDP+CP runs (sharding only over dp_shard*cp instead of the full domain).
+    if parallel_dims.dp_replicate_enabled:
+        dp_mesh = parallel_dims.get_mesh(["dp_replicate", "fsdp"])
+        logger.info("Using HSDP mesh [dp_replicate, fsdp] (2D)")
+    else:
+        dp_mesh = parallel_dims.get_mesh("fsdp")
+        logger.info("Using FSDP mesh [fsdp] (1D)")
+
+    edp_mesh = None
+    if parallel_dims.ep_enabled:
+        edp_mesh_names = (
+            ["dp_replicate", "efsdp"]
+            if parallel_dims.dp_replicate_enabled
+            else ["efsdp"]
+        )
+        edp_mesh = parallel_dims.get_mesh(edp_mesh_names)
+    expert_shard_degree = parallel_dims.get_mesh("efsdp").size() if edp_mesh is not None else 1
+
+    # --- Build FSDP config ---
+    reshard_policy = getattr(parallelism, "reshard_after_forward_policy", "default")
+    reshard_after_forward = get_fsdp_reshard_after_forward_policy(
+        reshard_policy, parallel_dims.pp_enabled
+    )
+
+    cpu_offload = getattr(parallelism, "cpu_offload", False)
+    # Always accumulate + reduce gradients in fp32: reduce-scatter / all-reduce run in
+    # fp32 and the reduced gradient is accumulated onto a fp32 ``param.main_grad`` buffer
+    # (Megatron-LM main_grad semantics), keeping ``param.grad`` at None.
+    mp_policy = MixedPrecisionPolicy(
+        reduce_dtype=ms.float32, apply_grad_on_fp32_main_grad=True
+    )
+    fsdp_config = {
+        "mesh": dp_mesh,
+        "offload_policy": CPUOffloadPolicy() if cpu_offload else OffloadPolicy(),
+        "mp_policy": mp_policy,
+        "comm_fusion": False,
+    }
+    efsdp_config = {
+        "mesh": edp_mesh,
+        "offload_policy": CPUOffloadPolicy() if cpu_offload else OffloadPolicy(),
+        "mp_policy": mp_policy,
+        "comm_fusion": False,
+    }
+
+    # --- Optionally limit the FSDP shard degree of dense (non-expert) weights ---
+    # When ``dense_fsdp_shard_size`` is set, ``fsdp_config`` is rebound to a reduced
+    # ``[replicate, shard]`` sub-mesh, so all dense parameters below (embedding,
+    # transformer layers, output layer, and root) shard over that many ranks and
+    # HSDP-replicate over the rest of the DP domain. ``efsdp_config`` (routed
+    # experts) is built above and left untouched. The (world-collective) sub-mesh is
+    # built here once, on every rank, before any wrapping, so process-group creation
+    # stays consistent across pipeline stages.
+    fsdp_config, dense_shard_degree = _resolve_dense_fsdp_config(
+        parallelism, fsdp_config, parallel_dims
+    )
+    if dense_shard_degree != parallel_dims.fsdp:
+        logger.info(
+            "Dense-weight FSDP limited to shard_size=%d (full fsdp domain=%d); "
+            "routed experts keep the full efsdp domain.",
+            dense_shard_degree, parallel_dims.fsdp,
+        )
+
+    embedding = getattr(gpt_model, "embedding", None)
+    layers = list(gpt_model.decoder.layers)
+
+    mtp = getattr(gpt_model, "mtp", None)
+    # Runtime state must stay outside every FSDP wrapper, including the final root
+    # wrapper. Collect it up front so nested wrappers and the root see the same
+    # ignored-parameter identity set.
+    fsdp_ignored_params = set()
+    for layer in layers:
+        fsdp_ignored_params.update(_collect_layer_fsdp_ignored_params(layer))
+    if mtp is not None:
+        for mtp_layer in mtp.layers:
+            fsdp_ignored_params.update(
+                _collect_layer_fsdp_ignored_params(mtp_layer.transformer_layer)
+            )
+    # Sum over every mesh axis the (unsharded) indexer weight is replicated on: the FSDP
+    # domain and, when tp > 1, the TP axis.  The TP axis looks redundant -- the TP-paired
+    # ranks hold bit-identical indexer gradients, because ``_dsa_attention_layer_plan``
+    # all-gathers the indexer's sequence input and the loss's head-bearing inputs so every
+    # TP rank runs the same complete indexer -- but summing it and declaring the result
+    # ``Replicate()`` on the same axis is what makes ``_get_grad_factor`` divide the global
+    # grad norm by the whole domain, counting this weight exactly once.  The two halves are
+    # a pair: dropping only the sum leaves the division behind and the grad norm comes out
+    # a factor sqrt(tp) low (measured against the FSDP-managed path: 2.8e-04 -> 2.9e-01).
+    grad_mesh_dims = list(dp_mesh.mesh_dim_names or ()) if dp_mesh is not None else []
+    if parallel_dims.get_optional_mesh("tp") is not None:
+        grad_mesh_dims.append("tp")
+    grad_mesh = parallel_dims.get_optional_mesh(grad_mesh_dims) if grad_mesh_dims else None
+    tagged = _tag_warmup_indexer_grad_sync(layers, mtp, grad_mesh)
+    if tagged:
+        logger.info(
+            "DSA warm-up per-layer backward: %d indexer parameters kept outside FSDP; "
+            "the trainer clears their gradients each step, and %s.", tagged,
+            f"sums them as Partial on mesh {grad_mesh_dims} before the optimizer step"
+            if grad_mesh is not None and grad_mesh.size() > 1
+            else "no cross-rank sum is needed (the weight is replicated nowhere)",
+        )
+    tail_modules = [
+        m for m in [
+            getattr(gpt_model.decoder, "final_layernorm", None),
+            getattr(gpt_model, "output_layer", None) if not mtp else None,
+        ] if m is not None
+    ]
+
+    if not layers:
+        raise ValueError(f"{type(model).__name__} has no decoder layers")
+
+    # --- 1. Wrap embedding ---
+    if embedding is not None:
+        embed_replicate_params = _collect_module_replicate_params(embedding, dense_shard_degree)
+        embed_ignored_params, embed_replicate_params = _split_fsdp_replicate_params(
+            embedding, embed_replicate_params, fsdp_ignored_params
+        )
+        fsdp_ignored_params.update(embed_ignored_params)
+        with ms.DeviceCtx("meta"):
+            fully_shard(
+                embedding,
+                **fsdp_config,
+                reshard_after_forward=reshard_after_forward,
+                ignored_params=fsdp_ignored_params,
+                replicate_params=embed_replicate_params,
+            )
+
+    # --- 2. Wrap transformer layers ---
+    for layer in layers:
+        # Routed experts use their own EDP mesh and remain a nested FSDP unit.
+        if hasattr(layer.mlp, "experts") and edp_mesh is not None:
+            expert_shard_plan, expert_replicate_params = _build_expert_fsdp_policy(
+                layer.mlp.experts, expert_shard_degree)
+            expert_ignored_params, expert_replicate_params = _split_fsdp_replicate_params(
+                layer.mlp.experts, expert_replicate_params, fsdp_ignored_params
+            )
+            fsdp_ignored_params.update(expert_ignored_params)
+            with ms.DeviceCtx("meta"):
+                fully_shard(
+                    layer.mlp.experts,
+                    **efsdp_config,
+                    shard_placement_fn=expert_shard_plan,
+                    reshard_after_forward=reshard_after_forward,
+                    ignored_params=fsdp_ignored_params,
+                    replicate_params=expert_replicate_params,
+                )
+
+        layer_shard_plan, replicate_params = _build_layer_fsdp_policy(
+            layer, dense_shard_degree
+        )
+        layer_ignored_params, replicate_params = _split_fsdp_replicate_params(
+            layer, replicate_params, fsdp_ignored_params
+        )
+        fsdp_ignored_params.update(layer_ignored_params)
+
+        with ms.DeviceCtx("meta"):
+            fully_shard(
+                layer,
+                **fsdp_config,
+                shard_placement_fn=layer_shard_plan,
+                reshard_after_forward=reshard_after_forward,
+                ignored_params=fsdp_ignored_params,
+                replicate_params=replicate_params,
+            )
+
+    # --- 3. Wrap final_layernorm and output_layer independently ---
+    # Principle: small modules (norms) first, then larger modules (output_layer)
+    if tail_modules:
+        for tail_module in tail_modules:
+            if is_norm_module(tail_module):
+                # Small module: wrap norm independently
+                with ms.DeviceCtx("meta"):
+                    fully_shard(tail_module, **fsdp_config, ignored_params=fsdp_ignored_params)
+            else:
+                # Larger module: output_layer, do not reshard_after_forward by default
+                # since FSDP would prefetch it immediately after the forward pass.
+                tail_replicate_params = _collect_module_replicate_params(
+                    tail_module, dense_shard_degree)
+                tail_ignored_params, tail_replicate_params = _split_fsdp_replicate_params(
+                    tail_module, tail_replicate_params, fsdp_ignored_params
+                )
+                fsdp_ignored_params.update(tail_ignored_params)
+                with ms.DeviceCtx("meta"):
+                    fully_shard(
+                        tail_module,
+                        **fsdp_config,
+                        reshard_after_forward=reshard_policy == "always",
+                        ignored_params=fsdp_ignored_params,
+                        replicate_params=tail_replicate_params,
+                    )
+
+    if mtp:
+        for layer in mtp.layers:
+            # Expert FSDP (same as main decoder layers)
+            if hasattr(layer.transformer_layer.mlp, "experts") and edp_mesh is not None:
+                expert_shard_plan, expert_replicate_params = _build_expert_fsdp_policy(
+                    layer.transformer_layer.mlp.experts, expert_shard_degree)
+                expert_ignored_params, expert_replicate_params = _split_fsdp_replicate_params(
+                    layer.transformer_layer.mlp.experts,
+                    expert_replicate_params,
+                    fsdp_ignored_params,
+                )
+                fsdp_ignored_params.update(expert_ignored_params)
+                with ms.DeviceCtx("meta"):
+                    fully_shard(
+                        layer.transformer_layer.mlp.experts, **efsdp_config,
+                        shard_placement_fn=expert_shard_plan,
+                        reshard_after_forward=reshard_after_forward,
+                        ignored_params=fsdp_ignored_params,
+                        replicate_params=expert_replicate_params,
+                    )
+
+            layer_shard_plan, mtp_replicate_params = _build_mtp_fsdp_policy(
+                layer, dense_shard_degree
+            )
+            mtp_ignored_params, mtp_replicate_params = _split_fsdp_replicate_params(
+                layer, mtp_replicate_params, fsdp_ignored_params
+            )
+            fsdp_ignored_params.update(mtp_ignored_params)
+
+            with ms.DeviceCtx("meta"):
+                fully_shard(
+                    layer,
+                    **fsdp_config,
+                    shard_placement_fn=layer_shard_plan,
+                    reshard_after_forward=reshard_after_forward,
+                    ignored_params=fsdp_ignored_params,
+                    replicate_params=mtp_replicate_params,
+                )
+    # --- 4. Wrap root-owned state, including the decoder mHC head ---
+    root_shard_plan, root_replicate_params = _build_hc_head_fsdp_policy(
+        getattr(gpt_model.decoder, "hc_head", None), dense_shard_degree
+    )
+    root_ignored_params, root_replicate_params = _split_fsdp_replicate_params(
+        model, root_replicate_params, fsdp_ignored_params
+    )
+    fsdp_ignored_params.update(root_ignored_params)
+    with ms.DeviceCtx("meta"):
+        fully_shard(
+            model,
+            **fsdp_config,
+            shard_placement_fn=root_shard_plan,
+            ignored_params=fsdp_ignored_params,
+            replicate_params=root_replicate_params,
+        )
+
+    # --- 5. Disable gradient division ---
+    if getattr(parallelism, "disable_gradient_division", True):
+        disable_fsdp_gradient_division(model)
+
+    # --- 6. Prefetch chains ---
+    # Extend the prefetch chain with MTP layers so their FSDP all-gathers overlap
+    # with the preceding layer's forward/backward compute.
+    if mtp:
+        if tail_modules:
+            layers.extend(tail_modules)
+        for mtp_layer in mtp.layers:
+            layers.append(mtp_layer)
+        _setup_gpt_prefetch(embedding, layers, [])
+    else:
+        _setup_gpt_prefetch(embedding, layers, tail_modules)
+
+    if parallel_dims.dp_replicate_enabled:
+        logger.info("Successfully applied HSDP (Hybrid Sharded Data Parallel)")
+    else:
+        logger.info("Successfully applied FSDP (Fully Sharded Data Parallel)")
+
+
+def _uses_dsa_cp_kernel(gpt_model):
+    """Return whether any decoder or MTP block contains a real DSA CP kernel."""
+    decoder = getattr(gpt_model, "decoder", None)
+    blocks = list(getattr(decoder, "layers", ()) or ())
+    mtp = getattr(gpt_model, "mtp", None)
+    blocks.extend(list(getattr(mtp, "layers", ()) or ()))
+    return any(
+        isinstance(cell, DSAttention)
+        for block in blocks
+        for _, cell in block.cells_and_names()
+    )
+
+
+def _uses_ulysses_head_sharding(gpt_model):
+    """Return whether CP will split attention heads on a generic/DSA boundary.
+
+    CSA owns its complete CP schedule in ``DSv4HybridAttentionContextParallel``
+    and does not use the generic sequence-to-head all-to-all.  Excluding CSA
+    here prevents a generic Ulysses head-divisibility check from rejecting a
+    model whose CSA wrapper never performs that split.
+    """
+    decoder = getattr(gpt_model, "decoder", None)
+    blocks = list(getattr(decoder, "layers", ()) or ())
+    mtp = getattr(gpt_model, "mtp", None)
+    blocks.extend(list(getattr(mtp, "layers", ()) or ()))
+    return any(
+        name.endswith("core_attention") and not isinstance(cell, CompressedSparseAttention)
+        for block in blocks
+        for name, cell in block.cells_and_names()
+    )
+
+
+def apply_context_parallel_attention(
+    model: nn.Cell,
+    cp_mesh: DeviceMesh,
+    parallel_dims: Any,
+    parallelism: Any,
+) -> None:
+    """Apply Hyper-Parallel context parallel hooks to GPT attention modules."""
+    cp_size = parallel_dims.cp
+    gpt_model = _unwrap_gptmodel(model)
+    model_config = getattr(gpt_model, "config", None)
+
+    method = getattr(model_config, "_mf_runtime_context_parallel_method", None)
+    if method is None:
+        method = getattr(parallelism, "context_parallel_method", "colossal")
+    method = method.lower()
+
+    async_enabled = bool(getattr(parallelism, "context_parallel_async", False))
+    if model_config is not None:
+        async_enabled = bool(getattr(model_config, "_mf_runtime_context_parallel_async", async_enabled))
+    input_layout = getattr(model_config, "input_layout", None) if model_config is not None else None
+    decoder = getattr(gpt_model, "decoder", None)
+    decoder_layers = getattr(decoder, "layers", None)
+    if decoder_layers is None:
+        raise ValueError("Unable to locate GPT decoder layers for context parallel application.")
+    uses_dsa_cp_kernel = _uses_dsa_cp_kernel(gpt_model)
+    uses_ulysses_head_sharding = _uses_ulysses_head_sharding(gpt_model)
+    if async_enabled and method == "colossal" and not uses_dsa_cp_kernel:
+        raise NotImplementedError(
+            "Async context parallel currently supports 'ulysses' and 'hybrid' only. "
+            "Use context_parallel_async=false for colossal CP."
+        )
+
+    requested_ulysses_degree = (
+        getattr(model_config, "_mf_runtime_ulysses_degree_in_cp", None)
+        if model_config is not None else None
+    )
+    if requested_ulysses_degree is None:
+        requested_ulysses_degree = getattr(parallelism, "ulysses_degree_in_cp", None)
+
+    if method == "colossal":
+        ulysses_degree = 1
+    elif method == "ulysses":
+        ulysses_degree = cp_size if requested_ulysses_degree is None else requested_ulysses_degree
+    else:
+        ulysses_degree = requested_ulysses_degree
+
+    if model_config is not None:
+        setattr(model_config, "_mf_runtime_context_parallel_method", method)
+        setattr(model_config, "_mf_runtime_context_parallel_async", async_enabled)
+        setattr(model_config, "_mf_runtime_ulysses_degree_in_cp", ulysses_degree)
+        setattr(model_config, "_mf_runtime_cp_rank_list", tuple(cp_mesh.rank_list))
+        rotary_pos_emb = getattr(gpt_model, "rotary_pos_emb", None)
+        if rotary_pos_emb is not None and hasattr(rotary_pos_emb, "use_rotary_position_ids"):
+            gpt_model.set_use_rotary_position_ids(True)
+            # Context parallel forces explicit position_ids, so the rotary cos/sin carries a
+            # per-batch dimension. The fused interleaved RoPE op (apply_rope_fusion) does not
+            # support non-broadcast batch>1 cos/sin and fails in tiling. What matters is the
+            # micro-batch size, which is only known per call: ``GPTModel.construct`` rejects
+            # ``position_ids.shape[0] > 1`` there. Rejecting every non-TND CP run up front also
+            # blocked micro-batch 1 -- the usual long-sequence setup -- whose cos/sin is batch 1
+            # and broadcastable exactly like the TND case.
+        if method in ("ulysses", "hybrid") and uses_ulysses_head_sharding:
+            # Ulysses (and hybrid's inner Ulysses group) splits the local
+            # per-TP-rank heads. Validate that count rather than the global head
+            # count so an invalid TP x CP layout fails during setup instead of in FA.
+            num_heads = getattr(model_config, "num_attention_heads", None)
+            tp_size = max(int(getattr(parallel_dims, "tp", 1)), 1)
+            if num_heads is not None and ulysses_degree:
+                if num_heads % tp_size != 0:
+                    raise ValueError(
+                        f"num_attention_heads ({num_heads}) must be divisible by "
+                        f"tensor_parallel ({tp_size})."
+                    )
+                heads_per_rank = num_heads // tp_size
+                if heads_per_rank % ulysses_degree != 0:
+                    raise ValueError(
+                        f"{method.capitalize()} CP requires per-TP-rank attention heads "
+                        f"(num_attention_heads // tensor_parallel = {num_heads} // {tp_size} "
+                        f"= {heads_per_rank}) to be divisible by ulysses_degree "
+                        f"({ulysses_degree})."
+                    )
+
+    generic_cp_style = build_context_parallel_attention_style(
+        method=method,
+        cp_size=cp_size,
+        ulysses_degree_in_cp=ulysses_degree,
+        input_layout=input_layout,
+        async_enabled=async_enabled,
+        attention_variant=None,
+        dsa_use_sparse_loss=getattr(model_config, "dsa_indexer_use_sparse_loss", True),
+    )
+    dsa_cp_style = None
+    if uses_dsa_cp_kernel:
+        dsa_cp_style = build_context_parallel_attention_style(
+            method=method,
+            cp_size=cp_size,
+            ulysses_degree_in_cp=ulysses_degree,
+            input_layout=input_layout,
+            async_enabled=async_enabled,
+            attention_variant="dsa",
+            dsa_use_sparse_loss=getattr(model_config, "dsa_indexer_use_sparse_loss", True),
+        )
+
+    def _find_one_module(transformer_block, block_label, suffix):
+        matches = [
+            (name, cell) for name, cell in transformer_block.cells_and_names()
+            if "self_attention" in name and name.endswith(suffix)
+        ]
+        if len(matches) != 1:
+            raise ValueError(
+                f"Expected one self_attention {suffix} in {block_label}, "
+                f"but got {[name for name, _ in matches]}."
+            )
+        return matches[0]
+
+    def _apply_cp_to_block(transformer_block, block_label):
+        cp_module_path, cp_module = _find_one_module(transformer_block, block_label, "core_attention")
+        if isinstance(cp_module, CompressedSparseAttention):
+            attention_path, attention_module = _find_one_module(transformer_block, block_label, "self_attention")
+            DSv4HybridAttentionContextParallel(cp_mesh)._apply(attention_module, cp_mesh)
+            logger.info(
+                "Applied CSA context parallel to %s.%s through %s",
+                block_label,
+                cp_module_path,
+                attention_path,
+            )
+            return
+
+        is_dsa_core = isinstance(cp_module, DSAttention)
+        selected_cp_style = dsa_cp_style if is_dsa_core else generic_cp_style
+        if async_enabled:
+            attention_path, attention_module = _find_one_module(transformer_block, block_label, "self_attention")
+            selected_cp_style.apply_to_attention(attention_module, cp_mesh)
+            logger.info(
+                "Applied async context parallel to %s.%s through %s handoff boundaries",
+                block_label,
+                cp_module_path,
+                attention_path,
+            )
+            return
+
+        selected_cp_style._apply(cp_module, cp_mesh)
+        logger.info("Applied context parallel to %s.%s", block_label, cp_module_path)
+
+    for layer_idx, transformer_block in enumerate(decoder_layers):
+        _apply_cp_to_block(transformer_block, f"decoder.layers.{layer_idx}")
+
+    mtp = getattr(gpt_model, "mtp", None)
+    if mtp:
+        for layer_idx, mtp_layer in enumerate(mtp.layers):
+            _apply_cp_to_block(mtp_layer, f"mtp.layers.{layer_idx}")
+
+def _setup_moe_aux_loss_group(model, parallel_dims):
+    """Attach TP/CP reduction groups to every sequence-sharded MoE router.
+
+    This function equips each MoE router with the process group used to
+    all-reduce ``tokens_per_expert`` before the aux loss is computed.
+
+    TP sequence parallelism and CP both shard the router token view. Their
+    per-axis groups recover global token statistics without gathering router
+    activations. DP remains excluded because it owns independent samples.
+    """
+    if parallel_dims is None:
+        return
+
+    aux_groups: list = []
+    aux_group_size = 1
+    tp_mesh = parallel_dims.get_optional_mesh("tp")
+    tp_group = None
+    tp_size = 1
+    if tp_mesh is not None:
+        tp_group = tp_mesh.get_group()
+        tp_size = tp_mesh.size()
+        aux_groups.append(tp_group)
+        aux_group_size *= tp_size
+    cp_mesh = parallel_dims.get_optional_mesh("cp")
+    cp_groups = []
+    cp_size = 1
+    if cp_mesh is not None:
+        cp_groups.append(cp_mesh.get_group())
+        cp_size = cp_mesh.size()
+        aux_groups.extend(cp_groups)
+        aux_group_size *= cp_size
+
+    gpt_model = _unwrap_gptmodel(model)
+    moe_routers = []
+    for _, cell in gpt_model.cells_and_names():
+        router = getattr(cell, "router", None)
+        # Identify TopKRouters by their ``aux_loss_group`` attribute, without
+        # importing the moe package (keeps this helper decoupled).
+        if router is not None and hasattr(router, "moe_aux_loss_coeff"):
+            moe_routers.append(router)
+
+    mtp = getattr(gpt_model, "mtp", None)
+    if mtp is not None:
+        for _, cell in mtp.cells_and_names():
+            router = getattr(cell, "router", None)
+            if router is not None and hasattr(router, "moe_aux_loss_coeff"):
+                moe_routers.append(router)
+
+    if not moe_routers:
+        return
+
+    # Set global communication domain variables in moe_utils so both the
+    # router forward pass (``get_tokens_per_expert_and_token_count``) and
+    # the step-end aggregation (``track_moe_metrics``) share the same TP/CP
+    # reduction group without per-router attribute plumbing.
+    set_moe_aux_loss_group_info(aux_groups, aux_group_size)
+    for router in moe_routers:
+        router.enable_sequence_parallel(tp_group, tp_size, cp_groups, cp_size)
+
+    logger.info(
+        "[MoE-AuxLossGroup] set global TP/CP aux_loss groups "
+        "(size=%d, ) for %d MoE router(s).",
+        aux_group_size, len(moe_routers),
+    )
+
+
+def _setup_qk_clip_reduce_group(model, parallel_dims):
+    """Scope QK-clip max-logit synchronization to the dp x cp loss mesh."""
+    if parallel_dims is None:
+        return
+
+    gpt_model = _unwrap_gptmodel(model)
+    if not hasattr(gpt_model, "set_qk_clip_reduce_group"):
+        return
+
+    # dp x cp is the only group the feature needs; the apply path is purely local.
+    mesh = parallel_dims.get_optional_mesh("loss")
+    size = mesh.size() if mesh is not None else 1
+    gpt_model.set_qk_clip_reduce_group(mesh.get_group() if size > 1 else None, size)
+    logger.info("[QK-Clip] configured loss-mesh reduce group (size=%d).", size)
+
+
+def _apply_spmd_parallelism(
+        model: nn.Cell,
+        parallel_dims: Any,
+        parallelism: Any,
+        recompute: Any,
+        recompute_comm: Any,
+        swap: Any,
+        overlap=None,
+) -> nn.Cell:
+    """Unified GPTModel parallelization entry point.
+
+    Args:
+        overlap: Optional
+            :class:`~hyper_parallel.core.pipeline_parallel.comm_compute_overlap.CommComputeOverlap`
+            instance.  When provided (and ``ep_enabled`` is ``True`` with
+            ``moe_token_dispatcher_type='alltoall'``), replaces the plain
+            :class:`ExpertParallel` strategy with
+            :class:`OverlapExpertParallel` and registers
+            ``CHUNK_START``/``CHUNK_END`` hooks on the model.
+    """
+    logger.info("Starting GPTModel parallelization for MCore architecture...")
+
+    # Phase 1: TP
+    tp_mesh = None
+    if parallel_dims.tp_enabled:
+        tp_mesh = parallel_dims.get_mesh("tp")
+        with ms.DeviceCtx("meta"):
+            apply_non_moe_tp(
+                model,
+                tp_mesh=tp_mesh,
+                enable_ep=parallel_dims.ep_enabled,
+                enable_mc2=getattr(parallelism, "enable_mc2", False),
+            )
+
+    # Phase 2: EP
+    if parallel_dims.ep_enabled:
+        ep_mesh = parallel_dims.get_mesh("ep")
+        use_safe_tokens = getattr(parallelism, "expert_parallel_use_safe_tokens", True)
+        if overlap is not None and parallelism.moe_token_dispatcher_type == "alltoall":
+            # Overlap path: OverlapExpertParallel + CHUNK_START/END hooks.
+            # apply_moe_ep_overlap_tp wraps its own weight sharding in
+            # ms.DeviceCtx("meta") internally and registers hooks outside it.
+            apply_moe_ep_overlap_tp(
+                model,
+                overlap=overlap,
+                tp_mesh=tp_mesh,
+                ep_mesh=ep_mesh,
+                moe_token_dispatcher_type=parallelism.moe_token_dispatcher_type,
+                expert_async_d2h=getattr(parallelism, "expert_parallel_async_d2h", False),
+                use_safe_tokens=use_safe_tokens,
+            )
+        else:
+            with ms.DeviceCtx("meta"):
+                apply_moe_ep_tp(
+                    model,
+                    tp_mesh=tp_mesh,
+                    ep_mesh=ep_mesh,
+                    moe_token_dispatcher_type=parallelism.moe_token_dispatcher_type,
+                    npu_nums_per_device=parallelism.npu_nums_per_device,
+                    expert_async_d2h=getattr(parallelism, "expert_parallel_async_d2h", False),
+                    use_safe_tokens=use_safe_tokens,
+                )
+
+    # Phase 3: CP
+    if parallel_dims.cp_enabled:
+        apply_context_parallel_attention(
+            model=model,
+            cp_mesh=parallel_dims.get_mesh("cp"),
+            parallel_dims=parallel_dims,
+            parallelism=parallelism,
+        )
+
+    # Phase 4: AC
+    gptmodel = _unwrap_gptmodel(model)
+    if recompute.mode != "None" or recompute_comm.enable or swap.enable:
+        apply_ac(
+            gptmodel.decoder,
+            recompute,
+            recompute_comm,
+            swap,
+            parallelism.pipeline_parallel,
+            mtp_block=getattr(gptmodel, "mtp", None),
+        )
+
+    # Phase 5: FSDP/HSDP
+    apply_fsdp(
+        model,
+        parallel_dims,
+        parallelism,
+    )
+    _tag_dsv4_tp_replicated_grad_norm_params(model)
+
+    for param_name, param in model.parameters_and_names():
+        if isinstance(param, DTensor):
+            logger.debug(param_name, param.layout, param.placements)
+        else:
+            logger.debug(f"{param_name} is not DTensor, shape is {param.shape}")
+
+    # Phase 6: CP root I/O hooks. Apply after FSDP so the hooks live on the final
+    # model boundary called by trainer.
+    if parallel_dims.cp_enabled:
+        gptmodel = _unwrap_gptmodel(model)
+        apply_context_parallel_model_io(
+            model,
+            parallel_dims,
+            parallelism,
+            gptmodel.config,
+            uses_dsa_cp_kernel=_uses_dsa_cp_kernel(gptmodel),
+        )
+
+    # Configure this even when DP and CP are both size one. Pure PP must skip
+    # the collective instead of falling back to a world-group all-reduce.
+    _setup_qk_clip_reduce_group(model, parallel_dims)
+
+    # Tag every MoE router with the dp x cp group so the seq_aux_loss /
+    # global_aux_loss can all-reduce tokens_per_expert and aggregated probs
+    # before applying the Switch formula.
+    _setup_moe_aux_loss_group(model, parallel_dims)
+
+    logger.info("GPTModel parallelization completed.")
+    return model
+
+
+def _make_overlap_b_f_callback(overlap):
+    """Build the OVERLAP_B_F schedule callback for PP+EP comm/compute overlap.
+
+    The callback drives :meth:`CommComputeOverlap.run` with the forward and
+    backward closures for a paired ``OVERLAP_B_F`` schedule step.  It mirrors
+    the PoC's ``_make_overlap_b_f_callback`` for the mindformers trainer.
+
+    MindSpore PyNative notes:
+    - ``_pynative_executor.set_enable_grad(True)`` must be called explicitly
+      on the daemon BWD thread because the grad-enable flag is thread-local
+      and the daemon does not inherit the main thread's enabled state.
+    - MindSpore's current device is process-wide (not thread-local like
+      PyTorch), so the BWD thread inherits the correct device automatically.
+    - After ``backward_one_chunk``, one explicit
+      ``coordinator.rendezvous(HookRole.COMPUTE)`` is called out-of-band to
+      pair with ``CHUNK_END.fwd`` because MS autograd may skip
+      ``CHUNK_START.bwd`` when the chunk input lacks ``requires_grad``.
+    """
+
+    def _callback(step, ctx):
+        from mindspore.common.api import _pynative_executor  # pylint: disable=C0415
+        from hyper_parallel.core.pipeline_parallel.hook_coordinator import HookRole  # pylint: disable=C0415
+
+        bwd_step, fwd_step = step.sub_steps
+        schedule = ctx.schedule
+        fwd_stage = schedule._stage_dict[fwd_step.stage_index]  # pylint: disable=W0212
+        bwd_stage = schedule._stage_dict[bwd_step.stage_index]  # pylint: disable=W0212
+        fwd_mi, bwd_mi = fwd_step.micro_index, bwd_step.micro_index
+
+        def fwd_fn():
+            # CHUNK_START equivalent, at callback level so the bracket covers
+            # the WHOLE chunk record — including preprocess/embedding/rotary
+            # (entry) and lm-head/loss (exit), which live outside the decoder.
+            # MS PyNative does not support concurrent FWD-record + BWD-replay;
+            # decoder-level Cell hooks left those segments recording while the
+            # BWD thread replayed loss.bwd / lm-head.bwd (its pre-D_LAST tail),
+            # corrupting memory and grads. Pairing is unchanged: this COMPUTE
+            # rendezvous pairs with D_LAST.bwd, parking FWD until the BWD
+            # thread has passed its first hook.
+            if overlap.coordinator.is_enabled():
+                overlap.coordinator.rendezvous(HookRole.COMPUTE)
+            # wait_fwd_recv pops the cached recv handle (overlap_p2p) and waits;
+            # no-op when nothing is cached. fwd_handle_cache is touched only by
+            # the main thread here, bwd_handle_cache only by the daemon below.
+            schedule.wait_fwd_recv(fwd_stage.stage_index, fwd_mi)
+            out = fwd_stage.forward_one_chunk(
+                fwd_mi, ctx.arg_mbs[fwd_mi], ctx.kwarg_mbs[fwd_mi],
+            )
+            schedule.update_losses(fwd_stage, out, ctx.losses)
+            # CHUNK_END equivalent: release the C_last comm event, then pair
+            # with the bwd_fn out-of-band rendezvous below.
+            if overlap.coordinator.is_enabled():
+                overlap.coordinator.notify_dispatched(HookRole.COMM)
+                overlap.coordinator.rendezvous(HookRole.COMPUTE)
+
+        def bwd_fn():
+            # MS PyNative grad-enable is thread-local; enable explicitly on
+            # the daemon BWD thread so value_and_grad does not raise.
+            _pynative_executor.set_enable_grad(True)
+            schedule.wait_bwd_recv(bwd_stage.stage_index, bwd_mi)
+            bwd_stage.backward_one_chunk(bwd_mi)
+            # Pair-8 BWD partner taken out-of-band: MS autograd may skip
+            # CHUNK_START.bwd when the chunk input has no requires_grad.
+            # One explicit rendezvous(COMPUTE) here matches CHUNK_END.fwd.
+            if overlap.coordinator.is_enabled():
+                overlap.coordinator.rendezvous(HookRole.COMPUTE)
+
+        # Activation-recompute compatibility: fire the BWD chunk's forward
+        # re-run serially on THIS (main) thread, BEFORE overlap.run enables the
+        # coordinator and spawns the BWD daemon. Two reasons it must be here:
+        #   1. The coordinator is still disabled, so the re-run's A/B/C/D sync
+        #      hooks are no-ops (the is_enabled() gate) — no stray rendezvous to
+        #      desync the protocol.
+        #   2. backward_one_chunk then reuses the cached recomputed activations
+        #      instead of re-running the forward on the daemon thread, which
+        #      would be concurrent FWD-record + BWD-replay (unsupported by MS
+        #      PyNative) and would re-fire the hooks, deadlocking the coordinator.
+        # No-op when the chunk has no checkpoint_wrapper'd blocks (recompute
+        # off). Mirrors the reference PoC's recompute path.
+        bwd_stage.recompute_one_chunk(bwd_mi)
+
+        # Diagnostic: EP_OVERLAP_SEQ=1 runs bwd then fwd sequentially on the main
+        # thread WITHOUT enabling the coordinator (all A/B/C/D/CHUNK sync hooks
+        # stay passthrough). This isolates the OverlapExpertParallel dispatch/
+        # combine math from the dual-thread synchronization: if grads match the
+        # baseline here, the math is correct and the bug is in the threading.
+        if os.environ.get("EP_OVERLAP_SEQ") == "1":
+            # Diagnostic isolation: run bwd then fwd sequentially with the
+            # coordinator disabled (sync hooks passthrough). Validates the
+            # OverlapExpertParallel dispatch/combine math without dual-threading.
+            bwd_fn()
+            fwd_fn()
+        else:
+            overlap.run(fwd_fn=fwd_fn, bwd_fn=bwd_fn)
+
+    return _callback
+
+
+def apply_pp(
+        model,
+        pp_mesh,
+        parallel_dims,
+        parallelism,
+        recompute,
+        recompute_comm,
+        swap,
+        gradient_accumulation_steps: int = 1,
+        forward_only: bool = False,
+):
+    """Apply pipeline parallelism to the GPTModel.
+
+    When ``parallelism.pipeline_parallel_overlap_b_f`` is ``True`` and
+    ``parallel_dims.ep_enabled`` is ``True`` with
+    ``moe_token_dispatcher_type='alltoall'``, creates a single
+    :class:`~hyper_parallel.core.pipeline_parallel.comm_compute_overlap.CommComputeOverlap`
+    orchestrator per rank, passes it to :func:`_apply_spmd_parallelism` so
+    :func:`apply_moe_ep_overlap_tp` installs :class:`OverlapExpertParallel` on
+    every MoE layer, and registers it on the schedule for the
+    ``OVERLAP_B_F`` callback.
+
+    ``forward_only=True`` builds stages with ``has_backward=False`` --
+    the inference path, where backward chunks become no-ops.
+    """
+    layer_setting = PpLayerSetting(model.config.num_hidden_layers, parallelism)
+
+    model_cls = type(model)
+    builder = StageModelBuilder(layer_setting)
+    # tp_mesh lets each stage resolve the rank group for TP/SP-sharded activations
+    # crossing the PP boundary (the pp_mesh's flat world root can't resolve "tp").
+    tp_mesh = parallel_dims.get_optional_mesh("tp")
+    stages, model_parts = builder.build_stages(
+        model_cls, model.config, pp_mesh, tp_mesh,
+        has_backward=not forward_only, dyn_shape=forward_only
+    )
+    # Detect MoE from the complete model before PP replaces it with rank-local
+    # stage models, so every PP rank builds the schedule with the same setting.
+    has_moe = any(
+        hasattr(layer.mlp, "experts") for layer in model.model.decoder.layers
+    )
+    # PP rebuilds fresh per-stage models from config, discarding any LoRA injected into
+    # the original model. Re-inject into each stage on meta device BEFORE SPMD parallelism
+    # so the adapters pick up TP/FSDP layouts. strict=False: an embedding-only stage may
+    # hold no target layer; the "no adapters anywhere" guard is in the Trainer.
+    lora_cfg = getattr(model.config, "_mf_lora_config", None)
+    del model
+    if lora_cfg is not None:
+        for part in model_parts:
+            build_lora_model(part, lora_cfg, strict=False)
+
+    # Create one CommComputeOverlap orchestrator per rank when B/F EP overlap
+    # is requested.  One orchestrator is shared across ALL chunks on this rank
+    # so that the coordinator's barrier/event state is consistent across the
+    # interleaved chunk sequence.
+    use_ep_overlap = (
+        getattr(parallelism, "pipeline_parallel_overlap_b_f", False)
+        and parallel_dims.ep_enabled
+        and getattr(parallelism, "moe_token_dispatcher_type", "alltoall") == "alltoall"
+    )
+    overlap = None
+    if use_ep_overlap:
+        from hyper_parallel.core.pipeline_parallel.comm_compute_overlap import CommComputeOverlap  # pylint: disable=C0415
+        overlap = CommComputeOverlap()
+        logger.info("PP+EP overlap enabled: created CommComputeOverlap orchestrator")
+
+    for part in model_parts:
+        _apply_spmd_parallelism(
+            part,
+            parallel_dims,
+            parallelism,
+            recompute,
+            recompute_comm,
+            swap,
+            overlap=overlap,
+        )
+
+    # Tag the MTP-shared input embedding so its gradient is summed across the
+    # embedding-owning PP stages before the optimizer step (handled in the
+    # grad-norm helper), keeping the embedding identical to the single-card run.
+    # Run ONCE over all chunks this rank owns (not per-chunk inside
+    # _apply_spmd_parallelism): under interleaving the main and MTP embeddings
+    # live in different chunks/stages, so ownership must be aggregated across
+    # the whole rank for the cross-PP-stage sync group to form.
+    _setup_mtp_embedding_grad_sync(model_parts, parallel_dims)
+
+    # Adjust the last-stage loss backward scaling so PP gradients match the single-card case.
+    # DTensor repeat compensation is handled by ScaledLossPipelineStage from the actual output layout.
+    # MoE/MTP losses are scaled separately by their own auto-scalers and are not affected here.
+    # With calculate_per_token_loss the micro-batches' token-loss sums are accumulated, not
+    # averaged -- the single division by the global token count happens in the trainer -- so
+    # the 1/grad_accum factor must be left out of the last-stage seed.
+    main_loss_sense = get_loss_sense(
+        parallelism=parallelism,
+        enable_parallel=True,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        apply_gradient_accumulation=not getattr(
+            _unwrap_gptmodel(model_parts[0]).get_gpt_transformer_config(),
+            "calculate_per_token_loss", False),
+        )
+    loss_scale = float(main_loss_sense.asnumpy().item())
+    for stage in stages:
+        stage.loss_scale = loss_scale
+
+    micro_batch_num = parallelism.pipeline_parallel_microbatch_size
+    schedule_type = _infer_schedule_type(parallelism)
+    schedule = _create_schedule(schedule_type, stages, micro_batch_num, parallelism, swap=swap.enable, has_moe=has_moe)
+    logger.info(f"Pipeline schedule: {schedule_type}, exec_order: {schedule.exec_order}")
+
+    # Register the OVERLAP_B_F callback when EP overlap is active.
+    if use_ep_overlap and overlap is not None:
+        from hyper_parallel.core.pipeline_parallel.scheduler import MetaStepType  # pylint: disable=C0415
+        schedule.register_custom_function(
+            MetaStepType.OVERLAP_B_F,
+            _make_overlap_b_f_callback(overlap),
+        )
+        logger.info("Registered OVERLAP_B_F callback on schedule")
+
+    has_first = any(s.stage_index == 0 for s in stages)
+    has_last = any(s.stage_index == layer_setting.num_virtual_stages - 1 for s in stages)
+
+    return model_parts, schedule, has_first, has_last
+
+# ---------------------------------------------------------------------------
+# GPT parallelization entry point
+# ---------------------------------------------------------------------------
+
+def parallelize_gptmodel(
+        model: nn.Cell,
+        parallel_dims: Any,
+        parallelism: Any,
+        recompute: Any,
+        recompute_comm: Any,
+        swap: Any,
+        gradient_accumulation_steps: int = 1,
+        forward_only: bool = False,
+) -> List[nn.Cell]:
+    """Apply pipeline parallelism to the GPTModel."""
+
+    if parallel_dims.pp_enabled:
+        pp_mesh = parallel_dims.get_mesh("pp")
+        return apply_pp(
+            model,
+            pp_mesh=pp_mesh,
+            parallel_dims=parallel_dims,
+            parallelism=parallelism,
+            recompute=recompute,
+            recompute_comm=recompute_comm,
+            swap=swap,
+            gradient_accumulation_steps=gradient_accumulation_steps,
+            forward_only=forward_only,
+        )
+
+    _apply_spmd_parallelism(model, parallel_dims, parallelism, recompute, recompute_comm, swap)
+
+    return [model], None, False, False

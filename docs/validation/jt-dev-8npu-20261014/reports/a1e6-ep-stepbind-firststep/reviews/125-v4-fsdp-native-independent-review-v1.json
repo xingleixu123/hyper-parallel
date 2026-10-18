@@ -1,0 +1,84 @@
+{
+  "schema": "explicit-public-independent-review-extract-v1",
+  "original_review_sha256": "8e6438262123cf159839fff5d9a96adbe3a532b8812feadbd9f0ceb51e948082",
+  "original_review_bytes": 161945,
+  "original_raw_retained_privately": true,
+  "transformation": "Selected scientific conclusions/integrity/scope; private operator paths,fullCID,harness and control records omitted. This is not the original raw review.",
+  "review": {
+    "schema": "ep-stepbind-v4-125-fsdp-singlearm-independent-review-v1",
+    "role": "INDEPENDENT_SCIENTIFIC_REVIEW; not the capture operator or raw evidence author",
+    "created_utc": "2026-10-18 15:01:04 UTC",
+    "status": "PASS_FULL31_SELECTED_NATIVE_AND_EXACT_CROSS_HOST3_PREFIX_ONLY",
+    "case": "r125-a1e6-ep-stepbind-fsdp8-3-v1",
+    "findings": [],
+    "conclusion_zh": "125 新 FSDP 三步的原生首步记录满足冻结 v4 的 D/E0/Q0 全31角色合同；独立重建完整逻辑覆盖并逐slab重读SHA和全元素有限性通过。对129同源baseline200与continuous400的前3步，8rank六日志标量、输入、四计数、完整CPU初态及runtime均严格0差。此结论只有跨机三步与所选原生窗口范围，125自己的无observer对照和完整200步尚未由本证据提供。",
+    "independent_physical_view_check": {
+      "status": "PASS_ALL_NATIVE_PHYSICAL_VIEWS",
+      "value_metadata_rows": 248,
+      "nonzero_storage_offset_rows": 0,
+      "max_storage_offset_elements": 0,
+      "all_device_npu_local_rank_and_FP32": true,
+      "all_storage_pointer_bounds_valid": true
+    },
+    "reviewed_actual_native_scope": {
+      "D": "model.layers.0.input_layernorm.weight; full5120-vector across8 proven FSDP shards,12 roles",
+      "E": "model.layers.1.mlp.experts.down_proj; global expert0 only,5120x1536 full selected matrix,9 roles",
+      "Q": "model.layers.0.self_attn.q_b_proj.weight; global first192 rows x1536,10 roles",
+      "owner_coverage": "Metadata proves logical owners0..7 once per target; this does not mean native values for all8 experts were recorded.",
+      "role_values": "31 roles,860 logical slab references,73,789,440 FP32 values including repeated stage references; every finite and SHA verified.",
+      "physical_data": "130,658,304 stored native bytes after content dedup; unique referenced intervals exactly cover all8 physical blobs without gaps or overlap.",
+      "independent_mapping": "FSDP mesh names/shape/ranks/coordinate, actual placements/global and local shapes/current HSDP owner were independently reconstructed from raw value_metadata, not inferred by physical rank pairing.",
+      "actual_storage": "All248 value_metadata views independently verified actual npu:<localrank>,FP32, storage-pointer/offset/stride bounds; no CPU fixture branch.",
+      "G0_semantics": "Actual FSDP all-grad and original norm inputs alias the same local object; no Partial reduction/flat temporary in this arm. Coalescer is observed once, not newly executed.",
+      "actual_consumer": "Selected D actual AdamW consumer and E/Q actual Muon caller462 with fixed owned-record and installed LRScheduler source binding precede each G3. No consumer_unproven.",
+      "lifecycle": "8rank steps3; each B0/G0/N2/G1/G2/U0/U1/U2 once;46 trainable-parameter norms cover inventory; router R0/R1/R2 and QK boundaries present; wrappers_remaining0.",
+      "state_limit": "G2 missing-state records are expected before first update. G2/U2 state_metadata_only records are not optimizer state bytes. Only explicitly recorded G3/U0 states are full selected native values."
+    },
+    "transparency_boundary": {
+      "compared_reference_cases": [
+        "r129-a1e6-fsdp8-0-200-v3",
+        "r129-a1e6-fsdp8-continuous400-v2"
+      ],
+      "per_reference": "3 steps x8rank=24 rows;6 metrics144 pairs,4 counters96 pairs,24 global input identities;8runtime pairs;16 CPU initial files comprising384 corresponding state entries.",
+      "CPU_initial": "Complete48-entry CPU state_dict hashes per rank after JT initializer, before TP/FSDP/NPU conversion; not proof of all actual materialized NPU parameter bytes.",
+      "numeric_logs": "total loss,main LM,weighted MTP,weighted aux,gradient norm andLR are exact0-difference in both3-step comparisons. These allrank logger copies are not8 independent statistical observations.",
+      "input": "Full recorded canonical global SHA identities and rank_count8/micro_steps1 match; no raw data tokens are exposed by this review.",
+      "recipe": "Resolved numerical recipe matches each reference except explicit train_iters3/newcheckpointdir/FSDP save_ckptfalse. Initial state is fresh, not resumed.",
+      "performance": "Instrumented3-step timing/memory is excluded from transparency and no performance conclusion is drawn.",
+      "unavailable_control": "No same125 no-observer baseline is supplied. Exact129 prefix match does not alone prove samehost causal observer transparency.",
+      "unavailable200": "No125 full200 reference or125 cross-host full200 admission established."
+    },
+    "limits": [
+      "This is a completed single-arm selected native recording and cross-host3-step prefix result.",
+      "It does not provide same125 no-observer control,125full200,matrix LM<=0.005 acceptance,or all tensors/all experts.",
+      "Gradient and clipping values require boundary-specific interpretation; their numeric difference is not the main-LM0.005 criterion.",
+      "A later same125 EP4 arm must independently satisfy its own original-control prefix and full selected contract before canonical logical-coordinate comparison.",
+      "No product root cause,optimizer bug,unique kernel fault,fix success,issue/PR attribution,or performance win is inferred."
+    ],
+    "evidence_integrity_summary": {
+      "status": "PASS_SINGLE_ARM_FULL31_NATIVE_AND_CROSS_HOST3_PREFIX_ONLY",
+      "manifest_results": [
+        {
+          "case": "r125-a1e6-ep-stepbind-fsdp8-3-v1",
+          "files": 111,
+          "all_SHA_match": true,
+          "raw_bytes": 132850467,
+          "manifest_sha256": "bc3794077ad09b818640f52d6b60534ad43775298e2e6de6d82b2d8bec1983ca"
+        },
+        {
+          "case": "r129-a1e6-fsdp8-0-200-v3",
+          "files": 91,
+          "all_SHA_match": true,
+          "manifest_sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca"
+        },
+        {
+          "case": "r129-a1e6-fsdp8-continuous400-v2",
+          "files": 91,
+          "all_SHA_match": true,
+          "manifest_sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b"
+        }
+      ],
+      "raw_manifest_files_verified": 293
+    }
+  }
+}
