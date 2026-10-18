@@ -1,0 +1,404 @@
+{
+  "schema": "jt-recompute-flexibility-source-audit-v1",
+  "created_utc": "2026-10-18T03:54:20Z",
+  "source_observed_date_utc": "2026-10-18",
+  "scope": "Source audit and proposed change/test/measurement plan only; no provider implementation, new CPU semantic tests, container or NPU execution in this audit.",
+  "checkout": "fixes/latest-jt-validation-f637",
+  "checkout_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "checkout_status_observation": "HEAD and empty --porcelain --untracked-files=all output were read before report authoring; file SHA256 values were read again for this report.",
+  "official_heads": [
+    {
+      "repository": "mindformers",
+      "branch": "master",
+      "commit": "409019aac0c6579bb4fb8a9b04a75c259d98a96e",
+      "head_query": "git ls-remote https://gitcode.com/mindspore/mindformers.git refs/heads/master",
+      "preferred_source_memory": "ascend-software-sources.md was read first; official GitCode page was inspected; pinned file contents were then read from the official GitHub mirror."
+    },
+    {
+      "repository": "megatron",
+      "branch": "main",
+      "commit": "65ac8216e481b8a2e10d0f366865528fc010342a",
+      "head_query": "git ls-remote https://github.com/NVIDIA/Megatron-LM.git refs/heads/main"
+    }
+  ],
+  "local_sources": [
+    {
+      "id": "registration",
+      "path": "hyper_parallel/models/jt_deepseek_v3/adapter/registration.py",
+      "sha256": "fba0632ef7c8501ddcb081ad1a052081cf69a47272cb12a9f5e7594cdc7efba6",
+      "line_ranges": [
+        [
+          39,
+          48
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/models/jt_deepseek_v3/adapter/registration.py"
+    },
+    {
+      "id": "policy_contract",
+      "path": "hyper_parallel/models/adapter_spec.py",
+      "sha256": "492b4ae3af89b1a2768a69dfefbbbcfa37000dac9e5d00a454e6a3591fe638b9",
+      "line_ranges": [
+        [
+          36,
+          47
+        ],
+        [
+          90,
+          111
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/models/adapter_spec.py"
+    },
+    {
+      "id": "config",
+      "path": "hyper_parallel/trainer/config/parallelism.py",
+      "sha256": "bc916586d69bb75235dad53a204d93bc0a29a61c2475975645c0b64dd98ad2bc",
+      "line_ranges": [
+        [
+          54,
+          135
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/trainer/config/parallelism.py"
+    },
+    {
+      "id": "checkpoint_selection",
+      "path": "hyper_parallel/distributed/activation_checkpoint.py",
+      "sha256": "ccb0cf8023569c4114fa567bd4c2bd3a54fd70b50b1a805efdd0410ca5ea326b",
+      "line_ranges": [
+        [
+          350,
+          412
+        ],
+        [
+          748,
+          895
+        ],
+        [
+          943,
+          962
+        ],
+        [
+          1088,
+          1165
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/distributed/activation_checkpoint.py"
+    },
+    {
+      "id": "jt_model",
+      "path": "hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py",
+      "sha256": "2ddd28910688710ea777f1724fb8aeb8821c6045a01f18f21eea4e92507fd906",
+      "line_ranges": [
+        [
+          176,
+          189
+        ],
+        [
+          196,
+          234
+        ],
+        [
+          389,
+          474
+        ],
+        [
+          508,
+          523
+        ],
+        [
+          539,
+          577
+        ],
+        [
+          580,
+          631
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/models/jt_deepseek_v3/modeling_jt_deepseek_v3.py"
+    },
+    {
+      "id": "optimizer_hook",
+      "path": "hyper_parallel/models/jt_deepseek_v3/adapter/runtime/jt_optimizer.py",
+      "sha256": "ba1da979aab5d85c5da1b6526c1fcb2c307de30d15a0bf5fb0c19e4e1a526711",
+      "line_ranges": [
+        [
+          106,
+          134
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/models/jt_deepseek_v3/adapter/runtime/jt_optimizer.py"
+    },
+    {
+      "id": "ep_boundary",
+      "path": "hyper_parallel/models/jt_deepseek_v3/adapter/distributed/ep_compute.py",
+      "sha256": "b007830f41db662fbe2f4d73b8cb6626a0832f0f5b2d508e3295ba2bad2e28d4",
+      "line_ranges": [
+        [
+          30,
+          50
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/models/jt_deepseek_v3/adapter/distributed/ep_compute.py"
+    },
+    {
+      "id": "mtp_boundary",
+      "path": "hyper_parallel/components/modules/mtp.py",
+      "sha256": "a53caede963cbe4c6ef1711bfdfff7ef0a39a2393720188b11413b56dbead65c",
+      "line_ranges": [
+        [
+          38,
+          74
+        ],
+        [
+          104,
+          143
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/components/modules/mtp.py"
+    },
+    {
+      "id": "chunked_ce",
+      "path": "hyper_parallel/components/losses/chunked_cross_entropy.py",
+      "sha256": "eba4deaa90834afc2fba4a3c4dc550331e43ac51738badf2819c10a18931e41b",
+      "line_ranges": [
+        [
+          227,
+          297
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/components/losses/chunked_cross_entropy.py"
+    },
+    {
+      "id": "checkpoint_api",
+      "path": "hyper_parallel/core/activation_memory/api.py",
+      "sha256": "7a0120c4c6f7ed423552c11f771a974cad0bfeab74ff23c62834d118adc67b34",
+      "line_ranges": [
+        [
+          297,
+          305
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/core/activation_memory/api.py"
+    },
+    {
+      "id": "checkpoint_wrapper",
+      "path": "hyper_parallel/core/activation_memory/wrapper.py",
+      "sha256": "3283c73da08a6342b86287305f5ef931d2dbd44af73b89a92c44a273d9bb89af",
+      "line_ranges": [
+        [
+          485,
+          511
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/core/activation_memory/wrapper.py"
+    },
+    {
+      "id": "build_order",
+      "path": "hyper_parallel/models/_transformers/model_builder.py",
+      "sha256": "f5dc8a3bb02141cdc54316d0b0191b9eaa17da6ffaeed706c0147515fc886581",
+      "line_ranges": [
+        [
+          497,
+          539
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/models/_transformers/model_builder.py"
+    },
+    {
+      "id": "existing_provider_example",
+      "path": "hyper_parallel/models/deepseek_v41/adapter/policies/activation_checkpointing.py",
+      "sha256": "334a6b3f3bb42e55f602322e71f8f950a448e9ca065d288e5bbaba306914a69b",
+      "line_ranges": [
+        [
+          20,
+          29
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/hyper_parallel/models/deepseek_v41/adapter/policies/activation_checkpointing.py"
+    },
+    {
+      "id": "jt_cpu_test_seam",
+      "path": "tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py",
+      "sha256": "bba89fa2d7027dd9b1bcef86c308fcc340bcc42abc17e240fc286849d3c7e21e",
+      "line_ranges": [
+        [
+          51,
+          91
+        ],
+        [
+          113,
+          150
+        ],
+        [
+          153,
+          195
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/tests/ut/models/jt_deepseek_v3/test_modeling_jt_deepseek_v3.py"
+    },
+    {
+      "id": "generic_layer_tests",
+      "path": "tests/ut/auto_models/distributed/test_activation_checkpoint.py",
+      "sha256": "cdfcc468f6413a4854b3c83bfac844f8f5304ad9d16376c83e1c49ab17a33c2e",
+      "line_ranges": [
+        [
+          211,
+          246
+        ]
+      ],
+      "local_link": "https://github.com/xingleixu123/hyper-parallel/blob/544526f7db8342c607244fd41009b2a74adb84c8/tests/ut/auto_models/distributed/test_activation_checkpoint.py"
+    }
+  ],
+  "official_sources": [
+    {
+      "id": "mf_activation",
+      "repository": "mindformers",
+      "commit": "409019aac0c6579bb4fb8a9b04a75c259d98a96e",
+      "path": "mindformers/pynative/distributed/activation_checkpoint.py",
+      "sha256": "f7a12cd243559355b124f79b562ca7756c0010ae7047c97ad7e9b365b15d655d",
+      "line_ranges": [
+        [
+          56,
+          156
+        ],
+        [
+          562,
+          637
+        ],
+        [
+          654,
+          689
+        ],
+        [
+          726,
+          788
+        ],
+        [
+          791,
+          869
+        ]
+      ],
+      "url": "https://github.com/mindspore-ai/mindformers/blob/409019aac0c6579bb4fb8a9b04a75c259d98a96e/mindformers/pynative/distributed/activation_checkpoint.py",
+      "raw_url": "https://raw.githubusercontent.com/mindspore-ai/mindformers/409019aac0c6579bb4fb8a9b04a75c259d98a96e/mindformers/pynative/distributed/activation_checkpoint.py",
+      "read_method": "HTTP bytes read in memory; SHA256 computed from complete response; selected source lines inspected"
+    },
+    {
+      "id": "mf_config",
+      "repository": "mindformers",
+      "commit": "409019aac0c6579bb4fb8a9b04a75c259d98a96e",
+      "path": "mindformers/pynative/config/config.py",
+      "sha256": "2e7b15b05daca4f05c1a32a38a913aa0811fbbf875ee9e21196604b9b80b9640",
+      "line_ranges": [
+        [
+          853,
+          908
+        ]
+      ],
+      "url": "https://github.com/mindspore-ai/mindformers/blob/409019aac0c6579bb4fb8a9b04a75c259d98a96e/mindformers/pynative/config/config.py",
+      "raw_url": "https://raw.githubusercontent.com/mindspore-ai/mindformers/409019aac0c6579bb4fb8a9b04a75c259d98a96e/mindformers/pynative/config/config.py",
+      "read_method": "HTTP bytes read in memory; SHA256 computed from complete response; selected source lines inspected"
+    },
+    {
+      "id": "megatron_config",
+      "repository": "megatron",
+      "commit": "65ac8216e481b8a2e10d0f366865528fc010342a",
+      "path": "megatron/core/transformer/transformer_config.py",
+      "sha256": "ec8de7059bf8d6c78663384a489794d0712eaa1b81685ad0339e2c77cb9e32e3",
+      "line_ranges": [
+        [
+          630,
+          684
+        ]
+      ],
+      "url": "https://github.com/NVIDIA/Megatron-LM/blob/65ac8216e481b8a2e10d0f366865528fc010342a/megatron/core/transformer/transformer_config.py",
+      "raw_url": "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/65ac8216e481b8a2e10d0f366865528fc010342a/megatron/core/transformer/transformer_config.py",
+      "read_method": "HTTP bytes read in memory; SHA256 computed from complete response; selected source lines inspected"
+    },
+    {
+      "id": "megatron_layer",
+      "repository": "megatron",
+      "commit": "65ac8216e481b8a2e10d0f366865528fc010342a",
+      "path": "megatron/core/transformer/transformer_layer.py",
+      "sha256": "682ecd8fd17f6ae4bf0dc8fc928e73c7a917abf4bc690b79e956a28e80c8a040",
+      "line_ranges": [
+        [
+          507,
+          520
+        ],
+        [
+          1171,
+          1185
+        ],
+        [
+          1476,
+          1480
+        ],
+        [
+          1590,
+          1595
+        ]
+      ],
+      "url": "https://github.com/NVIDIA/Megatron-LM/blob/65ac8216e481b8a2e10d0f366865528fc010342a/megatron/core/transformer/transformer_layer.py",
+      "raw_url": "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/65ac8216e481b8a2e10d0f366865528fc010342a/megatron/core/transformer/transformer_layer.py",
+      "read_method": "HTTP bytes read in memory; SHA256 computed from complete response; selected source lines inspected"
+    },
+    {
+      "id": "megatron_moe",
+      "repository": "megatron",
+      "commit": "65ac8216e481b8a2e10d0f366865528fc010342a",
+      "path": "megatron/core/transformer/moe/moe_layer.py",
+      "sha256": "bfe309cdb8d30fbbde4a202a047f30e343c0b3e08c3f89e822ed15780f369a7c",
+      "line_ranges": [
+        [
+          273,
+          282
+        ],
+        [
+          606,
+          612
+        ],
+        [
+          787,
+          791
+        ],
+        [
+          823,
+          830
+        ]
+      ],
+      "url": "https://github.com/NVIDIA/Megatron-LM/blob/65ac8216e481b8a2e10d0f366865528fc010342a/megatron/core/transformer/moe/moe_layer.py",
+      "raw_url": "https://raw.githubusercontent.com/NVIDIA/Megatron-LM/65ac8216e481b8a2e10d0f366865528fc010342a/megatron/core/transformer/moe/moe_layer.py",
+      "read_method": "HTTP bytes read in memory; SHA256 computed from complete response; selected source lines inspected"
+    }
+  ],
+  "profiling_helper": {
+    "path": "tools/module_profile.py",
+    "sha256": "b01dcf73a23ec967b04b5b5358f2f8cdae028227cb87e28ac465c0bb7e722c9c",
+    "line_ranges": [
+      [
+        55,
+        105
+      ]
+    ],
+    "local_link": "../module_profile.py",
+    "scope": "Existing task instrumentation; inclusive NPU Event elapsed time and allocation delta, not per-module retained memory or peak attribution."
+  },
+  "operation_boundary": {
+    "authorized_report_outputs": [
+      "README_ZH.md",
+      "sources.json"
+    ],
+    "git_object_lookup": "Earlier git cat-file -t checks in existing blob:none reference repositories were followed by observation of new promisor pack files timestamped 2026-10-18 09:25:43 local (Asia/Shanghai). Automatic object fetching is possible; the causal attribution was not independently traced.",
+    "followup": "No further Git object reads/fetches or cleanup were performed after noticing this risk; official source contents were obtained using in-memory HTTP.",
+    "unchanged_scope": [
+      "fixed JT source",
+      "canonical guard",
+      "runner",
+      "requests",
+      "running experiment inputs"
+    ],
+    "hardware_claims": "No hardware or full-matrix acceptance claim is derived from this report. Parent-reported full200 PASS/selective200 running was not independently audited here."
+  }
+}

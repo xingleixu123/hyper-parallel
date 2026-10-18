@@ -4,7 +4,7 @@
 
 本单是 JT DeepSeek V3 八卡验证的**总问题单**，统一关联所有已拆分的小问题及独立 PR，维护优先级、复现证据、精度曲线、显存/性能、重计算与续训验收状态。每个已确认的独立缺陷或接口需求各用一个小问题单和一个单提交 PR，两个方向均能回到本单；不把多个缺陷混入同一个修复提交。
 
-**当前源码FSDP基线与续训已通过，整体并行/重算矩阵尚未完成。** 最新固定上游为 `a1e6c222`，集成源为 `544526f7`，含用户指定#180及#230/#232。129已完成三次独立运行：FSDP8基线0–200、从其checkpoint恢复200–400、独立连续0–400。两个完整200步×8rank窗口的主LM最大绝对差均为 **0**；已有MTP/aux日志及按系数还原值、总loss、梯度范数也全为0，输入一致，恢复计数6400项0差异。三次均exit0并释放。当前源码TP/CP/EP、组合及full/selective重算仍待完成，历史结果不转写为当前通过。[完整续训验收、曲线与逐rank证据](reports/a1e6-fsdp-resume-400/README_ZH.md)。
+**当前源码FSDP基线、续训及off/full/selective重算已通过，TP/CP/EP及组合矩阵尚未完成。** 最新固定上游为 `a1e6c222`，集成源为 `544526f7`，含用户指定#180及#230/#232。129的FSDP8基线0–200、checkpoint200恢复200–400分别对独立连续400的两个200步×8rank窗口，主LM及已有其余loss/梯度范数差全0，恢复计数6400项0差异；2026-10-18新增full和SAC selective各独立完整200步×8rank，也均主LM及上述观测零差、三处wrapper覆盖正确。五次均exit0并释放。当前源码并行结果仍待实跑，历史结果不转写为当前通过。[续训验收](reports/a1e6-fsdp-resume-400/README_ZH.md)；[当前重算验收、两张精度图与成本图](reports/a1e6-recompute-200/README_ZH.md)。
 
 **201后续工作已取消，仅保留历史跨机结果。** 同源129与201完整0–200比较的主LM最大绝对差为 **0.009525299072265625**（第189步），首超0.005为第125步，共8个超阈值步。源码、初态、数据、输入、runtime flags与完成/释放证据通过核验，但精度未通过。按用户2026-10-17最新指示，后续仅在125/129实验，不再排查或准备201迁移。[完整跨机结果、曲线与公开逐rank证据](reports/a1e6-cross-host-200/README_ZH.md)。
 
@@ -28,12 +28,12 @@
 
 | 排序 | 问题与影响 | 小问题单 | 独立单提交 PR | 已有证据及剩余边界 |
 |---|---|---|---|---|
-| Top1 | 跨拓扑完整200步精度与最新源码矩阵尚未通过 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 18602c4历史配方全rank超阈值：EP2为0.007523/0.015433/0.138989，CP2为0.011062/0.022786/0.204605（LM/还原MTP/aux），TP2为0.021448/0.024670/0.155838；544526f7的129基线及续训对独立连续400，两窗口主LM及已有其余loss/梯度差全0；129对201主LM最大差0.0095253，201不准入；当前并行与重算矩阵仍待完成 |
+| Top1 | 跨拓扑完整200步精度与最新源码矩阵尚未通过 | 本总单的整体验收缺口 | 根因确认后继续拆分 | 18602c4历史配方全rank超阈值：EP2为0.007523/0.015433/0.138989，CP2为0.011062/0.022786/0.204605（LM/还原MTP/aux），TP2为0.021448/0.024670/0.155838；544526f7的FSDP基线、续训及full/SAC selective完整200步×8rank主LM及已有其余loss/梯度范数差全0；当前并行矩阵仍待实跑，201后续已取消 |
 | Top2 | 梯度累积按微批有效 token 归一化，改变整步目标 | [#203](https://github.com/hf1s/hyper-parallel/issues/203) | [#194](https://github.com/hf1s/hyper-parallel/pull/194) | 实际 Trainer 的不等长监督样例，正确梯度 14、旧行为 10；TP2×EP2 LM 误差显著下降但仍未过 0.005 |
 | Top3 | FSDP 分片后仍持有完整源参数，显存不能释放 | [#204](https://github.com/hf1s/hyper-parallel/issues/204) | [#198](https://github.com/hf1s/hyper-parallel/pull/198) | EP2/CP2 分别减少 9.422/10.125 GiB；同拓扑 200 步 loss/梯度零误差 |
 | Top4 | 测试调度器覆盖上层NPU可见列表，使设备分配越界 | [#223](https://github.com/hf1s/hyper-parallel/issues/223) | [#224](https://github.com/hf1s/hyper-parallel/pull/224) | 单提交2文件；无设备回归10测试/18子测试通过、两轴检视通过；不等同实际多卡训练验证 |
 | Top5 | CP 分块输出损失的支持与回归覆盖 | [#205](https://github.com/hf1s/hyper-parallel/issues/205) | [#199](https://github.com/hf1s/hyper-parallel/pull/199) | 功能已由上游 #186 合入；#199 收敛为独立回归，新基点 CPU20项/25子测试及129四卡短步ST通过；每组2步，不代替200步验收 |
-| Top6 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 实际重放及覆盖用例通过；18602c4配方full200步×8rank全部loss/梯度范数零误差，两个主干层和一个MTP层均包裹；selective第三轮完整200步×8rank全部loss及梯度范数零误差，未拼接旧前缀 |
+| Top6 | 完整重计算漏掉独立 MTP 解码器 | [#206](https://github.com/hf1s/hyper-parallel/issues/206) | [#195](https://github.com/hf1s/hyper-parallel/pull/195) | 定向重放用例通过；历史18602c4及当前544526f7的full/SAC selective均各完整200步×8rank全部所测loss/梯度范数零差，两个主干层和一个MTP内部decoder实际wrapper覆盖正确；不代表整个MTP外围都重算 |
 | Top7 | 重计算重放重复提交专家路由 token 计数 | [#207](https://github.com/hf1s/hyper-parallel/issues/207) | [#196](https://github.com/hf1s/hyper-parallel/pull/196) | 保留必要张量运算，只约束持久副作用；均匀重复计数未必改变 sign 型 bias 更新，不能虚构旧 loss 漂移 |
 | Top8 | checkpoint 续训后累计样本/token 指标清零 | [#208](https://github.com/hf1s/hyper-parallel/issues/208) | [#197](https://github.com/hf1s/hyper-parallel/pull/197) | 18602c4历史及当前544526f7均已完成201–400×8rank对独立400参考；当前四项恢复计数6400项零差，主LM及已有其余loss/梯度差全0；集成结果不全部归因于本PR |
 | Top9 | 专家局部 BF16 权重梯度舍入不能由后续 FP32 归约恢复 | [#209](https://github.com/hf1s/hyper-parallel/issues/209) | [#200](https://github.com/hf1s/hyper-parallel/pull/200) | 默认关闭的 FP32 主梯度累加选项；CPU 与真实 2 卡累积/共享权重/重算 ST 通过，200 步组合验证仍待完成 |
@@ -50,11 +50,11 @@
 
 ## 当前固定环境
 
-最新固定 JT_dev 为 `a1e6c222eab097c9609d6e744a3c5f98aeed6bdc`，集成验证源为 `544526f7db8342c607244fd41009b2a74adb84c8`，三台机器均部署该源码并核对editable导入。它在上一集成源 `558eff5` 上加入#232：不再强制 `CLOSE_MATMUL_K_SHIFT=1`，配套3项UT通过；201实际八rank记录该变量前后均未设置。#180、#186及#230均已包含。#214/#219/#224/#226/#228仍是独立验证，不冒称全部进入训练源。[源码与环境证据](reports/a1e6-201-admission/README_ZH.md)；[上一e213阶段记录](reports/latest-jt-e213-sync/README_ZH.md)。
+最新固定 JT_dev 为 `a1e6c222eab097c9609d6e744a3c5f98aeed6bdc`，集成验证源为 `544526f7db8342c607244fd41009b2a74adb84c8`，当前只在125/129继续实验并核对editable导入；201部署与运行记录保留为历史。它在上一集成源 `558eff5` 上加入#232：不再强制 `CLOSE_MATMUL_K_SHIFT=1`，配套3项UT通过。#180、#186及#230均已包含。#214/#219/#224/#226/#228仍是独立验证，不冒称全部进入训练源。[历史源码与环境证据](reports/a1e6-201-admission/README_ZH.md)；[上一e213阶段记录](reports/latest-jt-e213-sync/README_ZH.md)。
 
 | 项目 | 固定值 |
 |---|---|
-| 训练资源 | 125/129共享机器按实际可用资源调度；201为用户独占8×Ascend 910B4 32GiB，后续矩阵须先通过跨机精度准入 |
+| 训练资源 | 仅125/129共享机器，按实际八卡空闲与全局1200秒释放间隔调度；201后续已取消 |
 | CANN | 9.2.0-beta.2 / V100R001C12B086 |
 | Python / Torch / TorchNPU | 3.12.14 / 2.12.0+cpu / 2.12.0；PTA Git `fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d` |
 | Transformers / datasets | 5.13.1 / 4.8.5 |
@@ -77,6 +77,19 @@
 5. 关闭、完整、选择重算各跑 200 步；模块选择消融注明步数和测量边界。报告 allocated/reserved 峰值及预热后中位步时，数据采集开销保持一致。
 6. 每个修复以独立最小回归、相应分布式用例和规范/验收条件两轴检视作为证据；保留首次失败与修复后结果。开放问题不能仅靠 PR 已创建或某个标签关闭。
 7. 消融结果必须继续定位到具体函数/算子、源码行和触发条件。核验FSDP基线与并行两侧的目标函数、前向/局部VJP、归约与优化器状态；比较前还原逻辑tensor、token和参数身份，不直接比较同编号物理rank。可控局部替换只能作为因果实验，不能靠强制复制loss、整层梯度或参数制造对齐。每个确认问题的小issue/单commit PR须同时交代根因、数学或接口契约、MF官方master PyNative及Megatron主线的固定源码依据、修复前后定向回归和完整200步的实际覆盖范围。尚未定位的漂移和已被否决的候选继续在总单追踪，不冒充已确认的新缺陷。
+
+## 544526f7当前结果：完整200步重算与成本
+
+2026-10-18，129的full与默认SAC selective各自从初态独立完成200步×8rank，exit0并释放；两种策略的主LM、日志与按系数还原MTP/aux、总loss、梯度范数、LR和输入与off基线均零差，三处wrapper覆盖两个主干decoder及MTP内部decoder。四次原manifest共364文件经独立SHA核验。[完整报告及三图](reports/a1e6-recompute-200/README_ZH.md)。
+
+| 同配方、每步全部8rank MAX | off连续参考前200 | full | selective（SAC） |
+|---|---:|---:|---:|
+| 去前20步中位秒/步 | 1.155826 | 1.234299 | 1.231250 |
+| 有效监督token/s | 15999.35 | 14947.21 | 14972.48 |
+| Allocated累计峰值GiB | 22.032196 | 19.392933 | 19.875641 |
+| Reserved累计峰值GiB | 27.171875 | 24.320313 | 24.789063 |
+
+Full与selective分别少用2.639263/2.156555GiB allocated，步时增加6.79%/6.53%。二者步时仅差0.247%，单次观测不能判定稳定性能胜负；full在本样本提供更多显存余量。off仍保留chunked head/CE内置重算，步时含标量/输入哈希采集，显存不是物理HBM瞬时峰值。当前SAC不等于MF式模块路径选择；JT缺少adapter-safe provider，模块ROI尚未硬件实测。[最新MF/Megatron固定源码、边界与候选方案](reports/a1e6-recompute-200/flexibility/README_ZH.md)。
 
 ## 18602c4历史结果：FSDP基线与续训两个独立200步窗口通过
 
@@ -288,7 +301,8 @@ FP32 Linear输入梯度候选已进入长跑：新FSDP8参考在163步后遇外�
 - [x] 历史201的544526f7 FSDP0–200完整执行、证据完整性与资源终态独立复核通过；19组后续配置仅完成CPU解析，用户现已取消201后续工作。
 - [x] 129同源FSDP0–200参考完整完成；历史201完整200步×8rank跨机精度已检验，主LM最大差0.0095253，未通过0.005；后续仅用125/129。
 - [x] 当前544526f7的129 FSDP8基线0–200、checkpoint200→400续训和独立连续400均完成；两个200步×8rank窗口主LM最大差均为0，三次均exit0并释放。
-- [ ] 当前544526f7的full/selective重算与并行矩阵仍待完整200步验收；off模式的FSDP参考已完成，历史重算结果不转写为当前通过。
+- [x] 当前544526f7的off/full/SAC selective均完成200步×8rank主LM验收；full/selective所测loss及梯度范数零差、实际三处wrapper正确、独立复核通过。
+- [ ] 当前544526f7的TP/CP/EP及合法组合仍待完整200步验收；模块选择和模块成本消融尚待硬件实测，不能移用历史结果。
 - [x] MF PyNative与Megatron最新固定源码能力对照完成，接口及限制可追溯。
 - [ ] TP/CP/EP及合法混合策略全部200步满足0.005，按确认的独立根因继续拆issue/PR。
 - [ ] 完成当前配方模块成本消融，筛选有价值的策略后做200步回归。

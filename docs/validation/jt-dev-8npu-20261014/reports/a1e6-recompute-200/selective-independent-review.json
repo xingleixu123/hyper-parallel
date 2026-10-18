@@ -1,0 +1,361 @@
+{
+  "schema": "a1e6-fsdp8-selective200-v2-independent-review-v1",
+  "created_utc": "2026-10-18T03:58:56.097803+00:00",
+  "status": "PASS_CURRENT_SOURCE_FSDP_SELECTIVE_RECOMPUTE_200",
+  "findings": [],
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "scope_zh": "129固定544526f7八卡FSDP selective默认算子级SAC，完整1–200步；不代表任意模块/层级选择重算、其他并行或完整矩阵通过。",
+  "inputs": {
+    "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json": {
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "bytes": 17543
+    },
+    "evidence/129-a1e6-fsdp8-selective200-v2-evidence-manifest.json": {
+      "sha256": "2d9713c5a5487c109fc75aacbc50ee583e0d2813d35d8c81fe77677c7c5938e9",
+      "bytes": 18271
+    },
+    "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json": {
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "bytes": 18270
+    },
+    "evidence/129-a1e6-fsdp8-full200-v2-evidence-manifest.json": {
+      "sha256": "c9f5d470f94fafc0ad391ff61714a4d85046d83ef6916847e8a2f9c05e1f1930",
+      "bytes": 17816
+    },
+    "evidence/a1e6-fsdp8-selective200-v2-strict.json": {
+      "sha256": "008a727149813c7b8caa62cd4912c696a27cde72d2962990a77df0236bdf35b6",
+      "bytes": 13360
+    },
+    "evidence/a1e6-fsdp8-selective200-v2-resources.json": {
+      "sha256": "53e97e5796c9ebd7b1b1bfb9057dec80430f5b18daf348bf3eb552350b545de4",
+      "bytes": 48405
+    },
+    "scheduling/r129-a1e6-fsdp8-selective-200-v2.request.json": {
+      "sha256": "b0174d48667bfa507ad533cea0c3442ab2dd07a9b0878f38df7382316c67c344",
+      "bytes": 1864
+    },
+    "tools/all_rank_resources.py": {
+      "sha256": "fb10519797206e58c4114bb3b9980d89553a0324d9188824cb26360c3104e93c",
+      "bytes": 6602
+    },
+    "tools/capture_a1e6_training.py": {
+      "sha256": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df",
+      "bytes": 3355
+    },
+    "tools/capture_training.py": {
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+      "bytes": 7263
+    },
+    "tools/run_fair_a1e6_matrix_v1.sh": {
+      "sha256": "449a6ba02e89e9e09c28aefec39cbc8ec5a8a39937b60958b619b2f3a7359768",
+      "bytes": 2307
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/distributed/activation_checkpoint.py": {
+      "sha256": "ccb0cf8023569c4114fa567bd4c2bd3a54fd70b50b1a805efdd0410ca5ea326b",
+      "bytes": 43697
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/models/jt_deepseek_v3/adapter/registration.py": {
+      "sha256": "fba0632ef7c8501ddcb081ad1a052081cf69a47272cb12a9f5e7594cdc7efba6",
+      "bytes": 2177
+    },
+    "evidence/a1e6-fsdp8-full200-v2-independent-review.json": {
+      "sha256": "5e7039e24be5063bf8c6f9040cd8fe22aeb938403aaea158636ad83097eddafb",
+      "bytes": 11166
+    }
+  },
+  "collections": {
+    "baseline": {
+      "manifest": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "manifest_sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "files": 91,
+      "bytes": 1707604,
+      "all_sha_size_match": true
+    },
+    "candidate": {
+      "manifest": "evidence/129-a1e6-fsdp8-selective200-v2-evidence-manifest.json",
+      "manifest_sha256": "2d9713c5a5487c109fc75aacbc50ee583e0d2813d35d8c81fe77677c7c5938e9",
+      "files": 91,
+      "bytes": 1711752,
+      "all_sha_size_match": true
+    },
+    "continuous": {
+      "manifest": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "manifest_sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "files": 91,
+      "bytes": 3040568,
+      "all_sha_size_match": true
+    },
+    "full": {
+      "manifest": "evidence/129-a1e6-fsdp8-full200-v2-evidence-manifest.json",
+      "manifest_sha256": "c9f5d470f94fafc0ad391ff61714a4d85046d83ef6916847e8a2f9c05e1f1930",
+      "files": 91,
+      "bytes": 1711829,
+      "all_sha_size_match": true
+    }
+  },
+  "finite_scalar_values_checked": 112000,
+  "candidate_resolved_differences_from_baseline": [
+    "activation_checkpoint.mode",
+    "checkpoint.checkpoint_dir",
+    "checkpoint.save_ckpt"
+  ],
+  "comparisons": {
+    "baseline": {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "pairs_per_metric": 1600,
+      "max_abs": {
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/total_loss": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0,
+        "data/step_tokens": 0.0,
+        "data/step_samples": 0.0,
+        "data/consumed_tokens": 0.0,
+        "data/consumed_samples": 0.0
+      },
+      "derived_unweighted_mtp_max_abs": 0.0,
+      "derived_unweighted_aux_max_abs": 0.0,
+      "input_identity_equal_pairs": 1600,
+      "initial_model_state_objects_per_rank": 48,
+      "initial_model_tensor_metadata_hashes_equal_all_ranks": true,
+      "runtime_flags_equal_all_ranks": true,
+      "model_parameter_metadata_equal_all_ranks": true
+    },
+    "continuous": {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "pairs_per_metric": 1600,
+      "max_abs": {
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/total_loss": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0,
+        "data/step_tokens": 0.0,
+        "data/step_samples": 0.0,
+        "data/consumed_tokens": 0.0,
+        "data/consumed_samples": 0.0
+      },
+      "derived_unweighted_mtp_max_abs": 0.0,
+      "derived_unweighted_aux_max_abs": 0.0,
+      "input_identity_equal_pairs": 1600,
+      "initial_model_state_objects_per_rank": 48,
+      "initial_model_tensor_metadata_hashes_equal_all_ranks": true,
+      "runtime_flags_equal_all_ranks": true,
+      "model_parameter_metadata_equal_all_ranks": true
+    },
+    "full": {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "pairs_per_metric": 1600,
+      "max_abs": {
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/total_loss": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0,
+        "data/step_tokens": 0.0,
+        "data/step_samples": 0.0,
+        "data/consumed_tokens": 0.0,
+        "data/consumed_samples": 0.0
+      },
+      "derived_unweighted_mtp_max_abs": 0.0,
+      "derived_unweighted_aux_max_abs": 0.0,
+      "input_identity_equal_pairs": 1600,
+      "initial_model_state_objects_per_rank": 48,
+      "initial_model_tensor_metadata_hashes_equal_all_ranks": true,
+      "runtime_flags_equal_all_ranks": true,
+      "model_parameter_metadata_equal_all_ranks": true
+    }
+  },
+  "activation_checkpoint": {
+    "actual_config": {
+      "mode": "selective",
+      "swap_inputs": false,
+      "selection": {
+        "source": "default",
+        "layer_count": null,
+        "layer_indices": null
+      }
+    },
+    "actual_wrapper_inventory": {
+      "count": 3,
+      "wrappers": [
+        {
+          "fqn": "model.layers.0",
+          "wrapped_type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Decoder"
+        },
+        {
+          "fqn": "model.layers.1",
+          "wrapped_type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Decoder"
+        },
+        {
+          "fqn": "mtp.layers.0.transformer_layer",
+          "wrapped_type": "hyper_parallel.core.fully_shard.api.HSDPJTDeepseekV3Decoder"
+        }
+      ]
+    },
+    "all_8_rank_runtime_application_logs_verified": true,
+    "worker_logs": [
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/0/stderr.log",
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/1/stderr.log",
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/2/stderr.log",
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/3/stderr.log",
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/4/stderr.log",
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/5/stderr.log",
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/6/stderr.log",
+      "runs/r129-a1e6-fsdp8-selective-200-v2/worker-logs/none_azskekor/attempt_0/7/stderr.log"
+    ],
+    "scope_zh": "默认算子级SAC应用到三个decoder wrapper；不是MF风格任意模块选择。未记录逐算子保存/重放次数。"
+  },
+  "execution": {
+    "baseline": {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "container_id": "431499a668c960916ef11abe2fc379ef64109a2784164c992cb56d309eb6ecb1",
+      "exit_code": 0,
+      "released": true,
+      "all_eight_idle_snapshots_verified": true,
+      "duration_seconds": 383.04995921999216
+    },
+    "candidate": {
+      "case": "r129-a1e6-fsdp8-selective-200-v2",
+      "container_id": "8426535f35244ad6919b130fd8bb5c8a1e256857d38b0489c894359df20a14dc",
+      "exit_code": 0,
+      "released": true,
+      "all_eight_idle_snapshots_verified": true,
+      "duration_seconds": 382.2484722399968
+    },
+    "continuous": {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+      "exit_code": 0,
+      "released": true,
+      "all_eight_idle_snapshots_verified": true,
+      "duration_seconds": 610.3890903799911
+    },
+    "full": {
+      "case": "r129-a1e6-fsdp8-full-200-v2",
+      "container_id": "0efd52b92c348bdbf68ca7fdd41cdde830bd82080208b0ec1d51babbc8b4e1d3",
+      "exit_code": 0,
+      "released": true,
+      "all_eight_idle_snapshots_verified": true,
+      "duration_seconds": 388.20828402001644
+    }
+  },
+  "resource_observations": {
+    "baseline": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "max",
+      "median_step_seconds": 1.156256079673767,
+      "summed_step_seconds": 207.97043895721436,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15990.50334593064,
+      "max_allocated_gib_through_step200": 22.032196044921875,
+      "max_reserved_gib_through_step200": 27.25
+    },
+    "candidate": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "max",
+      "median_step_seconds": 1.2312498688697815,
+      "summed_step_seconds": 222.11092841625214,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 14972.482550555424,
+      "max_allocated_gib_through_step200": 19.875640869140625,
+      "max_reserved_gib_through_step200": 24.7890625
+    },
+    "continuous": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "max",
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "max_allocated_gib_through_step200": 22.032196044921875,
+      "max_reserved_gib_through_step200": 27.171875
+    },
+    "full": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "max",
+      "median_step_seconds": 1.2342990636825562,
+      "summed_step_seconds": 222.48642230033875,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 14947.213252909307,
+      "max_allocated_gib_through_step200": 19.392932891845703,
+      "max_reserved_gib_through_step200": 24.3203125
+    }
+  },
+  "resource_comparison": {
+    "primary_reference": "continuous400 steps1–200, off, save_ckpt=false",
+    "actual_host_config_equal": true,
+    "warmup_steps_excluded": 20,
+    "all_rank_max_each_step": true,
+    "single_observation_per_strategy": true,
+    "ratios": {
+      "selective_vs_off_median_step_increase_percent": 6.525579331393838,
+      "selective_vs_off_throughput_change_percent": -6.41818060440592,
+      "selective_vs_off_allocated_reduction_gib": 2.15655517578125,
+      "selective_vs_off_allocated_reduction_percent": 9.78819892208751,
+      "selective_vs_off_reserved_reduction_gib": 2.3828125,
+      "selective_vs_off_reserved_reduction_percent": 8.769407705577914,
+      "selective_vs_full_median_step_change_percent": -0.24703857456371825,
+      "selective_vs_full_throughput_change_percent": 0.16905691528283917,
+      "full_allocated_lower_than_selective_gib": 0.4827079772949219,
+      "full_reserved_lower_than_selective_gib": 0.46875
+    },
+    "full_vs_selective_zh": "Full的allocator峰值更低；selective与full中位步时仅约0.25%差，且每种只有一次，不能判定性能胜负。"
+  },
+  "public_conclusion_zh": "在固定源码、相同初始模型和逐步输入下，selective默认SAC完整200步×8rank主LM、总loss、加权和系数还原MTP/aux、梯度范数、LR最大差均0，满足0.005。相对off，默认SAC本次观测降低allocator峰值并增加步时；full省显存更多，二者性能差异不足以判断胜负。",
+  "limitations_zh": [
+    "MTP/aux无权值仅为加权日志除以0.3/0.0001；不能推广为MTP/aux全并行矩阵验收。",
+    "初态证据仅pre-sharding模型state_dict48项shape/dtype/hash；没有内部optimizer/scheduler/RNG字节比较。",
+    "资源为相同观测开销的callback时间；统计step21–200每步8rank最大值，非无插桩或端到端吞吐。",
+    "allocator为从进程启动至step200的累计峰值，包含warmup，不是物理HBM瞬时峰值。",
+    "continuous400总train_iters不同但前200输入、LR和全部数值逐步一致；双方不保存checkpoint，比在step200保存的baseline更适合作性能对照。",
+    "每种策略仅1次，full与selective约0.25%的中位步时差不足以判定快慢，无置信区间。",
+    "off/full/selective均保留enable_chunk_loss=true、chunk_loss_size=4096的head内置重算；off不是完全无重算。",
+    "默认SAC的算子策略不等于MF任意层/模块灵活重算；JT adapter当前未提供model_adapter_safe_regions的recompute provider。"
+  ]
+}

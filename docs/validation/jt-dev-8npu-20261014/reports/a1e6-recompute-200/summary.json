@@ -1,0 +1,228 @@
+{
+  "schema": "a1e6-recompute200-v2-summary",
+  "created_utc": "2026-10-18T03:58:35.878555+00:00",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "upstream_JT_dev": "a1e6c222eab097c9609d6e744a3c5f98aeed6bdc",
+  "main_lm_recompute_status": "PASS",
+  "parallel_matrix_status": "TP/CP/EP and combinations not yet executed on this source",
+  "comparisons": [
+    {
+      "mode": "full",
+      "candidate": "r129-a1e6-fsdp8-full-200-v2",
+      "reference": "r129-a1e6-fsdp8-0-200-v3",
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "status": "PASS",
+      "errors": {
+        "training/total_loss": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/foundation_loss/lm": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/grad_norm": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        }
+      },
+      "unweighted_error_diagnostics": {
+        "lm": 0.0,
+        "mtp": 0.0,
+        "aux": 0.0
+      },
+      "input_mismatch_count": 0,
+      "initial_mismatches": [],
+      "strict_report_sha256": "4fe521c9210cda5705b6f9938ec62c0995a79eeab90e4aa3995367d2c2a13da2"
+    },
+    {
+      "mode": "selective",
+      "candidate": "r129-a1e6-fsdp8-selective-200-v2",
+      "reference": "r129-a1e6-fsdp8-0-200-v3",
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "status": "PASS",
+      "errors": {
+        "training/total_loss": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/foundation_loss/lm": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        },
+        "training/grad_norm": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0
+        }
+      },
+      "unweighted_error_diagnostics": {
+        "lm": 0.0,
+        "mtp": 0.0,
+        "aux": 0.0
+      },
+      "input_mismatch_count": 0,
+      "initial_mismatches": [],
+      "strict_report_sha256": "008a727149813c7b8caa62cd4912c696a27cde72d2962990a77df0236bdf35b6"
+    }
+  ],
+  "resource_measurements": [
+    {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.171875,
+      "rank0_time_underreport_steps": 0,
+      "precision_acceptance_claimed": false,
+      "scope": "Each step uses the maximum published callback time over all eight ranks. Logical token counts are counted once. Device peaks remain cumulative from process start, including warmup; timing excludes warmup and is not end-to-end wall time. This is not a precision verdict.",
+      "mode": "off",
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "timing_window": [
+        21,
+        200
+      ],
+      "memory_window": [
+        1,
+        200
+      ]
+    },
+    {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": 1.2342990636825562,
+      "summed_step_seconds": 222.48642230033875,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 14947.213252909307,
+      "allocated_gib": 19.392932891845703,
+      "reserved_gib": 24.3203125,
+      "rank0_time_underreport_steps": 0,
+      "precision_acceptance_claimed": false,
+      "scope": "Each step uses the maximum published callback time over all eight ranks. Logical token counts are counted once. Device peaks remain cumulative from process start, including warmup; timing excludes warmup and is not end-to-end wall time. This is not a precision verdict.",
+      "mode": "full",
+      "case": "r129-a1e6-fsdp8-full-200-v2",
+      "timing_window": [
+        21,
+        200
+      ],
+      "memory_window": [
+        1,
+        200
+      ],
+      "relative_to_off": {
+        "allocated_saved_gib": 2.639263153076172,
+        "allocated_saved_percent": 11.97911977405669,
+        "reserved_saved_gib": 2.8515625,
+        "median_extra_ms": 78.47350835800171,
+        "median_step_time_increase_percent": 6.789390319023214,
+        "supervised_throughput_change_percent": -6.576120133845198,
+        "allocated_saved_gib_per_extra_ms": 0.03363253674138878
+      }
+    },
+    {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": 1.2312498688697815,
+      "summed_step_seconds": 222.11092841625214,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 14972.482550555424,
+      "allocated_gib": 19.875640869140625,
+      "reserved_gib": 24.7890625,
+      "rank0_time_underreport_steps": 0,
+      "precision_acceptance_claimed": false,
+      "scope": "Each step uses the maximum published callback time over all eight ranks. Logical token counts are counted once. Device peaks remain cumulative from process start, including warmup; timing excludes warmup and is not end-to-end wall time. This is not a precision verdict.",
+      "mode": "selective",
+      "case": "r129-a1e6-fsdp8-selective-200-v2",
+      "timing_window": [
+        21,
+        200
+      ],
+      "memory_window": [
+        1,
+        200
+      ],
+      "relative_to_off": {
+        "allocated_saved_gib": 2.15655517578125,
+        "allocated_saved_percent": 9.78819892208751,
+        "reserved_saved_gib": 2.3828125,
+        "median_extra_ms": 75.42431354522705,
+        "median_step_time_increase_percent": 6.525579331393838,
+        "supervised_throughput_change_percent": -6.41818060440592,
+        "allocated_saved_gib_per_extra_ms": 0.028592307631518637
+      }
+    }
+  ],
+  "collection_manifests": [
+    {
+      "path": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca"
+    },
+    {
+      "path": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b"
+    },
+    {
+      "path": "evidence/129-a1e6-fsdp8-full200-v2-evidence-manifest.json",
+      "sha256": "c9f5d470f94fafc0ad391ff61714a4d85046d83ef6916847e8a2f9c05e1f1930"
+    },
+    {
+      "path": "evidence/129-a1e6-fsdp8-selective200-v2-evidence-manifest.json",
+      "sha256": "2d9713c5a5487c109fc75aacbc50ee583e0d2813d35d8c81fe77677c7c5938e9"
+    }
+  ],
+  "scope_zh": [
+    "每种重算策略目前仅一次完整200步观测；不是性能置信区间。",
+    "仅验证当前FSDP8配方的off/full/SAC selective；未实现或验证adapter-safe模块选择provider。",
+    "off仍保留chunked output loss的独立重算。",
+    "主LM先验收；现有MTP/aux日志及按系数还原值保留，不代替全部并行专项。",
+    "步时包含标量和输入identity采集开销；显存为allocator累计峰值，不是物理HBM瞬时峰值。"
+  ]
+}

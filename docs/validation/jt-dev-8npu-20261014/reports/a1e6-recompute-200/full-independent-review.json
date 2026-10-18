@@ -1,0 +1,272 @@
+{
+  "schema": "a1e6-fsdp8-full200-v2-independent-review-v1",
+  "created_utc": "2026-10-18T03:53:19.830670+00:00",
+  "reviewer": "independent readonly review with a single new review artifact",
+  "status": "PASS_CURRENT_SOURCE_FSDP_FULL_RECOMPUTE_200",
+  "findings": [],
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "scope_zh": "129同源同配方FSDP八卡full重算1–200步与off基线、独立连续400前200步比较；不代表其他并行或重算模式全矩阵通过。",
+  "inputs": {
+    "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json": {
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "bytes": 17543
+    },
+    "evidence/129-a1e6-fsdp8-full200-v2-evidence-manifest.json": {
+      "sha256": "c9f5d470f94fafc0ad391ff61714a4d85046d83ef6916847e8a2f9c05e1f1930",
+      "bytes": 17816
+    },
+    "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json": {
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "bytes": 18270
+    },
+    "evidence/a1e6-fsdp8-full200-v2-strict.json": {
+      "sha256": "4fe521c9210cda5705b6f9938ec62c0995a79eeab90e4aa3995367d2c2a13da2",
+      "bytes": 13345
+    },
+    "evidence/a1e6-fsdp8-full200-v2-resources.json": {
+      "sha256": "b33f794919a9f7ec0648a7a07ca85a1ce3ddfffc41d03130dd2807b36f18f9fa",
+      "bytes": 48421
+    },
+    "tools/capture_a1e6_training.py": {
+      "sha256": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df",
+      "bytes": 3355
+    },
+    "tools/capture_training.py": {
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+      "bytes": 7263
+    },
+    "tools/all_rank_resources.py": {
+      "sha256": "fb10519797206e58c4114bb3b9980d89553a0324d9188824cb26360c3104e93c",
+      "bytes": 6602
+    },
+    "tools/run_fair_a1e6_matrix_v1.sh": {
+      "sha256": "449a6ba02e89e9e09c28aefec39cbc8ec5a8a39937b60958b619b2f3a7359768",
+      "bytes": 2307
+    },
+    "scheduling/r129-a1e6-fsdp8-full-200-v2.request.json": {
+      "sha256": "8be55817164383d91a96102350991a325a7e50b0c6103f0415356fefdfa87dc5",
+      "bytes": 1854
+    }
+  },
+  "collections": {
+    "baseline": {
+      "manifest": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "manifest_sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "files": 91,
+      "bytes": 1707604,
+      "all_sha_and_size_match": true
+    },
+    "candidate": {
+      "manifest": "evidence/129-a1e6-fsdp8-full200-v2-evidence-manifest.json",
+      "manifest_sha256": "c9f5d470f94fafc0ad391ff61714a4d85046d83ef6916847e8a2f9c05e1f1930",
+      "files": 91,
+      "bytes": 1711829,
+      "all_sha_and_size_match": true
+    },
+    "continuous": {
+      "manifest": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "manifest_sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "files": 91,
+      "bytes": 3040568,
+      "all_sha_and_size_match": true
+    }
+  },
+  "finite_scalar_values_checked": 89600,
+  "candidate_resolved_config_differences_from_baseline": [
+    "activation_checkpoint.mode",
+    "checkpoint.checkpoint_dir",
+    "checkpoint.save_ckpt"
+  ],
+  "comparisons": {
+    "baseline": {
+      "step_range": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "pairs_per_metric": 1600,
+      "max_abs": {
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/total_loss": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0,
+        "data/step_tokens": 0.0,
+        "data/step_samples": 0.0,
+        "data/consumed_tokens": 0.0,
+        "data/consumed_samples": 0.0
+      },
+      "derived_unweighted_mtp_max_abs": 0.0,
+      "derived_unweighted_aux_max_abs": 0.0,
+      "input_identity_pairs_equal": 1600,
+      "initial_state_objects_per_rank": 48,
+      "initial_state_metadata_and_hashes_equal_on_all_8_ranks": true,
+      "runtime_flags_equal_on_all_8_ranks": true,
+      "model_parameter_metadata_equal_on_all_8_ranks": true
+    },
+    "continuous": {
+      "step_range": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "pairs_per_metric": 1600,
+      "max_abs": {
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/total_loss": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0,
+        "data/step_tokens": 0.0,
+        "data/step_samples": 0.0,
+        "data/consumed_tokens": 0.0,
+        "data/consumed_samples": 0.0
+      },
+      "derived_unweighted_mtp_max_abs": 0.0,
+      "derived_unweighted_aux_max_abs": 0.0,
+      "input_identity_pairs_equal": 1600,
+      "initial_state_objects_per_rank": 48,
+      "initial_state_metadata_and_hashes_equal_on_all_8_ranks": true,
+      "runtime_flags_equal_on_all_8_ranks": true,
+      "model_parameter_metadata_equal_on_all_8_ranks": true
+    }
+  },
+  "activation_checkpoint": {
+    "mode": "full",
+    "actual_inventory": {
+      "count": 3,
+      "wrappers": [
+        {
+          "fqn": "model.layers.0",
+          "wrapped_type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Decoder"
+        },
+        {
+          "fqn": "model.layers.1",
+          "wrapped_type": "hyper_parallel.models.jt_deepseek_v3.modeling_jt_deepseek_v3.JTDeepseekV3Decoder"
+        },
+        {
+          "fqn": "mtp.layers.0.transformer_layer",
+          "wrapped_type": "hyper_parallel.core.fully_shard.api.HSDPJTDeepseekV3Decoder"
+        }
+      ]
+    },
+    "all_8_rank_runtime_log_counts_verified": true,
+    "worker_logs": [
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/0/stderr.log",
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/1/stderr.log",
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/2/stderr.log",
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/3/stderr.log",
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/4/stderr.log",
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/5/stderr.log",
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/6/stderr.log",
+      "runs/r129-a1e6-fsdp8-full-200-v2/worker-logs/none_u9y10ekc/attempt_0/7/stderr.log"
+    ],
+    "limitation_zh": "记录证明包装安装和完整训练完成，未采集逐算子重放计数；off和full均保留enable_chunk_loss=true、chunk_loss_size=4096所带的投影交叉熵分块重算。"
+  },
+  "execution": {
+    "baseline": {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "container_id": "431499a668c960916ef11abe2fc379ef64109a2784164c992cb56d309eb6ecb1",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "duration_seconds": 383.04995921999216
+    },
+    "candidate": {
+      "case": "r129-a1e6-fsdp8-full-200-v2",
+      "container_id": "0efd52b92c348bdbf68ca7fdd41cdde830bd82080208b0ec1d51babbc8b4e1d3",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "duration_seconds": 388.20828402001644
+    },
+    "continuous": {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "duration_seconds": 610.3890903799911
+    }
+  },
+  "resource_observations": {
+    "baseline": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "max",
+      "median_step_seconds": 1.156256079673767,
+      "summed_step_seconds": 207.97043895721436,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15990.50334593064,
+      "max_allocated_gib_through_step200": 22.032196044921875,
+      "max_reserved_gib_through_step200": 27.25
+    },
+    "candidate": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "max",
+      "median_step_seconds": 1.2342990636825562,
+      "summed_step_seconds": 222.48642230033875,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 14947.213252909307,
+      "max_allocated_gib_through_step200": 19.392932891845703,
+      "max_reserved_gib_through_step200": 24.3203125
+    },
+    "continuous": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "rank_reduction": "max",
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "max_allocated_gib_through_step200": 22.032196044921875,
+      "max_reserved_gib_through_step200": 27.171875
+    }
+  },
+  "primary_resource_comparison": {
+    "reference": "continuous400 steps1–200 (off, save_ckpt=false)",
+    "candidate": "full200 (full, save_ckpt=false)",
+    "actual_host_config_equal": true,
+    "ratios": {
+      "median_step_time_increase_percent": 6.789390319023214,
+      "supervised_throughput_change_percent": -6.576120133845198,
+      "allocated_reduction_gib": 2.639263153076172,
+      "allocated_reduction_percent": 11.97911977405669,
+      "reserved_reduction_gib": 2.8515625,
+      "reserved_reduction_percent": 10.494537090281774
+    },
+    "single_observation_per_strategy": true
+  },
+  "public_conclusion_zh": "在固定544526f7、129八卡910B3、相同初始模型张量和逐步输入条件下，full重算完整200步×8rank主LM、总loss、日志MTP/aux、系数还原值、梯度范数、LR最大绝对差均为0，达到0.005阈值。相同观测开销的单次运行显示full降低累计allocator峰值并增加每步耗时；资源结论仅作为本次实测。",
+  "limitations_zh": [
+    "MTP/aux还原值由加权日志除以0.3/0.0001得到，并非另采集的模型内部无权标量；不能推广为MTP/aux全并行矩阵通过。",
+    "初态证据为pre-sharding模型state_dict的48项shape/dtype/hash；未比较优化器、scheduler或RNG内部字节。",
+    "性能使用step21–200每步8rank最大已发布callback时间，包含相同输入hash/标量观测开销，不是无插桩吞吐或端到端walltime。",
+    "显存为进程启动以来至step200的allocator累计峰值，包含warmup；不是物理HBM瞬时峰值。",
+    "主性能对照为continuous400前200，train_iters总长度不同但该窗口LR、输入和数值逐步一致，且两者均不保存checkpoint；baseline0–200在末步保存checkpoint，只作补充。",
+    "每种策略只有一次当前源码运行，无重复测量或置信区间；不能据此断言普遍性能收益或最优重算策略。",
+    "3个decoder wrapper为全模式覆盖；该模型仍保留head/chunk loss内置重算，off不等于关闭一切重算。"
+  ]
+}
