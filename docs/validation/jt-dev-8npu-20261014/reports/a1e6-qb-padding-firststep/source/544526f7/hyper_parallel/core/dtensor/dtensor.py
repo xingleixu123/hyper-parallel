@@ -1,0 +1,1518 @@
+# Copyright 2026 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""dtensor"""
+# pylint: disable=C9006,C9007
+import copy as cp
+import inspect
+import logging
+import warnings
+from typing import Any, Callable, Optional, Sequence, Set, Tuple, Union
+
+import numpy as np
+import torch
+from torch import Tensor
+
+from hyper_parallel.core.dtensor import _utils
+from hyper_parallel.core.dtensor._collective_utils import mesh_broadcast, mesh_scatter
+from hyper_parallel.core.dtensor._ragged_utils import (
+    _compute_ragged_slice,
+    _layout_has_ragged_shard,
+    _normalize_global_shape,
+    _scatter_ragged_tensor,
+    _slice_ragged_tensor,
+)
+from hyper_parallel.core.dtensor.device_mesh import _mesh_resources
+from hyper_parallel.core.dtensor.layout import (
+    DeviceMesh,
+    Layout,
+    _get_slice_tensor_by_layout,
+)
+from hyper_parallel.core.dtensor.placement_types import Partial, Placement, Replicate, StridedShard
+from hyper_parallel.core.utils import compute_local_shape_and_global_offset
+from hyper_parallel.core.dtensor.dtensor_base import DTensorBase
+
+logger = logging.getLogger(__name__)
+
+
+def _device_meshes_are_compatible(lhs: Any, rhs: Any) -> bool:
+    """Return whether two mesh objects describe the same device topology."""
+    if lhs is rhs:
+        return True
+    if not isinstance(lhs, DeviceMesh) or not isinstance(rhs, DeviceMesh):
+        return False
+    return lhs.device_type == rhs.device_type and lhs.to_hash() == rhs.to_hash()
+
+
+class SkipDTensorDispatch():
+    """Context manager that disables DTensor op dispatch for the enclosed block.
+
+    Args:
+        no_skip: Optional set of op callables or canonical op name strings that
+            should still be dispatched through DTensor even within this context.
+            All other ops bypass DTensor dispatch and operate on local tensors.
+
+    Example:
+        >>> import torch
+        >>> with SkipDTensorDispatch(no_skip={torch.zeros_like}):
+        ...     # zeros_like still goes through DTensor dispatch;
+        ...     # everything else uses the local tensor path.
+        ...     result = torch.zeros_like(dtensor)
+    """
+
+    def __init__(self, no_skip: Optional[Set] = None):
+        self._no_skip_names: frozenset = frozenset()
+        if no_skip:
+            names = set()
+            for op in no_skip:
+                if isinstance(op, str):
+                    names.add(op)
+                else:
+                    names.add(_utils.get_op_name(op))
+            self._no_skip_names = frozenset(names)
+        self._dispatch_token = None
+        self._ops_token = None
+
+    def __enter__(self):
+        # pylint: disable=C0415
+        from hyper_parallel.core.shard._op_dispatch import _dtensor_dispatch_disabled, _no_skip_ops
+        self._dispatch_token = _dtensor_dispatch_disabled.set(True)
+        if self._no_skip_names:
+            self._ops_token = _no_skip_ops.set(_no_skip_ops.get() | self._no_skip_names)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # pylint: disable=C0415
+        from hyper_parallel.core.shard._op_dispatch import _dtensor_dispatch_disabled, _no_skip_ops
+        if self._ops_token is not None:
+            _no_skip_ops.reset(self._ops_token)
+            self._ops_token = None
+        _dtensor_dispatch_disabled.reset(self._dispatch_token)
+        self._dispatch_token = None
+
+
+# Cache for _build_layout to avoid redundant Layout computations
+# Key: (device_mesh.to_hash(), tuple(placements), tensor_dim)
+# Value: Layout
+_LAYOUT_CACHE = {}
+
+
+def _is_alias_placements(placements) -> bool:
+    """
+    Check if placements use alias strings rather than Placement objects.
+
+    Alias placements use mesh dimension names (strings) to specify
+    the sharding strategy, e.g., ("dp", "tp") or (("dp", "tp"), "None").
+    All elements must be strings or tuples of strings for the sequence
+    to be recognized as alias-style.
+
+    Args:
+        placements: A sequence of placement specifications.
+
+    Returns:
+        bool: True if all elements are alias strings or tuples of strings.
+    """
+    if len(placements) == 0:
+        return False
+    for p in placements:
+        if isinstance(p, str):
+            continue
+        if isinstance(p, tuple) and len(p) > 0 and all(isinstance(x, str) for x in p):
+            continue
+        return False
+    return True
+
+
+def _build_layout(
+        device_mesh: DeviceMesh,
+        placements: Union[Sequence[Placement], Sequence[Union[str, Tuple[str, ...]]]],
+        tensor_dim: int
+) -> Layout:
+    """
+    Build Layout from device_mesh and placements.
+
+    This function uses a cache to avoid redundant Layout computations
+    for the same (device_mesh, placements, tensor_dim) combination.
+
+    Args:
+        device_mesh: The device mesh describing the device topology.
+        placements: Supports two styles:
+            - Placement objects (Shard, Replicate, etc.)
+            - Alias strings ("dp", "None", ("dp", "tp"), etc.), length must
+              equal the number of tensor dimensions (``tensor_dim``).
+        tensor_dim: Number of dimensions in the tensor.
+
+    Returns:
+        Layout: The built layout object.
+
+    Raises:
+        ValueError: If alias placements length does not match tensor dimensions.
+    """
+    mesh_key = device_mesh.to_hash()
+    placements_key = tuple(placements)
+    cache_key = (mesh_key, placements_key, tensor_dim)
+
+    if cache_key in _LAYOUT_CACHE:
+        return _LAYOUT_CACHE[cache_key]
+
+    layout = Layout.from_device_mesh(device_mesh)
+
+    if _is_alias_placements(placements):
+        if len(placements) != tensor_dim:
+            raise ValueError(
+                f"Alias placements length ({len(placements)}) must equal "
+                f"tensor dimensions ({tensor_dim})."
+            )
+        result = layout(*placements)
+    else:
+        result = layout(placements)
+        result.placement_to_tensor_map(tensor_dim)
+
+    _LAYOUT_CACHE[cache_key] = result
+
+    return result
+
+
+def _is_broadcastable(src_shape: Sequence[int], dst_shape: Sequence[int]) -> bool:
+    """Return True iff ``src_shape`` is broadcastable to ``dst_shape``.
+
+    Standard NumPy / PyTorch right-aligned broadcast rule: ``src`` cannot
+    have more dimensions than ``dst``; each right-aligned dimension pair
+    must be equal, or ``src``'s dimension must be 1.
+    """
+    src_shape = tuple(src_shape)
+    dst_shape = tuple(dst_shape)
+    if len(src_shape) > len(dst_shape):
+        return False
+    for i in range(1, len(src_shape) + 1):
+        s, d = src_shape[-i], dst_shape[-i]
+        if s not in (d, 1):
+            return False
+    return True
+
+
+def _device_spec(device: Any) -> Tuple[str, Optional[int]]:
+    """Return normalised ``(device_type, device_index)``.
+
+    Handles device objects and strings such as ``"npu:0"``.
+    """
+    device_type = getattr(device, "type", None)
+    # Only read .index from objects that also have a .type attribute
+    # (i.e. torch.device).  Avoids capturing str.index on plain strings.
+    device_index = (
+        getattr(device, "index", None) if device_type is not None else None
+    )
+    device_text = str(device).lower()
+
+    if device_type is None:
+        parts = device_text.split(":", maxsplit=1)
+        device_type = parts[0]
+        if len(parts) == 2 and parts[1].isdigit():
+            device_index = int(parts[1])
+
+    return str(device_type).lower(), device_index
+
+
+class DTensor(DTensorBase):
+    """
+    DTensor - Distributed Tensor
+
+    A DTensor represents a tensor that is distributed across multiple devices
+    according to a DeviceMesh and placement specifications.
+
+    Args:
+        local_tensor (Tensor): The local tensor shard on this device.
+        device_mesh (DeviceMesh): The device mesh describing the device topology.
+        placements: The placement strategy. Supports two styles:
+            - Placement objects (e.g., ``[Shard(0), Replicate()]``).
+            - Alias strings (e.g., ``("dp", "None")`` or
+              ``(("dp", "tp"), "None")``), length must equal the number of
+              tensor dimensions.
+
+    Example:
+        >>> mesh = init_device_mesh(device_type="npu", mesh_shape=(2, 2), mesh_dim_names=("dp", "tp"))
+        >>> local_tensor = Tensor(np.ones((4, 4)))
+        >>> # Placement style
+        >>> dtensor = DTensor.from_local(local_tensor, mesh, [Shard(0), Replicate()])
+        >>> # Alias style — length matches tensor dims
+        >>> dtensor = DTensor.from_local(local_tensor, mesh, ("dp", "None"))
+    """
+    _local_tensor: Tensor
+    _device_mesh: DeviceMesh
+    _placements: Sequence[Placement]
+
+    def __init_data__(
+        self,
+        local_tensor: Tensor,
+        device_mesh: DeviceMesh,
+        placements: Union[Sequence[Placement], Sequence[Union[str, Tuple[str, ...]]]],
+        layout: Optional[Layout] = None,
+        shape: Optional[Tuple[int, ...]] = None,
+    ):
+        self._local_tensor = local_tensor
+        self._device_mesh = device_mesh
+        tensor_dim = len(shape) if shape is not None else len(local_tensor.shape)
+        # Fast path: when an already-built Layout is supplied (e.g. output layouts
+        # cached by infer_layout and passed straight through wrap_output), reuse it
+        # directly and skip _build_layout (which otherwise recomputes device_mesh.to_hash(),
+        # tuple(placements) and a cache lookup on every single output construction).
+        self._layout = layout if layout is not None else _build_layout(
+            device_mesh, placements, tensor_dim
+        )
+        self._placements = tuple(self._layout.placements)
+        is_ragged = _layout_has_ragged_shard(self._layout)
+        if is_ragged and shape is None:
+            raise ValueError(
+                "DTensor.from_local with RaggedShard requires an explicit global shape"
+            )
+        if shape is not None:
+            self._global_shape = _normalize_global_shape(shape)
+        else:
+            self._global_shape = tuple(self._layout.get_global_shape(local_tensor.shape))
+        if (
+            shape is not None
+            and (
+                self._layout.tensor_map is None
+                or len(self._layout.tensor_map) != len(self._global_shape)
+            )
+        ):
+            raise ValueError(
+                "DTensor global shape rank must match layout tensor_map rank, "
+                f"got global_shape={self._global_shape!r}, tensor_map={self._layout.tensor_map!r}"
+            )
+        if is_ragged:
+            if hasattr(local_tensor, "is_contiguous") and not local_tensor.is_contiguous():
+                raise ValueError("RaggedShard local tensor must be contiguous")
+            if len(local_tensor.shape) != 1:
+                raise ValueError(
+                    "RaggedShard local tensor must use one-dimensional flat storage, "
+                    f"got local_shape={tuple(local_tensor.shape)!r}"
+                )
+            expected = _compute_ragged_slice(self._global_shape, self._layout)
+            if local_tensor.numel() != expected.local_numel:
+                raise ValueError(
+                    "RaggedShard local tensor numel does not match its allocation, "
+                    f"got actual={local_tensor.numel()}, expected={expected.local_numel}, "
+                    f"global_shape={self._global_shape!r}, placement={self._layout.ragged_shard.placement!r}"
+                )
+
+    @property
+    def device_mesh(self) -> DeviceMesh:
+        """The device mesh of this DTensor."""
+        return self._device_mesh
+
+    @property
+    def placements(self) -> Sequence[Placement]:
+        """The placements of this DTensor."""
+        return self._placements
+
+    @property
+    def layout(self) -> Layout:
+        """Internal layout for redistribution (for backward compatibility)."""
+        if not hasattr(self, '_layout'):
+            return None
+        return self._layout
+
+    @staticmethod
+    def from_local(
+        local_tensor: Tensor,
+        device_mesh: DeviceMesh,
+        placements: Union[Sequence[Placement], Sequence[Union[str, Tuple[str, ...]]]],
+        *,
+        run_check: bool = False,
+        shape: Optional[Tuple[int, ...]] = None,
+        stride: Optional[Tuple[int, ...]] = None,
+    ) -> 'DTensor':
+        """
+        Create a DTensor from a local tensor with device mesh and placements.
+
+        Args:
+            local_tensor (Tensor): The local tensor shard on this device. For
+                ``RaggedShard``, the input may use its natural rank-local shape;
+                construction stores it as a one-dimensional view internally.
+            device_mesh (DeviceMesh): The device mesh describing the device topology.
+            placements: The placement strategy. Supports two styles:
+                - Placement objects (e.g., ``[Shard(0), Replicate()]``).
+                - Alias strings (e.g., ``("dp", "None")`` or
+                  ``(("dp", "tp"), "None")``), length must equal the number
+                  of tensor dimensions.
+            run_check (bool, optional): When ``True``, perform cross-rank metadata
+                checks and broadcast replicate placements from the mesh source rank.
+                Default: ``False``.
+            shape (tuple[int, ...], optional): Explicit logical global shape.
+                Required for RaggedShard.
+            stride (tuple[int, ...], optional): Explicit logical global stride.
+                Requires ``shape``. Normal layouts also retain compatibility
+                with shape-only construction.
+
+        Returns:
+            DTensor: A new DTensor instance.
+
+        Example:
+            >>> mesh = init_device_mesh(device_type="npu", mesh_shape=(2, 2), mesh_dim_names=("dp", "tp"))
+            >>> local_tensor = Tensor(np.ones((4, 4)))
+            >>> dtensor = DTensor.from_local(local_tensor, mesh, [Shard(0), Replicate()])
+            >>> dtensor = DTensor.from_local(local_tensor, mesh, ("dp", "None"))
+        """
+        tensor_dim = len(shape) if shape is not None else len(local_tensor.shape)
+        layout = _build_layout(device_mesh, placements, tensor_dim)
+        is_ragged = _layout_has_ragged_shard(layout)
+        if is_ragged:
+            if stride is not None and shape is None:
+                raise ValueError("stride requires an explicit shape")
+            if hasattr(local_tensor, "is_contiguous") and not local_tensor.is_contiguous():
+                raise ValueError("RaggedShard local tensor must be contiguous")
+            local_tensor = local_tensor.view(-1)
+        elif stride is not None and shape is None:
+            raise ValueError("stride requires an explicit shape")
+        if run_check:
+            # pylint: disable=C0415
+            from hyper_parallel.core.dtensor._from_local_utils import run_from_local_checks
+            run_from_local_checks(
+                local_tensor,
+                device_mesh,
+                layout.placements,
+                shape=shape,
+            )
+        if shape is not None and stride is not None:
+            layout = cp.deepcopy(layout)
+            layout.set_tensor_meta(shape, stride, local_tensor.dtype)
+        return DTensor(
+            local_tensor,
+            device_mesh,
+            layout.placements,
+            layout,
+            shape=shape,
+        )
+
+    @staticmethod
+    def from_local_with_layout(
+        local_tensor: Tensor,
+        layout: Layout,
+        *,
+        shape: Optional[Tuple[int, ...]] = None,
+    ) -> 'DTensor':
+        """Fast DTensor construction from a local tensor and a pre-built Layout.
+
+        Unlike :meth:`from_local`, this does NOT rebuild the layout via
+        ``_build_layout`` — it hands the already-built ``layout`` straight to
+        ``__init_data__``. Intended for hot paths (e.g. ``wrap_output``) where the
+        output Layout was already inferred and cached by ``infer_layout``, so
+        recomputing ``device_mesh.to_hash()`` / ``tuple(placements)`` / the layout
+        cache lookup on every output is pure waste.
+
+        ``layout.placements`` (a plain attribute) is passed only to satisfy the
+        constructor's non-None check; ``__init_data__`` ignores it when ``layout``
+        is supplied.
+        """
+        return DTensor(
+            local_tensor,
+            layout.mesh,
+            layout.placements,
+            layout,
+            shape=shape,
+        )
+
+    def _alias_placements(self) -> Sequence[Placement]:
+        """Return alias_placements from layout, falling back to _placements."""
+        if hasattr(self, '_layout') and self._layout:
+            return self._layout.alias_placements
+        return self._placements
+
+    def _from_converted_local(self, local_tensor: Tensor) -> 'DTensor':
+        """Rebuild converted DTensor data without preserving Parameter identity."""
+        cls = DTensor if isinstance(self, torch.nn.Parameter) else self.__class__
+        if not isinstance(self._layout, Layout):
+            constructor_kwargs = {
+                "device_mesh": self._device_mesh,
+                "placements": self._alias_placements(),
+            }
+            if hasattr(self, "_global_shape"):
+                constructor_kwargs["shape"] = self._global_shape
+            return cls(local_tensor, **constructor_kwargs)
+        layout = cp.deepcopy(self._layout)
+        if layout.tensor_shape is not None:
+            layout.set_tensor_meta(
+                layout.tensor_shape,
+                layout.tensor_stride,
+                local_tensor.dtype,
+            )
+        return cls(
+            local_tensor,
+            device_mesh=self._device_mesh,
+            placements=layout.placements,
+            layout=layout,
+            shape=getattr(self, "_global_shape", None),
+        )
+
+    def to(self, *args, **kwargs):
+        """Move the DTensor to a different device or dtype.
+
+        Delegates to the underlying local tensor's ``to`` method and
+        reconstructs a DTensor preserving device_mesh and placements.
+
+        Args:
+            *args (tuple): Arguments passed to the underlying tensor's ``to``
+                method (e.g., device or dtype).
+            **kwargs (dict): Keyword arguments for the tensor conversion
+                (e.g., dtype, device, non_blocking).
+
+        Returns:
+            DTensor: A new DTensor with the converted local tensor.
+        """
+        new_local = self._local_tensor.to(*args, **kwargs)
+        return self._from_converted_local(new_local)
+
+    def float(self):
+        """Convert the DTensor to float dtype.
+
+        Returns:
+            DTensor: A new DTensor with float32 local tensor.
+        """
+        new_local = self._local_tensor.float()
+        return self._from_converted_local(new_local)
+
+    def type_as(self, other: Tensor) -> "DTensor":
+        """Cast this DTensor to the dtype of ``other``.
+
+        This is a **local** operation — no communication. Each shard
+        independently casts its elements to the target dtype.
+
+        Only the **dtype** of ``other`` is read; its shape, values, and
+        layout are ignored.  The returned DTensor preserves the
+        device-mesh and placements of ``self`` unchanged.
+
+        Args:
+            other (Tensor): A tensor whose ``.dtype`` will be used as the
+                target type.  May be a plain :class:`Tensor` or a
+                :class:`DTensor`.  Must reside on the same device as
+                ``self``.
+
+        Returns:
+            DTensor: A new DTensor with the converted local tensor.  When
+            ``self.dtype == other.dtype`` the method returns ``self``
+            unchanged (no-op).
+
+        Raises:
+            ValueError: If ``other`` is not a Tensor.
+            ValueError: If ``self`` has Partial placement (cast does not
+                commute with reduction).
+            ValueError: If ``self`` and ``other`` are on different devices.
+
+        Note:
+            This implementation intentionally covers **dtype-only**
+            conversion.  PyTorch's native ``type_as`` may also handle
+            cross-device transfers, but a DTensor cannot silently change
+            its backend device while retaining the old ``DeviceMesh``.
+            Use :meth:`to` for explicit device + dtype conversion.
+
+        Example:
+            >>> # x is a DTensor of float16, y is a plain float32 Tensor
+            >>> # on the same device.
+            >>> z = x.type_as(y)
+            >>> z.dtype == y.dtype
+            True
+        """
+        if not isinstance(other, Tensor):
+            raise ValueError(
+                f"type_as() argument must be a Tensor, but got "
+                f"{type(other).__name__}."
+            )
+        if hasattr(self, '_layout') and self._layout is not None:
+            if self._layout.is_partial():
+                raise ValueError(
+                    "DTensor.type_as does not support Partial input; "
+                    "call reduce_partial() first."
+                )
+
+        other_local = other.to_local() if isinstance(other, DTensor) else other
+        if self._local_tensor.device != other_local.device:
+            raise ValueError(
+                "DTensor.type_as requires self and other to be on the "
+                "same device. Use to() for explicit device + dtype "
+                "conversion."
+            )
+
+        target_dtype = other.dtype
+        if self.dtype == target_dtype:
+            return self
+        new_local = self._local_tensor.to(dtype=target_dtype)
+        return self._from_converted_local(new_local)
+
+    def _validate_factory_device(self, device: Any) -> None:
+        """Raise :class:`ValueError` if ``device`` does not match the DTensor's device."""
+        requested_type, requested_index = _device_spec(device)
+        local_type, local_index = _device_spec(self._local_tensor.device)
+        if (
+            requested_type != local_type
+            or (
+                requested_index is not None
+                and requested_index != local_index
+            )
+        ):
+            raise ValueError(
+                f"DTensor requires device to match the input DTensor "
+                f"device {self._local_tensor.device}, but got {device}."
+            )
+
+    def _new_const_tensor_op(
+            self,
+            method_name: str,
+            size: Union[int, Sequence[int]],
+            *,
+            dtype: Optional[Any] = None,
+            device: Optional[Any] = None,
+            requires_grad: bool = False,
+            layout: Optional[Any] = None,
+            pin_memory: bool = False,
+    ) -> 'DTensor':
+        """Create an all-``Replicate`` constant DTensor.
+
+        Shared implementation for ``new_zeros`` and ``new_ones``.
+
+        ``self`` is only used as a dtype/device reference and mesh source;
+        its values are ignored.  The output is always **all-Replicate**
+        because every device produces identical data independently.
+
+        Args:
+            method_name:
+                ``"new_zeros"`` or ``"new_ones"`` — the local tensor
+                factory method to call.
+            size:
+                Output shape — an int or a sequence of ints.
+            dtype:
+                Desired dtype.  Defaults to ``self.dtype`` on Torch.
+            device:
+                Must match ``self``'s device.
+            requires_grad:
+                If true, the new tensor requires gradient.
+            layout:
+                Desired layout of the new tensor.
+            pin_memory:
+                If true, the new tensor is allocated in pinned memory.
+
+        Returns:
+            DTensor: A new DTensor with all-``Replicate`` placements on
+            ``self``'s ``DeviceMesh``.
+
+        Raises:
+            ValueError: If ``device`` does not match the DTensor's device.
+        """
+        if isinstance(size, int):
+            size = (size,)
+
+        local_kwargs = {}
+        if dtype is not None:
+            local_kwargs["dtype"] = dtype
+        if device is not None:
+            self._validate_factory_device(device)
+            # An unindexed device such as "cuda" resolves to the framework's
+            # current device, which may differ from this DTensor's local device.
+            local_kwargs["device"] = self._local_tensor.device
+        if requires_grad:
+            local_kwargs["requires_grad"] = True
+        if layout is not None:
+            local_kwargs["layout"] = layout
+        if pin_memory:
+            local_kwargs["pin_memory"] = True
+
+        factory = getattr(self._local_tensor, method_name)
+        local_result = factory(size, **local_kwargs)
+
+        replicated_placements = [Replicate()] * self._device_mesh.ndim
+        return DTensor.from_local(
+            local_result, self._device_mesh, replicated_placements,
+        )
+
+    def new_zeros(
+            self,
+            size: Union[int, Sequence[int]],
+            *,
+            dtype: Optional[Any] = None,
+            device: Optional[Any] = None,
+            requires_grad: bool = False,
+            layout: Optional[Any] = None,
+            pin_memory: bool = False,
+    ) -> 'DTensor':
+        """Create an all-Replicate DTensor filled with zeros.
+
+        The output is always **fully replicated** across every device in
+        ``self``'s ``DeviceMesh``, regardless of how ``self`` is sharded.
+
+        Args:
+            size:
+                Output shape — an int or a sequence of ints.
+            dtype:
+                Desired dtype.  Defaults to ``self.dtype``.
+            device:
+                Must match ``self``'s device.
+            requires_grad:
+                If true, the new tensor requires gradient.
+            layout:
+                Desired layout of the new tensor.
+            pin_memory:
+                If true, the new tensor is allocated in pinned memory.
+
+        Returns:
+            DTensor: A new all-Replicate DTensor filled with zeros.
+        """
+        return self._new_const_tensor_op(
+            "new_zeros", size,
+            dtype=dtype,
+            device=device,
+            requires_grad=requires_grad,
+            layout=layout,
+            pin_memory=pin_memory,
+        )
+
+    def new_ones(
+            self,
+            size: Union[int, Sequence[int]],
+            *,
+            dtype: Optional[Any] = None,
+            device: Optional[Any] = None,
+            requires_grad: bool = False,
+            layout: Optional[Any] = None,
+            pin_memory: bool = False,
+    ) -> 'DTensor':
+        """Create an all-Replicate DTensor filled with ones.
+
+        The output is always **fully replicated** across every device in
+        ``self``'s ``DeviceMesh``, regardless of how ``self`` is sharded.
+
+        Args:
+            size:
+                Output shape — an int or a sequence of ints.
+            dtype:
+                Desired dtype.  Defaults to ``self.dtype``.
+            device:
+                Must match ``self``'s device.
+            requires_grad:
+                If true, the new tensor requires gradient.
+            layout:
+                Desired layout of the new tensor.
+            pin_memory:
+                If true, the new tensor is allocated in pinned memory.
+
+        Returns:
+            DTensor: A new all-Replicate DTensor filled with ones.
+        """
+        return self._new_const_tensor_op(
+            "new_ones", size,
+            dtype=dtype,
+            device=device,
+            requires_grad=requires_grad,
+            layout=layout,
+            pin_memory=pin_memory,
+        )
+
+    def to_local(self) -> Tensor:
+        """
+        Convert DTensor to local tensor.
+
+        Returns:
+            Tensor: The local tensor shard on this device.
+        """
+        return self._local_tensor
+
+    def tolist(self):
+        """
+        Convert the DTensor to a nested Python list or number.
+
+        This operation gathers the complete tensor on every participating rank
+        before converting it to Python values. It is an **implicit collective**:
+        all ranks in the DeviceMesh must participate.
+
+        Returns:
+            Union[list, int, float, bool]: A nested Python list, or a Python
+            number for a scalar DTensor.
+
+        Note:
+            This triggers ``full_tensor()`` under the hood, which performs
+            all-gather communication. For large tensors, prefer slicing or
+            index-based access to avoid materialising the full tensor.
+
+            If you only need the **local shard** as a list, use
+            ``dtensor.to_local().tolist()`` instead — that path has zero
+            communication overhead.
+
+        Example:
+            >>> mesh = init_device_mesh("npu", (2,), ("dp",))
+            >>> x = distribute_tensor(torch.arange(8).reshape(4, 2), mesh, [Shard(0)])
+            >>> x.tolist()              # full data: [[0,1],[2,3],[4,5],[6,7]]
+            >>> x.to_local().tolist()   # local shard only (no comm)
+        """
+        return self.full_tensor().tolist()
+
+    def copy_(self, src: "DTensor", non_blocking: bool = False) -> "DTensor":
+        """In-place copy of ``src`` into this DTensor's local shard.
+
+        Delegates to ``Tensor.copy_`` on the underlying local tensors.
+        Follows standard ``Tensor.copy_`` semantics: version counter is
+        bumped and autograd edges are created when grad is enabled.
+
+        Constraints on ``src``:
+            * must be a ``DTensor`` on the same or an equivalent ``DeviceMesh`` topology as ``self``;
+            * its placements must equal ``self.placements``, OR
+              ``src._local_tensor.numel() == 1`` (single-element broadcast);
+            * its local shape must equal or be broadcastable to
+              ``self._local_tensor.shape``.
+
+        No redistribute / implicit slicing is performed; src dtype is cast
+        to self dtype in-place.
+
+        Args:
+            src (DTensor): Source DTensor satisfying the constraints above.
+            non_blocking (bool): Forwarded to the underlying ``copy_``.
+
+        Returns:
+            DTensor: ``self``.
+
+        Raises:
+            TypeError:  if ``src`` is not a ``DTensor``.
+            ValueError: if mesh, placement, or shape constraint is violated.
+        """
+        if not isinstance(src, DTensor):
+            raise TypeError(
+                f"For DTensor.copy_, src should be a DTensor, but got {type(src).__name__}."
+            )
+        src_local = src.to_local()
+        if not _device_meshes_are_compatible(src.device_mesh, self._device_mesh):
+            raise ValueError(
+                f"For DTensor.copy_, src and self should share the same DeviceMesh, "
+                f"but got src.device_mesh={src.device_mesh!r}, "
+                f"self._device_mesh={self._device_mesh!r}."
+            )
+
+        placement_eq = tuple(src.placements) == tuple(self._placements)
+        shape_eq = src_local.shape == self._local_tensor.shape
+        src_is_scalar = src_local.numel() == 1
+
+        if not placement_eq and not src_is_scalar:
+            raise ValueError(
+                f"For DTensor.copy_, src.placements should equal self.placements "
+                f"or src.numel() should be 1, but got "
+                f"src.placements={src.placements}, "
+                f"self.placements={self._placements}, "
+                f"src.numel()={src_local.numel()}."
+            )
+        if not shape_eq and not src_is_scalar and not _is_broadcastable(
+            src_local.shape, self._local_tensor.shape
+        ):
+            raise ValueError(
+                f"For DTensor.copy_, src local shape should be broadcastable to "
+                f"self local shape, but got "
+                f"src.shape={tuple(src_local.shape)}, "
+                f"self.shape={tuple(self._local_tensor.shape)}."
+            )
+
+        self._local_tensor.copy_(src_local, non_blocking=non_blocking)
+        return self
+
+    def zero_(self) -> "DTensor":
+        """In-place fill with zeros. Returns ``self``."""
+        self._local_tensor.zero_()
+        return self
+
+    def fill_(self, value) -> "DTensor":
+        """In-place fill with ``value``. Returns ``self``."""
+        self._local_tensor.fill_(value)
+        return self
+
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        """
+        The global shape of this DTensor.
+
+        Returns:
+            Tuple[int, ...]: The global tensor shape.
+        """
+        return self._global_shape
+
+    def size(self, dim=None):
+        """Return the global shape, consistent with .shape.
+
+        Without ``dim`` returns a tuple matching ``self.shape``.
+        With ``dim`` returns the size of that dimension.
+        """
+        global_shape = self.shape
+        if dim is not None:
+            return global_shape[dim]
+        return global_shape
+
+    def numel(self) -> int:
+        """Return the number of elements in this DTensor."""
+        return int(np.prod(self.shape))
+
+    @property
+    def ndim(self) -> int:
+        """Return the logical global tensor rank."""
+        return len(self._global_shape)
+
+    def dim(self) -> int:
+        """Return the logical global tensor rank."""
+        return len(self._global_shape)
+
+    @property
+    def local_shape(self) -> Tuple[int, ...]:
+        """
+        The local shape of this DTensor on this device.
+
+        Returns:
+            Tuple[int, ...]: The local tensor shape.
+        """
+        return self._local_tensor.shape
+
+    def redistribute(
+        self,
+        device_mesh: DeviceMesh,
+        placements: Union[Sequence[Placement], Sequence[Union[str, Tuple[str, ...]]]]
+    ) -> 'DTensor':
+        """
+        Redistribute this DTensor to a new device mesh and placements.
+
+        Args:
+            device_mesh (DeviceMesh): The target device mesh.
+            placements: The target placements. Supports Placement objects
+                or alias strings.
+
+        Returns:
+            DTensor: A new DTensor with the specified distribution.
+
+        Example:
+            >>> new_dtensor = dtensor.redistribute(mesh, [Replicate(), Shard(1)])
+            >>> new_dtensor = dtensor.redistribute(mesh, ("None", "tp"))
+        """
+        logger.debug(
+            "redistribute: shape=%s, src_placements=%s -> dst_placements=%s, "
+            "mesh_shape=%s, local_shape=%s",
+            tuple(self.shape),
+            tuple(self._placements),
+            tuple(placements),
+            tuple(device_mesh.shape),
+            tuple(self._local_tensor.shape),
+        )
+
+        # Build dst_layout from device_mesh and placements
+        dst_layout = _build_layout(
+            device_mesh, placements, len(self._global_shape)
+        )
+
+        # pylint: disable=C0415
+        from hyper_parallel.core.dtensor.tensor_redistribution import _tensor_redistribution
+        out = _tensor_redistribution.redistribution(self, dst_layout)
+        return out
+
+    def reduce_partial(self) -> 'DTensor':
+        """
+        Reduce partial sharding state for this DTensor.
+
+        Returns:
+            DTensor: A new DTensor with partial state reduced.
+        """
+        if not self._layout:
+            return self
+        to_layout = cp.deepcopy(self._layout)
+        to_layout.reset_partial()
+        # pylint: disable=C0415
+        from hyper_parallel.core.dtensor.tensor_redistribution import _tensor_redistribution
+        out = _tensor_redistribution.reduce_partial(self, to_layout)
+        return out
+
+    def full_tensor(self) -> Tensor:
+        """
+        Return the full tensor of this DTensor.
+
+        Returns:
+            Tensor: A Tensor object that represents the full tensor of this DTensor.
+                    The returned tensor contains the complete data gathered from
+                    all ranks.
+
+        Note:
+            This operation involves communication across all ranks in the DeviceMesh,
+            which may be expensive for large tensors. Use with caution in
+            performance-critical code paths.
+
+        Example:
+            >>> # Assume dtensor is sharded across multiple devices
+            >>> local_tensor = dtensor.to_local()  # Returns only the local shard
+            >>> full_tensor = dtensor.full_tensor()  # Returns the complete tensor
+        """
+        if not self._layout:
+            return self._local_tensor
+
+        # Create a fully replicated layout
+        replicated_layout = cp.deepcopy(self._layout)
+
+        # Set all placements to Replicate and convert to tensor_map
+        replicated_placements = [Replicate()] * len(replicated_layout.mesh_shape)
+        replicated_layout.set_placements(replicated_placements)
+        replicated_layout.placement_to_tensor_map(len(self._global_shape))
+
+        # Clear partial status from original layout since Replicate has no partial
+        replicated_layout.reset_partial()
+
+        # Redistribute to the replicated layout and return local tensor
+        # pylint: disable=C0415
+        from hyper_parallel.core.dtensor.tensor_redistribution import _tensor_redistribution
+        out = _tensor_redistribution.redistribution(self, replicated_layout)
+        return out.to_local()
+
+
+def _normalize_shard_dim(dim: int, ndim: int) -> int:
+    return dim + ndim if dim < 0 else dim
+
+
+def _distribute_tensor_with_communication(
+    tensor: Tensor,
+    device_mesh: DeviceMesh,
+    placements: Sequence[Placement],
+    src_data_rank: int,
+) -> Tensor:
+    """Scatter/broadcast a logical global tensor along mesh dimensions (PyTorch parity)."""
+    local = tensor
+    if len(placements) < device_mesh.ndim:
+        raise ValueError(
+            f"placements length ({len(placements)}) must be at least device_mesh.ndim "
+            f"({device_mesh.ndim}) when src_data_rank is set"
+        )
+    for mesh_dim in range(device_mesh.ndim):
+        placement = placements[mesh_dim]
+        if isinstance(placement, StridedShard):
+            raise NotImplementedError(
+                "distribute_tensor with src_data_rank does not support StridedShard yet; "
+                "pass src_data_rank=None for local-only sharding."
+            )
+        if placement.is_shard():
+            shard_dim = _normalize_shard_dim(placement.dim, local.ndim)
+            num_chunks = device_mesh.size(mesh_dim)
+            if num_chunks <= 0:
+                raise ValueError(f"invalid mesh dim size {num_chunks} on mesh_dim={mesh_dim}")
+            chunks = tuple(local.chunk(num_chunks, dim=shard_dim))
+            if not chunks:
+                raise ValueError(f"cannot shard dim {shard_dim} into {num_chunks} chunks")
+            output = torch.empty_like(chunks[0])
+            local = mesh_scatter(output, chunks, device_mesh, mesh_dim, group_src=src_data_rank)
+        elif placement.is_replicate() or placement.is_partial():
+            local = mesh_broadcast(local, device_mesh, mesh_dim, group_src=src_data_rank)
+            if isinstance(placement, Partial):
+                warnings.warn(
+                    f"Partial placement {placement} during distribute_tensor: "
+                    "broadcast only; partial partition is not applied yet.",
+                    stacklevel=3,
+                )
+        else:
+            raise RuntimeError(
+                f"unsupported placement {placement} on device mesh dimension {mesh_dim}"
+            )
+    return local
+
+
+def distribute_tensor(
+    tensor: Tensor,
+    device_mesh: DeviceMesh,
+    placements: Union[Sequence[Placement], Sequence[Union[str, Tuple[str, ...]]]],
+    *,
+    src_data_rank: Optional[int] = None,
+) -> DTensor:
+    """
+    Distribute a global tensor to the device mesh according to the placements.
+
+    Args:
+        tensor (Tensor): The global tensor to be distributed. All ranks
+            should have the same tensor data.
+        device_mesh (DeviceMesh): The device mesh describing the device topology.
+        placements: The placement strategy. Supports two styles:
+            - Placement objects (e.g., ``[Shard(0), Replicate()]``).
+            - Alias strings (e.g., ``("dp", "None")`` or
+              ``(("dp", "tp"), "None")``), length must equal the number of
+              tensor dimensions.
+
+    Returns:
+        DTensor: A new DTensor with the local shard on each rank.
+
+    Note:
+        When ``src_data_rank`` is an ``int`` (e.g. ``0``), shard/replicate
+        placements use scatter/broadcast from the source rank on each mesh axis,
+        matching PyTorch ``distribute_tensor``. When ``src_data_rank=None``
+        (default), each rank slices its local tensor without communication
+        (legacy Hyper behavior; all ranks must hold the same global data).
+
+    Example:
+        >>> mesh = init_device_mesh(device_type="npu", mesh_shape=(2, 2), mesh_dim_names=("dp", "tp"))
+        >>> global_tensor = Tensor(np.arange(16).reshape(4, 4))
+        >>> dtensor = distribute_tensor(global_tensor, mesh, [Shard(0), Replicate()])
+        >>> dtensor = distribute_tensor(global_tensor, mesh, ("dp", "None"))
+    """
+    layout = _build_layout(device_mesh, placements, len(tensor.shape))
+    if _layout_has_ragged_shard(layout):
+        if src_data_rank is None:
+            local_tensor = _slice_ragged_tensor(tensor, layout)
+        else:
+            local_tensor = _scatter_ragged_tensor(tensor, layout, src_data_rank)
+    elif src_data_rank is None:
+        local_tensor = _get_slice_tensor_by_layout(tensor, layout)
+    else:
+        local_tensor = _distribute_tensor_with_communication(
+            tensor, device_mesh, layout.placements, src_data_rank
+        )
+    return DTensor.from_local_with_layout(
+        local_tensor,
+        layout,
+        shape=tuple(tensor.shape),
+    )
+
+
+def _distribute_module_param_source(param: Any) -> Tensor:
+    """Tensor data used as the global tensor for :func:`distribute_tensor`."""
+    return param.data
+
+
+def _distribute_module_new_parameter(key: str, dtensor: DTensor, requires_grad: bool) -> Any:
+    """Build a :class:`torch.nn.Parameter` holding *dtensor*."""
+    del key
+    return torch.nn.Parameter(dtensor, requires_grad=requires_grad)
+
+
+def _distribute_module_set_param(module: Any, key: str, new_param: Any) -> None:
+    """Register or assign a parameter on *module* (``nn.Module``-like)."""
+    if hasattr(module, "register_parameter"):
+        module.register_parameter(key, new_param)
+        return
+    if hasattr(module, "_params"):
+        module._params[key] = new_param
+        if hasattr(module, "_params_list"):
+            module._params_list[key] = new_param
+        if key in module.__dict__:
+            module.__dict__[key] = new_param
+        return
+    raise TypeError(
+        f"distribute_module expects nn.Module-like objects with register_parameter or _params; "
+        f"got {type(module)}."
+    )
+
+
+def _distribute_module_iter_params(module: Any) -> list:
+    """Return ``[(name, param), ...]`` for direct parameters (``_parameters`` or ``_params``)."""
+    if hasattr(module, "_parameters"):
+        return list(module._parameters.items())
+    if hasattr(module, "_params"):
+        return list(module._params.items())
+    return []
+
+
+def _distribute_module_iter_buffers(module: Any) -> list:
+    """Return ``[(name, buffer), ...]`` if the module has ``_buffers`` (PyTorch ``nn.Module``)."""
+    if hasattr(module, "_buffers"):
+        return list(module._buffers.items())
+    return []
+
+
+def _distribute_module_named_modules(module: Any):
+    """``nn.Module.named_modules`` (submodule FQNs)."""
+    if hasattr(module, "named_modules"):
+        return module.named_modules()
+    raise TypeError(
+        f"distribute_module expects a module-like object with named_modules; "
+        f"got {type(module)}."
+    )
+
+
+def _distribute_module_named_parameters(module: Any):
+    """``nn.Module.named_parameters(recurse=False)``."""
+    if hasattr(module, "named_parameters"):
+        return module.named_parameters(recurse=False)
+    raise TypeError(
+        f"distribute_module expects a module-like object with named_parameters; "
+        f"got {type(module)}."
+    )
+
+
+def _replicate_submodule_params_buffers(
+    sub_mod: Any,
+    device_mesh: DeviceMesh,
+    *,
+    module_prefix: str = "",
+) -> None:
+    """Convert plain params/buffers on *sub_mod* to fully replicated :class:`DTensor`."""
+    full_replicate = [Replicate()] * device_mesh.ndim
+    for key, param in _distribute_module_iter_params(sub_mod):
+        if param is None or isinstance(param, DTensorBase):
+            continue
+        src = _distribute_module_param_source(param)
+        requires_grad = bool(getattr(param, "requires_grad", True))
+        dt = distribute_tensor(src, device_mesh, full_replicate)
+        param_name = f"{module_prefix}.{key}" if module_prefix else key
+        new_param = _distribute_module_new_parameter(param_name, dt, requires_grad)
+        _distribute_module_set_param(sub_mod, key, new_param)
+    for key, buffer in _distribute_module_iter_buffers(sub_mod):
+        if buffer is None or isinstance(buffer, DTensorBase):
+            continue
+        sub_mod._buffers[key] = distribute_tensor(buffer, device_mesh, full_replicate)
+
+
+def _distribute_module_run_partition_and_replicate(
+    module: Any,
+    device_mesh: DeviceMesh,
+    partition_fn: Optional[Callable[[str, Any, DeviceMesh], None]],
+) -> None:
+    """Call optional ``partition_fn`` per ``named_modules`` and replicate remaining tensors."""
+    if partition_fn is None:
+        for mod_name, submod in _distribute_module_named_modules(module):
+            _replicate_submodule_params_buffers(submod, device_mesh, module_prefix=mod_name)
+        return
+    for mod_name, submod in _distribute_module_named_modules(module):
+        partition_fn(mod_name, submod, device_mesh)
+        _replicate_submodule_params_buffers(submod, device_mesh, module_prefix=mod_name)
+
+
+def _distribute_module_register_input_fn(
+    module: Any,
+    device_mesh: DeviceMesh,
+    input_fn: Callable[..., Any],
+) -> None:
+    """Register *input_fn* as a forward pre-hook on *module* (2- or 3-arg, PyTorch-compatible)."""
+    num_args = len(inspect.signature(input_fn).parameters)
+    if num_args == 2:
+        warnings.warn(
+            "Deprecating input_fn that takes two arguments (inputs, device_mesh), "
+            "please use input_fn that takes in (module, inputs, device_mesh) instead!",
+            FutureWarning,
+            stacklevel=3,
+        )
+        module.register_forward_pre_hook(
+            lambda _, inputs: input_fn(inputs, device_mesh)
+        )
+    elif num_args == 3:
+        module.register_forward_pre_hook(
+            lambda mod, inputs: input_fn(mod, inputs, device_mesh)
+        )
+    else:
+        raise ValueError(
+            f"input_fn should take in 2 or 3 arguments, but got {num_args} arguments!"
+        )
+
+
+def _distribute_module_register_output_fn(
+    module: Any,
+    device_mesh: DeviceMesh,
+    output_fn: Callable[..., Any],
+) -> None:
+    """Register *output_fn* as a forward hook on *module* (2- or 3-arg, PyTorch-compatible)."""
+    num_args = len(inspect.signature(output_fn).parameters)
+    if num_args == 2:
+        warnings.warn(
+            "Deprecating output_fn that takes two arguments (outputs, device_mesh), "
+            "please use output_fn that takes in (module, outputs, device_mesh) instead!",
+            FutureWarning,
+            stacklevel=3,
+        )
+        module.register_forward_hook(
+            lambda mod, inputs, outputs: output_fn(outputs, device_mesh)
+        )
+    elif num_args == 3:
+        module.register_forward_hook(
+            lambda mod, inputs, outputs: output_fn(mod, outputs, device_mesh)
+        )
+    else:
+        raise ValueError(
+            f"output_fn should take in 2 or 3 arguments, but got {num_args} arguments!"
+        )
+
+
+def distribute_module(
+    module: Any,
+    device_mesh: Optional[DeviceMesh] = None,
+    partition_fn: Optional[Callable[[str, Any, DeviceMesh], None]] = None,
+    input_fn: Optional[Callable[..., Any]] = None,
+    output_fn: Optional[Callable[..., Any]] = None,
+) -> Any:
+    """PyTorch ``distribute_module`` parity: shard/replicate params and optional I/O hooks.
+
+    Unsharded parameters and buffers become fully replicated :class:`DTensor` after
+    ``partition_fn``. ``input_fn`` / ``output_fn`` attach only to the root *module*.
+
+    Args:
+        module: Root ``nn.Module``.
+        device_mesh: Placement mesh; if ``None``, uses ``_mesh_resources.get_current_mesh()``.
+        partition_fn: Per ``named_modules`` callback before replicate pass; ``None`` replicates all.
+        input_fn: ``(module, inputs, mesh)`` or deprecated ``(inputs, mesh)`` pre-hook.
+        output_fn: ``(module, outputs, mesh)`` or deprecated ``(outputs, mesh)`` forward hook.
+
+    Returns:
+        *module* in place, with distributed tensors where applied.
+
+    Raises:
+        RuntimeError: If called twice on the same *module*.
+        ValueError: If ``input_fn`` / ``output_fn`` arity is not 2 or 3.
+
+    Note:
+        XLA / ``torch_xla`` is not supported; strided device :class:`DTensor` only.
+    """
+    if getattr(module, "_distribute_module_applied", False):
+        raise RuntimeError(
+            "distribute_module should only be called once on a module, "
+            "but it has already been called on this module!"
+        )
+    device_mesh = device_mesh or _mesh_resources.get_current_mesh()
+    _distribute_module_run_partition_and_replicate(module, device_mesh, partition_fn)
+    if input_fn is not None:
+        _distribute_module_register_input_fn(module, device_mesh, input_fn)
+    if output_fn is not None:
+        _distribute_module_register_output_fn(module, device_mesh, output_fn)
+    module._distribute_module_applied = True
+    return module
+
+
+def _dtensor_init_helper(
+        init_op,
+        size,
+        device_mesh,
+        placements,
+        *,
+        rng_tracked: bool = False,
+        **kwargs,
+) -> DTensor:
+    """
+        Helper function to create and initialize a distributed tensor.
+
+        Args:
+            size: Shape of the tensor.
+            dtype: Data type of the tensor.
+            device: Target device for the tensor.
+            requires_grad: Whether the tensor requires gradient.
+            rng_tracked: When ``True``, initialize via :class:`OffsetBasedRNGTracker`
+                so shard/replicate random semantics match PyTorch DTensor factories.
+
+        Returns:
+            DTensor: The initialized distributed tensor.
+    """
+    global_shape = (size,) if isinstance(size, int) else tuple(size)
+    layout = _build_layout(device_mesh, placements, len(global_shape))
+    if _layout_has_ragged_shard(layout):
+        raise NotImplementedError(
+            "RaggedShard tensor factories are not implemented in the DTensor metadata phase"
+        )
+
+    # get local tensor shape
+    local_shape = compute_local_shape_and_global_offset(
+        size, device_mesh, placements
+    )
+
+    # initialize the local tensor
+    if init_op is torch.full:
+        fill_value = kwargs.pop("fill_value", 0)
+        local_tensor = init_op(local_shape, fill_value, **kwargs)
+    elif rng_tracked:
+        # pylint: disable=C0415
+        from hyper_parallel.core.dtensor.random import is_rng_supported_mesh, OffsetBasedRNGTracker
+        from hyper_parallel.core.shard._op_dispatch import _OP_DISPATCHER
+
+        layout = _build_layout(device_mesh, placements, len(local_shape))
+        if is_rng_supported_mesh(device_mesh):
+            if _OP_DISPATCHER._rng_tracker is None:
+                _OP_DISPATCHER._rng_tracker = OffsetBasedRNGTracker(run_state_sync=False)
+            with _OP_DISPATCHER._rng_tracker._distribute_region(
+                device_mesh,
+                layout.placements,
+                global_shape,
+            ):
+                local_tensor = init_op(local_shape, **kwargs)
+        else:
+            local_tensor = init_op(local_shape, **kwargs)
+    else:
+        local_tensor = init_op(local_shape, **kwargs)
+
+    return DTensor.from_local(
+        local_tensor,
+        device_mesh,
+        placements,
+    )
+
+
+def ones(
+    size,
+    device_mesh,
+    placements,
+) -> DTensor:
+    """
+    Returns a :class:`DTensor` filled with the scalar value 1, with the shape defined
+    by the variable argument ``size``.
+
+    Args:
+        size (Union[tuple[int], list[int], int, Tensor]): The specified shape of output tensor. Only positive integer or
+            tuple or Tensor containing positive integers are allowed. If it is a Tensor,
+            it must be a 0-D or 1-D Tensor with int32 or int64 dtypes.
+
+    Keyword args:
+        device_mesh: :class:`DeviceMesh` type, contains the mesh info of ranks
+        placements: a sequence of :class:`Placement` type: ``Shard``, ``Replicate``
+
+    Returns:
+        A :class:`DTensor` object on each rank
+    """
+    ones_ = torch.ones
+    return _dtensor_init_helper(
+        ones_,
+        size,
+        device_mesh=device_mesh,
+        placements=placements,
+    )
+
+
+def empty(
+    size,
+    device_mesh,
+    placements,
+) -> DTensor:
+    """
+    Returns a :class:`DTensor` filled with uninitialized data. The shape of the :class:`DTensor`
+    is defined by the variable argument ``size``.
+
+    Args:
+        size (Union[tuple[int], list[int], int]): The specified shape of output tensor. Can be variable numbers of
+            positive integers or tuple or list containing positive integers.
+
+    Keyword args:
+        device_mesh: :class:`DeviceMesh` type, contains the mesh info of ranks
+        placements: a sequence of :class:`Placement` type: ``Shard``, ``Replicate``
+
+    Returns:
+        A :class:`DTensor` object on each rank
+    """
+    empty_ = torch.empty
+    return _dtensor_init_helper(
+        empty_,
+        size,
+        device_mesh=device_mesh,
+        placements=placements,
+    )
+
+
+def full(
+    size,
+    fill_value,
+    *,
+    device_mesh,
+    placements,
+) -> DTensor:
+    """
+    Returns a :class:`DTensor` filled with ``fill_value`` according to ``device_mesh`` and
+    ``placements``, with the shape defined by the argument ``size``.
+
+    Args:
+        size (Union[tuple[int], list[int]]): The specified shape of output tensor.
+        fill_value (Union[numbers.Number, Tensor]): Value to fill the returned tensor. It can be a scalar number, a 0-D
+            Tensor, or a 1-D Tensor with only one element.
+
+    Keyword args:
+        device_mesh: :class:`DeviceMesh` type, contains the mesh info of ranks.
+        placements: a sequence of :class:`Placement` type: ``Shard``, ``Replicate``
+
+    Returns:
+        A :class:`DTensor` object on each rank
+    """
+    full_ = torch.full
+    return _dtensor_init_helper(
+        full_,
+        size,
+        fill_value=fill_value,
+        device_mesh=device_mesh,
+        placements=placements,
+    )
+
+
+def zeros(
+    size,
+    device_mesh,
+    placements,
+) -> DTensor:
+    """
+    Returns a :class:`DTensor` filled with the scalar value 0.
+
+    Args:
+        size (Union[tuple[int], list[int], int, Tensor]): The specified shape of output tensor. Only positive integer or
+        tuple or Tensor containing positive integers are allowed. If it is a Tensor,
+            it must be a 0-D or 1-D Tensor with int32 or int64 dtypes.
+    Keyword args:
+        device_mesh: :class:`DeviceMesh` type, contains the mesh info of ranks
+        placements: a sequence of :class:`Placement` type: ``Shard``, ``Replicate``
+
+    Returns:
+        A :class:`DTensor` object on each rank
+    """
+    zeros_ = torch.zeros
+    return _dtensor_init_helper(
+        zeros_,
+        size,
+        device_mesh=device_mesh,
+        placements=placements,
+    )
+
+
+def rand(
+    size,
+    device_mesh,
+    placements,
+    **kwargs,
+) -> DTensor:
+    """
+    Returns a :class:`DTensor` filled with random numbers from a uniform
+    distribution on ``[0, 1)``.
+
+    Args:
+        size: Global output shape.
+        device_mesh: :class:`DeviceMesh` for the distributed layout.
+        placements: Per-mesh-dimension :class:`Placement` values.
+        **kwargs: Forwarded to :func:`torch.rand` (for example ``dtype``).
+
+    Returns:
+        A :class:`DTensor` object on each rank.
+    """
+    return _dtensor_init_helper(
+        torch.rand,
+        size,
+        device_mesh=device_mesh,
+        placements=placements,
+        rng_tracked=True,
+        **kwargs,
+    )
+
+
+def randn(
+    size,
+    device_mesh,
+    placements,
+    **kwargs,
+) -> DTensor:
+    """
+    Returns a :class:`DTensor` filled with random numbers from a normal
+    distribution with mean ``0`` and variance ``1``.
+
+    Args:
+        size: Global output shape.
+        device_mesh: :class:`DeviceMesh` for the distributed layout.
+        placements: Per-mesh-dimension :class:`Placement` values.
+        **kwargs: Forwarded to :func:`torch.randn` (for example ``dtype``).
+
+    Returns:
+        A :class:`DTensor` object on each rank.
+    """
+    return _dtensor_init_helper(
+        torch.randn,
+        size,
+        device_mesh=device_mesh,
+        placements=placements,
+        rng_tracked=True,
+        **kwargs,
+    )

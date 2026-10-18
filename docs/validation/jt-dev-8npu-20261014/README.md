@@ -4,6 +4,8 @@
 
 最新[真实q_b宽度定位、两图与无Torch复算](reports/a1e6-qb-native-width-cause/README_ZH.md)：原生W/X相同，全宽重复与P零差，半宽两次稳定且逐字节重现旧TP2；对应P的两半运行时全元素最大差0.015625/0.0078125、非零3976/3798。本次3步×8rank对原FSDP训练标量/计数/input零差。证据只确认一个真实使用点的形状效应，具体kernel和完整200步根因仍未解决。
 
+新增[主动T/P首步因果对照与离线复算](reports/a1e6-qb-padding-firststep/README_ZH.md)：T三步×8rank对原TP2全零差，P完整1536个目标Y块恢复FSDP，首步主LM的P−T=+0.00019359588623046875、P−F=−0.000301361083984375；仍非200步修复，不推荐生产padding。科学与[发布独审](evidence/a1e6-qb-padding-firststep-publication-review-v1.json)已通过；子报告保留作者冻结原字节，内部publication pending仅为冻结时历史状态。
+
 下方为按当时状态保留的早期原始索引，其中英文和旧的待验证描述不覆盖上述当前中文报告；历史数据不能移用为新基点验收。
 
 # JT DeepSeek V3: eight-910B validation evidence
