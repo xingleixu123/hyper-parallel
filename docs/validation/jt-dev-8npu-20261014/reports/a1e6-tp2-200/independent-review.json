@@ -1,0 +1,1870 @@
+{
+  "schema": "a1e6-tp2200-v2-independent-review-v1",
+  "created_utc": "2026-10-18T04:32:04.572541+00:00",
+  "status": "REVIEW_COMPLETE_MAIN_LM_FAIL",
+  "evidence_integrity": "PASS",
+  "acceptance": {
+    "main_lm": "FAIL",
+    "tolerance": 0.005,
+    "new_confirmed_root_cause": false,
+    "resource_recommendation_eligible": false
+  },
+  "findings": [],
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "inputs": {
+    "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json": {
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "bytes": 17543
+    },
+    "evidence/129-a1e6-tp2200-v2-evidence-manifest.json": {
+      "sha256": "296ca4df1365d00cbab1f9bbea4c2f3027baec2062f243d0cefbc8036a62fca8",
+      "bytes": 17185
+    },
+    "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json": {
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "bytes": 18270
+    },
+    "evidence/a1e6-tp2200-v2-strict.json": {
+      "sha256": "0014f6e5c5a8fbf633d231f7f4d934a6004db73fb78f6bf859fa854af3a1e9bb",
+      "bytes": 27701
+    },
+    "evidence/a1e6-tp2200-v2-resources.json": {
+      "sha256": "8707c17911825742c59778940f389335335abdad10f7825c7aec039d478fe4d3",
+      "bytes": 48395
+    },
+    "scheduling/r129-a1e6-tp2-200-v2.request.json": {
+      "sha256": "54c865138b6997f2ed698c1cf1842a5607becd9d51fec70e11de4598053e78ef",
+      "bytes": 1840
+    },
+    "configs/r129-a1e6-tp2-200-v2.yaml": {
+      "sha256": "f62c6b322f859138805f9362bfa3548461cc1ed7545cd2a3cab737f1d58e5b68",
+      "bytes": 6808
+    },
+    "evidence/a1e6-shared-matrix-planning-v1/actual-parser.json": {
+      "sha256": "22c3d8a151c6f3738383b20ad4f4887eab59b268bd00f5763c414cd61a925de4",
+      "bytes": 244394
+    },
+    "tools/all_rank_resources.py": {
+      "sha256": "fb10519797206e58c4114bb3b9980d89553a0324d9188824cb26360c3104e93c",
+      "bytes": 6602
+    },
+    "tools/capture_training.py": {
+      "sha256": "aef5a45ef770da810f07a59a3d97e3363368e7bb7076525d8e95f05ac9c6d717",
+      "bytes": 7263
+    },
+    "tools/capture_a1e6_training.py": {
+      "sha256": "e00039cd516ce01975d068318fa613b0f1d893304899f2a78562af6a2c36a1df",
+      "bytes": 3355
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/text_trainer.py": {
+      "sha256": "79426f3fdd5f91f8b74791b45b727558637552eadc702176761ac96ce6bf3c87",
+      "bytes": 14547
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/trainer/runtime/fsdp.py": {
+      "sha256": "96b4ce0b53577fbcde9d7338aadb002a6ce0e4316fd6632241beea9e9eb32a79",
+      "bytes": 17585
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/distributed/mesh.py": {
+      "sha256": "1fcbeb292a25f1655437adc1842a5dfd268d624ca04d5e3faeba59c98798e853",
+      "bytes": 12230
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/distributed/_builder/default_templates.py": {
+      "sha256": "549c3c5b89f705544ccae594043f14d25d05a4d9e7a50a6d88438ab5063c835e",
+      "bytes": 19351
+    },
+    "fixes/latest-jt-validation-f637/hyper_parallel/components/optim/mixed_precision_optimizer.py": {
+      "sha256": "1843d66dd9cee3bce44f6a99f803f3ec337a5f0cfbf56c127a9a43ded4fb451b",
+      "bytes": 16151
+    }
+  },
+  "collections": {
+    "baseline": {
+      "manifest": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca",
+      "files": 91,
+      "bytes": 1707604,
+      "all_sha_size_match": true
+    },
+    "candidate": {
+      "manifest": "evidence/129-a1e6-tp2200-v2-evidence-manifest.json",
+      "sha256": "296ca4df1365d00cbab1f9bbea4c2f3027baec2062f243d0cefbc8036a62fca8",
+      "files": 91,
+      "bytes": 1800431,
+      "all_sha_size_match": true
+    },
+    "continuous": {
+      "manifest": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b",
+      "files": 91,
+      "bytes": 3040568,
+      "all_sha_size_match": true
+    }
+  },
+  "finite_scalar_values_checked": 89600,
+  "resolved_differences_from_baseline": [
+    "accelerator.loss_parallel",
+    "accelerator.sequence_parallel",
+    "accelerator.tp_size",
+    "checkpoint.checkpoint_dir",
+    "checkpoint.save_ckpt",
+    "fsdp_config.dp_shard_size",
+    "plan_overrides"
+  ],
+  "comparisons": {
+    "baseline": {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "pairs_per_metric": 1600,
+      "canonical_input_sha_equal_pairs": 1600,
+      "input_metadata_expected_difference": {
+        "reference_micro_steps": 1,
+        "candidate_micro_steps": 2,
+        "rank_count": 8
+      },
+      "CPU_initial_48_objects_equal_all_ranks": true,
+      "runtime_flags_equal_all_ranks": true,
+      "global_parameter_metadata_equal_all_ranks": true,
+      "statistics": {
+        "training/foundation_loss/lm": {
+          "max_abs": 0.012035369873046875,
+          "step": 97,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 97,
+          "over_0_005_step_count": 12,
+          "over_0_005_steps": [
+            97,
+            98,
+            100,
+            148,
+            154,
+            157,
+            167,
+            169,
+            173,
+            181,
+            188,
+            193
+          ],
+          "step1": {
+            "reference_rank0": 12.881054878234863,
+            "candidate_rank0": 12.880559921264648,
+            "signed_candidate_minus_reference": -0.0004949569702148438,
+            "max_abs_all_ranks": 0.0004949569702148438
+          }
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.007373809814453125,
+          "step": 98,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 98,
+          "over_0_005_step_count": 1,
+          "over_0_005_steps": [
+            98
+          ],
+          "step1": {
+            "reference_rank0": 3.928363800048828,
+            "candidate_rank0": 3.9281868934631348,
+            "signed_candidate_minus_reference": -0.00017690658569335938,
+            "max_abs_all_ranks": 0.00017690658569335938
+          }
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 9.295647032558918e-06,
+          "step": 179,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.00025308559997938573,
+            "candidate_rank0": 0.000253074977081269,
+            "signed_candidate_minus_reference": -1.0622898116707802e-08,
+            "max_abs_all_ranks": 1.0622898116707802e-08
+          }
+        },
+        "training/total_loss": {
+          "max_abs": 0.01053619384765625,
+          "step": 148,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 45,
+          "over_0_005_step_count": 15,
+          "over_0_005_steps": [
+            45,
+            97,
+            100,
+            134,
+            141,
+            148,
+            154,
+            167,
+            169,
+            173,
+            176,
+            177,
+            179,
+            188,
+            193
+          ],
+          "step1": {
+            "reference_rank0": 16.809673309326172,
+            "candidate_rank0": 16.80900001525879,
+            "signed_candidate_minus_reference": -0.0006732940673828125,
+            "max_abs_all_ranks": 0.0006732940673828125
+          }
+        },
+        "training/grad_norm": {
+          "max_abs": 0.6902656555175781,
+          "step": 148,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 10,
+          "over_0_005_step_count": 159,
+          "over_0_005_steps": [
+            10,
+            14,
+            16,
+            18,
+            19,
+            20,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            34,
+            35,
+            36,
+            37,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            47,
+            48,
+            50,
+            51,
+            52,
+            53,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            69,
+            70,
+            71,
+            72,
+            73,
+            75,
+            76,
+            78,
+            79,
+            80,
+            82,
+            83,
+            84,
+            86,
+            88,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105,
+            106,
+            107,
+            108,
+            110,
+            111,
+            112,
+            113,
+            114,
+            116,
+            117,
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            129,
+            130,
+            131,
+            132,
+            133,
+            134,
+            135,
+            136,
+            137,
+            138,
+            139,
+            140,
+            141,
+            142,
+            144,
+            145,
+            146,
+            147,
+            148,
+            149,
+            150,
+            152,
+            153,
+            154,
+            155,
+            156,
+            158,
+            159,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            166,
+            167,
+            168,
+            169,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            179,
+            180,
+            181,
+            182,
+            183,
+            184,
+            185,
+            186,
+            187,
+            188,
+            190,
+            191,
+            193,
+            194,
+            195,
+            196,
+            198,
+            199,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 22.473445892333984,
+            "candidate_rank0": 22.473865509033203,
+            "signed_candidate_minus_reference": 0.00041961669921875,
+            "max_abs_all_ranks": 0.00041961669921875
+          }
+        },
+        "training/lr": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.0001,
+            "candidate_rank0": 0.0001,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_tokens": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_samples": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_tokens": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_samples": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        }
+      },
+      "reconstructed_unweighted_diagnostics": {
+        "mtp": {
+          "coefficient": 0.3,
+          "max_abs": 0.024579366048177086,
+          "step": 98,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 45,
+          "over_0_005_step_count": 20,
+          "over_0_005_steps": [
+            45,
+            75,
+            97,
+            98,
+            104,
+            112,
+            125,
+            131,
+            145,
+            157,
+            158,
+            171,
+            172,
+            177,
+            179,
+            181,
+            185,
+            188,
+            194,
+            197
+          ],
+          "step1_max_abs": 0.0005896886189778646
+        },
+        "aux": {
+          "coefficient": 0.0001,
+          "max_abs": 0.09295647032558918,
+          "step": 179,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 25,
+          "over_0_005_step_count": 133,
+          "over_0_005_steps": [
+            25,
+            29,
+            35,
+            38,
+            39,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            52,
+            54,
+            57,
+            58,
+            60,
+            61,
+            64,
+            65,
+            66,
+            68,
+            69,
+            70,
+            73,
+            75,
+            76,
+            77,
+            78,
+            79,
+            83,
+            84,
+            85,
+            87,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            100,
+            102,
+            103,
+            105,
+            106,
+            107,
+            109,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115,
+            117,
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            128,
+            129,
+            130,
+            131,
+            132,
+            133,
+            135,
+            136,
+            137,
+            138,
+            139,
+            140,
+            141,
+            143,
+            146,
+            148,
+            149,
+            150,
+            151,
+            152,
+            153,
+            154,
+            155,
+            156,
+            157,
+            158,
+            159,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            166,
+            167,
+            168,
+            169,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            179,
+            180,
+            181,
+            182,
+            183,
+            185,
+            187,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            195,
+            196,
+            197,
+            198,
+            199,
+            200
+          ],
+          "step1_max_abs": 0.00010622898116707802
+        }
+      }
+    },
+    "continuous": {
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "pairs_per_metric": 1600,
+      "canonical_input_sha_equal_pairs": 1600,
+      "input_metadata_expected_difference": {
+        "reference_micro_steps": 1,
+        "candidate_micro_steps": 2,
+        "rank_count": 8
+      },
+      "CPU_initial_48_objects_equal_all_ranks": true,
+      "runtime_flags_equal_all_ranks": true,
+      "global_parameter_metadata_equal_all_ranks": true,
+      "statistics": {
+        "training/foundation_loss/lm": {
+          "max_abs": 0.012035369873046875,
+          "step": 97,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 97,
+          "over_0_005_step_count": 12,
+          "over_0_005_steps": [
+            97,
+            98,
+            100,
+            148,
+            154,
+            157,
+            167,
+            169,
+            173,
+            181,
+            188,
+            193
+          ],
+          "step1": {
+            "reference_rank0": 12.881054878234863,
+            "candidate_rank0": 12.880559921264648,
+            "signed_candidate_minus_reference": -0.0004949569702148438,
+            "max_abs_all_ranks": 0.0004949569702148438
+          }
+        },
+        "training/foundation_loss/mtp": {
+          "max_abs": 0.007373809814453125,
+          "step": 98,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 98,
+          "over_0_005_step_count": 1,
+          "over_0_005_steps": [
+            98
+          ],
+          "step1": {
+            "reference_rank0": 3.928363800048828,
+            "candidate_rank0": 3.9281868934631348,
+            "signed_candidate_minus_reference": -0.00017690658569335938,
+            "max_abs_all_ranks": 0.00017690658569335938
+          }
+        },
+        "training/foundation_loss/aux": {
+          "max_abs": 9.295647032558918e-06,
+          "step": 179,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.00025308559997938573,
+            "candidate_rank0": 0.000253074977081269,
+            "signed_candidate_minus_reference": -1.0622898116707802e-08,
+            "max_abs_all_ranks": 1.0622898116707802e-08
+          }
+        },
+        "training/total_loss": {
+          "max_abs": 0.01053619384765625,
+          "step": 148,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 45,
+          "over_0_005_step_count": 15,
+          "over_0_005_steps": [
+            45,
+            97,
+            100,
+            134,
+            141,
+            148,
+            154,
+            167,
+            169,
+            173,
+            176,
+            177,
+            179,
+            188,
+            193
+          ],
+          "step1": {
+            "reference_rank0": 16.809673309326172,
+            "candidate_rank0": 16.80900001525879,
+            "signed_candidate_minus_reference": -0.0006732940673828125,
+            "max_abs_all_ranks": 0.0006732940673828125
+          }
+        },
+        "training/grad_norm": {
+          "max_abs": 0.6902656555175781,
+          "step": 148,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 1600,
+          "nonzero_steps": 200,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 10,
+          "over_0_005_step_count": 159,
+          "over_0_005_steps": [
+            10,
+            14,
+            16,
+            18,
+            19,
+            20,
+            23,
+            24,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            34,
+            35,
+            36,
+            37,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            47,
+            48,
+            50,
+            51,
+            52,
+            53,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            69,
+            70,
+            71,
+            72,
+            73,
+            75,
+            76,
+            78,
+            79,
+            80,
+            82,
+            83,
+            84,
+            86,
+            88,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105,
+            106,
+            107,
+            108,
+            110,
+            111,
+            112,
+            113,
+            114,
+            116,
+            117,
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            129,
+            130,
+            131,
+            132,
+            133,
+            134,
+            135,
+            136,
+            137,
+            138,
+            139,
+            140,
+            141,
+            142,
+            144,
+            145,
+            146,
+            147,
+            148,
+            149,
+            150,
+            152,
+            153,
+            154,
+            155,
+            156,
+            158,
+            159,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            166,
+            167,
+            168,
+            169,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            179,
+            180,
+            181,
+            182,
+            183,
+            184,
+            185,
+            186,
+            187,
+            188,
+            190,
+            191,
+            193,
+            194,
+            195,
+            196,
+            198,
+            199,
+            200
+          ],
+          "step1": {
+            "reference_rank0": 22.473445892333984,
+            "candidate_rank0": 22.473865509033203,
+            "signed_candidate_minus_reference": 0.00041961669921875,
+            "max_abs_all_ranks": 0.00041961669921875
+          }
+        },
+        "training/lr": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 0.0001,
+            "candidate_rank0": 0.0001,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_tokens": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/step_samples": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_tokens": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 32573.0,
+            "candidate_rank0": 32573.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        },
+        "data/consumed_samples": {
+          "max_abs": 0.0,
+          "step": 1,
+          "rank": 0,
+          "pairs": 1600,
+          "nonzero_pairs": 0,
+          "nonzero_steps": 0,
+          "first_nonzero_step": null,
+          "first_over_0_005_step": null,
+          "over_0_005_step_count": 0,
+          "over_0_005_steps": [],
+          "step1": {
+            "reference_rank0": 8.0,
+            "candidate_rank0": 8.0,
+            "signed_candidate_minus_reference": 0.0,
+            "max_abs_all_ranks": 0.0
+          }
+        }
+      },
+      "reconstructed_unweighted_diagnostics": {
+        "mtp": {
+          "coefficient": 0.3,
+          "max_abs": 0.024579366048177086,
+          "step": 98,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 45,
+          "over_0_005_step_count": 20,
+          "over_0_005_steps": [
+            45,
+            75,
+            97,
+            98,
+            104,
+            112,
+            125,
+            131,
+            145,
+            157,
+            158,
+            171,
+            172,
+            177,
+            179,
+            181,
+            185,
+            188,
+            194,
+            197
+          ],
+          "step1_max_abs": 0.0005896886189778646
+        },
+        "aux": {
+          "coefficient": 0.0001,
+          "max_abs": 0.09295647032558918,
+          "step": 179,
+          "first_nonzero_step": 1,
+          "first_over_0_005_step": 25,
+          "over_0_005_step_count": 133,
+          "over_0_005_steps": [
+            25,
+            29,
+            35,
+            38,
+            39,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            52,
+            54,
+            57,
+            58,
+            60,
+            61,
+            64,
+            65,
+            66,
+            68,
+            69,
+            70,
+            73,
+            75,
+            76,
+            77,
+            78,
+            79,
+            83,
+            84,
+            85,
+            87,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            100,
+            102,
+            103,
+            105,
+            106,
+            107,
+            109,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115,
+            117,
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            128,
+            129,
+            130,
+            131,
+            132,
+            133,
+            135,
+            136,
+            137,
+            138,
+            139,
+            140,
+            141,
+            143,
+            146,
+            148,
+            149,
+            150,
+            151,
+            152,
+            153,
+            154,
+            155,
+            156,
+            157,
+            158,
+            159,
+            160,
+            161,
+            162,
+            163,
+            164,
+            165,
+            166,
+            167,
+            168,
+            169,
+            171,
+            172,
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            179,
+            180,
+            181,
+            182,
+            183,
+            185,
+            187,
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            195,
+            196,
+            197,
+            198,
+            199,
+            200
+          ],
+          "step1_max_abs": 0.00010622898116707802
+        }
+      }
+    }
+  },
+  "runtime_flags_all_ranks_equal": true,
+  "candidate_global_scalar_rank_spread_max": 0.0,
+  "LR_pairs_checked": 1600,
+  "LR_mismatch_pairs": 0,
+  "constant_LR": 0.0001,
+  "execution": {
+    "baseline": {
+      "case": "r129-a1e6-fsdp8-0-200-v3",
+      "container_id": "431499a668c960916ef11abe2fc379ef64109a2784164c992cb56d309eb6ecb1",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "duration_seconds": 383.04995921999216
+    },
+    "candidate": {
+      "case": "r129-a1e6-tp2-200-v2",
+      "container_id": "bf62a85c296a8c98c1e0734f4a48b92d7476dffe51a1a3d6caedc267b301efdd",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "duration_seconds": 512.812408739992
+    },
+    "continuous": {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "container_id": "717160fa4fba4fb7c1c9d72357f1bc86b7233a33a16eb7e7b6935a52883dc930",
+      "exit_code": 0,
+      "released": true,
+      "all_8_idle_snapshots_verified": true,
+      "duration_seconds": 610.3890903799911
+    }
+  },
+  "resources": {
+    "baseline": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "all_rank_max_each_step": true,
+      "median_step_seconds": 1.156256079673767,
+      "summed_step_seconds": 207.97043895721436,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15990.50334593064,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.25,
+      "rank0_time_underreport_steps": 0,
+      "rank0_time_underreport_step_numbers": [],
+      "rank0_max_underestimate_seconds": 0
+    },
+    "candidate": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "all_rank_max_each_step": true,
+      "median_step_seconds": 1.855198621749878,
+      "summed_step_seconds": 333.37590050697327,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 9975.382128530431,
+      "allocated_gib": 17.2946720123291,
+      "reserved_gib": 18.638671875,
+      "rank0_time_underreport_steps": 43,
+      "rank0_time_underreport_step_numbers": [
+        6,
+        8,
+        9,
+        11,
+        12,
+        19,
+        20,
+        21,
+        27,
+        29,
+        30,
+        33,
+        36,
+        40,
+        48,
+        54,
+        55,
+        62,
+        69,
+        79,
+        89,
+        90,
+        100,
+        101,
+        102,
+        110,
+        111,
+        115,
+        116,
+        117,
+        119,
+        139,
+        143,
+        148,
+        153,
+        162,
+        168,
+        171,
+        172,
+        189,
+        190,
+        195,
+        200
+      ],
+      "rank0_max_underestimate_seconds": 0.0013140439987182617
+    },
+    "continuous": {
+      "window": [
+        1,
+        200
+      ],
+      "timing_window": [
+        21,
+        200
+      ],
+      "all_rank_max_each_step": true,
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.171875,
+      "rank0_time_underreport_steps": 0,
+      "rank0_time_underreport_step_numbers": [],
+      "rank0_max_underestimate_seconds": 0
+    }
+  },
+  "primary_resource_comparison": {
+    "reference": "continuous400 first200, off, no save",
+    "candidate": "TP2/DP4/SP, off, no save",
+    "actual_HostConfig_equal": true,
+    "diagnostic_only_precision_failed": true,
+    "relative": {
+      "median_step_time_increase_percent": 60.5085311709465,
+      "supervised_throughput_change_percent": -37.65132765377365,
+      "allocated_saved_gib": 4.737524032592773,
+      "allocated_saved_percent": 21.502731833600897,
+      "reserved_saved_gib": 8.533203125,
+      "reserved_saved_percent": 31.404542840713056,
+      "rank0_layout_FP32_model_gib_increase": 0.2593116760253906
+    }
+  },
+  "initial_optimizer_layout_observations": {
+    "baseline": {
+      "rank_scope": "rank0 inventory only",
+      "parameter_count": 46,
+      "local_model_numel_from_layout": 339747840,
+      "FP32_model_gib_from_layout": 1.2656593322753906,
+      "initial_optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.0.self_attn.linear_qkv.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            2112,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            264,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    },
+    "candidate": {
+      "rank_scope": "rank0 inventory only",
+      "parameter_count": 46,
+      "local_model_numel_from_layout": 409356288,
+      "FP32_model_gib_from_layout": 1.5249710083007812,
+      "initial_optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            4,
+            2
+          ],
+          "placements": [
+            "StridedShard(dim=0, split_factor=2)",
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            4,
+            2
+          ],
+          "placements": [
+            "StridedShard(dim=0, split_factor=2)",
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            2,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            4,
+            2
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            768,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            4,
+            2
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "model.layers.0.self_attn.linear_qkv.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            2112,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            528,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            4,
+            2
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1280,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "mesh_shape": [
+            4,
+            2
+          ],
+          "placements": [
+            "Shard(dim=0)",
+            "Replicate()"
+          ]
+        }
+      }
+    },
+    "continuous": {
+      "rank_scope": "rank0 inventory only",
+      "parameter_count": 46,
+      "local_model_numel_from_layout": 339747840,
+      "FP32_model_gib_from_layout": 1.2656593322753906,
+      "initial_optimizer_state_empty": true,
+      "examples": {
+        "model.embed_tokens.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "lm_head.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            152064,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            19008,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.experts.gate_up_proj": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            8,
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            1,
+            3072,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.1.mlp.shared_experts.gate_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            3072,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            384,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "model.layers.0.self_attn.linear_qkv.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            2112,
+            5120
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            264,
+            5120
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        },
+        "mtp.layers.0.eh_proj.weight": {
+          "device": "npu:0",
+          "dtype": "torch.float32",
+          "global_shape": [
+            5120,
+            10240
+          ],
+          "is_dtensor": true,
+          "local_shape": [
+            640,
+            10240
+          ],
+          "mesh_dim_names": [
+            "fsdp_shard"
+          ],
+          "mesh_shape": [
+            8
+          ],
+          "placements": [
+            "Shard(dim=0)"
+          ]
+        }
+      }
+    }
+  },
+  "interpretation_zh": [
+    "当前同源TP2主LM完整200×8最大差0.012035369873046875@97，首超0.005为97；结果失败，根因尚未定位。",
+    "第1步loss在第1次optimizer更新之前已被计算，存在非零差；不能仅归咎后续optimizer累计，也不能据此确定具体根因。",
+    "所有rank所记loss/grad/LR的最大spread为0，属于相同全局日志，并非八份独立本地样本。",
+    "CPU初态48项shape/dtype/hash相同，不证明TP后NPU逻辑权重逐字节一致。输入canonical global_sha全1600对相同，micro_steps从1变2为DP4×TP2下GBS8/MBS1的预期变化。",
+    "实际rank0初始layout证明embedding/head本地份额不变，TP复制的专家/shared/linear_qkv/eh_proj份额增大；模型FP32布局体积1.265659→1.524971GiB。",
+    "峰值下降不能归因于持久参数或优化器state减半；部分TP/SP激活与计算期unshard缓冲变小是合理方向，但没有阶段profile完成定量归因。",
+    "两串行微批、每微批requires_grad_sync=true、TP/SP通信、重复launch与Muon临时工作区可能增加时间；不能凭总耗时定量分摊。",
+    "正式资源采用每步全部8rank MAX，完整200步有43步rank0低于最慢rank；strict内rank0 performance仅保留审计，不能用于正式资源结论。",
+    "精度未过，资源只作失败配方诊断，不推荐为已验收优化。"
+  ],
+  "limitations_zh": [
+    "MTP/aux无权误差由加权日志分别除0.3/0.0001，不是额外采集的内部无权张量，不扩展为专项全矩阵验收。",
+    "梯度仅比较范数；grad的0.005超阈值列表为统一诊断，非既定梯度验收门槛。",
+    "初始optimizer_state为空；layout仅推算rank0模型FP32局部元素，不等于训练后momentum/AdamW实占内存，不重复计算model/main。",
+    "资源时间窗口为step21–200，含标量和输入hash开销；TP2微批数变化使观测工作量也可能不同。",
+    "allocator峰值为进程启动至step200累计，包括warmup，非物理HBM瞬时峰值；仅一次运行，无置信区间。",
+    "本回执没有新增远端容器删除证据，不启动任何实验。"
+  ]
+}

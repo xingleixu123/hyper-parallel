@@ -1,0 +1,183 @@
+{
+  "schema": "a1e6-tp2200-v2-summary",
+  "created_utc": "2026-10-18T04:31:36.575369+00:00",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "candidate": "r129-a1e6-tp2-200-v2",
+  "reference": "r129-a1e6-fsdp8-0-200-v3",
+  "steps": [
+    1,
+    200
+  ],
+  "ranks": 8,
+  "main_lm_status": "FAIL",
+  "strict_all_component_status": "FAIL",
+  "root_cause_status": "UNRESOLVED",
+  "main_lm": {
+    "max_abs": 0.012035369873046875,
+    "step": 97,
+    "rank": 0
+  },
+  "main_lm_over_005_steps": [
+    97,
+    98,
+    100,
+    148,
+    154,
+    157,
+    167,
+    169,
+    173,
+    181,
+    188,
+    193
+  ],
+  "errors": {
+    "training/total_loss": {
+      "max_abs": 0.01053619384765625,
+      "step": 148,
+      "rank": 0
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.012035369873046875,
+      "step": 97,
+      "rank": 0
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.007373809814453125,
+      "step": 98,
+      "rank": 0
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 9.295647032558918e-06,
+      "step": 179,
+      "rank": 0
+    },
+    "training/grad_norm": {
+      "max_abs": 0.6902656555175781,
+      "step": 148,
+      "rank": 0
+    }
+  },
+  "unweighted_diagnostics": {
+    "lm": 0.012035369873046875,
+    "mtp": 0.024579366048177086,
+    "aux": 0.09295647032558918
+  },
+  "first_step_rank0": {
+    "reference": {
+      "training/foundation_loss/lm": 12.881054878234863,
+      "training/foundation_loss/mtp": 3.928363800048828,
+      "training/foundation_loss/aux": 0.00025308559997938573,
+      "training/total_loss": 16.809673309326172,
+      "training/grad_norm": 22.473445892333984,
+      "training/lr": 0.0001
+    },
+    "candidate": {
+      "training/foundation_loss/lm": 12.880559921264648,
+      "training/foundation_loss/mtp": 3.9281868934631348,
+      "training/foundation_loss/aux": 0.000253074977081269,
+      "training/total_loss": 16.80900001525879,
+      "training/grad_norm": 22.473865509033203,
+      "training/lr": 0.0001
+    },
+    "absolute_differences": {
+      "training/foundation_loss/lm": 0.0004949569702148438,
+      "training/foundation_loss/mtp": 0.00017690658569335938,
+      "training/foundation_loss/aux": 1.0622898116707802e-08,
+      "training/total_loss": 0.0006732940673828125,
+      "training/grad_norm": 0.00041961669921875,
+      "training/lr": 0.0
+    }
+  },
+  "integrity": {
+    "findings": [],
+    "input_mismatch_count": 0,
+    "cpu_initial_mismatches": []
+  },
+  "resource_measurements": [
+    {
+      "case": "r129-a1e6-fsdp8-continuous400-v2",
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": 1.1558255553245544,
+      "summed_step_seconds": 207.85544788837433,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 15999.349710506209,
+      "allocated_gib": 22.032196044921875,
+      "reserved_gib": 27.171875,
+      "rank0_time_underreport_steps": 0,
+      "mode": "off",
+      "timing_window": [
+        21,
+        200
+      ],
+      "memory_scope": "allocator process-lifetime peak through steps1–200"
+    },
+    {
+      "case": "r129-a1e6-tp2-200-v2",
+      "steps": [
+        1,
+        200
+      ],
+      "ranks": 8,
+      "warmup_steps_excluded": 20,
+      "median_step_seconds": 1.855198621749878,
+      "summed_step_seconds": 333.37590050697327,
+      "supervised_tokens": 3325552.0,
+      "supervised_tokens_per_second": 9975.382128530431,
+      "allocated_gib": 17.2946720123291,
+      "reserved_gib": 18.638671875,
+      "rank0_time_underreport_steps": 43,
+      "mode": "tp2",
+      "timing_window": [
+        21,
+        200
+      ],
+      "memory_scope": "allocator process-lifetime peak through steps1–200"
+    }
+  ],
+  "relative_to_off": {
+    "median_time_increase_percent": 60.5085311709465,
+    "supervised_throughput_change_percent": -37.65132765377365,
+    "allocated_saved_gib": 4.737524032592773,
+    "allocated_saved_percent": 21.502731833600897,
+    "reserved_saved_gib": 8.533203125
+  },
+  "inputs": [
+    {
+      "path": "evidence/a1e6-tp2200-v2-strict.json",
+      "sha256": "0014f6e5c5a8fbf633d231f7f4d934a6004db73fb78f6bf859fa854af3a1e9bb"
+    },
+    {
+      "path": "evidence/a1e6-tp2200-v2-resources.json",
+      "sha256": "8707c17911825742c59778940f389335335abdad10f7825c7aec039d478fe4d3"
+    },
+    {
+      "path": "evidence/a1e6-fsdp8-continuous-first200-v2-resources.json",
+      "sha256": "0848d7976436eac6bcb35ad0d381d940af4ca09f30e40de3c1d4f1fa8270880b"
+    },
+    {
+      "path": "evidence/129-a1e6-tp2200-v2-evidence-manifest.json",
+      "sha256": "296ca4df1365d00cbab1f9bbea4c2f3027baec2062f243d0cefbc8036a62fca8"
+    },
+    {
+      "path": "evidence/129-a1e6-fsdp8-200-v3-evidence-manifest.json",
+      "sha256": "ffc52868bb02fd0f788aafcf3fa762f2528ec7556a511859d8533fc100c607ca"
+    },
+    {
+      "path": "evidence/129-a1e6-fsdp8-continuous400-v2-evidence-manifest.json",
+      "sha256": "167da70bfd4c1bf7ea4eb481bbebe7e56a1de61dc62dff22f5ba059609a8ea7b"
+    }
+  ],
+  "scope_zh": [
+    "精度FAIL；资源差只用于诊断，不推荐为已验收优化。",
+    "首步loss在optimizer更新前形成，但仍需验证首次NPU计算状态和局部前向；未认定某个函数或算子错误。",
+    "八rank记录全局归约标量，不是八个独立本地loss观测。",
+    "MTP/aux还原值来自加权日志，不是另采张量；当前主LM矩阵优先。",
+    "性能每步取8rank MAX；43步rank0时间低报。单次观测，含输入identity/标量采集；allocator累计峰值非物理HBM峰值。"
+  ]
+}
