@@ -1,0 +1,135 @@
+{
+  "schema": "paused-goal-continuous400-public-summary-v1",
+  "status": "DRAFT_NOT_PUBLISHED",
+  "goal_state": "PAUSED",
+  "source_commit": "59b25cdd15505a4f6fb1990484d4e890e3d3724c",
+  "source_parent": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "cann": "9.2.0-beta.2",
+  "cases": {
+    "continuous400": "r125-a1e6-muon-no-cross-param-fsdp8-continuous400-v1",
+    "reference200": "r129-a1e6-muon-no-cross-param-fsdp8-200-v2"
+  },
+  "ranks": 8,
+  "continuous400": {
+    "steps": 400,
+    "rank_steps": 3200,
+    "start_step": 0,
+    "complete_step": 400,
+    "finite_points_per_field": 3200,
+    "main_lm_rank0_first": 12.881054878234863,
+    "main_lm_rank0_step200": 7.762490272521973,
+    "main_lm_rank0_last": 5.612583637237549,
+    "save_ckpt": false
+  },
+  "common_first200": {
+    "steps": 200,
+    "rank_steps": 1600,
+    "fields": {
+      "training/total_loss": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "training/foundation_loss/lm": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "training/foundation_loss/mtp": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "training/foundation_loss/aux": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "training/grad_norm": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "training/lr": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "data/step_tokens": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "data/consumed_tokens": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "data/step_samples": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      },
+      "data/consumed_samples": {
+        "points": 1600,
+        "max_abs": 0.0,
+        "nonzero": 0
+      }
+    },
+    "main_lm_threshold_abs": 0.005,
+    "main_lm_within_threshold": true,
+    "initial_entries_equal_per_rank": 48,
+    "runtime_equal_all8": true,
+    "input_identity_equal_all1600": true,
+    "recipe_difference_paths": [
+      "/checkpoint/checkpoint_dir",
+      "/checkpoint/save_ckpt",
+      "/training/train_iters"
+    ]
+  },
+  "policy": {
+    "ns_dtype": "float32",
+    "ns_batch_across_params": false,
+    "allow_hf32": false,
+    "seed": 42,
+    "lr_scheduler_iters": 1000
+  },
+  "old125_warning200": {
+    "common_first200_ten_fields_max_abs": 0,
+    "basis": "9c4521a661edcc060fd6eceafb347aa1fcbcbf4a20293fe6c84b543af09ff99b",
+    "execution_gate": "OBSERVATIONAL_ONLY_EXECUTION_GATE_UNVERIFIED",
+    "original_reason": "owned-process-observation-unavailable",
+    "allow_incomplete": true,
+    "complete_collection": false
+  },
+  "current59b_ep200": {
+    "pass": false,
+    "maximum_abs_difference": 0.010309219360351562,
+    "maximum_step": 146,
+    "first_exceed_step": 97,
+    "exceed_steps": [
+      97,
+      112,
+      146,
+      150,
+      165,
+      182,
+      188,
+      200
+    ],
+    "exceed_rank_step_points": 64
+  },
+  "resume201_to400_validated": false,
+  "performance_analyzed": false,
+  "ranks_are_independent_repeats": false,
+  "csv": {
+    "main-lm-allranks.csv": {
+      "bytes": 179407,
+      "sha256": "4c5f61fe1fe450b64f03309de13a894397bb18f3f2b7ce4accfecffaefbf1456"
+    },
+    "curves.csv": {
+      "bytes": 13595,
+      "sha256": "f8bb21a6542e0cd0d5f7bcd43c0f2fbb35516c3b7299f97a6cc55d230c89814d"
+    }
+  }
+}

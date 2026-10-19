@@ -1,0 +1,104 @@
+{
+  "schema": "public-native-expert-g0-summary-v1",
+  "experiment_status": "PAUSED_NO_FURTHER_RUNS",
+  "policy": {
+    "source": "59b25cdd15505a4f6fb1990484d4e890e3d3724c",
+    "parent": "544526f7db8342c607244fd41009b2a74adb84c8",
+    "bare_upstream_reference": "a1e6c222",
+    "bare_product_PR_head": "b32bded51f2ff352ff09e97270815b63d1c36620",
+    "ns_dtype": "float32",
+    "ns_batch_across_params": false,
+    "allow_hf32": false,
+    "CANN": "9.2.0-beta.2"
+  },
+  "E_vs_pure_EP3": {
+    "rank_step_pairs": 24,
+    "ten_fields_max_abs": 0,
+    "dense_each_P0_G0_G1_P1_equal": 336,
+    "expert_each_P0_G0_G1_P1_equal": 32,
+    "pre_QK_equal": 48,
+    "router_raw_equal": 32,
+    "first_input_DP_slots_equal": 8
+  },
+  "G0_E_vs_qualified_F": {
+    "matrices": 32,
+    "numel": 377487360,
+    "bitwise_unequal_count": 325468098,
+    "numeric_unequal_count": 325468098,
+    "signed_zero_only_count": 0,
+    "ranges": {
+      "max_abs": [
+        1.4551915228366852e-10,
+        1.210719347000122e-08
+      ],
+      "RMS": [
+        3.818468955994673e-12,
+        1.8207311503506152e-10
+      ],
+      "relative_L2_to_F": [
+        1.4690911690083005e-07,
+        3.600444381161473e-07
+      ]
+    },
+    "RMS": 5.766217561000351e-11,
+    "relative_L2_to_F": 3.253720377589696e-07,
+    "sum_squared_delta": 1.2551177251988682e-12,
+    "sum_squared_reference": 11.855612838608959,
+    "max_abs": 1.210719347000122e-08,
+    "argmax": [
+      {
+        "rank": 0,
+        "global_expert": 0,
+        "alias": "decoder1-gate_up",
+        "numel": 15728640,
+        "max_abs": 1.210719347000122e-08,
+        "RMS": 1.7320807145912284e-10,
+        "relative_L2_to_F": 3.600444381161473e-07,
+        "bitwise_unequal_count": 14409412,
+        "numeric_unequal_count": 14409412,
+        "signed_zero_only_count": 0,
+        "maximum": {
+          "column": 668,
+          "ep_fp32le_hex": "1b41473c",
+          "ep_value": 0.012161518447101116,
+          "flat_index": 297628,
+          "global_expert": 0,
+          "reference_fp32le_hex": "2841473c",
+          "reference_value": 0.012161530554294586,
+          "row": 58
+        }
+      }
+    ]
+  },
+  "E_vs_F_three_step_main_LM_absdiff": [
+    0,
+    1.1444091796875e-05,
+    3.337860107421875e-05
+  ],
+  "N2_vs_F_three_step_main_LM_absdiff": [
+    0,
+    0,
+    9.632110595703125e-05
+  ],
+  "same59b_F_EP200_main_LM": {
+    "status": "FAIL",
+    "rank_step_pairs": 1600,
+    "threshold": 0.005,
+    "max_abs": 0.010309219360351562,
+    "max_step": 146,
+    "first_over_threshold_step": 97,
+    "steps_over_threshold": [
+      97,
+      112,
+      146,
+      150,
+      165,
+      182,
+      188,
+      200
+    ]
+  },
+  "N2_causal_scope": "Only the fixed first-step used clip norm restores observed nonexpert G1/P1; not a norm bug, full EP repair, or overall loss improvement.",
+  "full_arrays_included": false,
+  "full_array_numeric_recomputed_by_this_package": false
+}

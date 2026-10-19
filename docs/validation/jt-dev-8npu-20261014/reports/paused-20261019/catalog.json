@@ -1,0 +1,702 @@
+{
+  "schema": "paused-jt-product-issue-pr-catalog-v1",
+  "snapshot_utc": "2026-10-19T14:51:23.342535+00:00",
+  "goal": "PAUSED",
+  "source_audit_sha256": "4e30faba638584c6b74c78b2adc4a02bc57c325ca2e64bafd2ed19f1e43e8bda",
+  "summary": {
+    "product_pairs": 15,
+    "product_single_commit_prs": 15,
+    "open_draft_prs": 14,
+    "merged_product_prs": [
+      230
+    ],
+    "closed_product_issues": [
+      229
+    ],
+    "all_chinese_titles_bodies": true,
+    "all_text_associations_present": true,
+    "native_subissues_count": 14,
+    "ci_green_claimed": false,
+    "native_subissues_count_after_wrapup": 15
+  },
+  "products": [
+    {
+      "priority": 1,
+      "issue": {
+        "number": 250,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/250",
+        "title": "【子问题·跨并行自洽】Muon 缺少可恢复的跨参数 NS 合批开关",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "a8fcff3c79d438cb95e76f69b52a41cf8910bb6ee3839cdd9f0661109a27b61c"
+      },
+      "pr": {
+        "number": 251,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/251",
+        "title": "feat(optimizer): 支持按原参数隔离 Muon NS 合批",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "b32bded51f2ff352ff09e97270815b63d1c36620",
+        "head_ref": "xxl-dev/jt-muon-ns-param-batching",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "b32bded51f2ff352ff09e97270815b63d1c36620"
+        ],
+        "changed_files": 5,
+        "body_sha256": "6332027f1173c6425258744c5fdb5070dff0d03062ff318be49028faedabecbe"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true,
+        "verified_at_wrapup": "GET250/parent=202 and GET202/sub_issues all15 after one POST, receipt9158cd7f5aa1b7fa239a3eea022290238cf502b70ba56f8a75c4b9a6bec22200"
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "PR251仅提供可恢复NS跨参数合批策略；裸b32与集成59b分明，当前EP200主LMFAIL，不等于产品已完成精度修复。"
+    },
+    {
+      "priority": 2,
+      "issue": {
+        "number": 203,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/203",
+        "title": "Trainer 梯度累积按微批有效token归一化，改变整步目标",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "d70d0f4b9ec957b5e9743cab23ea4f1b84a25a00c12542d6a1c4ed337753bd9f"
+      },
+      "pr": {
+        "number": 194,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/194",
+        "title": "fix(trainer): 按整步有效 token 数归一化梯度累积",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "bad2550675ff5e32ca6aba465aacbaa28af0480c",
+        "head_ref": "xxl-dev/fix-text-token-accumulation",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "bad2550675ff5e32ca6aba465aacbaa28af0480c"
+        ],
+        "changed_files": 4,
+        "body_sha256": "cd5ba955a4a01f2182fc7a754a982deea1700c6584305769b3932931429f5b62"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "整步 token 分母缺陷的定向数学回归；历史多补丁200步改善不等于完整并行达标。"
+    },
+    {
+      "priority": 3,
+      "issue": {
+        "number": 209,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/209",
+        "title": "专家权重梯度局部BF16舍入后，FSDP FP32归约无法恢复精度",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "ca8fa8742d7d0ce52f360f0045b11894f11b8c69e13d4f2aeaf7b092e224870d"
+      },
+      "pr": {
+        "number": 200,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/200",
+        "title": "fix(jt): 支持专家权重梯度直接累加到 FP32 主梯度",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "630d54358f94e34dc8e7f22c6a57d4043ba211f5",
+        "head_ref": "xxl-dev/fix-fp32-expert-gradients",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "630d54358f94e34dc8e7f22c6a57d4043ba211f5"
+        ],
+        "changed_files": 11,
+        "body_sha256": "a378ac06701c8a1d4c24f8f31d91768e2effcdf7be7ce88fd882040f16c6bef5"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "FP32专家主梯度是显式能力；当前59b已启用仍有post-RS数值差，不等于该补丁错误或已解决全部EP漂移。"
+    },
+    {
+      "priority": 4,
+      "issue": {
+        "number": 210,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/210",
+        "title": "Muon支持可持久化的NS精度配置并保留BF16默认",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "126ea05c66f793ff86b7fdd281f9ca6f552607368574fd340560a405a6a805bb"
+      },
+      "pr": {
+        "number": 201,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/201",
+        "title": "feat(optim): 支持可恢复的 Muon NS 精度配置",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "59a03c63490f2e47d0fd89d9e7974982abe1e9e2",
+        "head_ref": "xxl-dev/fix-muon-ns-precision",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "59a03c63490f2e47d0fd89d9e7974982abe1e9e2"
+        ],
+        "changed_files": 10,
+        "body_sha256": "c130b52c46550a70a097ab2b956b76900d642ac0a9d37dfef4aafb2d31cc0469"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "NS dtype可恢复能力与默认BF16策略；当前59b实际ns_dtype=float32，不能把当前残差归为默认BF16。"
+    },
+    {
+      "priority": 5,
+      "issue": {
+        "number": 227,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/227",
+        "title": "[缺陷] Trainer 高精度初始化未关闭 NPU HF32，错误属性写入被静默忽略",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "6726be40bbf110d61f4a6810690bb42157a16668fb20909f78415f782716e0d8"
+      },
+      "pr": {
+        "number": 228,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/228",
+        "title": "fix(trainer): 修正 NPU 高精度初始化的 HF32 开关",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "453fe5723429b0e45ee6f0236d6e262cbe58b04f",
+        "head_ref": "xxl-dev/fix-trainer-npu-hf32",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "453fe5723429b0e45ee6f0236d6e262cbe58b04f"
+        ],
+        "changed_files": 2,
+        "body_sha256": "1bfa2c9c24ff1c259e175c2c7a2ec9f101c38329df966aaacef5981b85ce1689"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "HF32设置契约独立修复；当前59b实际allow_hf32=False，未据此定位长程残差。"
+    },
+    {
+      "priority": 6,
+      "issue": {
+        "number": 208,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/208",
+        "title": "断点续训后累计样本与 token 监控计数重置",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "abb3504078a2cbc010a62b4c47e7ecfea4f03ccef28be4d61cf60eed0ca979ca"
+      },
+      "pr": {
+        "number": 197,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/197",
+        "title": "fix(trainer): 从 checkpoint 恢复累计样本和 token 计数",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "bd18261a14fc0608d0728defef756fd0028f80aa",
+        "head_ref": "xxl-dev/fix-resume-metric-counters",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "bd18261a14fc0608d0728defef756fd0028f80aa"
+        ],
+        "changed_files": 2,
+        "body_sha256": "39a5a1bcb306d783d3358c240453f7cd8fba8081f986ef71d56dc042c41d101b"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "历史544续训/连续400计数与loss结果保留；当前59b resume尚未执行，不能继承旧通过。"
+    },
+    {
+      "priority": 7,
+      "issue": {
+        "number": 206,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/206",
+        "title": "完整重计算未覆盖 JT 独立 MTP 解码器",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "ba180b3bad557c6821b79ec5a4238e07e2939ca722d0dffd65fef083539ac0de"
+      },
+      "pr": {
+        "number": 195,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/195",
+        "title": "fix(recompute): 完整覆盖独立 MTP 解码器的重计算",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "00ae8a77b36ed4a306147255781d986638249057",
+        "head_ref": "xxl-dev/fix-jt-recompute-coverage",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "00ae8a77b36ed4a306147255781d986638249057"
+        ],
+        "changed_files": 4,
+        "body_sha256": "3aa33ba673bf601e9197524900ac409a530e33c196f07e99e2c7416ad5acb4c9"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "历史544 FSDP full/selective200通过可保留；未证明59b全部拓扑和重算矩阵通过。"
+    },
+    {
+      "priority": 8,
+      "issue": {
+        "number": 207,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/207",
+        "title": "JT MoE checkpoint重放重复提交tokens_per_expert计数",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "83c2f56575777c5b6f5f6e42deb0159e171ed8bf072aa63616aa13920894b826"
+      },
+      "pr": {
+        "number": 196,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/196",
+        "title": "fix(jt): 避免重计算重复累计专家路由 token",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "d1f52136421c258646463e764421d34aac503f97",
+        "head_ref": "xxl-dev/fix-jt-recompute-routing-counts",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "d1f52136421c258646463e764421d34aac503f97"
+        ],
+        "changed_files": 2,
+        "body_sha256": "89b5adf1810fdace3893c5983aa55f458086e98efe452ac17e5a6f3dc9dcd7ba"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "持久路由计数重放缺陷成立；不能据此推断旧loss必然漂移，历史FSDP重算零差不扩大为新矩阵。"
+    },
+    {
+      "priority": 9,
+      "issue": {
+        "number": 205,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/205",
+        "title": "CP 分块输出损失的支持与多 MTP、TP/SP 回归覆盖",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "36ddc330f668481ed4f31b12465ddf5fc84ecfdc30fd5dfb64f17aa7b0490027"
+      },
+      "pr": {
+        "number": 199,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/199",
+        "title": "test(jt): 补齐 CP 分块损失的多 MTP 与四卡回归",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "e9fc94d376ca7380c13a5e09c0020b34a75dc1d2",
+        "head_ref": "xxl-dev/fix-jt-cp-chunk-loss",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "e9fc94d376ca7380c13a5e09c0020b34a75dc1d2"
+        ],
+        "changed_files": 2,
+        "body_sha256": "b9a72d7ae78dda04806925929ed0fae79890a6bf2ac067a1b9c23a491a07961e"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "功能已由历史PR186合入；PR199是独立回归覆盖，不应将该PR说成功能尚未存在。"
+    },
+    {
+      "priority": 10,
+      "issue": {
+        "number": 204,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/204",
+        "title": "FSDP 分片初始化后保留完整源Parameter，EP/CP额外占用显存",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "935f73d5551e3d4956009f2da56d07bfd2e474392c583f7f96df69a8810fa2aa"
+      },
+      "pr": {
+        "number": 198,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/198",
+        "title": "fix(fsdp): 分片初始化后释放完整源参数引用",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6",
+        "head_ref": "xxl-dev/fix-fsdp-source-param-lifetime",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "b948684ca3f5b3dd52ccbb385bf4123b8fa2c0b6"
+        ],
+        "changed_files": 3,
+        "body_sha256": "b9af1b0e2f0803dd12c17f1d267b1bd92238695e4033297da9dd4375eba9ca53"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "源 Parameter 释放的历史同拓扑数值与显存证据；性能专项目前暂停，不能将历史收益当新59b验收。"
+    },
+    {
+      "priority": 11,
+      "issue": {
+        "number": 211,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/211",
+        "title": "普通非整除 Shard 的重建形状错误及 Partial 归约入口缺少一致检查",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "368b9a531c9d6c6f366dcb6a0a4026eaeae05bfb0206eea7069202d49d952f93"
+      },
+      "pr": {
+        "number": 214,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/214",
+        "title": "fix(dtensor): 在重分布前一致拒绝非整除分片",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "453618aaad72c3a2f9fb7bf367cd31ca45437d17",
+        "head_ref": "xxl-dev/fix-uneven-dtensor-redistribution",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "453618aaad72c3a2f9fb7bf367cd31ca45437d17"
+        ],
+        "changed_files": 4,
+        "body_sha256": "5b5007bd27b078ab8b9b397f5ed6e6b276c4c259a058d2c832fabe2c7083f594"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "明确拒绝不支持普通非整除Shard，定向CPU/Gloo/NPU覆盖，不等于实现任意布局或完整训练验收。"
+    },
+    {
+      "priority": 12,
+      "issue": {
+        "number": 223,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/223",
+        "title": "【缺陷】并行测试启动器覆盖上层 NPU 选卡，导致用例越界分配设备",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "7d0f7af8ff4333aff8ec3d6438d05eb174fc66f02a346c52e75ab152ba2b0741"
+      },
+      "pr": {
+        "number": 224,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/224",
+        "title": "fix(tests): 并行测试继承上层 NPU 可见设备并校验卡数",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "a37d6bcb699d0509477882a71348c2d1d3d83177",
+        "head_ref": "xxl-dev/fix-parallel-case-visible-devices",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "a37d6bcb699d0509477882a71348c2d1d3d83177"
+        ],
+        "changed_files": 2,
+        "body_sha256": "acce4b311c63ab4a7acd6320470edd8340daa16935ee7d8a7b0be833eddd05b8"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "启动器可见设备边界的受控回归，不等于新NPU训练或资源规则已全部动态回归。"
+    },
+    {
+      "priority": 13,
+      "issue": {
+        "number": 229,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/229",
+        "title": "【缺陷】FSDP 动态派生重算 wrapper 被集成报告漏计",
+        "state": "closed",
+        "state_reason": "completed",
+        "body_sha256": "f64c99769a2a00742e2e581633122fc97068750d0cbdc6d292d89c1bf3669ee8"
+      },
+      "pr": {
+        "number": 230,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/230",
+        "title": "fix(integration): 统计 FSDP 动态派生的重算 wrapper",
+        "state": "closed",
+        "draft": false,
+        "merged": true,
+        "merged_at": "2026-10-16T06:28:41Z",
+        "head": "85b091b9100141ebc161a68a5c4bed5932d44509",
+        "head_ref": "xxl-dev/fix-checkpoint-wrapper-inventory",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "85b091b9100141ebc161a68a5c4bed5932d44509"
+        ],
+        "changed_files": 2,
+        "body_sha256": "115bfe9250464d573b4cd04bc98cd1843b2ba7320dae092243224a550cae2c15"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "PR230实际merged、issue229closed，中文原文已准确记录；不改为draft/open。"
+    },
+    {
+      "priority": 14,
+      "issue": {
+        "number": 225,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/225",
+        "title": "Trainer 资源统计遗漏其他 TP/PP rank 的耗时与显存峰值",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "53f3457a029f183b75bcf4d0e10b67ce78b74043d9e6d7159fc9dfe24f6adba4"
+      },
+      "pr": {
+        "number": 226,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/226",
+        "title": "fix(trainer): 跨所有并行维度归约资源峰值",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7",
+        "head_ref": "xxl-dev/fix-global-resource-metrics",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "b58fed7fcdce38a8a62c5fb5bae845247fcbbeb7"
+        ],
+        "changed_files": 2,
+        "body_sha256": "1adba4f730edae3c0bac55150ae8f51091763f1a4fe3a612c2ea3b11bea9f1c0"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "全rank资源统计契约的定向CPU/Gloo与历史日志证据；当前性能/收益分析暂停。"
+    },
+    {
+      "priority": 15,
+      "issue": {
+        "number": 218,
+        "url": "https://github.com/hf1s/hyper-parallel/issues/218",
+        "title": "[缺陷] CPU 设备索引返回字符串导致 JT 模型构建失败",
+        "state": "open",
+        "state_reason": null,
+        "body_sha256": "28bf267a45d6f51c355b081ccc704b80993de69f65c5502fbd9f79ba63b399d7"
+      },
+      "pr": {
+        "number": 219,
+        "url": "https://github.com/hf1s/hyper-parallel/pull/219",
+        "title": "fix(models): 修复 CPU 模型构建的设备索引",
+        "state": "open",
+        "draft": true,
+        "merged": false,
+        "merged_at": null,
+        "head": "86930ddc7263f6ff53a79b504b9e8db33dc83e3b",
+        "head_ref": "xxl-dev/fix-cpu-device-index",
+        "head_repository": "xingleixu123/hyper-parallel",
+        "base_ref": "JT_dev",
+        "base_repository": "hf1s/hyper-parallel",
+        "commits": 1,
+        "commit_list": [
+          "86930ddc7263f6ff53a79b504b9e8db33dc83e3b"
+        ],
+        "changed_files": 3,
+        "body_sha256": "fb2db42cf9bb6e03d6f16125d3563b049e925c9a8d34ed2d9ed7ded4559630b1"
+      },
+      "association": {
+        "issue_body_mentions_202": true,
+        "issue_body_mentions_paired_pr": true,
+        "pr_body_mentions_issue": true,
+        "native_child_of_202": true
+      },
+      "chinese_title_and_body_present": true,
+      "single_commit_verified": true,
+      "ci": {
+        "status_count": 0,
+        "check_run_count": 0,
+        "conclusion": "UNKNOWN_EMPTY_CHECKS_NOT_PASS"
+      },
+      "evidence_boundary_zh": "CPU设备索引修复；与125环境设备发现及当前运行归属记录分开。"
+    }
+  ],
+  "scope": "Product heads/statuses unchanged; public text refreshed separately and verified in final local publication receipt. CI empty is unknown, not pass.",
+  "body_sha_scope": "Issue/PR body SHA values belong to the read-only pre-wrapup audit snapshot, not the later refreshed bodies. Heads/commit counts were independently checked; final publication receipts track body-only changes separately."
+}
