@@ -1,0 +1,205 @@
+{
+  "schema": "125-129-fsdp-control200-portable-summary-v1",
+  "status": "PASS_OBSERVED_CROSS_HOST_200X8_LOGGED_PRECISION",
+  "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "image_sha256": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "cann": {
+    "display": "9.2b2",
+    "image_alias": "cann-9.2.0-beta.2"
+  },
+  "reference_case": "r129-a1e6-fsdp8-0-200-v3",
+  "candidate_case": "r125-a1e6-fsdp8-control200-v1",
+  "hosts": [
+    "129",
+    "125"
+  ],
+  "steps": 200,
+  "ranks": 8,
+  "runs_per_host": 1,
+  "csv_rows": 200,
+  "csv_sha256": "df1a4ecccae6149053c8bd18b9ea371e1110b352b70e0a74a37b500e77eea2d5",
+  "metrics": {
+    "training/total_loss": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true,
+      "tolerance_absolute": 0.005,
+      "exceeded_steps": [],
+      "exceeded_step_count": 0,
+      "first_exceeded_step": null,
+      "gate_status": "PASS"
+    },
+    "training/foundation_loss/lm": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true,
+      "tolerance_absolute": 0.005,
+      "exceeded_steps": [],
+      "exceeded_step_count": 0,
+      "first_exceeded_step": null,
+      "gate_status": "PASS"
+    },
+    "training/foundation_loss/mtp": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true,
+      "tolerance_absolute": 0.005,
+      "exceeded_steps": [],
+      "exceeded_step_count": 0,
+      "first_exceeded_step": null,
+      "gate_status": "PASS"
+    },
+    "training/foundation_loss/aux": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true,
+      "tolerance_absolute": 0.005,
+      "exceeded_steps": [],
+      "exceeded_step_count": 0,
+      "first_exceeded_step": null,
+      "gate_status": "PASS"
+    },
+    "training/grad_norm": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true
+    },
+    "training/lr": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true
+    },
+    "data/consumed_tokens": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true
+    },
+    "data/consumed_samples": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true
+    },
+    "data/step_tokens": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true
+    },
+    "data/step_samples": {
+      "max_abs": 0.0,
+      "nonzero_rank_steps": 0,
+      "first_nonzero": null,
+      "exact_logged_values": true
+    }
+  },
+  "derived_unweighted_max_abs": {
+    "lm": 0.0,
+    "mtp": 0.0,
+    "aux": 0.0
+  },
+  "loss_coefficients": {
+    "mtp_loss_factor": 0.3,
+    "moe_aux_loss_coeff": 0.0001
+  },
+  "four_loss_pairs": 6400,
+  "six_scalar_pairs": 9600,
+  "input_identity_object_mismatch_count": 0,
+  "cpu_initial": {
+    "entries_per_rank": 48,
+    "all16_recorded_fingerprint_objects_equal": true,
+    "reference_and_candidate_rank_pairs_compared": 8
+  },
+  "runtime_all16_equal": true,
+  "runtime_record": {
+    "before_trainer": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": null,
+        "FLASH_ATTENTION_DETERMINISTIC": null,
+        "CUBLAS_WORKSPACE_CONFIG": null,
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "scope": "Environment only; no backend queries"
+    },
+    "training": {
+      "environment": {
+        "CLOSE_MATMUL_K_SHIFT": null,
+        "NCCL_DETERMINISTIC": "true",
+        "FLASH_ATTENTION_DETERMINISTIC": "1",
+        "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+        "PYTHONHASHSEED": "42",
+        "PYTORCH_NPU_ALLOC_CONF": "expandable_segments:True"
+      },
+      "deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "npu_matmul": {
+        "allow_tf32": null,
+        "allow_hf32": false,
+        "allow_bf16_reduced_precision_reduction": null
+      }
+    }
+  },
+  "recipe_differences": [
+    {
+      "field": "checkpoint.save_ckpt",
+      "129": true,
+      "125": false
+    },
+    {
+      "field": "checkpoint.checkpoint_dir",
+      "meaning": "Changed only to the new case output"
+    }
+  ],
+  "recorded_data_file_sha256": {
+    "data/sft_data_4k/SOURCE_INDEX.jsonl": "34978f670d9b9cca68eea5935f96b2e46e8876473e77970fe0bbc18a84e3660b",
+    "data/sft_data_4k/data-00000-of-00001.arrow": "cb7e146388ff5de09cafe50bb57c060265038ecabd2f343fa9114c05f3b678f1",
+    "data/sft_data_4k/dataset_info.json": "5a36710bc182d24a0b3a03c391ad41cfed859fff8dd774b2fa30ebfc897129a0",
+    "data/sft_data_4k/state.json": "6d32594943adceeef6fd2dba11c02e679c85f73e32aeea9d176c3fc12d63ccbb"
+  },
+  "raw_canonical_mapping": {
+    "request": {
+      "canonical_sha256": "501e97fbf8bce3353f3b97fc6645a245e39cd7b1fdb3f868dc349a6c4104774f",
+      "remote_raw_sha256": "0f1ef5b40744187d80211c98bcac7bfbe66d7f6114109156b4af5f8b82d31edd",
+      "json_equal": true,
+      "raw_is_collected_member": true,
+      "canonical_is_direct_collected_member": false
+    },
+    "receipt": {
+      "canonical_sha256": "15b7248857d703f2d250f891b2cbf72dd8d9b309961e8484ccc28d663e3ee078",
+      "remote_raw_sha256": "92f9fcb0adc12187586905aa1f74e20d6e4aa8d869b850bd2dbceab9c20072aa",
+      "json_equal": true,
+      "raw_is_collected_member": true,
+      "canonical_is_direct_collected_member": false
+    }
+  },
+  "original_strict": {
+    "status": "FAIL",
+    "weighted_status": "PASS",
+    "unweighted_status": "UNVERIFIED",
+    "findings": [
+      "Missing collected input: r125-a1e6-fsdp8-control200-v1/r125-a1e6-fsdp8-control200-v1.receipt.json"
+    ],
+    "unchanged_and_not_relabelled": true
+  },
+  "independent_input_review": {
+    "source_sha256": "0b7bdef7ee2754b699ee2d165f79ba9937ac3782d77b35375fa574a4b6a01886",
+    "status": "PASS_DIRECT_FULL_200X8_SCALARS_INPUT_INITIAL_RUNTIME_AND_MAPPED_FILE_CLOSURE",
+    "method": "Independent direct stdlib JSON decoding and finite numeric subtraction; no compare_runs/strict helper imported. All raw manifest members rehashed; mapped remote scheduling bytes and canonical documents bound separately."
+  },
+  "performance_included": false,
+  "limits": [
+    "One ordinary FSDP8 run per host, not eight independent repetitions.",
+    "global_sha256 is an unordered global component fingerprint, not token UID or DP-slot proof.",
+    "CPU initial evidence is 48 recorded tensor fingerprints per rank, not optimizer internal state.",
+    "No claim about parallel-matrix acceptance, kernel root cause, or performance benefit."
+  ]
+}

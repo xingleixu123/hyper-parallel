@@ -1,0 +1,100 @@
+{
+  "schema": "expert-replay-actual-scientific-independent-review-binding-v1",
+  "role": "Independent review of actual five-arm source evidence; not independent review of these newly authored figures.",
+  "source_sha256": "4aa049a4cdecaab3d6a96e813a90747177a826cf0bd076196b7e28a3e1dbddd3",
+  "status": "PASS_ACTUAL_FIVE_ROLE_THREE_STEP_INTERVENTION_EVIDENCE_ONLY",
+  "blockers": [],
+  "independence": "Reviewer authored control/collector but not A1 core/intervention reader, actual NPU executions or A3 report. All5 raw inventories/SHA, native event mappings,4B norm decode and scalar differences independently recomputed. No SSH/Torch/NPU action.",
+  "raw_file_counts_by_role": {
+    "capture": 152,
+    "self": 111,
+    "norm": 111,
+    "grad": 111,
+    "both": 111
+  },
+  "raw_files_total": 596,
+  "checks": {
+    "all596_files_full_SHA": true,
+    "complete5x8x3_six_scalar_values": true,
+    "input_counter_LR_cross_arm_exact": true,
+    "first_step_total_LM_MTP_aux_exact_all5x8": true,
+    "CPU48_initial_and_runtime_equal_all5": true,
+    "distinct_released_CIDs": 5,
+    "fullCIDabsence_each_collection": true,
+    "startup_request_pins": {
+      "capture": 27,
+      "self": 27,
+      "norm": 37,
+      "grad": 37,
+      "both": 37
+    },
+    "first_update_targets_each_arm": 32,
+    "global_expert_join_not_same_physical_rank": true,
+    "per_rank_native_events": 31,
+    "consumer_calls_per_rank": 1,
+    "physical_storage_version_and_actual_consumer_chain": true,
+    "wrapper_rollback_first_update_and_complete3": true,
+    "author_actual_result_matches_independent_recomputation": true
+  },
+  "main_LM_allrank_max_abs_vs_F_by_step": {
+    "capture": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "self": [
+      0.0,
+      0.0001430511474609375,
+      8.96453857421875e-05
+    ],
+    "norm": [
+      0.0,
+      3.147125244140625e-05,
+      0.000274658203125
+    ],
+    "grad": [
+      0.0,
+      0.00014495849609375,
+      0.0004444122314453125
+    ],
+    "both": [
+      0.0,
+      3.4332275390625e-05,
+      3.814697265625e-05
+    ]
+  },
+  "recorded_parameter_after_hash_matches_F": {
+    "capture": 32,
+    "self": 0,
+    "norm": 0,
+    "grad": 0,
+    "both": 32
+  },
+  "recorded_after_clip_hash_matches_F": {
+    "capture": 32,
+    "self": 0,
+    "norm": 0,
+    "grad": 0,
+    "both": 32
+  },
+  "norms_all8_per_arm_match_portable_csv": true,
+  "donor_independent_redecode": {
+    "files": 32,
+    "bytes": 1509949440,
+    "elements": 377487360,
+    "all_finite": true,
+    "chunk_bytes": 1048576,
+    "numpy_version": "2.5.4"
+  },
+  "current_small_report_values_match_review": true,
+  "limits": [
+    "除保留的F donor32原生FP32文件外，参数和各阶段梯度完整数值未保存；这里独立解析全部原始JSON及全Tensor SHA记录、物理身份和源绑定，不能声称独立解码了未保留的参数/梯度或从SHA推得数值max/RMS。",
+    "8rank日志通常为同一全局标量，不是8个独立实验重复；只3步。",
+    "48项CPU初态不等于完整optimizer/scheduler/RNG内部字节，参数after相同也不证明全部隐藏state正确。",
+    "只干预首更新的四类专家参数×8expert；未覆盖所有模型梯度、后续全部更新或MTP/aux200专项。",
+    "旧global input hash为无序组件指纹，不能充当完整token UID证明。",
+    "rollback是首更新后仅自有观察/干预wrapper卸载，不是撤销训练参数更新。",
+    "没有创建gate、产品PR、issue或新运行；不以此宣布200步对齐/性能收益或唯一根因。"
+  ],
+  "no_private_lifecycle_or_large_payload_copied": true
+}
