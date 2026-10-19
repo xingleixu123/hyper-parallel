@@ -1,0 +1,441 @@
+{
+  "schema": "norm-only-firststep-public-scientific-summary-v1",
+  "scope_zh": "由私有实际独审及派生比较摘录，原始张量未全量公开；不是200步修复或新执行门。",
+  "source": "59b25cdd15505a4f6fb1990484d4e890e3d3724c",
+  "source_analysis_sha256": "4d8e23470ca368d990dc78d133c246e0685a71f24dd2258788b7968345c1db89",
+  "source_independent_review_sha256": "c664f2211db90f6ac257c0c52225e60c0c7de1dff8cfac50d1af97ee0e82ff18",
+  "source_independent_review_status": "PASS_ACTUAL_NORM_ONLY3_INTERVENTION_EVIDENCE_AND_RESPONSE_ACCOUNTING_ONLY",
+  "source_private_manifest_sha256": "ca6d1c72ca6f411834fce7e6514e3d89eb24e4c489594aec133e1c12416998d3",
+  "recipe": {
+    "ns_dtype": "float32",
+    "ns_batch_across_params": false,
+    "npu_matmul_allow_hf32": false,
+    "seed": 42
+  },
+  "actual_N_case": "r129-a1e6-no-cross-param-norm-only-ep4-3-v2",
+  "actual_collection": {
+    "files": 115,
+    "raw_bytes": 2942827,
+    "batches": 18,
+    "container_exit": 0,
+    "released": true,
+    "manifest_sha256": "ca34104ecdfa1d82ffc9b0c559108bdafe96b1ea20f0edd0d9aeb868b4511f0b"
+  },
+  "stages": {
+    "ep4": {
+      "G0": {
+        "expert": {
+          "complete_fqns_equal": 4,
+          "equal": 32,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 42,
+          "equal": 336,
+          "total": 336
+        }
+      },
+      "G1": {
+        "expert": {
+          "complete_fqns_equal": 0,
+          "equal": 0,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 0,
+          "equal": 1,
+          "total": 336
+        }
+      },
+      "P0": {
+        "expert": {
+          "complete_fqns_equal": 4,
+          "equal": 32,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 42,
+          "equal": 336,
+          "total": 336
+        }
+      },
+      "P1": {
+        "expert": {
+          "complete_fqns_equal": 0,
+          "equal": 0,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 13,
+          "equal": 126,
+          "total": 336
+        }
+      }
+    },
+    "fsdp": {
+      "G0": {
+        "expert": {
+          "complete_fqns_equal": 0,
+          "equal": 0,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 42,
+          "equal": 336,
+          "total": 336
+        }
+      },
+      "G1": {
+        "expert": {
+          "complete_fqns_equal": 0,
+          "equal": 0,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 42,
+          "equal": 336,
+          "total": 336
+        }
+      },
+      "P0": {
+        "expert": {
+          "complete_fqns_equal": 4,
+          "equal": 32,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 42,
+          "equal": 336,
+          "total": 336
+        }
+      },
+      "P1": {
+        "expert": {
+          "complete_fqns_equal": 0,
+          "equal": 0,
+          "total": 32
+        },
+        "nonexpert": {
+          "complete_fqns_equal": 42,
+          "equal": 336,
+          "total": 336
+        }
+      }
+    }
+  },
+  "preintervention": {
+    "dp_slots_equal": 8,
+    "measured_norm_equal_ep_ranks": 8,
+    "native_before_clip": {
+      "expert_G0": {
+        "equal": 32,
+        "total": 32
+      },
+      "expert_P0": {
+        "equal": 32,
+        "total": 32
+      },
+      "nonexpert_G0": {
+        "equal": 336,
+        "total": 336
+      },
+      "nonexpert_P0": {
+        "equal": 336,
+        "total": 336
+      }
+    },
+    "used_norm_equal_fsdp_ranks": 8
+  },
+  "all8rank_six_scalar_maxabs_by_step": {
+    "1": {
+      "training/foundation_loss/aux": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      },
+      "training/foundation_loss/lm": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      },
+      "training/foundation_loss/mtp": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      },
+      "training/grad_norm": {
+        "max_abs_vs_fsdp": 1.9073486328125e-06,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      },
+      "training/lr": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      },
+      "training/total_loss": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      }
+    },
+    "2": {
+      "training/foundation_loss/aux": {
+        "max_abs_vs_fsdp": 4.423782229423523e-09,
+        "max_abs_vs_ep4": 1.146690919995308e-08,
+        "N_ranks_all_equal": true
+      },
+      "training/foundation_loss/lm": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 1.1444091796875e-05,
+        "N_ranks_all_equal": true
+      },
+      "training/foundation_loss/mtp": {
+        "max_abs_vs_fsdp": 9.107589721679688e-05,
+        "max_abs_vs_ep4": 0.00018930435180664062,
+        "N_ranks_all_equal": true
+      },
+      "training/grad_norm": {
+        "max_abs_vs_fsdp": 0.000274658203125,
+        "max_abs_vs_ep4": 0.000919342041015625,
+        "N_ranks_all_equal": true
+      },
+      "training/lr": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      },
+      "training/total_loss": {
+        "max_abs_vs_fsdp": 9.1552734375e-05,
+        "max_abs_vs_ep4": 0.0002002716064453125,
+        "N_ranks_all_equal": true
+      }
+    },
+    "3": {
+      "training/foundation_loss/aux": {
+        "max_abs_vs_fsdp": 3.565219230949879e-08,
+        "max_abs_vs_ep4": 7.674680091440678e-08,
+        "N_ranks_all_equal": true
+      },
+      "training/foundation_loss/lm": {
+        "max_abs_vs_fsdp": 9.632110595703125e-05,
+        "max_abs_vs_ep4": 6.29425048828125e-05,
+        "N_ranks_all_equal": true
+      },
+      "training/foundation_loss/mtp": {
+        "max_abs_vs_fsdp": 0.00024437904357910156,
+        "max_abs_vs_ep4": 0.00014662742614746094,
+        "N_ranks_all_equal": true
+      },
+      "training/grad_norm": {
+        "max_abs_vs_fsdp": 0.002788543701171875,
+        "max_abs_vs_ep4": 0.0005931854248046875,
+        "N_ranks_all_equal": true
+      },
+      "training/lr": {
+        "max_abs_vs_fsdp": 0,
+        "max_abs_vs_ep4": 0,
+        "N_ranks_all_equal": true
+      },
+      "training/total_loss": {
+        "max_abs_vs_fsdp": 0.000339508056640625,
+        "max_abs_vs_ep4": 0.000209808349609375,
+        "N_ranks_all_equal": true
+      }
+    }
+  },
+  "clip_by_rank": [
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 0,
+      "used_hex": "9ec9b341"
+    },
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 1,
+      "used_hex": "9ec9b341"
+    },
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 2,
+      "used_hex": "9ec9b341"
+    },
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 3,
+      "used_hex": "9ec9b341"
+    },
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 4,
+      "used_hex": "9ec9b341"
+    },
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 5,
+      "used_hex": "9ec9b341"
+    },
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 6,
+      "used_hex": "9ec9b341"
+    },
+    {
+      "ep4": {
+        "clip_coef_clamped_hex": "6f42363d",
+        "clip_coef_hex": "6f42363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "fsdp": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "measured_hex": "9fc9b341",
+      "norm_only": {
+        "clip_coef_clamped_hex": "7042363d",
+        "clip_coef_hex": "7042363d",
+        "original_code_verified": true,
+        "source_line": 792
+      },
+      "rank": 7,
+      "used_hex": "9ec9b341"
+    }
+  ],
+  "limits_zh": [
+    "仅首步clip使用范数替换；原measured/return/log保持EP。",
+    "非专家首步恢复、专家仍异；第3步N/F差大于原EP/F。",
+    "原200步F2/EP精度FAIL最大0.010309219360351562@146不变。",
+    "原生SHA相同不是误差幅度；postRS观测不能定位preRS与RS的唯一来源。",
+    "既有数学范数审阅无doublecount证据；不新认定norm产品bug。",
+    "公开包可复绘图片；全量复算原生梯度哈希需要私有原件。"
+  ]
+}
