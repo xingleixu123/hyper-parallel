@@ -1,0 +1,311 @@
+{
+  "schema": "selected-unbatch-scientific-review-safe-excerpt-v1",
+  "status": "NOT_PUBLISHED",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "independent_review": {
+    "path": "evidence/a1e6-muon-selected-ns-unbatch-control-v2/129-selected-unbatch-v2-scientific-independent-review-v1.json",
+    "bytes": 15413,
+    "sha256": "157526f69fdea759e970308baeae3e09110fff71e1b462913f072262857ab21c",
+    "status": "PASS_ACTUAL_INTERVENTION_CONTRACT_FIRST_UPDATE_AND_STEP2_ALIGNMENT_STEP3_NONZERO_NOT_200_ACCEPTANCE"
+  },
+  "native_outcome": {
+    "five_FQNs_all13_boundaries": {
+      "NS_input": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "NS_output": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "X0": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "X1": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "X2": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "X3": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "X4": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "X5": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "full_U_before_NS": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "local_U": {
+        "observations": 40,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "local_split": {
+        "observations": 40,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "parameter_after_apply": {
+        "observations": 40,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "scaled_full": {
+        "observations": 5,
+        "unequal": 0,
+        "unequal_names": []
+      }
+    },
+    "census_F": {
+      "G0": {
+        "observations": 336,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "G1": {
+        "observations": 336,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "P0": {
+        "observations": 336,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "P1": {
+        "observations": 336,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "pre_QK": {
+        "observations": 48,
+        "unequal": 0,
+        "unequal_names": []
+      }
+    },
+    "census_oldB": {
+      "G0": {
+        "observations": 336,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "G1": {
+        "observations": 336,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "P0": {
+        "observations": 336,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "P1": {
+        "observations": 336,
+        "unequal": 24,
+        "unequal_names": [
+          "model.layers.0.self_attn.linear_qkv.weight",
+          "model.layers.1.mlp.gate.weight",
+          "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight"
+        ]
+      },
+      "pre_QK": {
+        "observations": 48,
+        "unequal": 0,
+        "unequal_names": []
+      }
+    },
+    "expert_F": {
+      "after_clip": {
+        "observations": 32,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "optimizer_actual_read": {
+        "observations": 32,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "optimizer_prepared": {
+        "observations": 32,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "parameter_after": {
+        "observations": 32,
+        "unequal": 0,
+        "unequal_names": []
+      },
+      "parameter_before": {
+        "observations": 32,
+        "unequal": 0,
+        "unequal_names": []
+      }
+    },
+    "postapply_and_poststep_target_hash_matches": 40,
+    "negative_controls": [
+      "model.layers.1.self_attn.linear_qkv.weight: original singleton unaffected",
+      "mtp.layers.0.transformer_layer.mlp.gate.weight: co-member intervened but all13 boundaries unchanged"
+    ],
+    "meaning": "Complete logical native FP32 encoding equality at FQN/slice scope, not tensor-derived numerical error amplitude."
+  },
+  "new_schedule_counts": {
+    "intercepted": 3,
+    "member": 4,
+    "singleton": 1,
+    "stack": 2,
+    "ns": 5
+  },
+  "member_groups": [
+    {
+      "group": "qkv0-mtpqkv",
+      "names": [
+        "model.layers.0.self_attn.linear_qkv.weight",
+        "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight"
+      ]
+    },
+    {
+      "group": "gate1-mtpgate",
+      "names": [
+        "model.layers.1.mlp.gate.weight",
+        "mtp.layers.0.transformer_layer.mlp.gate.weight"
+      ]
+    }
+  ],
+  "preintervention": {
+    "P0_G0_G1_each336_slices_equal_F_and_oldB": true,
+    "local_U40_full_U5_NS_input5_equal_F_and_oldB": true,
+    "actual_production_indices_group_owner_assignment_and_options_same_as_B": true,
+    "runtime_model_initial48_per_rank_and_CPU_initial48_per_rank_equal_F_B": true,
+    "three_step_data_counter_input_LR_equal_F_B": true,
+    "full_resolved_recipe_equal_old_B_except_output": true
+  },
+  "norm_measured_vs_used": {
+    "all8_measured_hex": "9fc9b341",
+    "all8_used_hex": "9ec9b341",
+    "unchanged_original_return_object": true,
+    "gradient_norm_log_is_not_used_norm": true
+  },
+  "metrics_allranks": [
+    {
+      "reference": "F",
+      "step": 1,
+      "maxabs_allrank": {
+        "training/total_loss": 0.0,
+        "training/grad_norm": 1.9073486328125e-06,
+        "training/lr": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0
+      },
+      "S_rank0_LM": 12.881054878234863,
+      "reference_rank0_LM": 12.881054878234863
+    },
+    {
+      "reference": "F",
+      "step": 2,
+      "maxabs_allrank": {
+        "training/total_loss": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0
+      },
+      "S_rank0_LM": 12.84947395324707,
+      "reference_rank0_LM": 12.84947395324707
+    },
+    {
+      "reference": "F",
+      "step": 3,
+      "maxabs_allrank": {
+        "training/total_loss": 0.000331878662109375,
+        "training/grad_norm": 0.0006160736083984375,
+        "training/lr": 0.0,
+        "training/foundation_loss/aux": 1.775333657860756e-09,
+        "training/foundation_loss/lm": 0.0006237030029296875,
+        "training/foundation_loss/mtp": 0.0002930164337158203
+      },
+      "S_rank0_LM": 12.471757888793945,
+      "reference_rank0_LM": 12.472381591796875
+    },
+    {
+      "reference": "B",
+      "step": 1,
+      "maxabs_allrank": {
+        "training/total_loss": 0.0,
+        "training/grad_norm": 0.0,
+        "training/lr": 0.0,
+        "training/foundation_loss/aux": 0.0,
+        "training/foundation_loss/lm": 0.0,
+        "training/foundation_loss/mtp": 0.0
+      },
+      "S_rank0_LM": 12.881054878234863,
+      "reference_rank0_LM": 12.881054878234863
+    },
+    {
+      "reference": "B",
+      "step": 2,
+      "maxabs_allrank": {
+        "training/total_loss": 8.0108642578125e-05,
+        "training/grad_norm": 0.0012159347534179688,
+        "training/lr": 0.0,
+        "training/foundation_loss/aux": 4.94765117764473e-09,
+        "training/foundation_loss/lm": 3.4332275390625e-05,
+        "training/foundation_loss/mtp": 0.00011587142944335938
+      },
+      "S_rank0_LM": 12.84947395324707,
+      "reference_rank0_LM": 12.84943962097168
+    },
+    {
+      "reference": "B",
+      "step": 3,
+      "maxabs_allrank": {
+        "training/total_loss": 0.000186920166015625,
+        "training/grad_norm": 0.0011043548583984375,
+        "training/lr": 0.0,
+        "training/foundation_loss/aux": 8.731149137020111e-11,
+        "training/foundation_loss/lm": 0.0005855560302734375,
+        "training/foundation_loss/mtp": 0.0003998279571533203
+      },
+      "S_rank0_LM": 12.471757888793945,
+      "reference_rank0_LM": 12.472343444824219
+    }
+  ],
+  "conclusion_zh": "在同源同机、输入/初态/裁剪及专家回放不变的这一次受限干预中，将两个实际合批组改为原NS的逐二维成员调用，首步五个目标的全部13边界、42个非专家参数的P1及32个专家均与F的完整原生哈希对齐，原3个P1差异消失、两阴性不变；第二步主LM与F相等。第三步主LM仍有0.0006237030029296875最大绝对差，不能称三步完全一致或200步修复。",
+  "limits": [
+    "NS数学函数体保持，但调用形态发生改变；此结果支持该首步合批边界的局部因果作用，不识别唯一kernel或完整训练根因。",
+    "P1位于optimizer+QK/router后；另核parameter_after_apply及pre_QK，未把poststep P1冒称全optimizer状态。",
+    "没有第二、三步的完整参数/optimizer-state普查，不能仅凭loss对齐或残差推断其精确原因。",
+    "哈希只能说明原生编码是否一致；没有从哈希推算元素maxabs，未重新传输或重复读取巨大donor。",
+    "CPU初态与实际运行时model probes是两个独立证据；均不代表所有optimizer state逐字节相等。",
+    "四data的实际原文hash由固定guard准入和输入身份链证明；本独审未在本机重新读取远端Arrow原文。"
+  ],
+  "native_boundary_CSV": {
+    "path": "data/native-boundaries.csv",
+    "rows": 28,
+    "sha256": "5304ccc401b7b7746225db3a449ceb664d8d848e3f28dcccd80326616483e518"
+  },
+  "report_author_scope": "原生结果摘录自固定SHA的独立科学审核；报告作者另直接复算24份metrics，不冒称另行解码完整原生张量。",
+  "private_lifecycle_bindings_or_container_id_copied": false,
+  "raw_tensors_donor_checkpoints_or_training_text_copied": false
+}

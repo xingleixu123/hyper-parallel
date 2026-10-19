@@ -1,0 +1,94 @@
+{
+  "schema": "selected-ns-unbatch-report-metrics-v1",
+  "status": "NOT_PUBLISHED",
+  "source": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "cases": {
+    "F": "r129-a1e6-muon-update-fsdp8-3-v1",
+    "B": "r129-a1e6-muon-update-ep4-both-3-v1",
+    "S": "r129-a1e6-muon-selected-ns-unbatch-both-3-v2"
+  },
+  "steps": [
+    1,
+    2,
+    3
+  ],
+  "ranks": 8,
+  "metrics_rows": 72,
+  "LM_comparison": [
+    {
+      "step": 1,
+      "ranks_per_arm": 8,
+      "F_main_LM": 12.881054878234863,
+      "B_main_LM": 12.881054878234863,
+      "S_main_LM": 12.881054878234863,
+      "B_vs_F_all8rank_max_absdiff": 0.0,
+      "S_vs_F_all8rank_max_absdiff": 0.0
+    },
+    {
+      "step": 2,
+      "ranks_per_arm": 8,
+      "F_main_LM": 12.84947395324707,
+      "B_main_LM": 12.84943962097168,
+      "S_main_LM": 12.84947395324707,
+      "B_vs_F_all8rank_max_absdiff": 3.4332275390625e-05,
+      "S_vs_F_all8rank_max_absdiff": 0.0
+    },
+    {
+      "step": 3,
+      "ranks_per_arm": 8,
+      "F_main_LM": 12.472381591796875,
+      "B_main_LM": 12.472343444824219,
+      "S_main_LM": 12.471757888793945,
+      "B_vs_F_all8rank_max_absdiff": 3.814697265625e-05,
+      "S_vs_F_all8rank_max_absdiff": 0.0006237030029296875
+    }
+  ],
+  "checks": [
+    {
+      "step": 1,
+      "all8rank_global_LM_equal_within_each_arm": true,
+      "input_component_fingerprint_equal": true,
+      "LR_and_four_counters_equal": true
+    },
+    {
+      "step": 2,
+      "all8rank_global_LM_equal_within_each_arm": true,
+      "input_component_fingerprint_equal": true,
+      "LR_and_four_counters_equal": true
+    },
+    {
+      "step": 3,
+      "all8rank_global_LM_equal_within_each_arm": true,
+      "input_component_fingerprint_equal": true,
+      "LR_and_four_counters_equal": true
+    }
+  ],
+  "csv_sha256": {
+    "metrics-72rows.csv": "c40edd832df98d2d270c6756aa6c20c55544e9f6bc1f037bbc3ac4c6834406e0",
+    "main-lm-3steps.csv": "4ad9eb374a9ed742f6c2f844e247aefe0f772fe1b17a8e40dadc95b3e724ddba"
+  },
+  "parsed_fields_only": [
+    "training/total_loss",
+    "training/foundation_loss/lm",
+    "training/foundation_loss/mtp",
+    "training/foundation_loss/aux",
+    "training/grad_norm",
+    "training/lr",
+    "data/step_tokens",
+    "data/consumed_tokens",
+    "data/step_samples",
+    "data/consumed_samples",
+    "step",
+    "rank",
+    "input_identity"
+  ],
+  "rank_scope": "八rank是同一运行的归约标量观测，不是八次独立重复。",
+  "input_scope": "global_sha是输入组件的无序指纹，不是逐token UID或物理rank token对应证明。",
+  "parameter_and_NS_science": "NOT_ASSESSED_BY_METRICS_BUILDER",
+  "not_claimed": [
+    "200步验收",
+    "产品修复",
+    "唯一数学或kernel根因",
+    "性能或显存收益"
+  ]
+}
