@@ -1,0 +1,91 @@
+{
+  "schema": "muon-trace-public-science-summary-v1",
+  "source_commit": "544526f7db8342c607244fd41009b2a74adb84c8",
+  "experiment": {
+    "arms": [
+      "FSDP8",
+      "EP4 with first-update expert-gradient and clip-norm replay"
+    ],
+    "steps_each": 3,
+    "ranks_each": 8,
+    "independent_repetitions_claimed": false,
+    "full200_acceptance": false
+  },
+  "five_target_shapes_and_boundaries": [
+    {
+      "fqn": "model.layers.0.self_attn.linear_qkv.weight",
+      "global_shape": [
+        2112,
+        5120
+      ],
+      "first_unequal_boundary": "X1"
+    },
+    {
+      "fqn": "model.layers.1.self_attn.linear_qkv.weight",
+      "global_shape": [
+        2112,
+        5120
+      ],
+      "first_unequal_boundary": null
+    },
+    {
+      "fqn": "mtp.layers.0.transformer_layer.self_attn.linear_qkv.weight",
+      "global_shape": [
+        2112,
+        5120
+      ],
+      "first_unequal_boundary": "X1"
+    },
+    {
+      "fqn": "model.layers.1.mlp.gate.weight",
+      "global_shape": [
+        8,
+        5120
+      ],
+      "first_unequal_boundary": "X0"
+    },
+    {
+      "fqn": "mtp.layers.0.transformer_layer.mlp.gate.weight",
+      "global_shape": [
+        8,
+        5120
+      ],
+      "first_unequal_boundary": null
+    }
+  ],
+  "same_input_scope": {
+    "local_U": "all5exact_by_logical_shard",
+    "full_U": "all5exact_by_global_member",
+    "NS_input": "all5exact_by_global_member"
+  },
+  "observed_cross_arm_census_P1": {
+    "equal_whole_fqns": 39,
+    "compared_whole_fqns": 42
+  },
+  "own_topology_transparency": {
+    "scalar_fields": 6,
+    "counter_fields": 4,
+    "rank_step_pairs_each": 24,
+    "max_scalar_difference_each": 0,
+    "input_initial_runtime_equal": true
+  },
+  "short_window_main_LM_max_abs_difference": 3.814697265625e-05,
+  "source_boundaries": {
+    "X0": "Original normalization atmuon.py:143, observed beforeline145",
+    "X1": "After original first iteration atmuon.py:168-174"
+  },
+  "hash_semantics": "FullFP32 logicalmember encoding equality only; unequal hashes do not yield differingelement count,maxabs,RMS orsign.",
+  "scope_limits": [
+    "The earlier census located3nonexpertP1 differences; this trace narrows their firstobserved boundaries.",
+    "Actualgrouping:EP4 qkv0+MTPqkv share2x2112x5120; gate1+MTPgate share2x8x5120; qkv1 remains2D.",
+    "Differentphysicalowners are preserved in the scientificpairing; no same-rank assumption.",
+    "This is not proof of a unique kernel or mathematical bug, complete optimizerstate equality, or200step repair.",
+    "No performance ormemory-benefit conclusion."
+  ],
+  "portable_data": {
+    "file": "muon-first-boundary.csv",
+    "sha256": "236f6b09e3e0c535a67ab9b010bbad2e291f86587927770fa3291102599b18e9",
+    "rows": 65,
+    "member_pairs": 170
+  }
+}
