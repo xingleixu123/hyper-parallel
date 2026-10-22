@@ -757,6 +757,10 @@ class HSDPParamV2:
             unsharded_param,
             requires_grad=self.sharded_param.requires_grad,
         )
+        if self.reduce_dtype is not None and hasattr(torch.Tensor, "grad_dtype"):
+            # Preserve the declared reduction precision on the autograd leaf.
+            # Running-gradient consumers must see this same accumulator.
+            self._unsharded_param.grad_dtype = self.reduce_dtype
 
     def to_sharded(self) -> None:
         """Install the sharded parameter on managed modules and update state."""
@@ -809,6 +813,8 @@ class HSDPParamV2:
     def to_accumulated_grad_if_needed(self) -> None:
         """Move the current unsharded gradient into the accumulation buffer."""
         if self._unsharded_param.grad is None:
+            return
+        if self.reduce_dtype is not None and hasattr(torch.Tensor, "grad_dtype"):
             return
         # Keep local gradients alive across no-sync / delayed-sync steps even
         # after the parameter transitions back to the sharded view.

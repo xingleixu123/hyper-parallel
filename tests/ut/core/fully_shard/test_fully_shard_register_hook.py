@@ -52,6 +52,7 @@ def _make_prefetch_param(fqn: str, handle=None) -> HSDPParamV2:
 def _make_prefetch_scheduler(hsdp_params=(), all_gather_buckets=None, scheduler_ctx=None) -> HSDPSchedulerV2:
     """Create a scheduler sharing a tree context with mocked backward reductions."""
     scheduler = _make_scheduler_stub()
+    scheduler._fsdp_group_post_pending = None
     if scheduler_ctx is not None:
         scheduler.scheduler_ctx = scheduler_ctx
     scheduler.scheduler_ctx.all_hsdp_schedulers.append(scheduler)
@@ -330,15 +331,17 @@ class TestRegisterPostBackwardHook(unittest.TestCase):
 
 
 class TestRootBackwardCallback(unittest.TestCase):
-    """Unit tests for root-only backward finalizer registration."""
+    """Unit tests for tree-wide backward finalizer registration."""
 
     @patch("hyper_parallel.core.fully_shard.hsdp_scheduler.Variable")
     def test_root_backward_pre_hook_queues_finalizer(self, mock_variable):
-        """Only the root scheduler should queue the end-of-backward callback."""
+        """Queue the root finalizer once when root output starts backward."""
         scheduler = _make_scheduler_stub()
         scheduler.scheduler_state = FSDPSchedulerState.FORWARD
         scheduler._is_root = True
         scheduler.cell = MagicMock()
+        scheduler.scheduler_ctx.root_module = scheduler.cell
+        scheduler.cell.hsdp_scheduler = scheduler
         scheduler._hsdp_backward_pre_hook = MagicMock()
         grad = torch.ones(1)
 
@@ -351,18 +354,22 @@ class TestRootBackwardCallback(unittest.TestCase):
         scheduler._hsdp_backward_pre_hook.assert_called_once_with(scheduler.cell, None)
 
     @patch("hyper_parallel.core.fully_shard.hsdp_scheduler.Variable")
-    def test_non_root_backward_pre_hook_does_not_queue_finalizer(self, mock_variable):
-        """A child scheduler should run its pre-hook without queuing root finalization."""
+    def test_non_root_backward_pre_hook_queues_root_finalizer(self, mock_variable):
+        """A head-only backward must still finalize through the module tree root."""
         scheduler = _make_scheduler_stub()
         scheduler.scheduler_state = FSDPSchedulerState.FORWARD
         scheduler._is_root = False
         scheduler.cell = MagicMock()
+        scheduler.scheduler_ctx.root_module = MagicMock()
         scheduler._hsdp_backward_pre_hook = MagicMock()
 
         scheduler._backward_pre_hook(torch.ones(1))
+        scheduler._backward_pre_hook(torch.ones(1))
 
-        mock_variable._execution_engine.queue_callback.assert_not_called()
-        scheduler._hsdp_backward_pre_hook.assert_called_once_with(scheduler.cell, None)
+        mock_variable._execution_engine.queue_callback.assert_called_once_with(
+            scheduler.scheduler_ctx.root_module.hsdp_scheduler._root_backward_hook
+        )
+        self.assertEqual(scheduler._hsdp_backward_pre_hook.call_count, 2)
 
     @patch("hyper_parallel.core.fully_shard.hsdp_scheduler.Variable")
     def test_repeated_backward_pre_hook_does_not_queue_again(self, mock_variable):

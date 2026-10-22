@@ -174,6 +174,8 @@ def _new_state(hsdp_params=None, replicate_params=None, *, comm_fusion=False, of
 def _new_root_scheduler(state):
     """Create a root scheduler double that finalizes one state."""
     scheduler = object.__new__(HSDPSchedulerV2)
+    scheduler._fsdp_group_post_pending = None
+    scheduler._finalizing_backward = False
     scheduler.hsdp_state = state
     scheduler.scheduler_ctx = state.scheduler_ctx
     scheduler.scheduler_ctx.all_hsdp_schedulers = [scheduler]
@@ -630,6 +632,7 @@ class TestHSDPStateV2(unittest.TestCase):
         child_scheduler = SimpleNamespace(
             hsdp_state=non_fused_state,
             _backward_hook=child_backward_hook,
+            _fsdp_group_post_pending=None,
         )
         scheduler.scheduler_ctx.all_hsdp_schedulers.append(child_scheduler)
         scheduler._root_backward_hook()

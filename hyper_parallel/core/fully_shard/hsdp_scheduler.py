@@ -78,6 +78,9 @@ class HSDPSchedulerContext:
         # parameter state only on the first real forward.
         self.lazy_init_done: bool = False
         self.root_bp_state = False
+        # Any participating unit may start a backward that does not traverse
+        # the model root. Queue one tree-wide finalizer per autograd backward.
+        self.post_backward_callback_queued = False
         # all_hsdp_schedulers (for one module tree structure), deduplicated at
         # registration time because ``fully_shard`` may be given a module list
         # whose modules share one scheduler.
@@ -145,6 +148,7 @@ class HSDPSchedulerV2:
         self._backup_forward_fetch = None
         # Flag to identify root module.
         self._is_root = True
+        self._finalizing_backward = False
         # module and its all sub-modules share one same 'HSDPSchedulerContext'
         self.scheduler_ctx = HSDPSchedulerContext()
         # When ``fully_shard`` is given multiple root modules, forward pre/post hooks coordinate
@@ -219,6 +223,7 @@ class HSDPSchedulerV2:
     def reset_iter_state(self) -> None:
         """Reset scheduler bookkeeping after a completed iteration."""
         self.scheduler_ctx.root_bp_state = False
+        self.scheduler_ctx.post_backward_callback_queued = False
         self.scheduler_ctx.pre_reduce_scatter_params.clear()
         self.scheduler_ctx.pre_all_reduce_params.clear()
         self.scheduler_ctx.pre_direct_all_reduce_grads.clear()
@@ -285,9 +290,8 @@ class HSDPSchedulerV2:
             cast_fn = functools.partial(cast_fp_tensor, self.mp_policy.param_dtype)
             args = apply_to_tensors(cast_fn, args)
             kwargs = apply_to_tensors(cast_fn, kwargs)
-        with profiler_record(f"pre_forward unshard:{self.hsdp_state.module_name}"):
-            logger.debug("hook=forward_pre action=unshard module=%s", self.hsdp_state)
-            self.hsdp_state.unshard()
+        # Launch target gathers before materializing this unit. Each target owns
+        # its gather buffers; unshard below waits before exposing current weights.
         for prefetch_cell in self.forward_prefetch_cells:
             prefetch_state = prefetch_cell.hsdp_scheduler.hsdp_state
             with profiler_record(f"pre_forward prefetch:"
@@ -298,6 +302,9 @@ class HSDPSchedulerV2:
                     prefetch_state,
                 )
                 prefetch_state.prefetch()
+        with profiler_record(f"pre_forward unshard:{self.hsdp_state.module_name}"):
+            logger.debug("hook=forward_pre action=unshard module=%s", self.hsdp_state)
+            self.hsdp_state.unshard()
         return args, kwargs
 
     def _lazy_init_all_states(self):
@@ -361,10 +368,7 @@ class HSDPSchedulerV2:
         """Backward pre hook to unsharded parameter for backward process."""
         logger.debug("hook=backward_pre enter module=%s", self.hsdp_state)
         self.scheduler_state = FSDPSchedulerState.PRE_BACKWARD
-        if self.reshard_after_forward:
-            with profiler_record(f"pre_backward unshard:{self.hsdp_state.module_name}"):
-                logger.debug("hook=backward_pre action=unshard module=%s", self.hsdp_state)
-                self.hsdp_state.unshard()
+        # Preserve the same gather-before-materialization ordering in backward.
         for prefetch_cell in self.backward_prefetch_cells:
             prefetch_state = prefetch_cell.hsdp_scheduler.hsdp_state
             with profiler_record(f"pre_backward prefetch:"
@@ -375,6 +379,10 @@ class HSDPSchedulerV2:
                     prefetch_state,
                 )
                 prefetch_state.prefetch()
+        if self.reshard_after_forward:
+            with profiler_record(f"pre_backward unshard:{self.hsdp_state.module_name}"):
+                logger.debug("hook=backward_pre action=unshard module=%s", self.hsdp_state)
+                self.hsdp_state.unshard()
 
     # pylint: disable=W0613
     def _hsdp_backward_hook(self, cell, grad_inputs, grad_outputs):
@@ -514,7 +522,15 @@ class HSDPSchedulerV2:
         if self.scheduler_ctx.root_bp_state:
             self._restore_forward_prefetch_after_recompute()
             return
-        return self._hsdp_forward_hook(cell, inputs, outputs)
+        outputs = self._hsdp_forward_hook(cell, inputs, outputs)
+        if self._is_root:
+            # A managed group may include a head called outside root.forward.
+            # Attach its pending backward gather to the root's returned tensor.
+            for scheduler in reversed(self.scheduler_ctx.all_hsdp_schedulers):
+                if scheduler is not self and scheduler._fsdp_group_post_pending:
+                    outputs = scheduler._forward_hook(scheduler.cell, None, outputs)
+                    scheduler._fsdp_group_post_pending.clear()
+        return outputs
 
     # pylint: disable=W0212
     @_dynamo_disable
@@ -522,8 +538,13 @@ class HSDPSchedulerV2:
         """Execute backward pre hook."""
         if self.scheduler_state == FSDPSchedulerState.PRE_BACKWARD:
             return grad
-        if self._is_root:
-            Variable._execution_engine.queue_callback(self._root_backward_hook)
+        if not self.scheduler_ctx.post_backward_callback_queued:
+            self.scheduler_ctx.post_backward_callback_queued = True
+            # Children can trigger finalization without traversing the root.
+            # Keep its reduction-policy ownership independent of the trigger.
+            Variable._execution_engine.queue_callback(
+                self.scheduler_ctx.root_module.hsdp_scheduler._root_backward_hook
+            )
         self.scheduler_ctx.root_bp_state = True
         self._hsdp_backward_pre_hook(self.cell, None)
         return grad
@@ -534,9 +555,13 @@ class HSDPSchedulerV2:
         logger.debug("hook=root_backward_hook enter module=%s", self.hsdp_state)
         self.check_state_prefetch_handles_consumed()
         for hsdp_scheduler in self.scheduler_ctx.all_hsdp_schedulers:
-            # let modules which are not triggered backward_hook launch backward communication.
-            hsdp_scheduler._backward_hook()
-        self.scheduler_ctx.root_bp_state = False
+            hsdp_scheduler._finalizing_backward = True
+        try:
+            for hsdp_scheduler in self.scheduler_ctx.all_hsdp_schedulers:
+                hsdp_scheduler._backward_hook()
+        finally:
+            for hsdp_scheduler in self.scheduler_ctx.all_hsdp_schedulers:
+                hsdp_scheduler._finalizing_backward = False
         with torch.profiler.record_function(f"root_backward reduce:{self.hsdp_state.module_name}"):
             logger.debug(
                 "hook=root_backward_hook action=final_reduce module=%s",
@@ -545,6 +570,12 @@ class HSDPSchedulerV2:
             self._finalize_comm_fusion_reductions()
             self._finalize_per_param_reductions()
             self.launch_tp_replicate_reduce_and_apply()
+        self.scheduler_ctx.root_bp_state = False
+        self.scheduler_ctx.post_backward_callback_queued = False
+        for scheduler in self.scheduler_ctx.all_hsdp_schedulers:
+            scheduler.scheduler_state = None
+            if scheduler._fsdp_group_post_pending is not None:
+                scheduler._fsdp_group_post_pending.clear()
 
     def check_state_prefetch_handles_consumed(self) -> None:
         """Check that all parameters in the module tree consumed their prefetch work.
@@ -629,6 +660,14 @@ class HSDPSchedulerV2:
     @_dynamo_disable
     def _backward_hook(self):
         """Execute backward hook."""
+        if not self.scheduler_ctx.post_backward_callback_queued:
+            self.scheduler_ctx.post_backward_callback_queued = True
+            Variable._execution_engine.queue_callback(
+                self.scheduler_ctx.root_module.hsdp_scheduler._root_backward_hook
+            )
+        # A head input hook does not establish that other group gradients exist.
+        if len(self.modules) > 1 and not self._finalizing_backward:
+            return
         if self.scheduler_state == FSDPSchedulerState.BACKWARD:
             return
         self._hsdp_backward_hook(self.cell, None, None)

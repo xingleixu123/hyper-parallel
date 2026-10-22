@@ -177,28 +177,25 @@ class HSDPModule:
                                               source_shard_infos=source_shard_infos,
                                               )
 
-    def set_requires_gradient_sync(self, requires_grad_sync):
-        r"""
-            set requires grad sync flag.
-            Args:
-                requires_grad_sync(bool): requires_grad_sync is used to control gradient sync process.
-            Raises:
-                ValueError: If `requires_grad_sync` is not bool.
-        """
+    def _control_schedulers(self, recurse: bool):
+        if not isinstance(recurse, bool):
+            raise ValueError("recurse must be bool")
+        seen = set()
+        for module in self.modules() if recurse else (self,):
+            if isinstance(module, HSDPModule) and id(module.hsdp_scheduler) not in seen:
+                seen.add(id(module.hsdp_scheduler))
+                yield module.hsdp_scheduler
+
+    def set_requires_gradient_sync(self, requires_grad_sync: bool, *, recurse: bool = True) -> None:
+        """Control gradient synchronization once per managed module group."""
         if not isinstance(requires_grad_sync, bool):
-            raise ValueError(f"requires_grad_sync must be bool but got {requires_grad_sync}.")
-        if not hasattr(self, "hsdp_scheduler"):
-            raise ValueError("call hsdp interface first.")
+            raise ValueError("requires_grad_sync must be bool")
+        for scheduler in self._control_schedulers(recurse):
+            scheduler.set_requires_grad_sync(requires_grad_sync)
 
-        for _, module in self.named_modules():
-            if isinstance(module, HSDPModule):
-                module.hsdp_scheduler.set_requires_grad_sync(requires_grad_sync)
-
-    def zero_grad(self):
-        """zero accumunication grads"""
-        if not hasattr(self, "hsdp_scheduler"):
-            raise ValueError("call hsdp interface first.")
-        return super().zero_grad()
+    def zero_grad(self, set_to_none: bool = True) -> None:
+        """Clear optimizer gradients using nn.Module semantics."""
+        super().zero_grad(set_to_none=set_to_none)
 
     def set_modules_to_forward_prefetch(self, modules):
         """set forward prefetch module list to prefetch all gather for unsharded parameters"""
@@ -350,52 +347,25 @@ class HSDPModule:
                 module.hsdp_scheduler.reset_iter_state()
 
     def set_requires_all_reduce(self, requires_all_reduce: bool, *, recurse: bool = True) -> None:
-        """set requires_all_reduce flag"""
+        """Apply requires_all_reduce once per selected module group."""
         if not isinstance(requires_all_reduce, bool):
-            raise ValueError(
-                f"requires_all_reduce should be a bool, got {type(requires_all_reduce)}"
-            )
-        if not recurse:
-            raise NotImplementedError(
-                "Currently impl is equal to recurse=True, "
-                "need support module_param mapping."
-            )
-        self_module = cast(nn.Module, self)
-        for _, module in self_module.named_modules():
-            if isinstance(module, HSDPModule):
-                module.hsdp_scheduler.set_requires_all_reduce(requires_all_reduce)
+            raise ValueError("requires_all_reduce must be bool")
+        for scheduler in self._control_schedulers(recurse):
+            scheduler.set_requires_all_reduce(requires_all_reduce)
 
     def set_reshard_after_forward(self, reshard_after_forward: bool, recurse: bool = True) -> None:
-        """set reshard_after_forward flag"""
+        """Apply reshard_after_forward once per selected module group."""
         if not isinstance(reshard_after_forward, bool):
-            raise ValueError(
-                f"reshard_after_forward should be a bool, got {type(reshard_after_forward)}"
-            )
-        if not recurse:
-            raise NotImplementedError(
-                "Currently impl is equal to recurse=True, "
-                "need support module_param mapping."
-            )
-        self_module = cast(nn.Module, self)
-        for _, module in self_module.named_modules():
-            if isinstance(module, HSDPModule):
-                module.hsdp_scheduler.set_reshard_after_forward(reshard_after_forward)
+            raise ValueError("reshard_after_forward must be bool")
+        for scheduler in self._control_schedulers(recurse):
+            scheduler.set_reshard_after_forward(reshard_after_forward)
 
     def set_reshard_after_backward(self, reshard_after_backward: bool, recurse: bool = True) -> None:
-        """set reshard_after_backward flag"""
+        """Apply reshard_after_backward once per selected module group."""
         if not isinstance(reshard_after_backward, bool):
-            raise ValueError(
-                f"reshard_after_backward should be a bool, got {type(reshard_after_backward)}"
-            )
-        if not recurse:
-            raise NotImplementedError(
-                "Currently impl is equal to recurse=True, "
-                "need support module_param mapping."
-            )
-        self_module = cast(nn.Module, self)
-        for _, module in self_module.named_modules():
-            if isinstance(module, HSDPModule):
-                module.hsdp_scheduler.set_reshard_after_backward(reshard_after_backward)
+            raise ValueError("reshard_after_backward must be bool")
+        for scheduler in self._control_schedulers(recurse):
+            scheduler.set_reshard_after_backward(reshard_after_backward)
 
     def set_reduce_op_type(self, reduce_op_type, recurse: bool = True) -> None:
         """
@@ -584,6 +554,8 @@ def _get_device_from_mesh(mesh: DeviceMesh):
     """Extract and validate the torch device from the device mesh."""
     device = None
     device_type = mesh.device_type
+    if device_type == "cpu":
+        return torch.device("cpu")
     if device_type not in ("npu", "cuda"):
         raise AssertionError(
             f"hyper_parallel.fully_shard support device in [torch.npu, torch.cuda], "
