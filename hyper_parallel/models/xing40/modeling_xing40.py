@@ -258,14 +258,14 @@ class Xing40MoE(DeepseekV3MoE):
         self.ep_executor = None
 
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
-        """Add the routed and shared experts' outputs for ``[1, tokens, hidden]`` inputs.
+        """Add the routed and shared experts' outputs for ``[batch, tokens, hidden]`` inputs.
 
         Args:
             hidden_states: Normalized MLP input.
         """
         hidden = hidden_states
         if self.padding:
-            hidden = torch.cat((hidden.new_zeros(1, self.padding, hidden.shape[-1]), hidden), dim=1)
+            hidden = torch.cat((hidden.new_zeros(hidden.shape[0], self.padding, hidden.shape[-1]), hidden), dim=1)
         if self.ep_executor is None:
             indices, weights = self.route(hidden)
             # As MindFormers, the experts combine with the routing weights in the activation dtype.
@@ -276,7 +276,7 @@ class Xing40MoE(DeepseekV3MoE):
         return routed[:, self.padding:] + self.shared_experts(hidden_states)
 
     def route(self, hidden: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        """Route the real tokens of a pad-prefixed ``[1, padding + tokens, hidden]`` batch.
+        """Route real tokens of a pad-prefixed ``[batch, padding + tokens, hidden]`` input.
 
         Attaches the balance loss to the routing weights and counts the routed tokens.
         Pad tokens are routed to every expert with zero weight. Expert parallelism uses
@@ -286,7 +286,7 @@ class Xing40MoE(DeepseekV3MoE):
             hidden: Pad-prefixed router inputs.
 
         Returns:
-            Expert indices and routing weights, ``[padding + tokens, top_k]``.
+            Expert indices and routing weights, ``[batch * (padding + tokens), top_k]``.
         """
         real_hidden = hidden[:, self.padding:]
         if self.force_expert_balance:
@@ -302,39 +302,48 @@ class Xing40MoE(DeepseekV3MoE):
                 weights = weights / (weights.sum(-1, keepdim=True) + 1e-20)
             weights = weights * self.gate.routed_scaling_factor
         else:
-            logits, weights, indices = self.gate(real_hidden)
+            logits, weights, indices = self.gate(real_hidden.reshape(-1, hidden.shape[-1]))
             scores = logits.sigmoid()
-        weights = self._attach_balance_loss(weights, scores, indices if self.force_expert_balance else None)
+        weights = self._attach_balance_loss(weights, scores, indices if self.force_expert_balance else None,
+                                            batch_size=hidden.shape[0])
         # A recomputed forward replays the same routing; count each token once.
         if not is_recomputing():
             counts = torch.zeros_like(scores[0]).scatter_add_(
                 0, indices.reshape(-1), torch.ones_like(indices.reshape(-1), dtype=scores.dtype))
             self.tokens_per_expert = counts if self.tokens_per_expert is None else self.tokens_per_expert.add_(counts)
         if self.padding:
+            batch = hidden.shape[0]
             pad_indices = torch.arange(self.padding * self.top_k, device=indices.device)
-            indices = torch.cat((pad_indices.view(self.padding, self.top_k) % self.padding, indices))
-            weights = torch.cat((weights.new_zeros(self.padding, self.top_k), weights))
+            pad_indices = (pad_indices.view(1, self.padding, self.top_k) % self.num_experts).expand(batch, -1, -1)
+            indices = torch.cat((pad_indices, indices.reshape(batch, -1, self.top_k)), dim=1).reshape(-1, self.top_k)
+            weights = torch.cat((weights.new_zeros(batch, self.padding, self.top_k),
+                                 weights.reshape(batch, -1, self.top_k)), dim=1).reshape(-1, self.top_k)
         return indices, weights
 
     def _attach_balance_loss(self, weights: torch.Tensor, scores: torch.Tensor,
-                             selected_indices: torch.Tensor | None = None) -> torch.Tensor:
-        """Inject the gradient of ``coeff * E * sum_i(f_i * P_i)`` through the routing weights.
+                             selected_indices: torch.Tensor | None = None,
+                             batch_size: int = 1) -> torch.Tensor:
+        """Inject ``coeff * E * mean_b(sum_i(f_bi * P_bi))`` through the routing weights.
 
-        ``f_i`` counts unbiased top-k affinities, or the prescribed cyclic routes when
-        forced balancing is enabled. ``P_i`` averages the normalized affinities.
+        ``f_i`` counts unbiased top-k affinities, or prescribed routes when forced
+        balancing is enabled. ``P_i`` averages normalized affinities within
+        each sequence. The sequence objectives are averaged over the batch.
 
         Args:
             weights: Routing weights of the real tokens.
             scores: Router affinities of every expert.
             selected_indices: Forced routes, or None to use unbiased top-k affinities.
+            batch_size: Number of independent sequences before flattening the tokens.
         """
         if selected_indices is None:
             selected_indices = scores.topk(self.top_k, dim=-1, sorted=False).indices
-        selected = selected_indices.reshape(-1)
-        counts = torch.zeros_like(scores[0]).scatter_add_(0, selected, torch.ones_like(selected, dtype=scores.dtype))
-        load = counts / selected.numel()
-        affinity = (scores / (scores.sum(dim=-1, keepdim=True) + 1e-20)).mean(dim=0)
-        loss = (affinity * load).sum() * self.num_experts
+        selected = selected_indices.reshape(batch_size, -1)
+        counts = scores.new_zeros(batch_size, self.num_experts).scatter_add_(
+            1, selected, torch.ones_like(selected, dtype=scores.dtype))
+        load = counts / selected.shape[1]
+        affinity = (scores / (scores.sum(dim=-1, keepdim=True) + 1e-20)).reshape(
+            batch_size, -1, self.num_experts).mean(dim=1)
+        loss = (affinity * load).sum(dim=-1).mean() * self.num_experts
         self.last_aux_loss = loss.detach()
         return aux_loss_auto_scale(weights, loss * self.aux_loss_coeff)
 
@@ -679,7 +688,7 @@ class Xing40ForCausalLM(Xing40PreTrainedModel):
         """Compute the training losses of one batch.
 
         Args:
-            input_ids: Token IDs ``[1, sequence]``.
+            input_ids: Token IDs ``[batch, sequence]``.
             labels: Unused; ``shift_labels`` carries the same targets.
             shift_labels: Next-token targets aligned with ``input_ids``; negative targets are ignored.
             position_ids: RoPE positions; defaults to ``0..sequence-1``.
@@ -691,14 +700,14 @@ class Xing40ForCausalLM(Xing40PreTrainedModel):
             the router balance loss reaches the gradients through the routing weights.
 
         Raises:
-            ValueError: If the inputs do not describe one causal training sequence.
+            ValueError: If the inputs do not describe a nonempty batch of causal training sequences.
         """
         del labels
         if attention_mask is not None or use_cache:
             raise ValueError("Xing4.0 trains causal sequences without attention masks or KV cache")
-        if shift_labels is None or input_ids.ndim != 2 or input_ids.shape[0] != 1 \
+        if shift_labels is None or input_ids.ndim != 2 or min(input_ids.shape) < 1 \
                 or shift_labels.shape != input_ids.shape:
-            raise ValueError("Xing4.0 requires [1, sequence] input_ids with matching shift_labels")
+            raise ValueError("Xing4.0 requires nonempty [batch, sequence] input_ids with matching shift_labels")
         if position_ids is None:
             position_ids = torch.arange(input_ids.shape[1], device=input_ids.device).unsqueeze(0)
         # The empty FP32 tensor selects the device and the FP32 dtype of the RoPE tables.
