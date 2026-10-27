@@ -195,12 +195,16 @@ def _populate_mesh_ranks(mesh_context: MeshContext, dp_shard_size: int) -> None:
     )
 
 
-def create_distributed_setup_from_config(cfg: Any) -> DistributedSetup:
-    """Build mesh domains and preserve explicit eager precision on a single rank.
+def create_distributed_setup_from_config(
+    cfg: Any, *, allow_single_rank_precision: bool = False,
+) -> DistributedSetup:
+    """Build mesh domains, optionally applying eager precision on a single rank.
 
     Single-rank FSDP keeps full parameter storage while applying the configured
     compute and reduction dtypes. It requires an initialized CUDA/NPU process
-    group; the graph-compiler model path does not consume this strategy.
+    group; the graph-compiler model path does not consume this strategy. Callers
+    must opt in because other runtimes populate dtype defaults without asking
+    for single-rank FSDP.
     """
     accel = cfg.accelerator if cfg is not None and hasattr(cfg, "accelerator") else None
     if accel is None:
@@ -216,9 +220,9 @@ def create_distributed_setup_from_config(cfg: Any) -> DistributedSetup:
 
     world_size = dist.get_world_size() if dist.is_initialized() else 1
     precision = fsdp_config.mix_precision
-    single_rank_precision = world_size == 1 and (
+    single_rank_precision = allow_single_rank_precision and world_size == 1 and (
         precision.param_dtype is not None or precision.reduce_dtype is not None
-        or precision.output_dtype is not None or bool(getattr(precision, "custom_params", None))
+        or precision.output_dtype is not None
     )
     if dist.is_initialized() and single_rank_precision:
         if get_device_type() not in ("cuda", "npu"):
