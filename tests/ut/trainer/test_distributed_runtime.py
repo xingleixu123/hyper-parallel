@@ -48,12 +48,7 @@ class TestSingleRankMixedPrecision(unittest.TestCase):
 
     @staticmethod
     def _config(**precision):
-        custom_params = precision.pop("custom_params", None)
         policy = FSDP2MixedPrecisionConfig(**precision)
-        if custom_params is not None:
-            # Downstream policies can extend the base schema with per-parameter
-            # overrides; the setup boundary also accepts these duck-typed DTOs.
-            policy.custom_params = custom_params
         return SimpleNamespace(
             accelerator=AcceleratorConfig(),
             fsdp_config=FSDP2Config(mix_precision=policy),
@@ -62,30 +57,36 @@ class TestSingleRankMixedPrecision(unittest.TestCase):
         )
 
     @staticmethod
-    def _setup(config, *, initialized=True, world_size=1, device="npu"):
+    def _setup(config, *, initialized=True, world_size=1, device="npu", opt_in=True):
         with patch.object(runtime.dist, "is_initialized", return_value=initialized), \
              patch.object(runtime.dist, "get_world_size", return_value=world_size), \
              patch.object(runtime, "get_device_type", return_value=device), \
              patch.object(runtime, "_build_device_mesh_from_accelerator", return_value=(MeshContext(), None)):
-            return runtime.create_distributed_setup_from_config(config)
+            return runtime.create_distributed_setup_from_config(config, allow_single_rank_precision=opt_in)
 
     def test_default_single_rank_keeps_strategy_disabled(self):
-        """Default cast flags and empty overrides alone do not request a policy."""
-        for precision in ({}, {"cast_forward_inputs": False}, {"custom_params": {}}):
+        """Default cast flags alone do not request a policy."""
+        for precision in ({}, {"cast_forward_inputs": False}):
             with self.subTest(precision=precision):
                 self.assertIsNone(self._setup(self._config(**precision)).strategy_config)
 
     def test_explicit_single_rank_policy_reaches_model_builder(self):
-        """Each public dtype field and parameter override is an explicit request."""
+        """Each public dtype field survives the opt-in Trainer boundary."""
         for precision in (
             {"param_dtype": "bfloat16"}, {"reduce_dtype": "float32"}, {"output_dtype": "bfloat16"},
-            {"custom_params": {"*norm.weight": {"param_dtype": "float32"}}},
         ):
             config = self._config(**precision)
             with self.subTest(precision=precision):
                 setup = self._setup(config)
                 self.assertIs(setup.strategy_config, config.fsdp_config)
                 self.assertTrue(setup.fp32_main_params)
+
+    def test_existing_callers_keep_single_rank_strategy_disabled(self):
+        """Programmatic dtype defaults do not opt a shared runtime into size-1 FSDP."""
+        config = self._config(param_dtype="bfloat16", reduce_dtype="float32")
+        for device in ("cpu", "cuda", "npu"):
+            with self.subTest(device=device):
+                self.assertIsNone(self._setup(config, device=device, opt_in=False).strategy_config)
 
     def test_existing_multi_rank_and_uninitialized_behavior(self):
         """The change does not infer a strategy without a process group."""
