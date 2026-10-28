@@ -25,6 +25,7 @@ from torch import nn
 
 from hyper_parallel.components.functional.aux_loss import aux_loss_scale_context, bind_aux_loss_scale
 from hyper_parallel.components.modules.mhc import MhcPostModule, MhcPreModule
+from hyper_parallel.components.modules.mla_attention import MLAAttention
 from hyper_parallel.components.modules.moe_utils import MoEMonitorCallback
 from hyper_parallel.distributed.mesh import DistributedSetup
 from hyper_parallel.models import HyperAutoModelForCausalLM
@@ -85,6 +86,51 @@ def _poisoned_to_empty(module: nn.Module, *, device, recurse: bool = True) -> nn
 
 class TestXing40Training(unittest.TestCase):
     """Initialization, objective coverage and router-statistics lifecycle."""
+
+    @arg_mark(plat_marks=["cpu_linux", "cpu_macos"], level_mark="level0",
+              card_mark="onecard", essential_mark="essential")
+    def test_attention_scale_is_independent_of_rotary_frequencies(self):
+        """
+        Feature: Explicit attention score scale with ordinary rotary embeddings.
+        Description: Save/reload config and replace MLA, checking the score scale and softmax gradient.
+        Expectation: The requested scale is applied once, with unchanged frequencies and default behavior.
+        """
+        scale = (1.0 + 0.1 * math.log(40.0)) ** 2 / math.sqrt(16)
+        default = _model()
+        config = _config(attention_softmax_scale=scale)
+        restored = Xing40Config.from_dict(config.to_dict())
+        model = Xing40ForCausalLM(restored)
+        torch.testing.assert_close(model.model.rotary_emb.inv_freq, default.model.rotary_emb.inv_freq,
+                                   rtol=0, atol=0)
+        self.assertEqual(default.model.layers[0].self_attn.scaling, 16 ** -0.5)
+        self.assertEqual(model.mtp.layers[0].transformer_layer.self_attn.scaling, scale)
+        captured = []
+
+        def reference_attention(_module, query, key, value, _mask, **kwargs):
+            captured.append(kwargs["scaling"])
+            scores = query @ key.transpose(-1, -2) * kwargs["scaling"]
+            allowed = torch.ones(scores.shape[-2:], dtype=torch.bool).tril()
+            output = scores.masked_fill(~allowed, -torch.inf).softmax(-1) @ value
+            return output.transpose(1, 2), None
+
+        source = model.model.layers[0].self_attn.double()
+        target = MLAAttention(module=source, attention_interface=reference_attention)
+        with torch.no_grad():
+            target.linear_qkv.weight.copy_(torch.cat((source.q_a_proj.weight, source.kv_a_proj_with_mqa.weight)))
+        inputs = torch.linspace(-1, 1, 3 * 64, dtype=torch.float64).reshape(1, 3, 64).requires_grad_()
+        query, key, value = target._project_attention_inputs(inputs, None, None)
+        expected = torch.nn.functional.scaled_dot_product_attention(
+            query, key, value, is_causal=True, scale=scale).transpose(1, 2).reshape(1, 3, -1)
+        expected = target.o_proj(expected)
+        actual, _ = target(inputs)
+        torch.testing.assert_close(actual, expected, rtol=1e-10, atol=1e-12)
+        actual_grad = torch.autograd.grad(actual.square().sum(), inputs, retain_graph=True)[0]
+        expected_grad = torch.autograd.grad(expected.square().sum(), inputs)[0]
+        torch.testing.assert_close(actual_grad, expected_grad, rtol=1e-9, atol=1e-12)
+        self.assertEqual(captured, [scale])
+        for invalid in (0.0, -1.0, float("inf"), float("nan"), True, "0.5"):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "attention_softmax_scale"):
+                _config(attention_softmax_scale=invalid)
 
     @arg_mark(plat_marks=["cpu_linux", "cpu_macos"], level_mark="level0",
               card_mark="onecard", essential_mark="essential")
