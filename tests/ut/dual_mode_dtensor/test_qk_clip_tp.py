@@ -29,7 +29,10 @@ from tests.ut.dual_mode_dtensor.conftest import run_dist
 def _check_mesh(rank, ranks):
     """Compare each main shard against an independent global per-row formula."""
     mesh = DeviceMesh("cpu", ranks, mesh_dim_names=("fsdp_shard", "tp"))
-    dp_rank, tp_rank = mesh.get_coordinate()
+    coordinate = list(mesh.get_coordinate() or ())
+    assert len(coordinate) == 2
+    dp_rank = coordinate[0]
+    tp_rank = coordinate[1]
     assert mesh.rank_list[dp_rank * 2 + tp_rank] == rank
     query = torch.arange(1, 49, dtype=torch.float32).reshape(16, 3)
     key_value = query + 50

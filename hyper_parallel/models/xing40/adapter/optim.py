@@ -196,33 +196,12 @@ def _global_head_maximum(module: nn.Module, maximum: torch.Tensor) -> torch.Tens
     heads. Gathering these heads is a layout conversion; it does not average them
     or change the clipping formula. Replicated-head execution needs no gather.
     """
-    query = module.q_b_proj.weight
-    key = module.kv_b_proj.weight
-    query_main = getattr(query, "main_param", None)
-    key_main = getattr(key, "main_param", None)
-    query = query if query_main is None else query_main
-    key = key if key_main is None else key_main
-    query_width = module.qk_nope_head_dim + module.qk_rope_head_dim
-    key_width = module.qk_nope_head_dim + module.v_head_dim
-    if (maximum.ndim != 1 or query.shape[0] % query_width
-            or key.shape[0] % key_width or query.shape[0] // query_width != key.shape[0] // key_width):
-        raise ValueError("QK clipping requires one maximum per projection head")
-    heads = query.shape[0] // query_width
+    query, key, heads = _qk_projection_heads(module, maximum)
     if maximum.numel() == heads:
         return maximum
     if not isinstance(query, DTensor) or not isinstance(key, DTensor):
         raise ValueError("TP-local QK maxima require DTensor projection main weights")
-    mesh = query.device_mesh
-    names = mesh.mesh_dim_names or ()
-    if ("tp" not in names or key.device_mesh.mesh_dim_names != mesh.mesh_dim_names
-            or key.device_mesh.shape != mesh.shape or key.device_mesh.rank_list != mesh.rank_list):
-        raise ValueError("QK projection main weights require matching named TP meshes")
-    tp_axis = names.index("tp")
-    for weight in (query, key):
-        placement = weight.placements[tp_axis]
-        if type(placement) is not Shard or placement.dim != 0:  # pylint: disable=unidiomatic-typecheck
-            raise ValueError("QK maxima support contiguous projection-head TP shards")
-    tp_mesh = mesh["tp"]
+    tp_mesh = _qk_tp_mesh(query, key)
     degree = tp_mesh.size()
     if (not dist.is_available() or not dist.is_initialized() or heads % degree
             or maximum.numel() * degree != heads):
@@ -237,6 +216,38 @@ def _global_head_maximum(module: nn.Module, maximum: torch.Tensor) -> torch.Tens
     # follows mesh coordinates, so explicitly restore that order after gather.
     by_rank = dict(zip(group_ranks, gathered))
     return torch.cat([by_rank[rank] for rank in tp_mesh.rank_list])
+
+
+def _qk_projection_heads(module: nn.Module, maximum: torch.Tensor) -> tuple:
+    """Resolve projection main copies and validate their common head count."""
+    query = module.q_b_proj.weight
+    key = module.kv_b_proj.weight
+    query_main = getattr(query, "main_param", None)
+    key_main = getattr(key, "main_param", None)
+    query = query if query_main is None else query_main
+    key = key if key_main is None else key_main
+    query_width = module.qk_nope_head_dim + module.qk_rope_head_dim
+    key_width = module.qk_nope_head_dim + module.v_head_dim
+    if (maximum.ndim != 1 or query.shape[0] % query_width
+            or key.shape[0] % key_width or query.shape[0] // query_width != key.shape[0] // key_width):
+        raise ValueError("QK clipping requires one maximum per projection head")
+    heads = query.shape[0] // query_width
+    return query, key, heads
+
+
+def _qk_tp_mesh(query: DTensor, key: DTensor):
+    """Validate that both projections use the same contiguous TP head layout."""
+    mesh = query.device_mesh
+    names = mesh.mesh_dim_names or ()
+    if ("tp" not in names or key.device_mesh.mesh_dim_names != mesh.mesh_dim_names
+            or key.device_mesh.shape != mesh.shape or key.device_mesh.rank_list != mesh.rank_list):
+        raise ValueError("QK projection main weights require matching named TP meshes")
+    tp_axis = names.index("tp")
+    for weight in (query, key):
+        placement = weight.placements[tp_axis]
+        if type(placement) is not Shard or placement.dim != 0:  # pylint: disable=unidiomatic-typecheck
+            raise ValueError("QK maxima support contiguous projection-head TP shards")
+    return mesh["tp"]
 
 
 def _scale_head_rows(weight: torch.Tensor, scale: torch.Tensor, nope_dim: int, tail_scale: torch.Tensor,
