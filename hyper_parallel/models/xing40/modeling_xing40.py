@@ -31,6 +31,7 @@ NPU. The recipe supplies every configuration value.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from typing import Any
 
 import numpy as np
@@ -77,9 +78,12 @@ class Xing40Config(DeepseekV3Config):
     ``mtp_loss_factor``, ``moe_aux_loss_coeff``, ``moe_router_enable_expert_bias``,
     ``moe_router_bias_update_rate``, ``use_pad_tokens`` and ``chunk_loss_size``.
     ``moe_router_force_expert_balance`` is optional and defaults to False.
+    ``attention_softmax_scale`` optionally sets the attention score scale,
+    independently of rotary frequencies. None retains DeepSeek-V3's scale.
     """
 
     model_type = "xing40"
+    attention_softmax_scale: float | None = None
 
     def __post_init__(self, **kwargs: Any) -> None:
         """Default ``architectures`` to the model class this configuration builds.
@@ -90,6 +94,10 @@ class Xing40Config(DeepseekV3Config):
         if self.architectures is None:
             self.architectures = ["Xing40ForCausalLM"]
         super().__post_init__(**kwargs)
+        scale = self.attention_softmax_scale
+        if scale is not None and (isinstance(scale, bool) or not isinstance(scale, (int, float))
+                                  or not math.isfinite(scale) or scale <= 0):
+            raise ValueError("attention_softmax_scale must be positive and finite or None")
 
 
 AutoConfig.register(Xing40Config.model_type, Xing40Config, exist_ok=True)
@@ -390,6 +398,8 @@ class Xing40DecoderLayer(nn.Module):
         """
         super().__init__()
         self.self_attn = DeepseekV3Attention(config, layer_idx)
+        if config.attention_softmax_scale is not None:
+            self.self_attn.scaling = config.attention_softmax_scale
         # Transformers builds the latent norms with the default epsilon; MindFormers uses rms_norm_eps.
         self.self_attn.q_a_layernorm.variance_epsilon = config.rms_norm_eps
         self.self_attn.kv_a_layernorm.variance_epsilon = config.rms_norm_eps
