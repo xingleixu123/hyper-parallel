@@ -1,0 +1,792 @@
+{
+  "schema": "perf-public-v3",
+  "runs": [
+    {
+      "run": "raf-no",
+      "run_id": "perf-fsdp4-reverse-no-raf-r1",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "16657e7e639f754b4310e27f224de7b9cfc43ec6ad40833459b95c6810b043e0",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "125",
+      "ac": "full",
+      "label": "no-RAF reverse",
+      "wave": "observer incomplete; post-timing unknown",
+      "mean_max_rank_seconds": 0.7544022763333333,
+      "median_max_rank_seconds": 0.75449262,
+      "cv": 0.0038243535429574524,
+      "perf_sha256": [
+        "f898e4358b636a3a0fe398049e0d54fc545bbdd931aa548da02c6b8b58bd4389",
+        "183294a2b280644638fe2320e3f2ab8c5f6cd4412a8b51c2562384f9f97f532a",
+        "48b95391d0ed82fe97ae908086d8ed82efa8e47fe3f4f50598abec720c3351d2",
+        "2efc36091e376c699d44378f3692e6660852374c04ae9cb9ece5289c32ae4f7b"
+      ]
+    },
+    {
+      "run": "raf-full",
+      "run_id": "perf-fsdp4-reverse-full-raf-r1",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "85758f05aaffa9c2dca91ca42c68b6eea3695be2573d98e08c5dd109dcb854e1",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "125",
+      "ac": "full",
+      "label": "full-RAF reverse",
+      "wave": "observer incomplete; post-timing unknown",
+      "mean_max_rank_seconds": 0.7808311553333334,
+      "median_max_rank_seconds": 0.7806750550000001,
+      "cv": 0.004059179184246694,
+      "perf_sha256": [
+        "a94f2acb1b07888598db61effd4f5f05f0317b7c826110e49c8a4d7c157f1897",
+        "7fdc23ccfbb25738d724b9b22bfa01683d29d75c4d1fded2a24ef014dc1182f9",
+        "dcc3cab50be4d7671d2d7709ec7965f6654b67d4c35e3c792c0d2ac9d1556d1c",
+        "46642406e0cd1d07375f20a7bb857c6ee25a4512e0a2f617dee7cdeaad52bd41"
+      ]
+    },
+    {
+      "run": "hsdp-1",
+      "run_id": "perf-hsdp2x2-full-r1",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "9c5ae59905917bf43dce0bf04ff0537d6471f5088cbe9a5afb2cf25481bcc8bc",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "129",
+      "ac": "full",
+      "label": "H1",
+      "wave": "discrete monitoring",
+      "mean_max_rank_seconds": 1.1686684213333334,
+      "median_max_rank_seconds": 1.1679679750000003,
+      "cv": 0.0034715093884578434,
+      "perf_sha256": [
+        "b4d57fc8b7109670394fcdecf2637c4b53d7711b8eadd4caf7e2d7d6be0588fc",
+        "86a3e1adff31e7968753f5e58d0c96d4e336ebdfba70c47330d9fb06258656f3",
+        "b38f8a29f23c708f988adfd63b2ef03e775df824b3a480f1a5e6354553a5db0b",
+        "35a36c254862566fa58693a4eec6a59e6fb407c00d38b3b2e51d753e28914555"
+      ]
+    },
+    {
+      "run": "fsdp-1",
+      "run_id": "perf-fsdp4-full-v3-r1",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "129",
+      "ac": "full",
+      "label": "F1",
+      "wave": "discrete monitoring",
+      "mean_max_rank_seconds": 0.779870791,
+      "median_max_rank_seconds": 0.779306825,
+      "cv": 0.004409843389501125,
+      "perf_sha256": [
+        "00befc873775121f86b0c9ca5cc59aea6101ca7e3140de6b5a75c4726f29f212",
+        "01ac4c0dbe80cbd1dee1a7cd8ce74092708aefa2600608fa9b5242791c5cd208",
+        "6f6ce7af8ff0892e667aea3cebeb4d26435fe02cd3634092b8b16a597157803c",
+        "7e61445a34b61040823ec604085b124addb4108e98f796ba3028c36e8152afb5"
+      ]
+    },
+    {
+      "run": "hsdp-2",
+      "run_id": "perf-hsdp2x2-r2",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "9c5ae59905917bf43dce0bf04ff0537d6471f5088cbe9a5afb2cf25481bcc8bc",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "129",
+      "ac": "full",
+      "label": "H2",
+      "wave": "discrete monitoring",
+      "mean_max_rank_seconds": 1.1787378416666667,
+      "median_max_rank_seconds": 1.1685515899999999,
+      "cv": 0.0423265256383782,
+      "perf_sha256": [
+        "4abb3b35fb03e7c4ef781079593e7de8e9617cbb266f437061918db2326764b2",
+        "86d904cafa4b5d7485dd6bd57bd7cdef88444db974621e284ae91ec31cce5e11",
+        "eebafd47a6a89135027d2d3ff63b24f60e1cda33f4cf9339f3690d77d9520085",
+        "56ea9cd74601be9943ef119dc6df242077b1cef9355577b648193db9ce3100e6"
+      ]
+    },
+    {
+      "run": "fsdp-2",
+      "run_id": "perf-fsdp4-r2",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "129",
+      "ac": "full",
+      "label": "F2",
+      "wave": "discrete monitoring",
+      "mean_max_rank_seconds": 0.788007456,
+      "median_max_rank_seconds": 0.783275685,
+      "cv": 0.03370699963022016,
+      "perf_sha256": [
+        "a1606bbf8a3c9a1a17f43532aa817ce728ca9660cd03937d79819f8ae3ccbd15",
+        "0ad7e960d78f5e92735aacfe408d23a9cc57fee7a18e6cedebc860958222e735",
+        "dd71ac9c31a537a381a345ca64222cf6dc5da577e31c0a04c412c4e53b893df2",
+        "3ee4bd0e3fc49ac9ec4b9c68b66327b4171a3e7f08d1ceb27f14c8dc384a442d"
+      ]
+    },
+    {
+      "run": "ep2-2",
+      "run_id": "perf-ep2-full-r2",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "309c99035338ae937a3f52666424a99311dc5e7e38868c7555030191e795e7c1",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "129",
+      "ac": "full",
+      "label": "EP2 isolated r2",
+      "wave": "single run",
+      "mean_max_rank_seconds": 0.8164092770000001,
+      "median_max_rank_seconds": 0.815018945,
+      "cv": 0.003535662073958,
+      "perf_sha256": [
+        "08d5bc521e0ced4698eda5660a422d752b012114154fffae657804af611a3cba",
+        "653b14aa56333cd19a16150b8edff5a8923455984654389658a9e6ba25d7c7c6",
+        "c48dc85c0eb93930523aee05da71355e56a71af5a404e72f76e23a2a69698955",
+        "030e8d524002b28ca32e4f43741c1fb94237c8112a0bcf6f041c588d275a8283"
+      ]
+    },
+    {
+      "run": "tp-fsdp",
+      "run_id": "perf-fsdp4-125-pair-r1",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "125",
+      "ac": "full",
+      "label": "FSDP TP pair",
+      "wave": "discrete monitoring",
+      "mean_max_rank_seconds": 0.7845507293333334,
+      "median_max_rank_seconds": 0.781743055,
+      "cv": 0.01900812215387945,
+      "perf_sha256": [
+        "e8589189abaf65123d138a193f3ce894cde700f16162e6163ec2d40b03c621b9",
+        "6d6764089205b342fbf486369a239c9aa9e57aafbb395aecf578a7470a09cf35",
+        "e644223775a09dd2ddcef83a95ed5aefe496bcd87a0279cbc1dc23a8e1145155",
+        "4eb90a808faca5d0ef3bb5e7da515144bfca1c5a58198eebaf294e31a9ecf005"
+      ]
+    },
+    {
+      "run": "tp2",
+      "run_id": "perf-tp2-conservative-r2",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "30e12839938a9ea8dfc6c85558dcf807f1bad9ce9b2acfd22b86d2b566010e36",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "125",
+      "ac": "full",
+      "label": "TP2 conservative",
+      "wave": "observer incomplete",
+      "mean_max_rank_seconds": 2.019935879666667,
+      "median_max_rank_seconds": 2.0186051550000004,
+      "cv": 0.0026665576062429386,
+      "perf_sha256": [
+        "e39fa0eff781ddf723625d79c404c9676cae055df33de84afb8a854f860f911e",
+        "5652a15e739d3619a49074bf135fabf0ed04fa228c31f3ce37d4bea520921285",
+        "301b2e4a2dabe3d7f454ba89720d403de20086e26f466e843d39996402ffb6c4",
+        "3321c4111a79440cc3dd0b8346d5ef77b232e0ec1d87cb74fdd3e237e8a85baa"
+      ]
+    },
+    {
+      "run": "cp2-fixed",
+      "run_id": "perf-cp2-sac-fixed-r1",
+      "source_head": "03ea31945303bf8dca37d319a737f1f05596474b",
+      "source_manifest_sha256": "17232e0241a749b5e02d04e4ff531aab8f4ad7f0fdba1719d16d5abb8df30116",
+      "config_sha256": "bf856e229e70db23eead2d9fb6a8c57caa5d7b6076627ee754ef96fb932c5839",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "129",
+      "ac": "selective",
+      "label": "CP2 fixed SAC",
+      "wave": "observer incomplete; single run",
+      "mean_max_rank_seconds": 1.3577853783333333,
+      "median_max_rank_seconds": 1.341076045,
+      "cv": 0.04713324032883095,
+      "perf_sha256": [
+        "e8702579fd38ed6245a1016bad07426f9ed0501b22482e8839fe6c9f86c003e9",
+        "5bb83adb55e6539178d22bda40acd7bbcb5c8feb102613a3098862cbd16e5f36",
+        "0c623db3fb8b3e29a0718dcbd0e8b363c40af73bc88046ce7525579580b12527",
+        "9a74847cf8a2208037384ce5f127c68e41e79f2ca19cc89593088d29d612b3c9"
+      ]
+    },
+    {
+      "run": "fsdp-fixed",
+      "run_id": "perf-sac-fixed-r2",
+      "source_head": "03ea31945303bf8dca37d319a737f1f05596474b",
+      "source_manifest_sha256": "17232e0241a749b5e02d04e4ff531aab8f4ad7f0fdba1719d16d5abb8df30116",
+      "config_sha256": "1643450890283aa811b9243d4e6d9ffee5b4b56bdae517c7cc3030b88cd0a7ea",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "129",
+      "ac": "selective",
+      "label": "FSDP fixed SAC r2",
+      "wave": "observer incomplete; single comparator",
+      "mean_max_rank_seconds": 0.8207757050000001,
+      "median_max_rank_seconds": 0.8192791750000001,
+      "cv": 0.010033643165629309,
+      "perf_sha256": [
+        "29e9bcca929f432af10922c35055630d64d2d7588af09df18e67ffa231d8b6df",
+        "d4c79aa8b0351b975734f35537ad1584d4ea01182996f1fac72963fad7ee4e85",
+        "3e84492518b39f59b764bd22a63f06439dd7246c6f37d6162760ac08c27cab9d",
+        "90a0e1fe16c063154f64d6d4badcd290fd8b2ea02f0616b56d8acf010198611f"
+      ]
+    },
+    {
+      "run": "recompute-full",
+      "run_id": "perf-fsdp4-full-r2",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "125",
+      "ac": "full",
+      "label": "full",
+      "wave": "single run",
+      "mean_max_rank_seconds": 0.7832511750000001,
+      "median_max_rank_seconds": 0.78205013,
+      "cv": 0.005335897408387074,
+      "perf_sha256": [
+        "680f38cac1f5c59f31947297507ea2ffa6dae585c3ae2094423b8e4b004d13dd",
+        "2ebfa983fd6ebe233fffc0b40ccf9f1f3b0a0217ca6e0a9113ea28b47ae677f5",
+        "fd970b2adf3825ea477ea758a9910d402970348046723f73308fcc98ba079e2c",
+        "de1f17db0656efff92c42358ccc06335049f1e9eb34ea658acbdcfaa3de422a7"
+      ]
+    },
+    {
+      "run": "recompute-off",
+      "run_id": "perf-fsdp4-off-r2",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "d529edf8e565fc4c803377b2fff5e8a738e57e00484c114a24b71b4035d0153d",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "125",
+      "ac": "off",
+      "label": "off",
+      "wave": "single run",
+      "mean_max_rank_seconds": 0.7409714856666667,
+      "median_max_rank_seconds": 0.7407864749999999,
+      "cv": 0.00411605518332725,
+      "perf_sha256": [
+        "71f61689e7bf47266cc90c28eee1d3b4b02859a20c727efcd1e34f972a125b68",
+        "947293cb0917f1fdbfc729c13de909d2f91a88b917d83e7417e059bbd6dd8021",
+        "6bb912c45e0aa1aedfde9af9053be3c74068e97926c4aa413ef651203d621d1a",
+        "32a3f566ceb9768c950dac7a0f4e401f3f97e64b216caf688121bbdaff352f6f"
+      ]
+    },
+    {
+      "run": "recompute-selective",
+      "run_id": "perf-fsdp4-selective-r2",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "1643450890283aa811b9243d4e6d9ffee5b4b56bdae517c7cc3030b88cd0a7ea",
+      "env_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "dependency_versions": {
+        "torch-2.12.0+cpu.dist-info": "2.12.0+cpu",
+        "torch_npu-2.12.0.post3.dist-info": "2.12.0.post3",
+        "transformers-5.21.0.dist-info": "5.21.0",
+        "tokenizers-0.23.3.dist-info": "0.23.3",
+        "hyper_parallel-1.2.0.dev0.dist-info": "1.2.0.dev0"
+      },
+      "host": "125",
+      "ac": "selective",
+      "label": "selective",
+      "wave": "single run",
+      "mean_max_rank_seconds": 0.8220241100000001,
+      "median_max_rank_seconds": 0.82166958,
+      "cv": 0.00620322525035595,
+      "perf_sha256": [
+        "e16817a13411dffeb63cf7140cdd0cb19aab7af6f0bcbcbd3781ff5cff6a43fa",
+        "423f98e3b30cd28cbb2076d668a6cf2ed031f467081ed5a7e67bea819f3e40f5",
+        "d5f465b5ef1a749c0f720ec8eb6dcfc373f1e14ed0aa615acc8b125748c71ae5",
+        "4d40e4820fb4bbdaf5ecf69044d64b7e0170637ff048b38580717e944d99e9ab"
+      ]
+    }
+  ],
+  "memory_by_rank": [
+    {
+      "run": "raf-no",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.625070571899414,
+      "peak_reserved_gib": 16.865234375,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "raf-no",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.625069618225098,
+      "peak_reserved_gib": 16.865234375,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "raf-no",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.625069618225098,
+      "peak_reserved_gib": 16.865234375,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "raf-no",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.6250638961792,
+      "peak_reserved_gib": 16.865234375,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "raf-full",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.688899040222168,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "raf-full",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "raf-full",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "raf-full",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.688892364501953,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "hsdp-1",
+      "physical_card": 4,
+      "peak_allocated_gib": 21.92628288269043,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.980722922831774
+    },
+    {
+      "run": "hsdp-1",
+      "physical_card": 5,
+      "peak_allocated_gib": 21.926281929016113,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.98072287067771
+    },
+    {
+      "run": "hsdp-1",
+      "physical_card": 6,
+      "peak_allocated_gib": 21.92628288269043,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.980722922831774
+    },
+    {
+      "run": "hsdp-1",
+      "physical_card": 7,
+      "peak_allocated_gib": 21.926281929016113,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.98072287067771
+    },
+    {
+      "run": "fsdp-1",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.688899040222168,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "fsdp-1",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "fsdp-1",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "fsdp-1",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.688892364501953,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "hsdp-2",
+      "physical_card": 4,
+      "peak_allocated_gib": 21.92628288269043,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.980722922831774
+    },
+    {
+      "run": "hsdp-2",
+      "physical_card": 5,
+      "peak_allocated_gib": 21.926281929016113,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.98072287067771
+    },
+    {
+      "run": "hsdp-2",
+      "physical_card": 6,
+      "peak_allocated_gib": 21.92628288269043,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.980722922831774
+    },
+    {
+      "run": "hsdp-2",
+      "physical_card": 7,
+      "peak_allocated_gib": 21.926281929016113,
+      "peak_reserved_gib": 22.361328125,
+      "warm_deduplicated_gib": 8.98072287067771
+    },
+    {
+      "run": "fsdp-2",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.688899040222168,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "fsdp-2",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "fsdp-2",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "fsdp-2",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.688892364501953,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "ep2-2",
+      "physical_card": 4,
+      "peak_allocated_gib": 14.30073070526123,
+      "peak_reserved_gib": 16.306640625,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "ep2-2",
+      "physical_card": 5,
+      "peak_allocated_gib": 14.300729751586914,
+      "peak_reserved_gib": 16.306640625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "ep2-2",
+      "physical_card": 6,
+      "peak_allocated_gib": 14.300729751586914,
+      "peak_reserved_gib": 16.306640625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "ep2-2",
+      "physical_card": 7,
+      "peak_allocated_gib": 14.300724029541016,
+      "peak_reserved_gib": 16.306640625,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "tp-fsdp",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.688899040222168,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "tp-fsdp",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "tp-fsdp",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "tp-fsdp",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.688892364501953,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "tp2",
+      "physical_card": 4,
+      "peak_allocated_gib": 19.879516124725342,
+      "peak_reserved_gib": 20.546875,
+      "warm_deduplicated_gib": 6.223886985331774
+    },
+    {
+      "run": "tp2",
+      "physical_card": 5,
+      "peak_allocated_gib": 19.879516124725342,
+      "peak_reserved_gib": 20.546875,
+      "warm_deduplicated_gib": 6.223886985331774
+    },
+    {
+      "run": "tp2",
+      "physical_card": 6,
+      "peak_allocated_gib": 19.879515171051025,
+      "peak_reserved_gib": 20.546875,
+      "warm_deduplicated_gib": 6.22388693317771
+    },
+    {
+      "run": "tp2",
+      "physical_card": 7,
+      "peak_allocated_gib": 19.879515171051025,
+      "peak_reserved_gib": 20.546875,
+      "warm_deduplicated_gib": 6.22388693317771
+    },
+    {
+      "run": "cp2-fixed",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.276105403900146,
+      "peak_reserved_gib": 17.576171875,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "cp2-fixed",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.317334175109863,
+      "peak_reserved_gib": 17.576171875,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "cp2-fixed",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.27610445022583,
+      "peak_reserved_gib": 17.576171875,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "cp2-fixed",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.317328453063965,
+      "peak_reserved_gib": 17.576171875,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "fsdp-fixed",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.94158697128296,
+      "peak_reserved_gib": 17.685546875,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "fsdp-fixed",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.941586017608643,
+      "peak_reserved_gib": 17.685546875,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "fsdp-fixed",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.941586017608643,
+      "peak_reserved_gib": 17.685546875,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "fsdp-fixed",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.941580295562744,
+      "peak_reserved_gib": 17.685546875,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "recompute-full",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.688899040222168,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "recompute-full",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "recompute-full",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.68889808654785,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "recompute-full",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.688892364501953,
+      "peak_reserved_gib": 16.962890625,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "recompute-off",
+      "physical_card": 4,
+      "peak_allocated_gib": 18.293450355529785,
+      "peak_reserved_gib": 20.703125,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "recompute-off",
+      "physical_card": 5,
+      "peak_allocated_gib": 18.29344940185547,
+      "peak_reserved_gib": 20.703125,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "recompute-off",
+      "physical_card": 6,
+      "peak_allocated_gib": 18.29344940185547,
+      "peak_reserved_gib": 20.703125,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "recompute-off",
+      "physical_card": 7,
+      "peak_allocated_gib": 18.29344367980957,
+      "peak_reserved_gib": 20.703125,
+      "warm_deduplicated_gib": 4.490361414849758
+    },
+    {
+      "run": "recompute-selective",
+      "physical_card": 4,
+      "peak_allocated_gib": 16.90091323852539,
+      "peak_reserved_gib": 17.404296875,
+      "warm_deduplicated_gib": 4.490361467003822
+    },
+    {
+      "run": "recompute-selective",
+      "physical_card": 5,
+      "peak_allocated_gib": 16.9006404876709,
+      "peak_reserved_gib": 17.404296875,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "recompute-selective",
+      "physical_card": 6,
+      "peak_allocated_gib": 16.900912284851074,
+      "peak_reserved_gib": 17.404296875,
+      "warm_deduplicated_gib": 4.490361459553242
+    },
+    {
+      "run": "recompute-selective",
+      "physical_card": 7,
+      "peak_allocated_gib": 16.900906562805176,
+      "peak_reserved_gib": 17.404296875,
+      "warm_deduplicated_gib": 4.490361414849758
+    }
+  ],
+  "note": "max rank local duration; not makespan; discrete observer cannot prove exclusive window"
+}
