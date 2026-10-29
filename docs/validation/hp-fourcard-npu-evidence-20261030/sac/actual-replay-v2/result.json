@@ -1,0 +1,286 @@
+{
+  "scope": "single-card below-SAC dispatch diagnostic; no numeric acceptance, kernel count, training, timing or optimizer",
+  "source_policy_sha256": "ad46b219aed99282ea002c2b710b856f65be44208b42e575090250dafe84e637",
+  "fixed_policy_sha256": "34ab7dd53763101d1f08e72e87a92195aed78a0fa5cb3dfb8b5610aa36a0b677",
+  "source_import": "/work/sources/hyper-parallel/hyper_parallel/distributed/activation_checkpoint.py",
+  "fixed_import": "/work/overlay/policy.py",
+  "physical_expected": 0,
+  "runs": {
+    "attention": {
+      "input_hashes": {
+        "q": {
+          "shape": [
+            1,
+            32,
+            4096,
+            192
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "9d78309ddfa9bcb938cb4dadf3fea29c556c5a1a7cc40a9c414cedafce00a989"
+        },
+        "k": {
+          "shape": [
+            1,
+            32,
+            4096,
+            192
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "a310b70417445b7d8c19ca871c9c440bbd52ce5e02563eca0218cc052002ac9f"
+        },
+        "v": {
+          "shape": [
+            1,
+            32,
+            4096,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "159c7bd5a6e081be95a764d8de2b43afc5b0908b205ef02a7985f6206cabab42"
+        },
+        "grad": {
+          "shape": [
+            1,
+            4096,
+            32,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "232f27ff09110f6d640741646d7c31dd2e007bd21816f04fdbd66bb36d9abf54"
+        }
+      },
+      "cloned_input_sha256_checked_each_run": true,
+      "below_sac_dispatch_diagnostic": {
+        "original": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_fusion_attention.default"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_fusion_attention.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_fusion_attention_grad.default"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_fusion_attention.default": 1,
+            "recompute|npu.npu_fusion_attention.default": 1,
+            "backward|npu.npu_fusion_attention_grad.default": 1
+          },
+          "phase_after": "outside",
+          "cache_entry_mutation_allowed": false,
+          "finite_fields": {
+            "output": true,
+            "grad_q": true,
+            "grad_k": true,
+            "grad_v": true,
+            "max_logits": true
+          }
+        },
+        "fixed": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_fusion_attention.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_fusion_attention_grad.default"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_fusion_attention.default": 1,
+            "backward|npu.npu_fusion_attention_grad.default": 1
+          },
+          "phase_after": "outside",
+          "cache_entry_mutation_allowed": false,
+          "finite_fields": {
+            "output": true,
+            "grad_q": true,
+            "grad_k": true,
+            "grad_v": true,
+            "max_logits": true
+          }
+        }
+      },
+      "routing": "synthetic balanced counts; not router execution"
+    },
+    "expert_major_gmm_chain": {
+      "input_hashes": {
+        "x": {
+          "shape": [
+            16384,
+            3584
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "1562f0c6d89f16779f3affa8dbada461fc058f2991cf937773643cd761772d7b"
+        },
+        "w1": {
+          "shape": [
+            64,
+            3584,
+            2048
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "30ae2acb29b358f0a737654a508b317d7ca1b58bd068db16211e21aa6654e7c7"
+        },
+        "w2": {
+          "shape": [
+            64,
+            1024,
+            3584
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "6433f01946494f7397599709d8bc0423431c020f05deb85cbbbf68de7e9a6981"
+        },
+        "ends": {
+          "shape": [
+            64
+          ],
+          "dtype": "torch.int64",
+          "sha256": "68b189a6cb044c190ce814994f46fce29d1f003f455aa4e299ee498f038bc726"
+        },
+        "grad": {
+          "shape": [
+            16384,
+            3584
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "693c476bd6a1d3b18670b9927ac1a5d29d26b5da9f2dceda1c9c1b4ad1ed6777"
+        }
+      },
+      "cloned_input_sha256_checked_each_run": true,
+      "below_sac_dispatch_diagnostic": {
+        "original": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_swiglu.default"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_swiglu.default"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_swiglu_backward.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_grouped_matmul.default": 2,
+            "forward|npu.npu_swiglu.default": 1,
+            "recompute|npu.npu_grouped_matmul.default": 2,
+            "recompute|npu.npu_swiglu.default": 1,
+            "backward|npu.npu_grouped_matmul.default": 4,
+            "backward|npu.npu_swiglu_backward.default": 1
+          },
+          "phase_after": "outside",
+          "cache_entry_mutation_allowed": false,
+          "finite_fields": {
+            "output": true,
+            "grad_x": true,
+            "grad_w1": true,
+            "grad_w2": true
+          }
+        },
+        "fixed": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_swiglu.default"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_swiglu.default"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_swiglu_backward.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            },
+            {
+              "phase": "backward",
+              "op": "npu.npu_grouped_matmul.default"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_grouped_matmul.default": 2,
+            "forward|npu.npu_swiglu.default": 1,
+            "recompute|npu.npu_swiglu.default": 1,
+            "recompute|npu.npu_grouped_matmul.default": 1,
+            "backward|npu.npu_grouped_matmul.default": 4,
+            "backward|npu.npu_swiglu_backward.default": 1
+          },
+          "phase_after": "outside",
+          "cache_entry_mutation_allowed": false,
+          "finite_fields": {
+            "output": true,
+            "grad_x": true,
+            "grad_w1": true,
+            "grad_w2": true
+          }
+        }
+      },
+      "routing": "synthetic balanced counts; not router execution"
+    }
+  }
+}

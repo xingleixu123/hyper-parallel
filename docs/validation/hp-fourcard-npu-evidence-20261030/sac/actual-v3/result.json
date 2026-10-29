@@ -1,0 +1,551 @@
+{
+  "scope": "single-card synthetic-input module diagnostic; not training, timing or optimizer",
+  "source_policy_sha256": "ad46b219aed99282ea002c2b710b856f65be44208b42e575090250dafe84e637",
+  "fixed_policy_sha256": "34ab7dd53763101d1f08e72e87a92195aed78a0fa5cb3dfb8b5610aa36a0b677",
+  "source_import": "/work/sources/hyper-parallel/hyper_parallel/distributed/activation_checkpoint.py",
+  "fixed_import": "/work/overlay/policy.py",
+  "physical_expected": 0,
+  "runs": {
+    "attention": {
+      "strict_outcomes": {
+        "original": "inconclusive_baseline_noise",
+        "fixed": "inconclusive_baseline_noise"
+      },
+      "cloned_input_sha256_checked_each_run": true,
+      "input_hashes": {
+        "q": {
+          "shape": [
+            1,
+            32,
+            4096,
+            192
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "9d78309ddfa9bcb938cb4dadf3fea29c556c5a1a7cc40a9c414cedafce00a989"
+        },
+        "k": {
+          "shape": [
+            1,
+            32,
+            4096,
+            192
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "a310b70417445b7d8c19ca871c9c440bbd52ce5e02563eca0218cc052002ac9f"
+        },
+        "v": {
+          "shape": [
+            1,
+            32,
+            4096,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "159c7bd5a6e081be95a764d8de2b43afc5b0908b205ef02a7985f6206cabab42"
+        },
+        "grad": {
+          "shape": [
+            1,
+            4096,
+            32,
+            128
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "232f27ff09110f6d640741646d7c31dd2e007bd21816f04fdbd66bb36d9abf54"
+        }
+      },
+      "no_checkpoint_noise": [
+        {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.15163440736453915,
+            "relative_rms": 0.0
+          },
+          "grad_q": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 3.0517578125e-05,
+            "rms_abs": 1.0679085888500924e-08,
+            "reference_rms": 0.0019215988563429031,
+            "relative_rms": 5.557396047177536e-06
+          },
+          "grad_k": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 6.103515625e-05,
+            "rms_abs": 2.2261542131130955e-08,
+            "reference_rms": 0.0019336553238121937,
+            "relative_rms": 1.1512673358580997e-05
+          },
+          "grad_v": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 6.103515625e-05,
+            "rms_abs": 2.163404465831636e-08,
+            "reference_rms": 0.0015150389019748384,
+            "relative_rms": 1.4279530796282917e-05
+          },
+          "max_logits": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 10.219086450886099,
+            "relative_rms": 0.0
+          }
+        },
+        {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.15163440736453915,
+            "relative_rms": 0.0
+          },
+          "grad_q": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 1.52587890625e-05,
+            "rms_abs": 1.009637127347088e-08,
+            "reference_rms": 0.0019215988563429031,
+            "relative_rms": 5.254151375113649e-06
+          },
+          "grad_k": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 6.103515625e-05,
+            "rms_abs": 2.6057368811628933e-08,
+            "reference_rms": 0.0019336553238121937,
+            "relative_rms": 1.3475705049779468e-05
+          },
+          "grad_v": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 6.103515625e-05,
+            "rms_abs": 2.7476601166468954e-08,
+            "reference_rms": 0.0015150389019748384,
+            "relative_rms": 1.8135904715485178e-05
+          },
+          "max_logits": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 10.219086450886099,
+            "relative_rms": 0.0
+          }
+        }
+      ],
+      "bitwise_baseline_stable": false,
+      "strict_evaluation": "inconclusive_baseline_noise",
+      "comparisons": {
+        "original": {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.15163440736453915,
+            "relative_rms": 0.0
+          },
+          "grad_q": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 3.0517578125e-05,
+            "rms_abs": 1.2904602182116358e-08,
+            "reference_rms": 0.0019215988563429031,
+            "relative_rms": 6.715554674442195e-06
+          },
+          "grad_k": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 6.103515625e-05,
+            "rms_abs": 2.259285543791511e-08,
+            "reference_rms": 0.0019336553238121937,
+            "relative_rms": 1.1684013774168079e-05
+          },
+          "grad_v": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 3.0517578125e-05,
+            "rms_abs": 1.1896962002905915e-08,
+            "reference_rms": 0.0015150389019748384,
+            "relative_rms": 7.852578562437138e-06
+          },
+          "max_logits": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 10.219086450886099,
+            "relative_rms": 0.0
+          }
+        },
+        "fixed": {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.15163440736453915,
+            "relative_rms": 0.0
+          },
+          "grad_q": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 3.0517578125e-05,
+            "rms_abs": 1.6052447107595456e-08,
+            "reference_rms": 0.0019215988563429031,
+            "relative_rms": 8.353693100206002e-06
+          },
+          "grad_k": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 6.103515625e-05,
+            "rms_abs": 2.4318223138587668e-08,
+            "reference_rms": 0.0019336553238121937,
+            "relative_rms": 1.2576296736609908e-05
+          },
+          "grad_v": {
+            "bitwise_equal": false,
+            "nonfinite": 0,
+            "max_abs": 6.103515625e-05,
+            "rms_abs": 2.2718174155617444e-08,
+            "reference_rms": 0.0015150389019748384,
+            "relative_rms": 1.4995109449667944e-05
+          },
+          "max_logits": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 10.219086450886099,
+            "relative_rms": 0.0
+          }
+        }
+      },
+      "policy_events_diagnostic_only": {
+        "original": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_fusion_attention.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_fusion_attention.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_fusion_attention.default|CheckpointPolicy.MUST_RECOMPUTE": 1,
+            "recompute|npu.npu_fusion_attention.default|CheckpointPolicy.MUST_RECOMPUTE": 1
+          }
+        },
+        "fixed": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_fusion_attention.default",
+              "decision": "CheckpointPolicy.MUST_SAVE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_fusion_attention.default",
+              "decision": "CheckpointPolicy.MUST_SAVE"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_fusion_attention.default|CheckpointPolicy.MUST_SAVE": 1,
+            "recompute|npu.npu_fusion_attention.default|CheckpointPolicy.MUST_SAVE": 1
+          }
+        }
+      },
+      "baseline_grad_path": "normal .grad; gemm_fusion=False",
+      "routing": "synthetic balanced counts; not router execution"
+    },
+    "expert_major_gmm_chain": {
+      "strict_outcomes": {
+        "original": "bitwise_match",
+        "fixed": "bitwise_match"
+      },
+      "cloned_input_sha256_checked_each_run": true,
+      "input_hashes": {
+        "x": {
+          "shape": [
+            16384,
+            3584
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "1562f0c6d89f16779f3affa8dbada461fc058f2991cf937773643cd761772d7b"
+        },
+        "w1": {
+          "shape": [
+            64,
+            3584,
+            2048
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "30ae2acb29b358f0a737654a508b317d7ca1b58bd068db16211e21aa6654e7c7"
+        },
+        "w2": {
+          "shape": [
+            64,
+            1024,
+            3584
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "6433f01946494f7397599709d8bc0423431c020f05deb85cbbbf68de7e9a6981"
+        },
+        "ends": {
+          "shape": [
+            64
+          ],
+          "dtype": "torch.int64",
+          "sha256": "68b189a6cb044c190ce814994f46fce29d1f003f455aa4e299ee498f038bc726"
+        },
+        "grad": {
+          "shape": [
+            16384,
+            3584
+          ],
+          "dtype": "torch.bfloat16",
+          "sha256": "693c476bd6a1d3b18670b9927ac1a5d29d26b5da9f2dceda1c9c1b4ad1ed6777"
+        }
+      },
+      "no_checkpoint_noise": [
+        {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.5642612174971451,
+            "relative_rms": 0.0
+          },
+          "grad_x": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.008118620811787904,
+            "relative_rms": 0.0
+          },
+          "grad_w1": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14352770086021902,
+            "relative_rms": 0.0
+          },
+          "grad_w2": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14107944846975853,
+            "relative_rms": 0.0
+          }
+        },
+        {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.5642612174971451,
+            "relative_rms": 0.0
+          },
+          "grad_x": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.008118620811787904,
+            "relative_rms": 0.0
+          },
+          "grad_w1": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14352770086021902,
+            "relative_rms": 0.0
+          },
+          "grad_w2": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14107944846975853,
+            "relative_rms": 0.0
+          }
+        }
+      ],
+      "bitwise_baseline_stable": true,
+      "strict_evaluation": "evaluated",
+      "comparisons": {
+        "original": {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.5642612174971451,
+            "relative_rms": 0.0
+          },
+          "grad_x": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.008118620811787904,
+            "relative_rms": 0.0
+          },
+          "grad_w1": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14352770086021902,
+            "relative_rms": 0.0
+          },
+          "grad_w2": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14107944846975853,
+            "relative_rms": 0.0
+          }
+        },
+        "fixed": {
+          "output": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.5642612174971451,
+            "relative_rms": 0.0
+          },
+          "grad_x": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.008118620811787904,
+            "relative_rms": 0.0
+          },
+          "grad_w1": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14352770086021902,
+            "relative_rms": 0.0
+          },
+          "grad_w2": {
+            "bitwise_equal": true,
+            "nonfinite": 0,
+            "max_abs": 0.0,
+            "rms_abs": 0.0,
+            "reference_rms": 0.14107944846975853,
+            "relative_rms": 0.0
+          }
+        }
+      },
+      "policy_events_diagnostic_only": {
+        "original": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_swiglu.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_swiglu.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_grouped_matmul.default|CheckpointPolicy.MUST_RECOMPUTE": 2,
+            "forward|npu.npu_swiglu.default|CheckpointPolicy.MUST_RECOMPUTE": 1,
+            "recompute|npu.npu_grouped_matmul.default|CheckpointPolicy.MUST_RECOMPUTE": 2,
+            "recompute|npu.npu_swiglu.default|CheckpointPolicy.MUST_RECOMPUTE": 1
+          }
+        },
+        "fixed": {
+          "events": [
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_SAVE"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_swiglu.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "forward",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_SAVE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_swiglu.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            },
+            {
+              "phase": "recompute",
+              "op": "npu.npu_grouped_matmul.default",
+              "decision": "CheckpointPolicy.MUST_RECOMPUTE"
+            }
+          ],
+          "counts": {
+            "forward|npu.npu_grouped_matmul.default|CheckpointPolicy.MUST_SAVE": 1,
+            "forward|npu.npu_swiglu.default|CheckpointPolicy.MUST_RECOMPUTE": 1,
+            "forward|npu.npu_grouped_matmul.default|CheckpointPolicy.MUST_RECOMPUTE": 1,
+            "recompute|npu.npu_grouped_matmul.default|CheckpointPolicy.MUST_SAVE": 1,
+            "recompute|npu.npu_swiglu.default|CheckpointPolicy.MUST_RECOMPUTE": 1,
+            "recompute|npu.npu_grouped_matmul.default|CheckpointPolicy.MUST_RECOMPUTE": 1
+          }
+        }
+      },
+      "baseline_grad_path": "normal .grad; gemm_fusion=False",
+      "routing": "synthetic balanced counts; not router execution"
+    }
+  }
+}
