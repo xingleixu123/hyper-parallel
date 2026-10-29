@@ -1,0 +1,337 @@
+{
+  "schema": "fourcard-performance-first-samples-cpu-preview-v1",
+  "status": "Incomplete performance investigation; CPU-rendered preview, not website export",
+  "source": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+  "environment": {
+    "python": "3.12.14",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0.post3",
+    "CANN": "9.2.0"
+  },
+  "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+  "environment_fingerprint": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+  "hardware": "125 Atlas 910B3 64GiB; physical devices 4-7",
+  "configuration": {
+    "layers": 3,
+    "dense_layers": 2,
+    "moe_layers": 1,
+    "MTP": false,
+    "GBS": 4,
+    "LBS": 1,
+    "sequence_length": 4096,
+    "scheduler_original_steps": 2500,
+    "restore_update": 1500
+  },
+  "limits": [
+    "One run per strategy; no matched repetitions or drift control.",
+    "Endpoint occupancy only; continuous exclusivity was not recorded.",
+    "Max rank local duration is not cross-rank wall-clock makespan.",
+    "Nominal tokens are 4*4096, not valid-token-mask counts.",
+    "Allocator measurements are not physical HBM or an additive activation breakdown.",
+    "SAC patch has not been NPU-tested; these are unpatched baseline observations.",
+    "No CP/TP/EP/HSDP or full performance acceptance claim.",
+    "Private YAML contents are not included."
+  ],
+  "runs": {
+    "fsdp4-full": {
+      "pins": {
+        "spec": {
+          "tp": 1,
+          "cp": 1,
+          "shard": 4,
+          "ac": "full"
+        },
+        "run_id": "perf-fsdp4-full-r2",
+        "port": 56550,
+        "script_manifest_sha256": "597b0613bb39b749e4f20217a50cd63210b1858c78f4d5abba7f02cfd8136f7b",
+        "worker_sha256": "17935eeec9cc4b830191ff58e3e101a05adfc780fa70310e17a4d5d0eb206f0b",
+        "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+        "host_sha256": "7e25cea54cdb4680a09fa2a2d59da878d35f8c008d55a6292dfa9c76a3d3f377",
+        "physical_cards": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+        "warmup_steps": [
+          1501,
+          1510
+        ],
+        "measurement_steps": [
+          1511,
+          1540
+        ]
+      },
+      "scope": "30 matched updates; max per-rank local duration, not cross-rank wall-clock makespan; no numerical acceptance or loss reduction",
+      "token_count": "nominal 4 * 4096; not valid-token mask count",
+      "memory_scope": "max of after-step current/peak allocator fields over 30 timed steps, per rank; not physical HBM",
+      "percentile_method": "linear interpolation at (n-1)*p",
+      "step_time_seconds": {
+        "mean": 0.7832511750000001,
+        "median": 0.78205013,
+        "p10": 0.77914605,
+        "p90": 0.7894303610000001,
+        "sd_population": 0.004179347914798631,
+        "cv_population": 0.005335897408387074
+      },
+      "step_tokens_per_second": {
+        "mean": 20918.531975910188,
+        "median": 20950.06370022131,
+        "p10": 20754.20647118885,
+        "p90": 21028.15089235958,
+        "sd_population": 111.20375189245102,
+        "cv_population": 0.005316039960190009
+      },
+      "window_tokens_per_second": 20917.93861656192,
+      "rank_memory_max_bytes": {
+        "0": {
+          "allocated_bytes": 4829323776,
+          "reserved_bytes": 18213765120,
+          "peak_allocated_bytes": 17919568896,
+          "peak_reserved_bytes": 18213765120
+        },
+        "1": {
+          "allocated_bytes": 4829322752,
+          "reserved_bytes": 18213765120,
+          "peak_allocated_bytes": 17919567872,
+          "peak_reserved_bytes": 18213765120
+        },
+        "2": {
+          "allocated_bytes": 4829322752,
+          "reserved_bytes": 18213765120,
+          "peak_allocated_bytes": 17919567872,
+          "peak_reserved_bytes": 18213765120
+        },
+        "3": {
+          "allocated_bytes": 4829316608,
+          "reserved_bytes": 18213765120,
+          "peak_allocated_bytes": 17919561728,
+          "peak_reserved_bytes": 18213765120
+        }
+      },
+      "sources": [
+        {
+          "rank": 0,
+          "path": "measurement-v2/fsdp4-full/run/rank-0-perf.jsonl",
+          "sha256": "680f38cac1f5c59f31947297507ea2ffa6dae585c3ae2094423b8e4b004d13dd"
+        },
+        {
+          "rank": 1,
+          "path": "measurement-v2/fsdp4-full/run/rank-1-perf.jsonl",
+          "sha256": "2ebfa983fd6ebe233fffc0b40ccf9f1f3b0a0217ca6e0a9113ea28b47ae677f5"
+        },
+        {
+          "rank": 2,
+          "path": "measurement-v2/fsdp4-full/run/rank-2-perf.jsonl",
+          "sha256": "fd970b2adf3825ea477ea758a9910d402970348046723f73308fcc98ba079e2c"
+        },
+        {
+          "rank": 3,
+          "path": "measurement-v2/fsdp4-full/run/rank-3-perf.jsonl",
+          "sha256": "de1f17db0656efff92c42358ccc06335049f1e9eb34ea658acbdcfaa3de422a7"
+        }
+      ]
+    },
+    "fsdp4-selective": {
+      "pins": {
+        "spec": {
+          "tp": 1,
+          "cp": 1,
+          "shard": 4,
+          "ac": "selective"
+        },
+        "run_id": "perf-fsdp4-selective-r2",
+        "port": 56552,
+        "script_manifest_sha256": "9e5dc4a910aa85471127d5a415d42a14b11c3df13b1810e09ed55470d2369118",
+        "worker_sha256": "17935eeec9cc4b830191ff58e3e101a05adfc780fa70310e17a4d5d0eb206f0b",
+        "config_sha256": "1643450890283aa811b9243d4e6d9ffee5b4b56bdae517c7cc3030b88cd0a7ea",
+        "host_sha256": "df624bdf2035de9bee216ec6dde6b3535e07e2214eb84862c2e4795b76c8f77e",
+        "physical_cards": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+        "warmup_steps": [
+          1501,
+          1510
+        ],
+        "measurement_steps": [
+          1511,
+          1540
+        ]
+      },
+      "scope": "30 matched updates; max per-rank local duration, not cross-rank wall-clock makespan; no numerical acceptance or loss reduction",
+      "token_count": "nominal 4 * 4096; not valid-token mask count",
+      "memory_scope": "max of after-step current/peak allocator fields over 30 timed steps, per rank; not physical HBM",
+      "percentile_method": "linear interpolation at (n-1)*p",
+      "step_time_seconds": {
+        "mean": 0.82202411,
+        "median": 0.82166958,
+        "p10": 0.8163165320000001,
+        "p90": 0.8278053740000001,
+        "sd_population": 0.005099200715553378,
+        "cv_population": 0.006203225250355951
+      },
+      "step_tokens_per_second": {
+        "mean": 19932.051964381062,
+        "median": 19939.889596321424,
+        "p10": 19792.09203750181,
+        "p90": 20070.657435032546,
+        "sd_population": 123.02117573228719,
+        "cv_population": 0.006172027644325243
+      },
+      "window_tokens_per_second": 19931.28887667297,
+      "rank_memory_max_bytes": {
+        "0": {
+          "allocated_bytes": 4829323776,
+          "reserved_bytes": 18687721472,
+          "peak_allocated_bytes": 18147217408,
+          "peak_reserved_bytes": 18687721472
+        },
+        "1": {
+          "allocated_bytes": 4829322752,
+          "reserved_bytes": 18687721472,
+          "peak_allocated_bytes": 18146924544,
+          "peak_reserved_bytes": 18687721472
+        },
+        "2": {
+          "allocated_bytes": 4829322752,
+          "reserved_bytes": 18687721472,
+          "peak_allocated_bytes": 18147216384,
+          "peak_reserved_bytes": 18687721472
+        },
+        "3": {
+          "allocated_bytes": 4829316608,
+          "reserved_bytes": 18687721472,
+          "peak_allocated_bytes": 18147210240,
+          "peak_reserved_bytes": 18687721472
+        }
+      },
+      "sources": [
+        {
+          "rank": 0,
+          "path": "measurement-v2/fsdp4-selective/run/rank-0-perf.jsonl",
+          "sha256": "e16817a13411dffeb63cf7140cdd0cb19aab7af6f0bcbcbd3781ff5cff6a43fa"
+        },
+        {
+          "rank": 1,
+          "path": "measurement-v2/fsdp4-selective/run/rank-1-perf.jsonl",
+          "sha256": "423f98e3b30cd28cbb2076d668a6cf2ed031f467081ed5a7e67bea819f3e40f5"
+        },
+        {
+          "rank": 2,
+          "path": "measurement-v2/fsdp4-selective/run/rank-2-perf.jsonl",
+          "sha256": "d5f465b5ef1a749c0f720ec8eb6dcfc373f1e14ed0aa615acc8b125748c71ae5"
+        },
+        {
+          "rank": 3,
+          "path": "measurement-v2/fsdp4-selective/run/rank-3-perf.jsonl",
+          "sha256": "4d40e4820fb4bbdaf5ecf69044d64b7e0170637ff048b38580717e944d99e9ab"
+        }
+      ]
+    },
+    "fsdp4-off": {
+      "pins": {
+        "spec": {
+          "tp": 1,
+          "cp": 1,
+          "shard": 4,
+          "ac": "off"
+        },
+        "run_id": "perf-fsdp4-off-r2",
+        "port": 56551,
+        "script_manifest_sha256": "97f3f92f2672e259f6c786247ef69e564769e5a4cc240d00c41e043d136f0a50",
+        "worker_sha256": "17935eeec9cc4b830191ff58e3e101a05adfc780fa70310e17a4d5d0eb206f0b",
+        "config_sha256": "d529edf8e565fc4c803377b2fff5e8a738e57e00484c114a24b71b4035d0153d",
+        "host_sha256": "948a0005004a1a4fb2166b5fd9656102dda96bef084cd5b613264329198b4628",
+        "physical_cards": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+        "warmup_steps": [
+          1501,
+          1510
+        ],
+        "measurement_steps": [
+          1511,
+          1540
+        ]
+      },
+      "scope": "30 matched updates; max per-rank local duration, not cross-rank wall-clock makespan; no numerical acceptance or loss reduction",
+      "token_count": "nominal 4 * 4096; not valid-token mask count",
+      "memory_scope": "max of after-step current/peak allocator fields over 30 timed steps, per rank; not physical HBM",
+      "percentile_method": "linear interpolation at (n-1)*p",
+      "step_time_seconds": {
+        "mean": 0.7409714856666667,
+        "median": 0.7407864749999999,
+        "p10": 0.7374570020000001,
+        "p90": 0.7439709720000001,
+        "sd_population": 0.003049879524275976,
+        "cv_population": 0.00411605518332725
+      },
+      "step_tokens_per_second": {
+        "mean": 22111.886004119868,
+        "median": 22117.03447547974,
+        "p10": 22022.365428106386,
+        "p90": 22216.888520294455,
+        "sd_population": 90.83249812924636,
+        "cv_population": 0.004107858466361599
+      },
+      "window_tokens_per_second": 22111.512139038645,
+      "rank_memory_max_bytes": {
+        "0": {
+          "allocated_bytes": 4829323776,
+          "reserved_bytes": 22229811200,
+          "peak_allocated_bytes": 19642442752,
+          "peak_reserved_bytes": 22229811200
+        },
+        "1": {
+          "allocated_bytes": 4829322752,
+          "reserved_bytes": 22229811200,
+          "peak_allocated_bytes": 19642441728,
+          "peak_reserved_bytes": 22229811200
+        },
+        "2": {
+          "allocated_bytes": 4829322752,
+          "reserved_bytes": 22229811200,
+          "peak_allocated_bytes": 19642441728,
+          "peak_reserved_bytes": 22229811200
+        },
+        "3": {
+          "allocated_bytes": 4829316608,
+          "reserved_bytes": 22229811200,
+          "peak_allocated_bytes": 19642435584,
+          "peak_reserved_bytes": 22229811200
+        }
+      },
+      "sources": [
+        {
+          "rank": 0,
+          "path": "measurement-v2/fsdp4-off/run/rank-0-perf.jsonl",
+          "sha256": "71f61689e7bf47266cc90c28eee1d3b4b02859a20c727efcd1e34f972a125b68"
+        },
+        {
+          "rank": 1,
+          "path": "measurement-v2/fsdp4-off/run/rank-1-perf.jsonl",
+          "sha256": "947293cb0917f1fdbfc729c13de909d2f91a88b917d83e7417e059bbd6dd8021"
+        },
+        {
+          "rank": 2,
+          "path": "measurement-v2/fsdp4-off/run/rank-2-perf.jsonl",
+          "sha256": "6bb912c45e0aa1aedfde9af9053be3c74068e97926c4aa413ef651203d621d1a"
+        },
+        {
+          "rank": 3,
+          "path": "measurement-v2/fsdp4-off/run/rank-3-perf.jsonl",
+          "sha256": "32a3f566ceb9768c950dac7a0f4e401f3f97e64b216caf688121bbdaff352f6f"
+        }
+      ]
+    }
+  }
+}
