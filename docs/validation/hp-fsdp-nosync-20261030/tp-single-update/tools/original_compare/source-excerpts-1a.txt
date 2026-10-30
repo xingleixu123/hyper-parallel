@@ -1,0 +1,868 @@
+# hyper_parallel/core/optimizer/muon.py SHA256 27e81dc93bcbbc4c3a288977ff3cab81f8e27c4f537d466d41c2830566aa4f10
+# lines 310-334
+0310              "ns_epsilon_mode": advanced.ns_epsilon_mode,
+0311              "zero_rms_scale_mode": advanced.zero_rms_scale_mode,
+0312              "apply_lr_in_update": advanced.apply_lr_in_update,
+0313          }
+0314          super().__init__(params, defaults, is_muon=True, hsdp_replica_count=hsdp_replica_count)
+0315          self.reshape_fn = advanced.reshape_fn
+0316          self.zeropower_fn = advanced.zeropower_fn
+0317          self.momentum_update_fn = advanced.momentum_update_fn
+0318          self.ns_transform_fn = advanced.ns_transform_fn
+0319          self.post_update_fn = advanced.post_update_fn
+0320          self.reset_optimizer_parameters()
+0321  
+0322      def reset_optimizer_parameters(self) -> None:
+0323          """Rebuild all parameter-identity caches from current param groups."""
+0324          self._group_dtensor_by_mesh()
+0325          self._build_param_shard_metadata()
+0326          deduced_count = self._auto_deduce_replica_count()
+0327          if deduced_count is None:
+0328              self.hsdp_replica_count = None
+0329          elif self.hsdp_replica_count is None:
+0330              self.hsdp_replica_count = deduced_count
+0331          self._split_replicate_groups()
+0332          self._build_hsdp_batch()
+0333          self._build_param_broadcast_info()
+0334          self._classify_parameters_for_step()
+# lines 400-465
+0400          # Compute momentum only for no-comm params upfront.
+0401          no_comm_ns: Dict[int, Dict] = {}
+0402          for group_idx in range(num_groups):
+0403              info = self._hsdp_assignment_batches.get(group_idx)
+0404              if not info:
+0405                  # No HSDP info — all params are no_comm.
+0406                  unshard_params = self.unshard_params_by_group.get(group_idx, [])
+0407                  no_comm_ns[group_idx] = self._update_muon_momentum(
+0408                      self.param_groups[group_idx], unshard_params
+0409                  )
+0410              else:
+0411                  no_comm_params = info.get("no_comm", [])
+0412                  if no_comm_params:
+0413                      no_comm_ns[group_idx] = self._update_muon_momentum(
+0414                          self.param_groups[group_idx], no_comm_params
+0415                      )
+0416                  else:
+0417                      no_comm_ns[group_idx] = {}
+0418  
+0419          # Process no-comm params.
+0420          for group_idx in range(num_groups):
+0421              if no_comm_ns[group_idx]:
+0422                  group = self.param_groups[group_idx]
+0423                  self._process_unshard_params(group, no_comm_ns[group_idx])
+0424                  if self.post_update_fn is not None:
+0425                      self._run_post_update_fn(group, no_comm_ns[group_idx].keys())
+0426  
+0427          # Flatten nested batch into a linear schedule.
+0428          group_linear_batches: Dict[int, List[HSDPGroupAssignment]] = {}
+0429          max_num_batches = 0
+0430          for group_idx in range(num_groups):
+0431              info = self._hsdp_assignment_batches.get(group_idx)
+0432              linear_batches = []
+0433              if info:
+0434                  for bg in info.get("batch_groups", []):
+0435                      linear_batches.extend(bg.get("sub_batches", []))
+0436              group_linear_batches[group_idx] = linear_batches
+0437              max_num_batches = max(max_num_batches, len(linear_batches))
+0438  
+0439          # Process batches: compute momentum per-batch for owned params only (HSDP de-duplication).
+0440          for batch_idx in range(max_num_batches):
+0441              for group_idx in range(num_groups):
+0442                  linear_batches = group_linear_batches[group_idx]
+0443                  if batch_idx >= len(linear_batches):
+0444                      continue
+0445  
+0446                  hsdp_assign = linear_batches[batch_idx]
+0447                  group = self.param_groups[group_idx]
+0448  
+0449                  # Compute momentum for this assignment's owned params only.
+0450                  ns_inputs = self._update_muon_momentum(group, hsdp_assign.owned_params)
+0451                  if not hsdp_assign.is_shard:
+0452                      if ns_inputs:
+0453                          self._process_unshard_params(group, ns_inputs)
+0454                  else:
+0455                      self._process_shard_params(
+0456                          group, ns_inputs, [hsdp_assign], group_idx,
+0457                          buffer_cache={},
+0458                      )
+0459                  if self.post_update_fn is not None:
+0460                      self._run_post_update_fn(group, ns_inputs.keys())
+0461  
+0462                  # Flush broadcasts after each assignment.
+0463                  broadcaster.flush_group(hsdp_assign)
+0464  
+0465          broadcaster.wait_all()
+# lines 490-536
+0490      def _classify_parameters_for_step(self) -> None:
+0491          """Classify params by whether the last two dims are sharded.
+0492  
+0493          unshard: run Newton-Schulz locally.
+0494          shard: all-gather before Newton-Schulz.
+0495  
+0496          Reads from self._hsdp_assignment_batches which is organized by batch.
+0497          """
+0498          self.unshard_params_by_group: Dict[int, List] = {}
+0499          self.shard_params_by_group: Dict[int, List] = {}
+0500          self.shard_assignments_by_group: Dict[int, List[HSDPGroupAssignment]] = {}
+0501          # Per group: record.index -> shard coord that computes NS.
+0502          self._shard_compute_coord: Dict[int, Dict[int, Tuple[int, ...]]] = {}
+0503  
+0504          for group_idx, group in enumerate(self.param_groups):
+0505              assignment_info = self._hsdp_assignment_batches.get(group_idx)
+0506  
+0507              unshard_params = []
+0508              shard_hsdp_assignments: List[HSDPGroupAssignment] = []
+0509  
+0510              if assignment_info:
+0511                  unshard_params.extend(assignment_info["no_comm"])
+0512                  for bg in assignment_info["batch_groups"]:
+0513                      for hsdp_assign in bg["sub_batches"]:
+0514                          if hsdp_assign.is_shard:
+0515                              shard_hsdp_assignments.append(hsdp_assign)
+0516                          else:
+0517                              unshard_params.extend(hsdp_assign.owned_params)
+0518              else:
+0519                  unshard_params.extend(group["params"])
+0520  
+0521              # Shard params only include locally owned params; replica ownership is enforced at apply time.
+0522              shard_params = [p for a in shard_hsdp_assignments for p in a.owned_params]
+0523  
+0524              # Greedily assign NS compute across shard ranks.
+0525              self._shard_compute_coord[group_idx] = {}
+0526              for hsdp_assign in shard_hsdp_assignments:
+0527                  shard_sizes, _, _, _ = self._get_shard_info(hsdp_assign)
+0528                  compute_by_index = build_owner_by_size(
+0529                      records=hsdp_assign.owned_records,
+0530                      replicate_sizes=shard_sizes,
+0531                  )
+0532                  self._shard_compute_coord[group_idx].update(compute_by_index)
+0533  
+0534              self.unshard_params_by_group[group_idx] = unshard_params
+0535              self.shard_assignments_by_group[group_idx] = shard_hsdp_assignments
+0536              self.shard_params_by_group[group_idx] = shard_params
+# lines 538-597
+0538      def _update_muon_momentum(
+0539              self,
+0540              group: Dict[str, Any],
+0541              params: List[torch.Tensor],
+0542      ) -> Dict[torch.nn.Parameter, torch.Tensor]:
+0543          """Compute first-order momentum before casting to the selected NS input dtype."""
+0544          input_dtype = _NS_DTYPES[group.get("ns_input_dtype", "bfloat16")]
+0545          momentum = group["momentum"]
+0546          if not isinstance(momentum, (list, tuple)):
+0547              momentum = [momentum]
+0548          if len(momentum) == 1:
+0549              momentum = (momentum[0], momentum[0])
+0550          momentum1, momentum2 = momentum
+0551          # Pre-filter params with valid grads and ensure momentum buffers exist
+0552          valid_params = []
+0553          grads = []
+0554          bufs = []
+0555          for p in params:
+0556              g = p.grad
+0557              if g is None:
+0558                  continue
+0559              if "momentum_buffer" not in self.state[p]:
+0560                  self.state[p]["momentum_buffer"] = torch.zeros_like(g)
+0561              valid_params.append(p)
+0562              grads.append(g)
+0563              bufs.append(self.state[p]["momentum_buffer"])
+0564  
+0565          if not valid_params:
+0566              return {}
+0567  
+0568          grads = [to_local_if_dtensor(grad) for grad in grads]
+0569          bufs = [to_local_if_dtensor(buffer) for buffer in bufs]
+0570          if self.momentum_update_fn is not None:
+0571              custom_updates = list(self.momentum_update_fn(grads, bufs, momentum1, momentum2, group["nesterov"]))
+0572              if len(custom_updates) != len(valid_params):
+0573                  raise ValueError(
+0574                      "momentum_update_fn must return one update tensor per input gradient, "
+0575                      f"got {len(custom_updates)} updates for {len(valid_params)} gradients"
+0576                  )
+0577              custom_updates = [update.to(input_dtype) for update in custom_updates]
+0578              param_updates = dict(zip(valid_params, custom_updates))
+0579              return param_updates
+0580  
+0581          # Match muon_update_core():
+0582          # m_for_update = grad + momentum1 * m_old
+0583          # m_new = grad + momentum2 * m_old
+0584          # pylint: disable=protected-access
+0585          local_us = torch._foreach_add(grads, bufs, alpha=momentum1)
+0586  
+0587          torch._foreach_mul_(bufs, momentum2)
+0588          torch._foreach_add_(bufs, grads)
+0589  
+0590          if group["nesterov"]:
+0591              torch._foreach_mul_(local_us, momentum1)
+0592              torch._foreach_add_(local_us, grads)
+0593  
+0594          local_us = [update.to(input_dtype) for update in local_us]
+0595  
+0596          param_updates = dict(zip(valid_params, local_us))
+0597          return param_updates
+# lines 1207-1245
+1207      def _build_param_shard_metadata(self) -> None:
+1208          """Build shard metadata once during optimizer init."""
+1209          self._param_shard_metadata: Dict[torch.nn.Parameter, ParamShardMeta] = {}
+1210  
+1211          for _, hsdp_groups in self._hsdp_grouping.values():
+1212              for hsdp_group in hsdp_groups:
+1213                  if hsdp_group.layout_spec is None or not hsdp_group.layout_spec.shard_axes:
+1214                      continue
+1215                  group_param_to_meta = build_param_shard_metadata_for_group(hsdp_group)
+1216                  for param, shard_meta in group_param_to_meta.items():
+1217                      self._param_shard_metadata[param] = shard_meta
+1218                  _debug_param_shard_metadata(hsdp_group, group_param_to_meta)
+1219  
+1220      @staticmethod
+1221      def _get_shard_info(
+1222              hsdp_assign: HSDPGroupAssignment,
+1223      ) -> Tuple[Tuple[int, ...], Tuple[int, ...], Tuple[dist.ProcessGroup, ...], int]:
+1224          """Extract shard topology from HSDPGroupAssignment.
+1225  
+1226          Returns:
+1227              shard_sizes: Size of each shard mesh dimension.
+1228              local_coords: Current rank's coordinate in each shard mesh dim.
+1229              shard_pgs: ProcessGroup for each shard mesh dim.
+1230              total_shard_size: Product of all shard_sizes.
+1231          """
+1232          shard_pgs = hsdp_assign.shard_pgs
+1233          shard_sizes = tuple(
+1234              dist.get_world_size(pg) if pg is not None else 1
+1235              for pg in shard_pgs
+1236          )
+1237          local_coords = tuple(
+1238              dist.get_rank(pg) if pg is not None else 0
+1239              for pg in shard_pgs
+1240          )
+1241          total_shard_size = 1
+1242          for s in shard_sizes:
+1243              total_shard_size *= s
+1244  
+1245          return shard_sizes, local_coords, shard_pgs, total_shard_size
+# hyper_parallel/core/optimizer/optimizer.py SHA256 9e24e38e602e929ef8cc3a214710602452aa99abb2f94980a26afa29d7bf63c6
+# lines 382-387
+0382      def _group_dtensor_by_mesh(self):
+0383          """Group DTensor parameters by mesh topology and shard layout."""
+0384          self._hsdp_grouping: Dict[int, Tuple[List, List]] = {}
+0385          for group_key, group in enumerate(self.param_groups):
+0386              no_comm_params, hsdp_groups = group_parameters_for_hsdp(group["params"])
+0387              self._hsdp_grouping[group_key] = (no_comm_params, hsdp_groups)
+# lines 393-435
+0393      def _auto_deduce_replica_count(self) -> Optional[int]:
+0394          """Deduce hsdp_replica_count based on cluster topology.
+0395  
+0396          - Intra-node PGs: Full dedup (no split), high bandwidth makes broadcast cheap.
+0397          - Inter-node PGs: Split at node boundaries to restrict communication domains
+0398            within a single node, bypassing cross-node bottlenecks.
+0399          """
+0400          devices_per_node = get_device_count()
+0401  
+0402          dedup_per_dim: Dict[int, int] = {}
+0403          needs_split = False
+0404  
+0405          # group_key, (no_comm_params, hsdp_groups)
+0406          for _, (_, hsdp_groups) in self._hsdp_grouping.items():
+0407              for hsdp_group in hsdp_groups:
+0408                  for dim_idx, pg in enumerate(hsdp_group.replicate_pgs):
+0409                      if pg is None:
+0410                          continue
+0411                      pg_size = dist.get_world_size(pg)
+0412                      if pg_size <= 1:
+0413                          continue
+0414  
+0415                      if pg_size > devices_per_node:
+0416                          # Inter-node: Find largest divisor safe for node boundary
+0417                          dedup = min(pg_size, devices_per_node)
+0418                          while pg_size % dedup != 0:
+0419                              dedup -= 1
+0420                          needs_split = True
+0421                      else:
+0422                          # origin Inter-node
+0423                          dedup = pg_size
+0424  
+0425                      # Enforce conservative (smallest) dedup across shared mesh axes
+0426                      if dim_idx not in dedup_per_dim:
+0427                          dedup_per_dim[dim_idx] = dedup
+0428                      else:
+0429                          dedup_per_dim[dim_idx] = min(dedup_per_dim[dim_idx], dedup)
+0430  
+0431          if not needs_split:
+0432              return None
+0433  
+0434          sorted_dedups = [dedup_per_dim[k] for k in sorted(dedup_per_dim.keys())]
+0435          return min(sorted_dedups)
+# lines 547-621
+0547      def _build_hsdp_batch(
+0548              self,
+0549              max_batch_numel: Optional[int] = None,
+0550      ) -> None:
+0551          """Split HSDP groups into memory-capped batches for compute-broadcast overlap."""
+0552          if max_batch_numel is None:
+0553              broadcast_max_bytes = getattr(
+0554                  self, "replicate_broadcast_max_bytes", 512 * 1024 * 1024,
+0555              )
+0556              hsdp_size = self.hsdp_replica_count if self.hsdp_replica_count is not None else 1
+0557              max_batch_numel = broadcast_max_bytes * hsdp_size  # if hsdp_size > 1 else float('inf')
+0558  
+0559          self._hsdp_batches: Dict[int, List[Dict]] = {}
+0560  
+0561          for group_key, (_, hsdp_groups) in self._hsdp_grouping.items():
+0562              # Sort groups by total numel descending — large groups first.
+0563              sorted_groups = sorted(
+0564                  hsdp_groups,
+0565                  key=lambda g: -sum(r.param.numel() for r in g.records),
+0566              )
+0567  
+0568              batch_groups: List[Dict] = []
+0569  
+0570              for hsdp_group in sorted_groups:
+0571                  # Sort records within group by numel descending.
+0572                  sorted_records = sorted(
+0573                      hsdp_group.records,
+0574                      key=lambda r: -r.param.numel(),
+0575                  )
+0576  
+0577                  sub_batches: List[List[Dict]] = []
+0578                  current_batch: List[Dict] = []
+0579                  current_numel = 0
+0580  
+0581                  for record in sorted_records:
+0582                      p_numel = record.param.numel()
+0583  
+0584                      current_batch.append({
+0585                          "record": record,
+0586                          "hsdp_group": hsdp_group,
+0587                      })
+0588                      current_numel += p_numel
+0589  
+0590                      # Soft limit: allow the bucket to slightly exceed the cap
+0591                      # so that symmetric structures stay together and fragmentation is reduced.
+0592                      if current_numel >= max_batch_numel:
+0593                          sub_batches.append(current_batch)
+0594                          current_batch = []
+0595                          current_numel = 0
+0596  
+0597                  if current_batch:
+0598                      sub_batches.append(current_batch)
+0599  
+0600                  # Sort sub-batches by numel descending within this group.
+0601                  sub_batches.sort(key=lambda b: -sum(e["record"].param.numel() for e in b))
+0602  
+0603                  batch_groups.append({
+0604                      "hsdp_group": hsdp_group,
+0605                      "sub_batches": sub_batches,
+0606                  })
+0607  
+0608              # log batch split info.
+0609              total_sub_batches = sum(len(bg["sub_batches"]) for bg in batch_groups)
+0610              logger.info_rank0(
+0611                  "[HSDP Batch] group_key=%s, num_hsdp_groups=%s, num_batch_groups=%s, "
+0612                  "total_sub_batches=%s, group_numels=%s, max_batch_numel=%s",
+0613                  group_key,
+0614                  len(hsdp_groups),
+0615                  len(batch_groups),
+0616                  total_sub_batches,
+0617                  [sum(bg['hsdp_group'].records_numel) if hasattr(bg['hsdp_group'], 'records_numel') else sum(
+0618                      r.param.numel() for r in bg['hsdp_group'].records) for bg in batch_groups],
+0619                  max_batch_numel
+0620              )
+0621              self._hsdp_batches[group_key] = batch_groups
+# lines 623-731
+0623      def _build_sub_batch_assignment(
+0624              self,
+0625              sub_batch_entries: List[Dict],
+0626              hsdp_group: Any,
+0627      ) -> Optional[HSDPGroupAssignment]:
+0628          """Build an HSDPGroupAssignment for one sub-batch and update broadcast info."""
+0629          records = [e["record"] for e in sub_batch_entries]
+0630          if not records:
+0631              return None
+0632  
+0633          device_mesh = records[0].param.device_mesh
+0634  
+0635          replicate_group_ranks, replicate_sizes = get_multi_dim_logical_info(
+0636              device_mesh,
+0637              hsdp_group.comm_key.replicate_mesh_dims,
+0638          )
+0639  
+0640          # When hsdp_replica_count is set, remap coordinates into
+0641          # sub-groups: each original coord maps to (coord % sub_size)
+0642          # within its sub-group, and the effective group size shrinks.
+0643          if self.hsdp_replica_count is not None:
+0644              replicate_group_ranks = tuple(
+0645                  r % self.hsdp_replica_count for r in replicate_group_ranks
+0646              )
+0647              replicate_sizes = tuple(
+0648                  min(s, self.hsdp_replica_count) for s in replicate_sizes
+0649              )
+0650  
+0651          # Greedy owner assignment on this sub-batch's records.
+0652          owner_by_index = build_owner_by_size(
+0653              records=records,
+0654              replicate_sizes=replicate_sizes,
+0655          )
+0656  
+0657          owned_records = select_owned_records(
+0658              records=records,
+0659              owner_by_index=owner_by_index,
+0660              replicate_group_ranks=replicate_group_ranks,
+0661          )
+0662  
+0663          is_shard_for_ns = (
+0664                  hsdp_group.comm_key.has_shard_group
+0665                  and hsdp_group.layout_spec.is_last2d_sharded
+0666          )
+0667  
+0668          hsdp_assign = HSDPGroupAssignment(
+0669              owned_records=owned_records,
+0670              all_records=records,
+0671              owner_by_index=owner_by_index,
+0672              replicate_group_ranks=replicate_group_ranks,
+0673              replicate_sizes=replicate_sizes,
+0674              replicate_pgs=hsdp_group.replicate_pgs,
+0675              shard_pgs=hsdp_group.shard_pgs,
+0676              is_shard=is_shard_for_ns,
+0677              layout_spec=hsdp_group.layout_spec,
+0678          )
+0679          logger.debug_rank0(f'[Hyper-optimizer] hsdp_assign: {hsdp_assign}')
+0680  
+0681          # Build broadcast reverse mapping for replicated groups
+0682          if hsdp_assign.is_replicated and hsdp_assign.replicate_pgs:
+0683              for record in hsdp_assign.all_records:
+0684                  src_coord = hsdp_assign.owner_rank_coord(record)
+0685                  if not src_coord or any(c < 0 for c in src_coord):
+0686                      continue
+0687                  self._param_to_broadcast_info[record.param] = (
+0688                      src_coord, hsdp_assign.replicate_pgs,
+0689                  )
+0690  
+0691          return hsdp_assign
+0692  
+0693      def _build_param_broadcast_info(self) -> None:
+0694          """Build per-batch HSDP assignments and param broadcast reverse mapping.
+0695  
+0696          When ``hsdp_replica_count`` is set, replicate coordinates and sizes
+0697          are remapped so that owner assignment and broadcast happen within
+0698          sub-groups of size ``hsdp_replica_count`` instead of the full
+0699          replicate group.
+0700  
+0701          Sub-group broadcast already covers all ranks (each rank belongs to
+0702          exactly one sub-group), so param and state broadcast use the same
+0703          sub-group mapping — no separate full-group path is needed.
+0704          """
+0705          self._hsdp_assignment_batches: Dict[int, Dict] = {}
+0706          self._param_to_broadcast_info: Dict[
+0707              torch.nn.Parameter, Tuple[Tuple[int, ...], Tuple[dist.ProcessGroup, ...]]
+0708          ] = {}
+0709  
+0710          for group_key, batch_groups in self._hsdp_batches.items():
+0711              no_comm_params = self._hsdp_grouping[group_key][0]
+0712              assignment_batch_groups = []
+0713  
+0714              for bg in batch_groups:
+0715                  hsdp_group = bg["hsdp_group"]
+0716                  sub_batch_assigns: List[HSDPGroupAssignment] = []
+0717  
+0718                  for sub_batch_entries in bg["sub_batches"]:
+0719                      hsdp_assign = self._build_sub_batch_assignment(sub_batch_entries, hsdp_group)
+0720                      if hsdp_assign is not None:
+0721                          sub_batch_assigns.append(hsdp_assign)
+0722  
+0723                  assignment_batch_groups.append({
+0724                      "hsdp_group": hsdp_group,
+0725                      "sub_batches": sub_batch_assigns,
+0726                  })
+0727  
+0728              self._hsdp_assignment_batches[group_key] = {
+0729                  "no_comm": no_comm_params,
+0730                  "batch_groups": assignment_batch_groups,
+0731              }
+# lines 733-746
+0733      def _broadcast_replicate_params_after_step(self) -> None:
+0734          """Broadcast updated params from assigned rank to replicate-group peers."""
+0735          self._broadcast_op_fused(target="param")
+0736  
+0737      def _broadcast_state_fused_for_ckpt(self) -> None:
+0738          """Broadcast optimizer state before checkpoint save."""
+0739          self._broadcast_op_fused(
+0740              target="state",
+0741              state_keys=list(self._state_keys_for_checkpoint_broadcast()),
+0742          )
+0743  
+0744      def _state_keys_for_checkpoint_broadcast(self) -> Tuple[str, ...]:
+0745          """Return optimizer state fields synchronized for an HSDP checkpoint."""
+0746          return ("momentum_buffer",) if self.is_muon else ("exp_avg", "exp_avg_sq")
+# hyper_parallel/core/optimizer/sharding_category.py SHA256 d418c2dbdb18dbaef9197342aba40430dbd90e6a352d5c08277ca9f9cf0a32ae
+# lines 225-329
+0225  def extract_param_shard_spec(dtensor: DTensor) -> ParamShardSpec:
+0226      """Extract all shard metadata and native process groups from one DTensor."""
+0227      device_mesh = dtensor.device_mesh
+0228      placements = dtensor.placements
+0229      tensor_ndim = len(dtensor.shape)
+0230  
+0231      shard_mesh_dims: List[int] = []
+0232      replicate_mesh_dims: List[int] = []
+0233      shard_axes: List[Tuple[int, int]] = []
+0234      replicate_pgs: List[dist.ProcessGroup] = []
+0235      shard_pgs: List[dist.ProcessGroup] = []
+0236  
+0237      for mesh_dim_idx, placement in enumerate(placements):
+0238          pg = device_mesh.get_group(mesh_dim_idx) if hasattr(device_mesh, "get_group") else None
+0239  
+0240          if placement.is_replicate():
+0241              replicate_mesh_dims.append(mesh_dim_idx)
+0242              replicate_pgs.append(pg)
+0243  
+0244          elif placement.is_shard():
+0245              if isinstance(placement, StridedShard):
+0246                  placement_for_grouping = Shard(placement.dim)
+0247              else:
+0248                  placement_for_grouping = placement
+0249  
+0250              tensor_dim = _normalize_tensor_dim(
+0251                  placement_for_grouping.dim,
+0252                  tensor_ndim,
+0253              )
+0254  
+0255              shard_mesh_dims.append(mesh_dim_idx)
+0256              shard_axes.append((mesh_dim_idx, tensor_dim))
+0257              shard_pgs.append(pg)
+0258  
+0259          else:
+0260              raise ValueError(
+0261                  f"Unsupported placement type in HSDP parameter grouping: "
+0262                  f"{type(placement).__name__}."
+0263              )
+0264  
+0265      axis_spec = ParamLayoutSpec(
+0266          tensor_ndim=tensor_ndim,
+0267          shard_axes=tuple(shard_axes),
+0268          replicate_mesh_dims=tuple(replicate_mesh_dims),
+0269      )
+0270  
+0271      return ParamShardSpec(
+0272          device_mesh=device_mesh,
+0273          shard_mesh_dims=tuple(shard_mesh_dims),
+0274          replicate_mesh_dims=tuple(replicate_mesh_dims),
+0275          replicate_pgs=tuple(replicate_pgs),
+0276          shard_pgs=tuple(shard_pgs),
+0277          axis_spec=axis_spec,
+0278      )
+0279  
+0280  
+0281  def build_comm_domain_key(shard_spec: ParamShardSpec) -> CommDomainKey:
+0282      """Build grouping key utilizing DeviceMesh properties."""
+0283      mesh_rank_list = ()
+0284      if hasattr(shard_spec.device_mesh, "rank_list"):
+0285          mesh_rank_list = tuple(shard_spec.device_mesh.rank_list)
+0286  
+0287      return CommDomainKey(
+0288          mesh_shape=tuple(getattr(shard_spec.device_mesh, "mesh_shape", None) or shard_spec.device_mesh.mesh.shape),
+0289          mesh_rank_list=mesh_rank_list,
+0290          replicate_mesh_dims=shard_spec.replicate_mesh_dims,
+0291          shard_mesh_dims=shard_spec.shard_mesh_dims,
+0292      )
+0293  
+0294  
+0295  def group_parameters_for_hsdp(
+0296          params: List[DTensor],
+0297  ) -> Tuple[List[DTensor], List[HSDPCommGroup]]:
+0298      """Group parameters relying on native DeviceMesh topology."""
+0299      no_comm_params: List[DTensor] = []
+0300      groups: Dict[HSDPGroupKey, HSDPCommGroup] = {}
+0301  
+0302      for param_index, param in enumerate(params):
+0303          if not isinstance(param, DTensor):
+0304              no_comm_params.append(param)
+0305              continue
+0306  
+0307          shard_spec = extract_param_shard_spec(param)
+0308          comm_key = build_comm_domain_key(shard_spec)
+0309  
+0310          if not comm_key.has_replicate_redundancy and not comm_key.has_shard_group:
+0311              no_comm_params.append(param)
+0312              continue
+0313  
+0314          group_key = HSDPGroupKey(
+0315              comm_key=comm_key,
+0316              axis_spec=shard_spec.axis_spec,  # ParamLayoutSpec
+0317          )
+0318  
+0319          if group_key not in groups:
+0320              groups[group_key] = HSDPCommGroup(
+0321                  comm_key=comm_key,
+0322                  layout_spec=shard_spec.axis_spec,
+0323                  replicate_pgs=shard_spec.replicate_pgs,
+0324                  shard_pgs=shard_spec.shard_pgs,
+0325              )
+0326  
+0327          groups[group_key].add_param(param_index, param)
+0328  
+0329      return no_comm_params, list(groups.values())
+# lines 419-489
+0419  def get_multi_dim_logical_info(
+0420          device_mesh: DeviceMesh,
+0421          mesh_dims: Sequence[int]
+0422  ) -> Tuple[Tuple[int, ...], Tuple[int, ...]]:
+0423      """Obtain the independent relative ranks and sizes of the parameters across multiple replicate dimensions."""
+0424      if not mesh_dims:
+0425          return (), ()
+0426  
+0427      coords = device_mesh.get_coordinate()
+0428      if coords is None:
+0429          return (-1,) * len(mesh_dims), (1,) * len(mesh_dims)
+0430  
+0431      ranks = tuple(coords[dim] for dim in mesh_dims)
+0432      sizes = tuple(device_mesh.size(dim) for dim in mesh_dims)
+0433  
+0434      return ranks, sizes
+0435  
+0436  
+0437  def build_owner_by_size(
+0438          records: List[ParamRecord],
+0439          replicate_sizes: Tuple[int, ...],
+0440  ) -> Dict[int, Tuple[int, ...]]:
+0441      """Build deterministic owner map across a multi-dimensional replicate grid."""
+0442      valid_records = [
+0443          record for record in records
+0444          if getattr(record.param, "requires_grad", True)
+0445      ]
+0446  
+0447      if not valid_records:
+0448          return {}
+0449  
+0450      if not replicate_sizes:
+0451          return {record.index: () for record in valid_records}
+0452  
+0453      dim_ranges = [range(s) for s in replicate_sizes]
+0454      all_coords = list(itertools.product(*dim_ranges))
+0455  
+0456      sorted_records = sorted(
+0457          valid_records,
+0458          key=lambda record: (-record.param.numel(), record.index),
+0459      )
+0460  
+0461      # The greedy strategy assigns the task to the node with the lowest load.
+0462      coord_loads = {coord: 0 for coord in all_coords}
+0463      owner_by_index: Dict[int, Tuple[int, ...]] = {}
+0464  
+0465      for record in sorted_records:
+0466          best_coord = min(
+0467              all_coords,
+0468              key=lambda c: (coord_loads[c], c),
+0469          )
+0470  
+0471          owner_by_index[record.index] = best_coord
+0472          coord_loads[best_coord] += record.param.numel()
+0473  
+0474      return owner_by_index
+0475  
+0476  
+0477  def select_owned_records(
+0478          records: List[ParamRecord],
+0479          owner_by_index: Dict[int, Tuple[int, ...]],
+0480          replicate_group_ranks: Tuple[int, ...],
+0481  ) -> List[ParamRecord]:
+0482      """Select records owned by current multi-dimensional replicate rank."""
+0483      if any(r < 0 for r in replicate_group_ranks):
+0484          return []
+0485  
+0486      return [
+0487          record for record in records
+0488          if owner_by_index.get(record.index) == replicate_group_ranks
+0489      ]
+# hyper_parallel/core/optimizer/muon_shard.py SHA256 b33e6ce958e8633c148e0e3fc209f4aebafbf4f3786a0e91ffe8b92ce5c079c4
+# lines 45-58
+0045  def make_param_shard_meta(
+0046          param: torch.Tensor,
+0047          stage_metas: List[ParamShardStageMeta],
+0048  ) -> ParamShardMeta:
+0049      """Construct shard metadata from real local-shape plans."""
+0050      global_shape = tuple(param.shape)
+0051      local_shape = tuple(to_local_if_dtensor(param.data).shape)
+0052      return ParamShardMeta(
+0053          global_shape=global_shape,
+0054          global_numel=math.prod(global_shape),
+0055          local_shape=local_shape,
+0056          local_numel=math.prod(local_shape),
+0057          stage_metas=tuple(stage_metas),
+0058      )
+# lines 129-203
+0129  def _allgather_shapes_for_group(
+0130          local_shapes: List[Tuple[int, ...]],
+0131          shard_pg: Optional[dist.ProcessGroup],
+0132          shard_size: int,
+0133          device: torch.device,
+0134  ) -> List[List[Tuple[int, ...]]]:
+0135      """All-gather per-parameter shapes within one shard process group."""
+0136      if shard_pg is None or shard_size <= 1:
+0137          return [[tuple(shape) for shape in local_shapes]]
+0138  
+0139      shape_tensor = torch.tensor(local_shapes, dtype=torch.int64, device=device)
+0140      gathered = torch.empty((shard_size, *shape_tensor.shape), dtype=torch.int64, device=device)
+0141      dist.all_gather_into_tensor(gathered.view(-1), shape_tensor.contiguous().view(-1), group=shard_pg)
+0142      gathered_cpu = gathered.cpu().tolist()
+0143      return [
+0144          [tuple(shape) for shape in rank_shapes]
+0145          for rank_shapes in gathered_cpu
+0146      ]
+0147  
+0148  
+0149  def build_param_shard_metadata_for_group(
+0150          hsdp_group: HSDPCommGroup,
+0151  ) -> Dict[torch.Tensor, ParamShardMeta]:
+0152      """Build per-parameter shard metadata before HSDP batching."""
+0153      # pylint: disable=too-many-locals
+0154      layout_spec = hsdp_group.layout_spec
+0155      shard_pgs = hsdp_group.shard_pgs
+0156      if layout_spec is None or not layout_spec.shard_axes or not hsdp_group.records:
+0157          return {}
+0158  
+0159      current_shapes = [tuple(to_local_if_dtensor(record.param.data).shape) for record in hsdp_group.records]
+0160      stage_metas_per_param: List[List[ParamShardStageMeta]] = [[] for _ in hsdp_group.records]
+0161      local_device = to_local_if_dtensor(hsdp_group.records[0].param.data).device
+0162  
+0163      for (_, tensor_dim), shard_pg in zip(layout_spec.shard_axes, shard_pgs):
+0164          shard_size = dist.get_world_size(shard_pg) if shard_pg is not None else 1
+0165          gathered_shapes = _allgather_shapes_for_group(current_shapes, shard_pg, shard_size, local_device)
+0166          cur_rank = dist.get_rank(shard_pg) if shard_pg is not None and shard_size > 1 else 0
+0167          next_shapes: List[Tuple[int, ...]] = []
+0168  
+0169          for record_idx, _ in enumerate(hsdp_group.records):
+0170              rank_shapes = tuple(
+0171                  tuple(gathered_shapes[rank_idx][record_idx])
+0172                  for rank_idx in range(shard_size)
+0173              )
+0174              tensor_dim_norm = tensor_dim % len(rank_shapes[0])
+0175              split_sizes = tuple(shape[tensor_dim_norm] for shape in rank_shapes)
+0176              pad_shape = tuple(max(shape[dim] for shape in rank_shapes) for dim in range(len(rank_shapes[0])))
+0177              stage_metas_per_param[record_idx].append(
+0178                  ParamShardStageMeta(
+0179                      tensor_dim=tensor_dim_norm,
+0180                      shard_size=shard_size,
+0181                      cur_rank_in_shard_group=cur_rank,
+0182                      rank_shapes=rank_shapes,
+0183                      split_sizes=split_sizes,
+0184                      pad_shape=pad_shape,
+0185                  )
+0186              )
+0187  
+0188              output_shape = list(rank_shapes[cur_rank])
+0189              if shard_size > 1:
+0190                  output_shape[tensor_dim_norm] = sum(split_sizes)
+0191              next_shapes.append(tuple(output_shape))
+0192  
+0193          current_shapes = next_shapes
+0194  
+0195      param_to_meta: Dict[torch.Tensor, ParamShardMeta] = {}
+0196      updated_records = []
+0197      for record, stage_metas in zip(hsdp_group.records, stage_metas_per_param):
+0198          shard_meta = make_param_shard_meta(record.param, stage_metas)
+0199          param_to_meta[record.param] = shard_meta
+0200          updated_records.append(record.__class__(index=record.index, param=record.param, shard_meta=shard_meta))
+0201  
+0202      hsdp_group.records = updated_records
+0203      return param_to_meta
+# hyper_parallel/core/optimizer/utils.py SHA256 0772696eadaf03c5a9c6de1df0d62222a3980b33b5577bed22be265267ce8157
+# lines 54-61
+0054  def get_device_count() -> int:
+0055      """Return the active accelerator count, defaulting to 1."""
+0056      npu = getattr(torch, "npu", None)
+0057      if npu is not None and npu.is_available():
+0058          return npu.device_count()
+0059      if torch.cuda.is_available():
+0060          return torch.cuda.device_count()
+0061      return 1
+# hyper_parallel/components/optim/mixed_precision_optimizer.py SHA256 5dce5f65c1f7a3fa6873c6ee25398d16d4f36b535f29056cd1e535b784e61400
+# lines 140-209
+0140      def __init__(self, optimizer: ChainedOptimizer, model: nn.Module) -> None:
+0141          """Replace leaf optimizer params with fp32 main parameters.
+0142  
+0143          Args:
+0144              optimizer: Chained AdamW/Muon optimizer over model parameters.
+0145              model: Module containing the computation parameters.
+0146          """
+0147          super().__init__(optimizer, model)
+0148          self.float16_groups: list[list[nn.Parameter]] = []
+0149          self.fp32_from_float16_groups: list[list[nn.Parameter]] = []
+0150          self.fp32_from_fp32_groups: list[list[nn.Parameter]] = []
+0151          self.model_param_by_optimizer_param: dict[nn.Parameter, nn.Parameter] = {}
+0152          self._build_model_and_main_param_groups()
+0153          self.optimizer_param_by_model_param = {
+0154              model_param: optimizer_param
+0155              for optimizer_param, model_param in self.model_param_by_optimizer_param.items()
+0156          }
+0157          self.optimizer.reset_optimizer_parameters(
+0158              self.model_param_by_optimizer_param
+0159          )
+0160          self.param_groups = self.optimizer.param_groups
+0161  
+0162          parameter_names = {
+0163              parameter: name for name, parameter in model.named_parameters()
+0164          }
+0165          self._main_param_by_fqn = {
+0166              parameter_names[model_param]: optimizer_param
+0167              for optimizer_param, model_param in self.model_param_by_optimizer_param.items()
+0168          }
+0169  
+0170      def _build_model_and_main_param_groups(self) -> None:
+0171          """Build Megatron-compatible model and main-parameter group views."""
+0172          parameter_names = {
+0173              parameter: name for name, parameter in self.model.named_parameters()
+0174          }
+0175          for leaf_optimizer in self.chained_optimizers:
+0176              for optimizer_group in leaf_optimizer.param_groups:
+0177                  float16_group = []
+0178                  fp32_from_float16_group = []
+0179                  fp32_from_fp32_group = []
+0180                  for param_index, model_param in enumerate(optimizer_group["params"]):
+0181                      model_param.main_grad = None
+0182                      if model_param.dtype == torch.float32:
+0183                          model_param.main_param = model_param
+0184                          fp32_from_fp32_group.append(model_param)
+0185                          continue
+0186                      if model_param.dtype not in (torch.float16, torch.bfloat16):
+0187                          raise TypeError(
+0188                              "Float16OptimizerWithFloat16Params supports trainable "
+0189                              "float16, bfloat16, or float32 parameters; "
+0190                              f"{parameter_names[model_param]} has dtype {model_param.dtype}"
+0191                          )
+0192  
+0193                      main_param = nn.Parameter(
+0194                          model_param.detach().to(dtype=torch.float32),
+0195                          requires_grad=model_param.requires_grad,
+0196                      )
+0197                      main_param.model_name = model_param.model_name
+0198                      model_param.main_param = main_param
+0199                      optimizer_group["params"][param_index] = main_param
+0200                      if model_param in leaf_optimizer.state:
+0201                          leaf_optimizer.state[main_param] = leaf_optimizer.state.pop(model_param)
+0202  
+0203                      float16_group.append(model_param)
+0204                      fp32_from_float16_group.append(main_param)
+0205                      self.model_param_by_optimizer_param[main_param] = model_param
+0206  
+0207                  self.float16_groups.append(float16_group)
+0208                  self.fp32_from_float16_groups.append(fp32_from_float16_group)
+0209                  self.fp32_from_fp32_groups.append(fp32_from_fp32_group)
+# hyper_parallel/core/dtensor/device_mesh.py SHA256 d36229a78ca50f193f0afc565da37e85f0cc2db7f477991a96e13177db20cf5d
+# lines 722-738
+0722      def get_group(self, mesh_dim: Optional[Union[int, str]] = None):
+0723          """Return the communication group for one mesh axis."""
+0724          if not hasattr(self, "_dim_group_names"):
+0725              raise RuntimeError("DeviceMesh process groups not initialized!")
+0726  
+0727          if self.ndim > 1 and mesh_dim is None:
+0728              raise RuntimeError(
+0729                  f"Found the DeviceMesh have {self.ndim} dimensions. "
+0730                  "Optional kwarg `mesh_dim` needs to be specified when device_mesh.ndim > 1."
+0731              )
+0732  
+0733          root_mesh = self._get_root_mesh()
+0734          if isinstance(mesh_dim, str) and mesh_dim in root_mesh.get_flatten_mapping():
+0735              flattened_mesh = root_mesh.get_flatten_mapping()[mesh_dim]
+0736              return flattened_mesh.get_comm_group_by_axis(mesh_dim)
+0737  
+0738          return self.get_comm_group_by_axis(mesh_dim)

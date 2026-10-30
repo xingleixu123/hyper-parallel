@@ -1,0 +1,1705 @@
+{
+  "boundaries": "Two-rank, 1D row-sharded SUM, FP32 synthetic model, both fusion modes and zero-copy disabled; no optimizer step, full-model numerical acceptance, HSDP 2x2, or NPU timing/performance. Empty bucket observations are snapshots, not proof of internal fusion layout or individual collectives.",
+  "cases": [
+    {
+      "case": "both_true",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": null,
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-false-both_true.json",
+      "source_sha256": "3c737d204e49b6634e885d46029f17b316377b7ad818cac1e74e2107a83423ee",
+      "status": "passed"
+    },
+    {
+      "case": "both_true",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": null,
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-false-both_true.json",
+      "source_sha256": "136b384831d59cba3a0121da83795986829a58544218137ab585cd0b807ecfe0",
+      "status": "passed"
+    },
+    {
+      "case": "both_false",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-false-both_false.json",
+      "source_sha256": "d79a7aacbe108dbfa14d68d1fa43d24501630f64a1648c360f3d90b4e9c1354a",
+      "status": "passed"
+    },
+    {
+      "case": "both_false",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": [
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-false-both_false.json",
+      "source_sha256": "4f09fdc264dd11ec77da225d0daf779f0597a5cb1d6ef730addd8e839c9a8f22",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_true",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": null,
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-false-micro0_only_true.json",
+      "source_sha256": "f3298620aeed91561baa57deb25c11fd06f7e335d829f6edcc4556efbf431dc3",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_true",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": null,
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-false-micro0_only_true.json",
+      "source_sha256": "e5f9b72b55aafa12a9c5491ca295697d98b4809dc28b6fb3dfd96949dcc2d8b7",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_false",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-false-micro0_only_false.json",
+      "source_sha256": "47062985a2b15d5ee4af67592595d74a748a687419cca042edab132e7568f2cb",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_false",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": false,
+      "initial_micro0_pending": [
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-false-micro0_only_false.json",
+      "source_sha256": "fce83ec9c022a7ec138e72e06529c6c8a186e42a1d22e3b674303d73b308529c",
+      "status": "passed"
+    },
+    {
+      "case": "both_true",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": null,
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-true-both_true.json",
+      "source_sha256": "7fa36c1b39bbf1c23e6ac5f39b12a1b1c5b1651fddbc7b0e362422e11d29afff",
+      "status": "passed"
+    },
+    {
+      "case": "both_true",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": null,
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-true-both_true.json",
+      "source_sha256": "8e28794a711429e62268ac4ec658e4e684c658eec7d227c378e52b0e79c8feca",
+      "status": "passed"
+    },
+    {
+      "case": "both_false",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-true-both_false.json",
+      "source_sha256": "c035f9c4336544f3f2184ba29eab0948f55a2f8353dee58d8e6ff0aeacf0d45b",
+      "status": "passed"
+    },
+    {
+      "case": "both_false",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": [
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-true-both_false.json",
+      "source_sha256": "dc96093e2173a43a5710374cb23b8c50303baa7a3b36c3ffa112c81d1fce0485",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_true",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": null,
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-true-micro0_only_true.json",
+      "source_sha256": "91def0c7432e019f129902976e33a15ce450ec360d9638ba5dff9d55fdfaee46",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_true",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": null,
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-true-micro0_only_true.json",
+      "source_sha256": "49d5d1f51e4d7339b77b6a12dfbf020ba467d9f32ae84366920708ac2c1e9c3e",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_false",
+      "expected_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "micro_inputs": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "rank": 0,
+      "source_file": "output/rank-0-fusion-true-micro0_only_false.json",
+      "source_sha256": "248f27318c6178fa0b5b226a72dc1788cd272dce4ca0a11e2995cf960a468c42",
+      "status": "passed"
+    },
+    {
+      "case": "micro0_only_false",
+      "expected_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "expected_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "final_pending_unsharded": null,
+      "fusion": true,
+      "initial_micro0_pending": [
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "micro_inputs": [
+        [
+          2,
+          1,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          3,
+          2
+        ]
+      ],
+      "observed_final_common": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "observed_final_early": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "rank": 1,
+      "source_file": "output/rank-1-fusion-true-micro0_only_false.json",
+      "source_sha256": "c37d2f51fc44b9f0ba4fbfe62afeeca01a267daccb9a7766b2991319d4283690",
+      "status": "passed"
+    }
+  ],
+  "failed_rank_cases": 0,
+  "inputs": {
+    "0": [
+      [
+        1,
+        1,
+        1,
+        2
+      ],
+      [
+        1,
+        2,
+        2,
+        2
+      ]
+    ],
+    "1": [
+      [
+        2,
+        1,
+        2,
+        2
+      ],
+      [
+        2,
+        2,
+        3,
+        2
+      ]
+    ]
+  },
+  "logical_weights": {
+    "common.weight": [
+      [
+        0.0625,
+        0.125,
+        0.1875,
+        0.25
+      ],
+      [
+        0.3125,
+        0.375,
+        0.4375,
+        0.5
+      ],
+      [
+        0.5625,
+        0.625,
+        0.6875,
+        0.75
+      ],
+      [
+        0.8125,
+        0.875,
+        0.9375,
+        1.0
+      ]
+    ],
+    "early.weight": [
+      [
+        0.1875,
+        0.25,
+        0.3125,
+        0.375
+      ],
+      [
+        0.4375,
+        0.5,
+        0.5625,
+        0.625
+      ],
+      [
+        0.6875,
+        0.75,
+        0.8125,
+        0.875
+      ],
+      [
+        0.9375,
+        1.0,
+        1.0625,
+        1.125
+      ]
+    ]
+  },
+  "method": "Exact rational derivative of loss=sum(x@W_common + branch*x@W_early): dloss/dW[i,j]=x[i]; SUM rank and active micros, then partition global rows 0:2 and 2:4. Never read or compare worker oracle field.",
+  "passed_rank_cases": 16,
+  "rank_case_count": 16,
+  "runtime": {
+    "backend_basis": "Pinned actual worker requires HCCL and world/rank before any case; artifacts are not a collective-operation trace.",
+    "device": "Ascend910B3",
+    "physical_rank_proof": [
+      {
+        "host_pid": 3735819,
+        "namespace_pid": 44,
+        "physical_card": 1,
+        "pid_namespace": "pid:[4026552149]",
+        "rank": 0,
+        "starttick": 87706658
+      },
+      {
+        "host_pid": 3735820,
+        "namespace_pid": 45,
+        "physical_card": 2,
+        "pid_namespace": "pid:[4026552149]",
+        "rank": 1,
+        "starttick": 87706658
+      }
+    ],
+    "python": "3.12.14",
+    "rank_security": "Both observed ranks UID 0, Seccomp 0, CapEff 000001ffffffffff, 14 actual cgroup entries; devices and memory match target, remaining groups are not claimed to match the init container.",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0.post3"
+  },
+  "schema": "upstream-e0-51-npu-two-rank-independent-direct-math-v1",
+  "source": {
+    "base_file_count": 2676,
+    "base_manifest_sha256": "2ee3981b6643d6ffa27c3e670bf1c0fca7500379d436874af0a761e86d3b242a",
+    "base_scheduler_sha256": "2d311ed2ee490370118100d457dfbfe4f773c7d2ba5997f180238a10a1ad4cdd",
+    "official_head": "e0cdf62c9d66f1f9ec48c6f15df87dcf4ce80a5f",
+    "per_rank_source_key_pins_after": true,
+    "scheduler_overlay_sha256": "51abc1d50805960b50c334c8f5a5b5c4a5b2a5e0d7984686bae3d2e553499fe2",
+    "sole_readonly_scheduler_overlay": true,
+    "worker_sha256": "5bea6387d6ce46bad195fd6d13d1338d6877fe489c1ac54770865250d04fb00e"
+  },
+  "status": "passed",
+  "sum_rows": {
+    "both": [
+      6,
+      6,
+      8,
+      8
+    ],
+    "micro0": [
+      3,
+      2,
+      3,
+      4
+    ],
+    "micro1": [
+      3,
+      4,
+      5,
+      4
+    ]
+  },
+  "termination": {
+    "child_exit_code": 0,
+    "closed_readback_sha256": "0b50fe294108a46c188a4f78d2d6bafa2abcb3ac28a4d3a821e68ad312164408",
+    "execute_terminal_sha256": "1dbd02153a81bb5e32847aff715049be1bd2df86cd5e9679b9cba908895086a5",
+    "gate_hashes_verified": true,
+    "rank_terminal_failed_any_case": [
+      false,
+      false
+    ]
+  }
+}
