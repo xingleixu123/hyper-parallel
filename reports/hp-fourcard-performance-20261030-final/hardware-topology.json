@@ -1,0 +1,3158 @@
+{
+  "common_library_versions": {
+    "CANN": "9.2.0",
+    "Python": "3.12.14",
+    "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+    "scope": "library fingerprint; do not equate with npu-smi/driver version",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0.post3"
+  },
+  "common_model_and_data": {
+    "checkpoint_producer_head": "33096a1030012777a5f71502dee009a7dd409bf9",
+    "data_bin_sha256": "6b925f342504c3eae80c5bde3163ff5924ad36b262bc6a276839a6f3f817ea3c",
+    "data_idx_sha256": "d535e502d62368e7a195b27a9a717543534ee1eaa9b4f9ce45f4d08d746cb5cd",
+    "global_batch_size": 4,
+    "layers": "2 Dense + 1 MoE",
+    "local_batch_size": 1,
+    "model_and_data_evidence": [
+      {
+        "local_path_from_G": "../performance-final-public-v3/public/README.md",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "paragraphs beginning 固定3层 and 数据前缀",
+        "sha256": "a0ba33ea27f2daea524e000afca46c3c57018e0ec1a8c89b23b1ac530d08bc5a",
+        "size_bytes": 9688
+      },
+      {
+        "local_path_from_G": "../replica-count-fix-v1/fullmodel-public-candidate-v1/source-info.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/baseline, /original_checkpoint_producer, /data_bin_sha256, /data_idx_sha256",
+        "sha256": "a5c704d9899e67247b464453287ef5549e3c590c9025523cd94d182e1f4c2f42",
+        "size_bytes": 1193
+      },
+      {
+        "local_path_from_G": "private-yaml-tp-perf-acceptance-v1/manifest.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/configuration, /dataset_hashes, /source; no YAML included",
+        "sha256": "17f5603c2d545dade298d305e09af5d8e4a96b93e3b33318dd2f3dfaea8892eb",
+        "size_bytes": 7398
+      }
+    ],
+    "mtp": "disabled",
+    "schedule_updates": 2500,
+    "sequence_length": 4096,
+    "source_step": 1500
+  },
+  "hosts": [
+    {
+      "all_28_distinct_device_pairs_reported_as": "HCCS",
+      "card_count": 8,
+      "card_name": "910B3",
+      "cores_per_socket": 64,
+      "cpu_architecture": "aarch64",
+      "cpu_model": "Kunpeng-920",
+      "cpu_sockets": 4,
+      "hbm_capacity_reported_per_card": "65536 MB as printed by npu-smi",
+      "host_alias": "125",
+      "link_count_lane_width_bandwidth_and_runtime_throughput": "unknown",
+      "npu_smi_cpu_affinity": {
+        "0": "192-223",
+        "1": "192-223",
+        "2": "128-159",
+        "3": "128-159",
+        "4": "0-31",
+        "5": "0-31",
+        "6": "64-95",
+        "7": "64-95"
+      },
+      "npu_smi_version_observed": "26.0.rc1.b080",
+      "numa_nodes": 8,
+      "online_cpu_count": 256,
+      "raw_inventory_reference": {
+        "local_path_from_G": "../resource-inventory-v1/125-root.stdout.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/commands entry argv [npu-smi,info,-t,topo], [npu-smi,info], [lscpu]",
+        "sha256": "6f746de156b06a0e310aa284ed0a81f46b26cac1c8bcb9a8fffdca561362b0ec",
+        "size_bytes": 258225
+      },
+      "snapshot_time_utc": "2026-10-29T12:08:26.935424+00:00"
+    },
+    {
+      "all_28_distinct_device_pairs_reported_as": "HCCS",
+      "card_count": 8,
+      "card_name": "910B3",
+      "cores_per_socket": 64,
+      "cpu_architecture": "aarch64",
+      "cpu_model": "Kunpeng-920",
+      "cpu_sockets": 4,
+      "hbm_capacity_reported_per_card": "65536 MB as printed by npu-smi",
+      "host_alias": "129",
+      "link_count_lane_width_bandwidth_and_runtime_throughput": "unknown",
+      "npu_smi_cpu_affinity": {
+        "0": "192-223",
+        "1": "192-223",
+        "2": "128-159",
+        "3": "128-159",
+        "4": "0-31",
+        "5": "0-31",
+        "6": "64-95",
+        "7": "64-95"
+      },
+      "npu_smi_version_observed": "26.0.rc1",
+      "numa_nodes": 8,
+      "online_cpu_count": 256,
+      "raw_inventory_reference": {
+        "local_path_from_G": "../resource-inventory-v1/129-root.stdout.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/commands entry argv [npu-smi,info,-t,topo], [npu-smi,info], [lscpu]",
+        "sha256": "1ee4b794ed88801fc30c13c44a338619cea82694cbd9f6d60c53338723b30456",
+        "size_bytes": 167666
+      },
+      "snapshot_time_utc": "2026-10-29T12:13:10.363000+00:00"
+    }
+  ],
+  "limits": [
+    "Hardware is a dated npu-smi/lscpu snapshot, not a claim of current resources or continuous idle.",
+    "HCCS is a reported connection class; link number, lanes, negotiated speed and achieved bandwidth remain unknown.",
+    "Mesh axis sets are derived from observed parameter coordinates; they are not traces of which collectives actually executed.",
+    "Muon assignment PG metadata only describes Muon assignment, not an alteration of the model HSDP mesh.",
+    "Local references are provenance locators only: original snapshots and target files can contain unrelated private fields and must not be published wholesale.",
+    "No individual training sample, private YAML, weights, IP addresses, or bus-ID-based bandwidth inference included."
+  ],
+  "public_existing_report": "https://github.com/xingleixu123/hyper-parallel/blob/a0050aeb15e62fb80aa14b805b96e9ebabafa2a9/docs/validation/hp-fourcard-performance-final-20261030/README.md",
+  "runs": [
+    {
+      "activation_checkpointing": "selective",
+      "config_sha256": "bf856e229e70db23eead2d9fb6a8c57caa5d7b6076627ee754ef96fb932c5839",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "129",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 2,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 1,
+          "cp_size": 2,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 2,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 1,
+          "cp_size": 2,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../cp2-sac-fixed-129-prep-v1/cp2-sac-fixed/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "78860c7a38255d363c945f5a910cc66d34eac3459c18f2fb14b6d76f95063447",
+        "size_bytes": 1567
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ],
+            "tp": [
+              [
+                0
+              ],
+              [
+                1
+              ],
+              [
+                2
+              ],
+              [
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4,
+            1
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-cp2-sac-fixed-r1",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "03ea31945303bf8dca37d319a737f1f05596474b",
+      "source_manifest_sha256": "17232e0241a749b5e02d04e4ff531aab8f4ad7f0fdba1719d16d5abb8df30116",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../cp2-sac-fixed-129-prep-v1/cp2-sac-fixed/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "a8a892d2dd82fd3ce51bdb3f105e5a4c5b2804deecf3d595f1ced2a7bb40fb84",
+          "size_bytes": 379527
+        },
+        {
+          "local_path_from_G": "../cp2-sac-fixed-129-prep-v1/cp2-sac-fixed/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "90d329518aed775d37e8b19fdd135acbc21dc4caf0db308292cb38aa6e02e751",
+          "size_bytes": 379885
+        },
+        {
+          "local_path_from_G": "../cp2-sac-fixed-129-prep-v1/cp2-sac-fixed/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "8ad97fec6f35f47f72bc322f2730e76ea446435d2786f49c1d8db8193ce51a3c",
+          "size_bytes": 380002
+        },
+        {
+          "local_path_from_G": "../cp2-sac-fixed-129-prep-v1/cp2-sac-fixed/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "2a056652e25d31f96dc5160f22ea92e9e5d8cbbe28e051c751a614536a4fca99",
+          "size_bytes": 380022
+        }
+      ],
+      "target_topology_label": "cp2-dp2",
+      "website_or_performance_groups": [
+        "g04_cp_fixed_129"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "309c99035338ae937a3f52666424a99311dc5e7e38868c7555030191e795e7c1",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "expert_actual_group_records": [
+        {
+          "edp_shard_group_rank_list": [
+            0,
+            2
+          ],
+          "ep_group_rank_list": [
+            0,
+            1
+          ],
+          "expert_mesh": {
+            "coordinate": [
+              0,
+              0
+            ],
+            "dimension_names": [
+              "edp_shard",
+              "ep"
+            ],
+            "rank_list": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "shape": [
+              2,
+              2
+            ]
+          },
+          "rank": 0
+        },
+        {
+          "edp_shard_group_rank_list": [
+            1,
+            3
+          ],
+          "ep_group_rank_list": [
+            0,
+            1
+          ],
+          "expert_mesh": {
+            "coordinate": [
+              0,
+              1
+            ],
+            "dimension_names": [
+              "edp_shard",
+              "ep"
+            ],
+            "rank_list": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "shape": [
+              2,
+              2
+            ]
+          },
+          "rank": 1
+        },
+        {
+          "edp_shard_group_rank_list": [
+            0,
+            2
+          ],
+          "ep_group_rank_list": [
+            2,
+            3
+          ],
+          "expert_mesh": {
+            "coordinate": [
+              1,
+              0
+            ],
+            "dimension_names": [
+              "edp_shard",
+              "ep"
+            ],
+            "rank_list": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "shape": [
+              2,
+              2
+            ]
+          },
+          "rank": 2
+        },
+        {
+          "edp_shard_group_rank_list": [
+            1,
+            3
+          ],
+          "ep_group_rank_list": [
+            2,
+            3
+          ],
+          "expert_mesh": {
+            "coordinate": [
+              1,
+              1
+            ],
+            "dimension_names": [
+              "edp_shard",
+              "ep"
+            ],
+            "rank_list": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "shape": [
+              2,
+              2
+            ]
+          },
+          "rank": 3
+        }
+      ],
+      "host": "129",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../ep2-isolated-repeat-129-prep-v1/ep2-full/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "29bcc617d12147c0c74a7155447fcce22a009b5ee57554b7f67c176bc60a0ff6",
+        "size_bytes": 1562
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "edp_shard": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "ep": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "edp_shard",
+            "ep"
+          ],
+          "parameter_count_per_rank": 2,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        },
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ],
+            "tp": [
+              [
+                0
+              ],
+              [
+                1
+              ],
+              [
+                2
+              ],
+              [
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "parameter_count_per_rank": 55,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4,
+            1
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-ep2-full-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../ep2-isolated-repeat-129-prep-v1/ep2-full/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "973286dd82c3cda4cd7a0892b0f602d361e42d12208a2ff76385d7cfbf5c064f",
+          "size_bytes": 380834
+        },
+        {
+          "local_path_from_G": "../ep2-isolated-repeat-129-prep-v1/ep2-full/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "2381f4153517d41237a35985a0dbd3379a35d39fc0cd03fbdf9e8dbd02ca3d31",
+          "size_bytes": 381184
+        },
+        {
+          "local_path_from_G": "../ep2-isolated-repeat-129-prep-v1/ep2-full/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "daf5cdd4a568bdef9fb2f2cdeec6c552e1ae7da583f4741613ed20d61808ccd9",
+          "size_bytes": 381301
+        },
+        {
+          "local_path_from_G": "../ep2-isolated-repeat-129-prep-v1/ep2-full/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "1c5a6af60743d79c9a89c7a080676ef71cd04594b8d680e56da14fc514fa07c7",
+          "size_bytes": 381321
+        }
+      ],
+      "target_topology_label": "ep2-dp4",
+      "website_or_performance_groups": [
+        "g05_ep2_129"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../tp2-paired-125-v2/fsdp4-full/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "3bcb9216e7dbb494dfcdc3144472a41df9d5397e635719e2912d55990062cf02",
+        "size_bytes": 1572
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-125-pair-r1",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/fsdp4-full/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "7851b13376adb398cbf9da014e2fd9d281d0ec3534388018145f234c79f776d9",
+          "size_bytes": 300031
+        },
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/fsdp4-full/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "732366dce881969cbf258717bcda5c4c7f599eeb85270a4dd74311b355d8c27a",
+          "size_bytes": 300389
+        },
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/fsdp4-full/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "e1a50521837580a34f7d0ea8f0cc290768bda8bd670feb821e3ecf00b84f5481",
+          "size_bytes": 300506
+        },
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/fsdp4-full/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "6766323a67c6ca8318f64bf730c4f3dfa815e97a9001586b286230287edd00b4",
+          "size_bytes": 300526
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g03_tp_fsdp_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../measurement-v2/fsdp4-full/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "db262b9cea9f831a72299ecd516a15206052d3a390cc6509104648126f66f6b1",
+        "size_bytes": 1568
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-full-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-full/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "762d86238ab5527d146e54ab776c6e7b75d32f90f07ec428e03c785771cdaecf",
+          "size_bytes": 300023
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-full/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "6a10ec4992140922cb66e6a7fcb14af8e6c185e889eb1adaf721fcf55b339263",
+          "size_bytes": 300381
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-full/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "a2d99927c1d5e4ef8b50c674c3d7cb330c11542c1f99b64902ee89e81e44ec75",
+          "size_bytes": 300498
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-full/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "0b71e76f10e2ba75b55cba902e2fe4090e44c4be66bb1922fc9473828c43189e",
+          "size_bytes": 300518
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g06_recompute_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "129",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../fsdp4-129-prep-v1/fsdp4-full/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "6addd1a827cb59580b9b8cbdfa65f91d197d3f672966ae3b4ac69a548fd53c27",
+        "size_bytes": 1567
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-full-v3-r1",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../fsdp4-129-prep-v1/fsdp4-full/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "06b881e1413a417d32d6493f850e7fd27dc1a28c57ba917fa9ada87166b71b2c",
+          "size_bytes": 300029
+        },
+        {
+          "local_path_from_G": "../fsdp4-129-prep-v1/fsdp4-full/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "d63cfd6299839f2db1bdc16ff33118f9ef212568aab45485fdf656dd7fe9db89",
+          "size_bytes": 300387
+        },
+        {
+          "local_path_from_G": "../fsdp4-129-prep-v1/fsdp4-full/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "375d6ea54974b83a3e8f91dbf4cecb77c2b7dad3ea05d64d43054f5f4ff0c25f",
+          "size_bytes": 300504
+        },
+        {
+          "local_path_from_G": "../fsdp4-129-prep-v1/fsdp4-full/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "fc0433d7cd5a5dd00257ad057e683370090d2be175960a3bb42ccfbc221bf2ac",
+          "size_bytes": 300524
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g02a_hsdp_fsdp_129_pair1",
+        "g05_ep2_129"
+      ]
+    },
+    {
+      "activation_checkpointing": "off",
+      "config_sha256": "d529edf8e565fc4c803377b2fff5e8a738e57e00484c114a24b71b4035d0153d",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../measurement-v2/fsdp4-off/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "ead21b38055e2525a164a7700260be2607e0c4fd9d34046bd97223b47c995316",
+        "size_bytes": 1567
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-off-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-off/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "cd95f8cdff40ff79232b998e13f903da6c36498ef461eb4b213e38cacb57f4ce",
+          "size_bytes": 300021
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-off/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "d14dc9e70f3045fe74ba9227b93db175da725cdae7d8314976cc7f400a301710",
+          "size_bytes": 300379
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-off/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "b28f0ac5a86d75ab8a08e748543742b0bcb6165f07ff28904364ea42fb586792",
+          "size_bytes": 300496
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-off/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "eded25c9792a36b59a26450686093ce65edca3086aedc74385f47ab20b8f7ce6",
+          "size_bytes": 300516
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g06_recompute_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "0d3e3504f5f4ec683f7b0c9a1450ddd3a029b2c8632a20ee170678e37a8d8da3",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "129",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../paired-repeat-129-v1/fsdp4-r2/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "1d4a541f2b77f8b0992fe1ce083bc89d374ac913053f6ca9180e824522a565e8",
+        "size_bytes": 1559
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/fsdp4-r2/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "f39eab2200bdf118b0117c8584cf67d6b4f69a59d6bc73cbfd73454c8d6d7341",
+          "size_bytes": 300013
+        },
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/fsdp4-r2/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "38472ca583df236321103b5855470a1c8bb34902c426e027179a5de17fcb8a9c",
+          "size_bytes": 300371
+        },
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/fsdp4-r2/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "d314c7e76022c289f8eb3c2ca06a9c0ecf91336a6dc5f5f5e8073042ac89d7d5",
+          "size_bytes": 300488
+        },
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/fsdp4-r2/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "86e66a08719d881f5879f3741ca200e6f98edfc8444b016f7044eb7b55e68f5b",
+          "size_bytes": 300508
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g02b_hsdp_fsdp_129_pair2",
+        "g05_ep2_129"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "85758f05aaffa9c2dca91ca42c68b6eea3695be2573d98e08c5dd109dcb854e1",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/full-raf/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "a7390a3f20e5dde7d37b42ecf4c51e716b9dd7cc4f52d2b5269fab7fcbe697e7",
+        "size_bytes": 1580
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-reverse-full-raf-r1",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/full-raf/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "49ccdf81556f37ba4921f322319df7bc2f16c469037ccd0c08b28fad91977fce",
+          "size_bytes": 300815
+        },
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/full-raf/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "8a00fe023fdcca08388c7f94627af762aa59a4adbb91b16dc149e9cef6708c80",
+          "size_bytes": 301173
+        },
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/full-raf/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "670e33ddec1b3c30e0229ae6fda86bb89e14a4afb65947366bb8c8e59a9002b8",
+          "size_bytes": 301290
+        },
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/full-raf/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "c3ae7bfbbad9072d6c9bc6ee629bfada02c282b8512d621aa8a40ceb7a8d3d5b",
+          "size_bytes": 301310
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g01_raf_reverse_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "16657e7e639f754b4310e27f224de7b9cfc43ec6ad40833459b95c6810b043e0",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/no-raf/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "a6e9650937ebc73ff4d088766f940024ba707302b52df2373823f2fb30dcf167",
+        "size_bytes": 1578
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-reverse-no-raf-r1",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/no-raf/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "90b3c9e81d249eab5c5379cdf0b50db3762a68e0a244b4b398df155afe4a9816",
+          "size_bytes": 300815
+        },
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/no-raf/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "d2a457409e1c8c2065017eae26969297bb30ca5f8e90e5bd1036e6817217314b",
+          "size_bytes": 301173
+        },
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/no-raf/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "b35ec56b81d8b36a62d356af63ce8d3de7bf4525c4e6c297ff164d2d0f47ff48",
+          "size_bytes": 301290
+        },
+        {
+          "local_path_from_G": "../fsdp4-raf-reverse-pair-125-prep-v1/no-raf/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "e8eb8b9de9d6ad46af3bf4223eee58686d9cc88aeaa84ca7518219cb5b8c9f21",
+          "size_bytes": 301310
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g01_raf_reverse_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "selective",
+      "config_sha256": "1643450890283aa811b9243d4e6d9ffee5b4b56bdae517c7cc3030b88cd0a7ea",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../measurement-v2/fsdp4-selective/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "e18d94c619bd4d298f9903c5d6894fa68308970a90e1f43cbc001d48fdc4f045",
+        "size_bytes": 1573
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-fsdp4-selective-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-selective/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "23b766eb9517800b6526c8c8358aceb24e5471dea38dbb91cfe5647f70c07820",
+          "size_bytes": 300033
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-selective/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "90a17ddb05231e52795548b305db715177581266b1c1a0c3e4f95765fa31599b",
+          "size_bytes": 300391
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-selective/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "6ecc6cb931cdebf4aa60de73c6fb5719ddad336432d9755cb4564986db49581f",
+          "size_bytes": 300508
+        },
+        {
+          "local_path_from_G": "../measurement-v2/fsdp4-selective/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "7dfc004c9397c59f102d4ebe7927939f943db1c0d69f38d0dada33165e090ace",
+          "size_bytes": 300528
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g06_recompute_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "baseline_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "9c5ae59905917bf43dce0bf04ff0537d6471f5088cbe9a5afb2cf25481bcc8bc",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "9145083ec8682489735378a8fe720a35a9a723d0c45232a3be79d5b2caa944a5",
+        "size_bytes": 761
+      },
+      "muon_assignment_pg_observations": [
+        {
+          "configured_replica_count": null,
+          "effective_replica_count": null,
+          "explicit_flag": false,
+          "owned_record_count": 16,
+          "rank": 0,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              0,
+              2
+            ]
+          ],
+          "shard_pgs": [
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "configured_replica_count": null,
+          "effective_replica_count": null,
+          "explicit_flag": false,
+          "owned_record_count": 16,
+          "rank": 1,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              1,
+              3
+            ]
+          ],
+          "shard_pgs": [
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "configured_replica_count": null,
+          "effective_replica_count": null,
+          "explicit_flag": false,
+          "owned_record_count": 12,
+          "rank": 2,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              0,
+              2
+            ]
+          ],
+          "shard_pgs": [
+            [
+              2,
+              3
+            ]
+          ]
+        },
+        {
+          "configured_replica_count": null,
+          "effective_replica_count": null,
+          "explicit_flag": false,
+          "owned_record_count": 12,
+          "rank": 3,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              1,
+              3
+            ]
+          ],
+          "shard_pgs": [
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      ],
+      "muon_observation_evidence": [
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/muon-initial-rank0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "76c19e3fb19ee4b4f51320e9c07454874927034e8890d1b85ffcc06abbc36bb0",
+          "size_bytes": 127148
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/muon-initial-rank1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "f0c7efabf1bf075aa2b07ead1dfcd5e3808a9b6e4153cf7f24fac298d6a213ee",
+          "size_bytes": 127148
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/muon-initial-rank2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "28780c492c1836cb4e4712f809a59888d00f3a3f43fc42b6a14ec22746502182",
+          "size_bytes": 127152
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/muon-initial-rank3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "428e169232c97b550942eb12c24d1603c2f0ddfe6f2f2e7946dffaa49f3640c5",
+          "size_bytes": 127152
+        }
+      ],
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_replicate": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "fsdp_shard": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_replicate",
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-hsdp-replica-default-125-r2",
+      "sole_overlay_sha256": "a3e5d62341c61309d8b7fb1261f2b4bb15022448e3430ea514ec5731c86ee265",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "f829c3146ec8981b0bc91ba87cc9f6c1cbcd3a3e04a563e7ab72a94b0ce4d4a1",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "2979f315e95251ad683b22ff4418a4c7d45ef375f0846dd6578e613103bd1010",
+          "size_bytes": 382800
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "3e9f2cd651cf196b6a0693aed1dbe8ffd87c6ca3a68dcacbcb06c11619371998",
+          "size_bytes": 383275
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "00b76c4af42f43b156ea4d616caff936c76c887c694e12514bc3a6aaeff05b13",
+          "size_bytes": 382800
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-default-125-v4-complete/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "bcc868e1b185444d8e813c0287427f8550e05bbf5073d3fe03defa296342be7f",
+          "size_bytes": 383275
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g07_hsdp_replica_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "baseline_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "config_sha256": "5ed73aafd36a973c4fa32a0f4ea54ea3c64da9e441d34a763b12df0c18f6f5ef",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "06f4a5a3ee8045e0b97f9fe1ce2ef7e24d605abd7abaed9124cc7056f5982afc",
+        "size_bytes": 757
+      },
+      "muon_assignment_pg_observations": [
+        {
+          "configured_replica_count": 1,
+          "effective_replica_count": 1,
+          "explicit_flag": true,
+          "owned_record_count": 28,
+          "rank": 0,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              0
+            ]
+          ],
+          "shard_pgs": [
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "configured_replica_count": 1,
+          "effective_replica_count": 1,
+          "explicit_flag": true,
+          "owned_record_count": 28,
+          "rank": 1,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              1
+            ]
+          ],
+          "shard_pgs": [
+            [
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "configured_replica_count": 1,
+          "effective_replica_count": 1,
+          "explicit_flag": true,
+          "owned_record_count": 28,
+          "rank": 2,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              2
+            ]
+          ],
+          "shard_pgs": [
+            [
+              2,
+              3
+            ]
+          ]
+        },
+        {
+          "configured_replica_count": 1,
+          "effective_replica_count": 1,
+          "explicit_flag": true,
+          "owned_record_count": 28,
+          "rank": 3,
+          "record_count": 28,
+          "replica_pgs": [
+            [
+              3
+            ]
+          ],
+          "shard_pgs": [
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      ],
+      "muon_observation_evidence": [
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/muon-initial-rank0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "2ec60674a60f6a839535e8c3c6b48b79730a5b080b7c5de7a4e23dc2638bcb39",
+          "size_bytes": 126480
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/muon-initial-rank1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "e1e841e75df85d277e3ee85cb4841d4946d913cdc8a56bc6c568a601d79b2c3d",
+          "size_bytes": 126480
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/muon-initial-rank2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "a9a8bd10503eb9adda1bd2b158a03a11ebc349dd88eb37a805644842b61a5c0d",
+          "size_bytes": 126480
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/muon-initial-rank3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/muon/groups/*/assignments/*/records/{replica_pgs,shard_pgs,current_owned}",
+          "sha256": "f79d0941735389c02f1efac06caa572327a0fcf6ad61046d6b47dbd99bedbf0f",
+          "size_bytes": 126480
+        }
+      ],
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_replicate": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "fsdp_shard": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_replicate",
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-hsdp-replica-one-125-r2",
+      "sole_overlay_sha256": "a3e5d62341c61309d8b7fb1261f2b4bb15022448e3430ea514ec5731c86ee265",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "f829c3146ec8981b0bc91ba87cc9f6c1cbcd3a3e04a563e7ab72a94b0ce4d4a1",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "b95486fcc0a401afa611975a1e02c6efb77dcbb75043796c2333c1ed2f9b92c8",
+          "size_bytes": 382792
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "190bf2ff4785f7c9ca069ae69810a3c1f71abf30fea29b5577ff88faf5b8ca48",
+          "size_bytes": 383267
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "f07aa6d8cc67a90e2077f4301fc099b16716fdae9213f66ad2f3234998e5108b",
+          "size_bytes": 382792
+        },
+        {
+          "local_path_from_G": "../replica-count-fix-v1/fullmodel-explicit1-125-v4-complete/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "a1e8c5cd560cbc1227d41287ee21cbde156c350c72fee364eafe2ba1b3763659",
+          "size_bytes": 383267
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g07_hsdp_replica_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "9c5ae59905917bf43dce0bf04ff0537d6471f5088cbe9a5afb2cf25481bcc8bc",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "129",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../hsdp2x2-129-prep-v1/hsdp2x2-full/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "190383dd201576009de3f3df94e48582ae875c214876bfa81a9c376c01d4329e",
+        "size_bytes": 1566
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_replicate": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "fsdp_shard": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_replicate",
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-hsdp2x2-full-r1",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../hsdp2x2-129-prep-v1/hsdp2x2-full/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "f2f47e2a0b93d7b80fbb1667e4fbf43b21daa336ab0b494d161daa570f3f4fd0",
+          "size_bytes": 382776
+        },
+        {
+          "local_path_from_G": "../hsdp2x2-129-prep-v1/hsdp2x2-full/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "564b0da5efbb5b35b2c3304fa10fbd61d30b8702b7d750b4c1143048e9f73208",
+          "size_bytes": 383251
+        },
+        {
+          "local_path_from_G": "../hsdp2x2-129-prep-v1/hsdp2x2-full/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "ceffe7ab52f5ff31c6001ee9a49c90a8bc30a4d85946be5bf6830149defb981f",
+          "size_bytes": 382776
+        },
+        {
+          "local_path_from_G": "../hsdp2x2-129-prep-v1/hsdp2x2-full/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "a9921cb09049a3411a049c3fe74b5dc781e942e0dfa5a8c802c7fdef83fd7a78",
+          "size_bytes": 383251
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g02a_hsdp_fsdp_129_pair1"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "9c5ae59905917bf43dce0bf04ff0537d6471f5088cbe9a5afb2cf25481bcc8bc",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "129",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../paired-repeat-129-v1/hsdp2x2-r2/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "15263b8b9ada64679ad15f604b7f699c568990adea1259ef4ada74333fa4ecf7",
+        "size_bytes": 1561
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_replicate": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "fsdp_shard": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_replicate",
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-hsdp2x2-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/hsdp2x2-r2/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "cfbabb6a696cc42f0585df06240a4244626f81053eb603f3ec88956ccc9d2600",
+          "size_bytes": 382766
+        },
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/hsdp2x2-r2/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "084ec24ef270a1585c8517a7a5a5295e2212dec24c4aa685c6064754d0ba537d",
+          "size_bytes": 383241
+        },
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/hsdp2x2-r2/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "c249c19081c450d14ca3a0506796a00ab4cb442432ddc40471b7c72b0466b5f6",
+          "size_bytes": 382766
+        },
+        {
+          "local_path_from_G": "../paired-repeat-129-v1/hsdp2x2-r2/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "614314f9993e0f794c22b1076a89a0ed29d6db64e309a0f56b56e68183a37f3e",
+          "size_bytes": 383241
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g02b_hsdp_fsdp_129_pair2"
+      ]
+    },
+    {
+      "activation_checkpointing": "selective",
+      "config_sha256": "1643450890283aa811b9243d4e6d9ffee5b4b56bdae517c7cc3030b88cd0a7ea",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "129",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 4,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 4,
+          "rank": 1,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 2,
+          "dp_size": 4,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 1
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 3,
+          "dp_size": 4,
+          "rank": 3,
+          "tp_rank": 0,
+          "tp_size": 1
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../sac-repeat-129-v2/fixed-selective/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "eda5118ca36ebbe8f3db55825a289bdc060bb7bba8fcff07c98250cf921a0b74",
+        "size_bytes": 1563
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            4
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-sac-fixed-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "03ea31945303bf8dca37d319a737f1f05596474b",
+      "source_manifest_sha256": "17232e0241a749b5e02d04e4ff531aab8f4ad7f0fdba1719d16d5abb8df30116",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../sac-repeat-129-v2/fixed-selective/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "492a2449aa0e93f9d8fa19a81d33f63173231fc1013a0dce58ae0f15ae202d85",
+          "size_bytes": 300021
+        },
+        {
+          "local_path_from_G": "../sac-repeat-129-v2/fixed-selective/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "d1d8191a17e030e5e74de223dd42d32d7c84fe44800d4c3bfbbe79663597f0ae",
+          "size_bytes": 300379
+        },
+        {
+          "local_path_from_G": "../sac-repeat-129-v2/fixed-selective/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "18ce378154768b3dedec9bf7a1708a45eebe7cbcf8f2cd439dd1f99de81ac97e",
+          "size_bytes": 300496
+        },
+        {
+          "local_path_from_G": "../sac-repeat-129-v2/fixed-selective/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "5ec077edcae3ff7510e7e6147293a896992ddad684ae1d605feeb4bda940080e",
+          "size_bytes": 300516
+        }
+      ],
+      "target_topology_label": "fsdp4",
+      "website_or_performance_groups": [
+        "g04_cp_fixed_129"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "30e12839938a9ea8dfc6c85558dcf807f1bad9ce9b2acfd22b86d2b566010e36",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 1,
+          "tp_rank": 1,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 3,
+          "tp_rank": 1,
+          "tp_size": 2
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "../tp2-paired-125-v2/tp2-conservative-full/run/preflight/resume5/physical-mapping-release.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "552a4bbd18b13580b40832aa4ede2430f8cd1250d22f95e5c44121e72e0ecb9e",
+        "size_bytes": 1574
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "tp": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "perf-tp2-conservative-r2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb",
+      "target_evidence": [
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/tp2-conservative-full/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "1f7fb0e5b665dc9b5c931f4a1c7eb8cb40c6c4d19fc329f807eacde190011b8f",
+          "size_bytes": 379500
+        },
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/tp2-conservative-full/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "674edac3f9dcf69c3eaaae82dff4ddb06671d89fd6ce0fb1455a02f80b833226",
+          "size_bytes": 379537
+        },
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/tp2-conservative-full/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "baf6fa3d5095a8088a90012ca3f7d05085a7dbe3ed39428bcacc94fce5f1ad6f",
+          "size_bytes": 379863
+        },
+        {
+          "local_path_from_G": "../tp2-paired-125-v2/tp2-conservative-full/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "a6d44a4cf37418c85ec3c3708c97fdb6446a12312aa0927437dfc112246aee15",
+          "size_bytes": 379900
+        }
+      ],
+      "target_topology_label": "tp2-dp2",
+      "website_or_performance_groups": [
+        "g03_tp_fsdp_125"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "acf412733e3bed399510709a6aeb9456bc7c3fd6c24ec4993e69adc1891a3481",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 1,
+          "tp_rank": 1,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 3,
+          "tp_rank": 1,
+          "tp_size": 2
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "tp-perf-acceptance-closed-v1/deferred/run/root-physical-review.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "89e7f810e791589fe595c54d86ac46d3ae73bbe5eaf94927cf26751f3f615892",
+        "size_bytes": 1760
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "tp": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "tp-nosync-accept-deferred-125-r1",
+      "sole_overlay_sha256": "51abc1d50805960b50c334c8f5a5b5c4a5b2a5e0d7984686bae3d2e553499fe2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "0f168e2ce3279cb315fc27d60d06693a17a5626a228fbf777146dda9da3e977d",
+      "target_evidence": [
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/deferred/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "2980352a4da13fa3addb99a524f982e4d4af9e2b1ba34d156c1313e507d29242",
+          "size_bytes": 379516
+        },
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/deferred/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "c5a8239b4f843c60388b92b39ffd1bddd292024e2665b12bd450c5e811d4c8c7",
+          "size_bytes": 379553
+        },
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/deferred/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "5400c05b7b768cf827af5ba85204715e4b2e0fcf311ccf8831feb4974e66dff7",
+          "size_bytes": 379879
+        },
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/deferred/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "f06789d8ef57e71bb67e6257cf0231d18fb228cd66482528e0ead5eb88b2d8b1",
+          "size_bytes": 379916
+        }
+      ],
+      "target_topology_label": "tp2-dp2",
+      "website_or_performance_groups": [
+        "new_tp_same_source_pair"
+      ]
+    },
+    {
+      "activation_checkpointing": "full",
+      "config_sha256": "d779f298fe8e335a4bd9cfec081705eb6dbf177a2a9371d14a9a30bdce5fea7b",
+      "environment_fingerprint_sha256": "e14f2704e4d568d79ef9df15546f3ed82e0613455ccb512f8c9e8c8b14b948cc",
+      "host": "125",
+      "logical_coordinates": [
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 0,
+          "tp_rank": 0,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 0,
+          "dp_size": 2,
+          "rank": 1,
+          "tp_rank": 1,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 2,
+          "tp_rank": 0,
+          "tp_size": 2
+        },
+        {
+          "cp_rank": 0,
+          "cp_size": 1,
+          "dp_rank": 1,
+          "dp_size": 2,
+          "rank": 3,
+          "tp_rank": 1,
+          "tp_size": 2
+        }
+      ],
+      "mapping_source": {
+        "local_path_from_G": "tp-perf-acceptance-closed-v1/sync/run/root-physical-review.json",
+        "publication": "reference only; do not copy raw source blindly",
+        "selector": "/physical_by_rank",
+        "sha256": "ede5a6a43810bb47fa7b8877c7b0f8c41b1410d52f076a18c0df8bdd5a20db0f",
+        "size_bytes": 1772
+      },
+      "parameter_meshes": [
+        {
+          "axis_rank_sets_inferred_from_coordinates": {
+            "fsdp_shard": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "tp": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "coordinate_by_rank": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "dimension_names": [
+            "fsdp_shard",
+            "tp"
+          ],
+          "parameter_count_per_rank": 57,
+          "rank_list": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "shape": [
+            2,
+            2
+          ]
+        }
+      ],
+      "physical_by_rank": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "run_id": "tp-nosync-perf-sync-125-r1",
+      "sole_overlay_sha256": "51abc1d50805960b50c334c8f5a5b5c4a5b2a5e0d7984686bae3d2e553499fe2",
+      "source_contract_sha256": "1fd4ac373a20f3edd8620cb0ac0593cf8f0ca5876a0d7f7227089358ef5cb633",
+      "source_head": "1a39572fef23819a2d2651b4bd53047a05a4892f",
+      "source_manifest_sha256": "0f168e2ce3279cb315fc27d60d06693a17a5626a228fbf777146dda9da3e977d",
+      "target_evidence": [
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/sync/run/target-live-rank-0.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "f172e8d88e8d11970ed45980d779cd9348d05495d2c2a0365560760c2ddc3842",
+          "size_bytes": 379504
+        },
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/sync/run/target-live-rank-1.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "6eafc7b09b20b587d350610cd6b484a68def6f9fb376864afa01f3cc83c5158f",
+          "size_bytes": 379541
+        },
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/sync/run/target-live-rank-2.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "0c91f1c8a5b202234e0e627977667fe0cc6658a9dbe77b1bbf11f6498432e76d",
+          "size_bytes": 379867
+        },
+        {
+          "local_path_from_G": "tp-perf-acceptance-closed-v1/sync/run/target-live-rank-3.json",
+          "publication": "reference only; do not copy raw source blindly",
+          "selector": "/mesh; /tensors/model_local_parameters/*/mesh; /expert_parallel if present",
+          "sha256": "da4a96e7c1ecb772d42120f3bd959ed45be9faacb3d8c447bd688c9f69a4dce3",
+          "size_bytes": 379904
+        }
+      ],
+      "target_topology_label": "tp2-dp2",
+      "website_or_performance_groups": [
+        "new_tp_same_source_pair"
+      ]
+    }
+  ],
+  "schema": "final-topology-evidence-index-max-v1",
+  "scope": "sanitized derived metadata; CPU-only local inspection; no devices or network",
+  "source_group_metadata": {
+    "local_path_from_G": "all-strategy-website-inputs-candidate-v1/groups.json",
+    "publication": "reference only; do not copy raw source blindly",
+    "selector": "/groups/*/series",
+    "sha256": "41588a6c90e22e22b8919e7ec58f7c1116eb1eaac2d6208ffb3d02f985b092db",
+    "size_bytes": 21908
+  }
+}

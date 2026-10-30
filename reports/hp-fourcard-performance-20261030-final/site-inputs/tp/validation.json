@@ -1,0 +1,62 @@
+{
+  "allocator": "2 arms x 4 ranks x 30 actual rank-step records, allocated and reserved peak in GiB",
+  "builder_sha256": "4b5873107f887b2db1ed77869ec930da06b8042a4305a0361845a1dda4e038d3",
+  "data_sha256": {
+    "data/01-fsdp-loss.jsonl": "5842358a5697642772227b391cdd43e49c50945555e6cea45ac1e670fd472dce",
+    "data/02-tp-loss.jsonl": "224d77936e1fd85e4e86f08fe5973ff6a6abed2a42cffaa6eff20a2920460325",
+    "data/03-zero-guides.jsonl": "653ac5199e98f0502b640e5de81f2e9baa04f5b934a1c92123382ec59082b17a",
+    "data/04-tp-delta.jsonl": "5ff872a092279b32db754f12ed225c1ed6c8cb436705c7b8a2a0ef5d61f405f8",
+    "data/05-tp-sync-perf.jsonl": "f5792824c931929ec0ebe32efc4ebcd850ee9592f91154002c874693776f4114",
+    "data/06-tp-deferred-perf.jsonl": "f3167562aaf3174ec8a05296832f81b8005d3d927e890134778e35a52bc319b0",
+    "data/07-tp-sync-allocator.jsonl": "1d6d1871daaa896a50c3fc877f7d4aab74baeb76f002d88e94d079754200e60a",
+    "data/08-tp-deferred-allocator.jsonl": "9b2784afb34b67b3ba67cee1a5a031280c0b3c105d1444f5cd8f61f67f6f3125",
+    "lineage.json": "10397fe54b64093059f6bf4cebafbb4c123c37132198eacd5032ea6f8d1da20a"
+  },
+  "limitations": [
+    "CPU data preparation only; no website, browser, NPU, or publication",
+    "1000-step reference differs in TP/recompute/sync policy; not single-factor causality",
+    "0.005 is a full-window absolute signed-mean condition, not a per-step line",
+    "step throughput is nominal; ratio to mean seconds differs from mean of per-step throughput",
+    "reserved can include allocator cache; warm storage not plotted"
+  ],
+  "loss_1000": {
+    "counts": {
+      "negative": 563,
+      "positive": 437,
+      "zero": 0
+    },
+    "max_abs": 0.07632064819335938,
+    "max_abs_step": 1804,
+    "nonfinite": 0,
+    "rows": 1000,
+    "signed_mean": -0.00014257359504699706,
+    "steps": [
+      1501,
+      2500
+    ]
+  },
+  "memory_audit_sha256": "2a0affbbd2d98d60b55c403e4c9a613376169f835ec5ba98012572cec99fa988",
+  "performance_30": {
+    "deferred": {
+      "mean_seconds": 1.8243707963333335,
+      "nominal_tokens_per_second_from_mean": 8980.630490758225,
+      "rows": 30,
+      "steps": [
+        1511,
+        1540
+      ]
+    },
+    "sync": {
+      "mean_seconds": 2.0174189883333336,
+      "nominal_tokens_per_second_from_mean": 8121.267864904675,
+      "rows": 30,
+      "steps": [
+        1511,
+        1540
+      ]
+    }
+  },
+  "schema": "tp-website-input-validation-v1",
+  "source_candidate_manifest_sha256": "060ffe710cfbf5129d7131d852500fbff1e74880b204addfd9f7cdb685c8af0c",
+  "status": "cpu_source_comparison_passed_not_plotted"
+}

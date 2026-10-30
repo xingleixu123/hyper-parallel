@@ -1,0 +1,70 @@
+{
+  "schema": "tp-website-local-helper-parser-preflight-v1",
+  "helper_sha256": "13d43733e714e4449234a79867286237a72f894d30cc5db110aa1bd394e3b4f1",
+  "scope": "local parser and input planning only; no browser, website worker, upload, or image rendering",
+  "groups": {
+    "loss": {
+      "files": [
+        "01-fsdp-loss.jsonl",
+        "02-tp-loss.jsonl",
+        "03-zero-guides.jsonl",
+        "04-tp-delta.jsonl"
+      ],
+      "metrics": [
+        "loss",
+        "cumulative_signed_mean",
+        "signed_delta"
+      ],
+      "points_per_series": 1000,
+      "first_step": 1501,
+      "last_step": 2500,
+      "input_mode": "original",
+      "input_reason": null,
+      "warning_count": 2,
+      "warnings": [
+        "指标「cumulative_signed_mean」有 1000 个共同步数的基准值为零，网站的相对误差对此会显示为 0，不能据此判断。",
+        "指标「signed_delta」有 1000 个共同步数的基准值为零，网站的相对误差对此会显示为 0，不能据此判断。"
+      ]
+    },
+    "performance": {
+      "files": [
+        "05-tp-sync-perf.jsonl",
+        "06-tp-deferred-perf.jsonl"
+      ],
+      "metrics": [
+        "nominal_tokens_per_second",
+        "step_seconds_max_rank"
+      ],
+      "points_per_series": 30,
+      "first_step": 1511,
+      "last_step": 1540,
+      "input_mode": "original",
+      "input_reason": null,
+      "warning_count": 0,
+      "warnings": []
+    },
+    "allocator": {
+      "files": [
+        "07-tp-sync-allocator.jsonl",
+        "08-tp-deferred-allocator.jsonl"
+      ],
+      "metrics": [
+        "peak_allocated_rank0_gib",
+        "peak_allocated_rank1_gib",
+        "peak_allocated_rank2_gib",
+        "peak_allocated_rank3_gib",
+        "peak_reserved_rank0_gib",
+        "peak_reserved_rank1_gib",
+        "peak_reserved_rank2_gib",
+        "peak_reserved_rank3_gib"
+      ],
+      "points_per_series": 30,
+      "first_step": 1511,
+      "last_step": 1540,
+      "input_mode": "original",
+      "input_reason": null,
+      "warning_count": 0,
+      "warnings": []
+    }
+  }
+}

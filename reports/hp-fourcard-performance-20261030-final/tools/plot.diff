@@ -1,0 +1,263 @@
+--- plot.base.cjs
++++ plot.cjs
+@@ -328,7 +328,7 @@
+ }
+ 
+ function readArgs(argv) {
+-  const options = { files: [], out: null, headed: true, snapshot: false, index: false, aliases: new Map(), stepRegex: null, edge: null };
++  const options = { files: [], out: null, headed: true, snapshot: false, index: false, aliases: new Map(), stepRegex: null, edge: null, xMin: null, xMax: null };
+   for (let i = 0; i < argv.length; i += 1) {
+     const arg = argv[i];
+     if (arg === '--help' || arg === '-h') options.help = true;
+@@ -336,12 +336,20 @@
+     else if (arg === '--headless') options.headed = false;
+     else if (arg === '--snapshot') options.snapshot = true;
+     else if (arg === '--index') options.index = true;
+-    else if (['--out', '--edge', '--step-regex', '--alias'].includes(arg)) {
++    else if (['--out', '--edge', '--step-regex', '--alias', '--x-min', '--x-max'].includes(arg)) {
+       if (i + 1 >= argv.length) throw new Error(arg + ' 缺少参数。');
+       const value = argv[++i];
+       if (arg === '--out') options.out = path.resolve(value);
+       else if (arg === '--edge') options.edge = value;
+       else if (arg === '--step-regex') options.stepRegex = new RegExp(value, 'i');
++      else if (arg === '--x-min' || arg === '--x-max') {
++        const property = arg === '--x-min' ? 'xMin' : 'xMax';
++        if (options[property] !== null) throw new Error(arg + ' 不可重复。');
++        if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(value) || !Number.isFinite(Number(value))) {
++          throw new Error(arg + ' 必须是有限十进制数字。');
++        }
++        options[property] = Number(value);
++      }
+       else {
+         const at = value.indexOf('=');
+         if (at <= 0 || !value.slice(at + 1).trim()) throw new Error('--alias 格式应为 原指标名=目标指标名。');
+@@ -351,6 +359,7 @@
+     else options.files.push(arg);
+   }
+   if (options.index && options.stepRegex) throw new Error('--index 和 --step-regex 不能同时使用。');
++  if (options.xMin !== null && options.xMax !== null && options.xMin >= options.xMax) throw new Error('--x-min 必须小于 --x-max。');
+   return options;
+ }
+ 
+@@ -412,9 +421,145 @@
+   }
+ }
+ 
++// These helpers use only the website's public, visibly labelled DOM controls.
++// No application state, chart object, React props or curve values are accessed.
++function inspectXRangeControls() {
++  const mins = document.querySelectorAll('input[aria-label="X 最小值"]');
++  const maxs = document.querySelectorAll('input[aria-label="X 最大值"]');
++  if (mins.length !== 1 || maxs.length !== 1) throw new Error('X 轴最小/最大输入数量异常。');
++  const min = mins[0], max = maxs[0], group = min.parentElement;
++  if (!group || group !== max.parentElement) throw new Error('X 轴输入不属于同一组。');
++  const inputs = group.querySelectorAll('input');
++  const axis = group.querySelector('span');
++  const section = group.closest('section[aria-labelledby]');
++  if (inputs.length !== 2 || inputs[0] !== min || inputs[1] !== max ||
++      min.type !== 'number' || max.type !== 'number' || !axis || axis.textContent.trim() !== 'X' ||
++      !section || section.getAttribute('aria-labelledby') !== 'regex-controls-heading') {
++    throw new Error('X 轴输入的轴标签、顺序、类型或区域异常。');
++  }
++  const describe = el => {
++    const style = getComputedStyle(el), box = el.getBoundingClientRect();
++    if (el.disabled || style.display === 'none' || style.visibility !== 'visible' ||
++        box.width <= 0 || box.height <= 0 || el.closest('[aria-hidden="true"]')) {
++      throw new Error('X 轴输入不可见或不可编辑。');
++    }
++    return { tag: el.tagName.toLowerCase(), type: el.type, aria_label: el.getAttribute('aria-label'),
++      placeholder: el.getAttribute('placeholder'), value: el.value, disabled: el.disabled,
++      width: box.width, height: box.height };
++  };
++  return { group: { tag: group.tagName.toLowerCase(), axis_text: axis.textContent.trim(),
++    number_of_inputs: inputs.length, section_aria_labelledby: section.getAttribute('aria-labelledby') },
++    min: describe(min), max: describe(max) };
++}
++
++function validateRangeForOriginalPoints(files, options) {
++  for (const file of files) for (const series of file.series.values()) for (const point of series.points) {
++    if ((options.xMin !== null && point.step < options.xMin) ||
++        (options.xMax !== null && point.step > options.xMax)) {
++      throw new Error('X 轴范围会裁去原始点；本候选要求范围包含所有原始点。');
++    }
++  }
++}
++
++async function applyXRange(page, options, output) {
++  if (options.xMin === null && options.xMax === null) return null;
++  const before = await page.evaluate(inspectXRangeControls);
++  for (const [label, value] of [['X 最小值', options.xMin], ['X 最大值', options.xMax]]) {
++    if (value === null) continue;
++    const locator = page.getByRole('spinbutton', { name: label, exact: true });
++    if (await locator.count() !== 1) throw new Error('X 轴输入数量异常：' + label);
++    await locator.fill(String(value));
++    await locator.press('Tab');
++    await page.waitForFunction(({ label, value }) => {
++      const input = document.querySelectorAll('input[aria-label="' + label + '"]');
++      return input.length === 1 && input[0].value !== '' && Number(input[0].value) === value;
++    }, { label, value }, { timeout: 10000 });
++  }
++  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
++  const after = await page.evaluate(inspectXRangeControls);
++  for (const [name, value] of [['min', options.xMin], ['max', options.xMax]]) {
++    if (value !== null && (after[name].value === '' || Number(after[name].value) !== value)) {
++      throw new Error('X 轴输入未保留指定值：' + name);
++    }
++    if (value === null && after[name].value !== before[name].value) {
++      throw new Error('未指定的 X 轴输入意外变化：' + name);
++    }
++  }
++  if (after.min.value !== '' && after.max.value !== '' && Number(after.min.value) >= Number(after.max.value)) {
++    throw new Error('X 轴输入区间无效。');
++  }
++  const receipt = { schema: 'website-x-range-controls-v1', source: 'website-public-dom-inputs',
++    requested: { min: options.xMin, max: options.xMax }, before, after };
++  await fsp.writeFile(path.join(output, 'x-range-controls.json'), JSON.stringify(receipt, null, 2) + '\n', { flag: 'wx' });
++  return receipt;
++}
++
++function findWebsiteChartCard(button) {
++  const card = button.closest('section.chart-panel');
++  if (!card) throw new Error('导出按钮不在网站 chart-panel 内。');
++  for (let parent = button.parentElement; parent && parent !== card; parent = parent.parentElement) {
++    if (parent.querySelectorAll('canvas').length === 1 && parent.querySelectorAll('h3').length === 1 &&
++        parent.querySelectorAll('button[title="导出"]').length === 1) {
++      throw new Error('发现比 chart-panel 更近的完整图表容器，需人工审核。');
++    }
++  }
++  const canvases = card.querySelectorAll('canvas');
++  const headings = card.querySelectorAll('h3');
++  const buttons = card.querySelectorAll('button[title="导出"]');
++  const label = card.getAttribute('aria-labelledby');
++  const color = getComputedStyle(card).backgroundColor;
++  const opacity = getComputedStyle(card).opacity;
++  if (canvases.length !== 1 || headings.length !== 1 || buttons.length !== 1 || buttons[0] !== button ||
++      !label || headings[0].id !== label || !headings[0].textContent.trim() ||
++      canvases[0].closest('section.chart-panel') !== card ||
++      !['rgb(255, 255, 255)', 'rgba(255, 255, 255, 1)'].includes(color) || Number(opacity) !== 1) {
++    throw new Error('图表卡片的画布、标题、导出按钮或白底不满足合同。');
++  }
++  return card;
++}
++
++function describeWebsiteChartCard(card) {
++  const heading = card.querySelector('h3');
++  const style = getComputedStyle(card);
++  return { tag: card.tagName.toLowerCase(), class_name: card.className,
++    title: heading.textContent.trim(), title_id: heading.id, aria_labelledby: card.getAttribute('aria-labelledby'),
++    canvas_count: card.querySelectorAll('canvas').length,
++    export_button_count: card.querySelectorAll('button[title="导出"]').length,
++    background_color: style.backgroundColor, opacity: style.opacity };
++}
++
++async function screenshotWebsiteCards(page, buttons, exports, output) {
++  if (await page.locator('canvas').count() !== exports.length) throw new Error('网站画布数量与导出数不符。');
++  const dir = path.join(output, 'white-card-charts');
++  await fsp.mkdir(dir);
++  const images = [], seen = new Set(), titles = new Set();
++  for (let i = 0; i < exports.length; i += 1) {
++    const native = exports[i];
++    if (!native || seen.has(native.stem)) throw new Error('网站原生导出与卡片映射不唯一。');
++    seen.add(native.stem);
++    const handle = await buttons.nth(i).evaluateHandle(findWebsiteChartCard);
++    const card = handle.asElement();
++    if (!card) throw new Error('未取得网站真实图表卡片。');
++    try {
++      const description = await card.evaluate(describeWebsiteChartCard);
++      if (titles.has(description.title_id)) throw new Error('图表卡片标题 ID 不唯一。');
++      titles.add(description.title_id);
++      const filename = native.stem + '.png';
++      await card.screenshot({ path: path.join(dir, filename), animations: 'disabled' });
++      images.push({ file: 'white-card-charts/' + filename, source: 'website-card-screenshot',
++        native_download: false, native_png: 'charts/' + native.stem + '.png',
++        native_csv: 'website-csv/' + native.stem + '.csv', card: description });
++    } finally { await handle.dispose(); }
++  }
++  await fsp.writeFile(path.join(output, 'white-card-charts.json'),
++    JSON.stringify({ schema: 'website-card-screenshots-v1', images }, null, 2) + '\n', { flag: 'wx' });
++  return images.length;
++}
++
+ async function render(files, metrics, output, options, onReady) {
+   const { chromium } = getPlaywright();
+   const plan = await planWebsiteInput(files, metrics, options);
++  validateRangeForOriginalPoints(files, options);
+   let snapshot;
+   const resources = new Map();
+   if (options.snapshot) {
+@@ -488,6 +633,8 @@
+     await page.waitForFunction(expected => document.querySelectorAll('canvas').length >= expected, expectedCharts, { timeout: 90000 });
+     if (errors.length) throw new Error('网站运行错误：' + errors.join('; '));
+     await verifyWebsiteWorker(page, worker.url(), plan, files, metrics);
++    const xRangeReceipt = await applyXRange(page, options, output);
++    let whiteCardCount = 0;
+ 
+     if (!options.headed) {
+     const chartDir = path.join(output, 'charts');
+@@ -498,7 +645,9 @@
+     const count = await buttons.count();
+     if (count !== expectedCharts) throw new Error('网站图表数与预期不符：' + count + ' / ' + expectedCharts);
+ 
++    const exportedCharts = [];
+     for (let i = 0; i < count; i += 1) {
++      let exportedChart = null;
+       for (const format of ['PNG', 'CSV 表格']) {
+         await buttons.nth(i).click();
+         const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
+@@ -509,6 +658,12 @@
+         const metric = metrics[Number(match[2])];
+         const stem = String(Number(match[2]) + 1).padStart(2, '0') + '_' + metric.slug +
+           (match[1] ? '_difference' : '');
++        if (format === 'PNG') {
++          if (match[3].toLowerCase() !== 'png') throw new Error('网站 PNG 导出类型异常。');
++          exportedChart = { stem };
++        } else if (match[3].toLowerCase() !== 'csv' || !exportedChart || exportedChart.stem !== stem) {
++          throw new Error('网站 PNG/CSV 与图表映射不一致。');
++        }
+         const destination = path.join(match[3].toLowerCase() === 'png' ? chartDir : tableDir, stem + '.' + match[3].toLowerCase());
+         await download.saveAs(destination);
+         if (match[3].toLowerCase() === 'csv') {
+@@ -517,11 +672,19 @@
+           else checkCsv(text, metric.key, files);
+         }
+       }
++      exportedCharts.push(exportedChart);
+     }
+     await page.getByTitle('导出报告', { exact: true }).click();
+     const reportPromise = page.waitForEvent('download', { timeout: 30000 });
+     await page.getByRole('menuitem', { name: '下载为 PNG', exact: true }).click();
+     await (await reportPromise).saveAs(path.join(output, 'website-report.png'));
++    whiteCardCount = await screenshotWebsiteCards(page, buttons, exportedCharts, output);
++    if (xRangeReceipt) {
++      const finalControls = await page.evaluate(inspectXRangeControls);
++      if (finalControls.min.value !== xRangeReceipt.after.min.value || finalControls.max.value !== xRangeReceipt.after.max.value) {
++        throw new Error('导出后 X 轴输入已变化。');
++      }
++    }
+     if (errors.length) throw new Error('网站运行错误：' + errors.join('; '));
+     }
+     if (options.headed) {
+@@ -541,6 +704,8 @@
+       website: response.url(),
+       site_mode: options.snapshot ? 'snapshot' : 'online',
+       input_mode: plan.mode,
++      ...(xRangeReceipt ? { x_range_controls: 'x-range-controls.json' } : {}),
++      ...(!options.headed ? { website_card_screenshots: 'white-card-charts.json', white_card_count: whiteCardCount } : {}),
+       step_keyword: plan.config.stepKeyword,
+       matching_rules: plan.config.metrics.map(metric => ({ name: metric.name, mode: metric.mode, keyword: metric.keyword })),
+       ...(plan.reason ? { input_reason: plan.reason } : {}),
+@@ -563,7 +728,7 @@
+   console.log([
+     '训练日志绘图助手：打开 log.javazero.top 在线网页，在隔离的 Microsoft Edge 会话中绘图',
+     '用法：node plot.cjs [--out 空目录] [--view|--headless] 文件1.log [文件2.log ...]',
+-    '      [--step-regex 正则] [--alias 原名=目标名] [--index] [--edge 路径]',
++    '      [--step-regex 正则] [--alias 原名=目标名] [--index] [--edge 路径] [--x-min 数值] [--x-max 数值]',
+     '默认保留可交互浏览器窗口；--headless 不打开窗口；--index 使用各指标的观测序号为 X。',
+     '默认查找同一行中的 step / global_step / iteration，保留每个数值指标的原始名称。',
+   ].join('\n'));
+@@ -628,4 +793,4 @@
+ }
+ 
+ if (require.main === module) main().catch(error => { console.error('绘图失败：' + error.message); process.exitCode = 1; });
+-module.exports = { fieldsInLine, stepsInLine, parseFile, verifySharedSteps, category, readArgs, planWebsiteInput };
++module.exports = { fieldsInLine, stepsInLine, parseFile, verifySharedSteps, category, readArgs, planWebsiteInput, inspectXRangeControls, validateRangeForOriginalPoints, applyXRange, findWebsiteChartCard, describeWebsiteChartCard, screenshotWebsiteCards };

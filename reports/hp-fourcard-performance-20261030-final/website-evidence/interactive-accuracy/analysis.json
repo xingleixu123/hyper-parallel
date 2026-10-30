@@ -1,0 +1,115 @@
+{
+  "status": "complete",
+  "website": "https://log.javazero.top/",
+  "x_kind": "recorded_step",
+  "metrics": [
+    {
+      "key": "loss | 1a/1a+51 | gbs4 lbs1 s4096",
+      "label": "LOSS | 1a/1a+51 | GBS4 LBS1 S4096"
+    },
+    {
+      "key": "signed loss tp-fsdp | +437/-563",
+      "label": "Signed LOSS TP-FSDP | +437/-563"
+    },
+    {
+      "key": "mean(tp-fsdp) -> -0.000142574",
+      "label": "Mean(TP-FSDP) -> -0.000142574"
+    }
+  ],
+  "files": [
+    {
+      "source": "D:\\Obsidian Vault D\\hyperllal\\HP-4Card-Perf-PR310-20261029\\grad-sync-fix-v1\\tp-perf-website-inputs-candidate-v1\\data\\01-fsdp-loss.jsonl",
+      "website_label": "01_01-fsdp-loss_jsonl.log",
+      "sha256": "5842358a5697642772227b391cdd43e49c50945555e6cea45ac1e670fd472dce",
+      "series": {
+        "loss | 1a/1a+51 | gbs4 lbs1 s4096": {
+          "count": 1000,
+          "first_step": 1501,
+          "last_step": 2500
+        }
+      },
+      "nonfinite": [],
+      "ignored_unstepped_fields": 0
+    },
+    {
+      "source": "D:\\Obsidian Vault D\\hyperllal\\HP-4Card-Perf-PR310-20261029\\grad-sync-fix-v1\\tp-perf-website-inputs-candidate-v1\\data\\02-tp-loss.jsonl",
+      "website_label": "02_02-tp-loss_jsonl.log",
+      "sha256": "224d77936e1fd85e4e86f08fe5973ff6a6abed2a42cffaa6eff20a2920460325",
+      "series": {
+        "loss | 1a/1a+51 | gbs4 lbs1 s4096": {
+          "count": 1000,
+          "first_step": 1501,
+          "last_step": 2500
+        }
+      },
+      "nonfinite": [],
+      "ignored_unstepped_fields": 0
+    },
+    {
+      "source": "D:\\Obsidian Vault D\\hyperllal\\HP-4Card-Perf-PR310-20261029\\grad-sync-fix-v1\\tp-perf-website-inputs-candidate-v1\\data\\03-zero-guides.jsonl",
+      "website_label": "03_03-zero-guides_jsonl.log",
+      "sha256": "653ac5199e98f0502b640e5de81f2e9baa04f5b934a1c92123382ec59082b17a",
+      "series": {
+        "signed loss tp-fsdp | +437/-563": {
+          "count": 1000,
+          "first_step": 1501,
+          "last_step": 2500
+        },
+        "mean(tp-fsdp) -> -0.000142574": {
+          "count": 1000,
+          "first_step": 1501,
+          "last_step": 2500
+        }
+      },
+      "nonfinite": [],
+      "ignored_unstepped_fields": 0
+    },
+    {
+      "source": "D:\\Obsidian Vault D\\hyperllal\\HP-4Card-Perf-PR310-20261029\\grad-sync-fix-v1\\tp-perf-website-inputs-candidate-v1\\data\\04-tp-delta.jsonl",
+      "website_label": "04_04-tp-delta_jsonl.log",
+      "sha256": "5ff872a092279b32db754f12ed225c1ed6c8cb436705c7b8a2a0ef5d61f405f8",
+      "series": {
+        "signed loss tp-fsdp | +437/-563": {
+          "count": 1000,
+          "first_step": 1501,
+          "last_step": 2500
+        },
+        "mean(tp-fsdp) -> -0.000142574": {
+          "count": 1000,
+          "first_step": 1501,
+          "last_step": 2500
+        }
+      },
+      "nonfinite": [],
+      "ignored_unstepped_fields": 0
+    }
+  ],
+  "warnings": [
+    "指标「signed loss tp-fsdp | +437/-563」有 1000 个共同步数的基准值为零，网站的相对误差对此会显示为 0，不能据此判断。",
+    "指标「mean(tp-fsdp) -> -0.000142574」有 1000 个共同步数的基准值为零，网站的相对误差对此会显示为 0，不能据此判断。"
+  ],
+  "render": {
+    "website": "https://log.javazero.top/",
+    "site_mode": "online",
+    "input_mode": "original",
+    "x_range_controls": "x-range-controls.json",
+    "step_keyword": "step",
+    "matching_rules": [
+      {
+        "name": "LOSS | 1a/1a+51 | GBS4 LBS1 S4096",
+        "mode": "keyword",
+        "keyword": "loss\":"
+      },
+      {
+        "name": "Signed LOSS TP-FSDP | +437/-563",
+        "mode": "keyword",
+        "keyword": "signed_delta\":"
+      },
+      {
+        "name": "Mean(TP-FSDP) -> -0.000142574",
+        "mode": "keyword",
+        "keyword": "cumulative_signed_mean\":"
+      }
+    ]
+  }
+}

@@ -1,0 +1,628 @@
+{
+  "views": [
+    {
+      "view": "tp-accuracy",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 6,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "LOSS | 1a/1a+51 | GBS4 LBS1 S4096",
+            "mode": "keyword",
+            "keyword": "loss\":"
+          },
+          {
+            "name": "Signed LOSS TP-FSDP | +437/-563",
+            "mode": "keyword",
+            "keyword": "signed_delta\":"
+          },
+          {
+            "name": "Mean(TP-FSDP) -> -0.000142574",
+            "mode": "keyword",
+            "keyword": "cumulative_signed_mean\":"
+          }
+        ]
+      },
+      "points": 6000,
+      "analysis_sha256": "0e7016b2d31d8bbf67c28ba5334447518d26f65b3f98d1cf712588f3691481d2",
+      "x_range": [
+        1501,
+        2500
+      ]
+    },
+    {
+      "view": "tp-timing",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 4,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "名义吞吐 (tokens per s) - GBS4 S4096",
+            "mode": "keyword",
+            "keyword": "nominal_tokens_per_second\":"
+          },
+          {
+            "name": "优化步耗时 (s) - TP2DP2 1a+51 - GBS4 S4096",
+            "mode": "keyword",
+            "keyword": "step_seconds_max_rank\":"
+          }
+        ]
+      },
+      "points": 120,
+      "analysis_sha256": "e328de7478856513b72d85052193b1f63441144583fb06862bca7c0d43d65aa8",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "tp-allocator",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 16,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "Allocated GiB | rank0 card4",
+            "mode": "keyword",
+            "keyword": "peak_allocated_rank0_gib\":"
+          },
+          {
+            "name": "Allocated GiB | rank1 card5",
+            "mode": "keyword",
+            "keyword": "peak_allocated_rank1_gib\":"
+          },
+          {
+            "name": "Allocated GiB | rank2 card6",
+            "mode": "keyword",
+            "keyword": "peak_allocated_rank2_gib\":"
+          },
+          {
+            "name": "Allocated GiB | rank3 card7",
+            "mode": "keyword",
+            "keyword": "peak_allocated_rank3_gib\":"
+          },
+          {
+            "name": "Reserved GiB | rank0 card4",
+            "mode": "keyword",
+            "keyword": "peak_reserved_rank0_gib\":"
+          },
+          {
+            "name": "Reserved GiB | rank1 card5",
+            "mode": "keyword",
+            "keyword": "peak_reserved_rank1_gib\":"
+          },
+          {
+            "name": "Reserved GiB | rank2 card6",
+            "mode": "keyword",
+            "keyword": "peak_reserved_rank2_gib\":"
+          },
+          {
+            "name": "Reserved GiB | rank3 card7",
+            "mode": "keyword",
+            "keyword": "peak_reserved_rank3_gib\":"
+          }
+        ]
+      },
+      "points": 480,
+      "analysis_sha256": "5a3aeabdaeb1bc77ad49779fa4a5b1dc2a427ec7e429ab9c16d4a977dcb05c5b",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g01_raf_reverse_125",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 4,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "FSDP RAF | 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g01_raf_reverse_125_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "FSDP RAF | 125 | s/step",
+            "mode": "keyword",
+            "keyword": "g01_raf_reverse_125_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 120,
+      "analysis_sha256": "2774e50446486406534239ab9fffcd0878061285f36a0aa69e12d8121e2a6be9",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g02a_hsdp_fsdp_129_pair1",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 4,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "HSDP/FSDP | 129 pair1 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g02a_hsdp_fsdp_129_pair1_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "HSDP/FSDP | 129 pair1 | s/step",
+            "mode": "keyword",
+            "keyword": "g02a_hsdp_fsdp_129_pair1_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 120,
+      "analysis_sha256": "7df1a787bb314078c1aaa7d49c460fb5197609859cb15a7e3ad308b52629cc26",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g02b_hsdp_fsdp_129_pair2",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 4,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "HSDP/FSDP | 129 pair2 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g02b_hsdp_fsdp_129_pair2_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "HSDP/FSDP | 129 pair2 | s/step",
+            "mode": "keyword",
+            "keyword": "g02b_hsdp_fsdp_129_pair2_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 120,
+      "analysis_sha256": "7a4eb7354314845f374dd19ab6b57397cc694fa21ec2f87e954110fe3916f7ff",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g03_tp_fsdp_125",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 4,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "TP2/FSDP4 | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g03_tp_fsdp_125_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "TP2/FSDP4 | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "g03_tp_fsdp_125_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 120,
+      "analysis_sha256": "a0d8c6bdab8cec0af924c057f40d1667cdef48a21f620ff386fe135d81102d84",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g04_cp_fixed_129",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 4,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "cp2 | fixed SAC | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g04_cp_fixed_129_cp2_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "fsdp4 reference | fixed SAC | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g04_cp_fixed_129_fsdp4_reference_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "cp2 | fixed SAC | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "g04_cp_fixed_129_cp2_max_rank_step_seconds\":"
+          },
+          {
+            "name": "fsdp4 reference | fixed SAC | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "g04_cp_fixed_129_fsdp4_reference_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 120,
+      "analysis_sha256": "4e0e9f8f1b43fd7aff6931b15987f304377e8bf376a567207cb1e6ad2f5dcbcf",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g05_ep2_129",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 6,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "ep2 retest | EP2 references | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g05_ep2_129_ep2_retest_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "fsdp reference1 | EP2 references | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g05_ep2_129_fsdp_reference1_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "fsdp reference2 | EP2 references | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g05_ep2_129_fsdp_reference2_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "ep2 retest | EP2 references | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "g05_ep2_129_ep2_retest_max_rank_step_seconds\":"
+          },
+          {
+            "name": "fsdp reference1 | EP2 references | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "g05_ep2_129_fsdp_reference1_max_rank_step_seconds\":"
+          },
+          {
+            "name": "fsdp reference2 | EP2 references | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "g05_ep2_129_fsdp_reference2_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 180,
+      "analysis_sha256": "0035e7da619394e81450a3969eeeea9a4c441e8826a20e9d80717d2163a2f9d3",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g06_recompute_125",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 6,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "full | AC policy | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g06_recompute_125_full_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "off | AC policy | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g06_recompute_125_off_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "selective | AC policy | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g06_recompute_125_selective_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "full | AC policy | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "g06_recompute_125_full_max_rank_step_seconds\":"
+          },
+          {
+            "name": "off | AC policy | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "g06_recompute_125_off_max_rank_step_seconds\":"
+          },
+          {
+            "name": "selective | AC policy | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "g06_recompute_125_selective_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 180,
+      "analysis_sha256": "d7a26305c033a976cf176985ae83e047e60cdb7f6598a062366a3e1b63398bd5",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "g07_hsdp_replica_125",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "website_card_screenshots": "white-card-charts.json",
+        "white_card_count": 4,
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "HSDP default/count1 | 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "g07_hsdp_replica_125_nominal_tokens_per_second\":"
+          },
+          {
+            "name": "HSDP default/count1 | 125 | s/step",
+            "mode": "keyword",
+            "keyword": "g07_hsdp_replica_125_max_rank_step_seconds\":"
+          }
+        ]
+      },
+      "points": 120,
+      "analysis_sha256": "8ba55311a9664cc01f9d57c26aa0ad6149a09437f72ed59491a76047dac0868f",
+      "x_range": [
+        1511,
+        1540
+      ]
+    },
+    {
+      "view": "interactive-accuracy",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "original",
+        "x_range_controls": "x-range-controls.json",
+        "step_keyword": "step",
+        "matching_rules": [
+          {
+            "name": "LOSS | 1a/1a+51 | GBS4 LBS1 S4096",
+            "mode": "keyword",
+            "keyword": "loss\":"
+          },
+          {
+            "name": "Signed LOSS TP-FSDP | +437/-563",
+            "mode": "keyword",
+            "keyword": "signed_delta\":"
+          },
+          {
+            "name": "Mean(TP-FSDP) -> -0.000142574",
+            "mode": "keyword",
+            "keyword": "cumulative_signed_mean\":"
+          }
+        ]
+      },
+      "points": 6000,
+      "analysis_sha256": "d003989990b0003e257de04209639f4fda8730a8b279be4cebe61d8a0e7ae42a",
+      "x_range": [
+        1501,
+        2500
+      ]
+    },
+    {
+      "view": "interactive-performance",
+      "status": "complete",
+      "render": {
+        "website": "https://log.javazero.top/",
+        "site_mode": "online",
+        "input_mode": "normalized",
+        "x_range_controls": "x-range-controls.json",
+        "step_keyword": "__codex_step__:",
+        "matching_rules": [
+          {
+            "name": "cp2 | fixed SAC | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_0__:"
+          },
+          {
+            "name": "ep2 retest | EP2 references | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_1__:"
+          },
+          {
+            "name": "FSDP RAF | 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_2__:"
+          },
+          {
+            "name": "fsdp reference1 | EP2 references | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_3__:"
+          },
+          {
+            "name": "fsdp reference2 | EP2 references | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_4__:"
+          },
+          {
+            "name": "fsdp4 reference | fixed SAC | 129 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_5__:"
+          },
+          {
+            "name": "full | AC policy | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_6__:"
+          },
+          {
+            "name": "HSDP default/count1 | 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_7__:"
+          },
+          {
+            "name": "HSDP/FSDP | 129 pair1 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_8__:"
+          },
+          {
+            "name": "HSDP/FSDP | 129 pair2 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_9__:"
+          },
+          {
+            "name": "off | AC policy | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_10__:"
+          },
+          {
+            "name": "selective | AC policy | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_11__:"
+          },
+          {
+            "name": "TP sync/deferred | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_12__:"
+          },
+          {
+            "name": "TP2/FSDP4 | 1a 125 | nominal token/s",
+            "mode": "keyword",
+            "keyword": "__codex_metric_13__:"
+          },
+          {
+            "name": "cp2 | fixed SAC | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_14__:"
+          },
+          {
+            "name": "ep2 retest | EP2 references | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_15__:"
+          },
+          {
+            "name": "FSDP RAF | 125 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_16__:"
+          },
+          {
+            "name": "fsdp reference1 | EP2 references | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_17__:"
+          },
+          {
+            "name": "fsdp reference2 | EP2 references | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_18__:"
+          },
+          {
+            "name": "fsdp4 reference | fixed SAC | 129 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_19__:"
+          },
+          {
+            "name": "full | AC policy | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_20__:"
+          },
+          {
+            "name": "HSDP default/count1 | 125 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_21__:"
+          },
+          {
+            "name": "HSDP/FSDP | 129 pair1 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_22__:"
+          },
+          {
+            "name": "HSDP/FSDP | 129 pair2 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_23__:"
+          },
+          {
+            "name": "off | AC policy | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_24__:"
+          },
+          {
+            "name": "selective | AC policy | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_25__:"
+          },
+          {
+            "name": "TP sync/deferred | 1a+51 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_26__:"
+          },
+          {
+            "name": "TP2/FSDP4 | 1a 125 | s/step",
+            "mode": "keyword",
+            "keyword": "__codex_metric_27__:"
+          }
+        ],
+        "input_reason": "网站关键词无法准确匹配指标「TP sync/deferred | nominal token/s」"
+      },
+      "points": 1200,
+      "analysis_sha256": "ddfe31dce87f8c5efef8ca8a537d3896181c572b765a5a3465e174082e6bce11",
+      "x_range": [
+        1511,
+        1540
+      ]
+    }
+  ],
+  "site": "https://log.javazero.top/",
+  "sharing": "ordinary URL does not reproduce data; rerun saved commands or use open isolated Edge pages",
+  "native_exports": "Original native PNG/CSV and full reports retained locally. Public preview PNGs are white website-card screenshots, not redrawn curves.",
+  "limitations": "Zero-baseline relative errors and the mean of cumulative means are not acceptance metrics."
+}
