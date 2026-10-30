@@ -1,0 +1,209 @@
+{
+  "_evidence_package_extraction": {
+    "omitted": "Embedded base64, stdout, and stderr were removed; the corresponding output/log files are retained separately.",
+    "source_receipt_sha256": "bfe07523cfc88564b9c44e6a0574312eb507fdeff165cdfc35f974a02387d5d8"
+  },
+  "argv": [
+    "docker",
+    "run",
+    "--rm",
+    "--name",
+    "hp-tp-nosync-cpu-green-false-r1",
+    "--cidfile",
+    "/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/runs/green-false-r1/cpu.cid",
+    "--read-only",
+    "--network",
+    "none",
+    "--cpus",
+    "4",
+    "--memory",
+    "8g",
+    "--shm-size",
+    "1g",
+    "--tmpfs",
+    "/tmp:rw,nosuid,nodev,size=1g",
+    "--label",
+    "codex.task=hp-tp-nosync-fix-cpu-v1",
+    "--label",
+    "codex.run=green-false-r1",
+    "--mount",
+    "type=bind,src=/home/xxl/hp-mf-cann92-pr310-20261028/runtime/python3.12.14,dst=/usr/local/python3.12.14,readonly",
+    "--mount",
+    "type=bind,src=/home/xxl/hp-mf-cann92-pr310-20261028/envs/hp-pta212-hf521-cpu,dst=/work/envs/hp-pta212,readonly",
+    "--mount",
+    "type=bind,src=/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/upstream,dst=/work/sources/hyper-parallel,readonly",
+    "--mount",
+    "type=bind,src=/home/xxl/hp-mf-cann92-pr301-20261027/runtime/cann920,dst=/work/runtime/cann920,readonly",
+    "--mount",
+    "type=bind,src=/usr/local/Ascend/driver,dst=/usr/local/Ascend/driver,readonly",
+    "--mount",
+    "type=bind,src=/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/diagnostic/green,dst=/work/diagnostic,readonly",
+    "--mount",
+    "type=bind,src=/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/runs/green-false-r1/output,dst=/work/output",
+    "--mount",
+    "type=bind,src=/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/patched_scheduler.py,dst=/work/sources/hyper-parallel/hyper_parallel/core/fully_shard/hsdp_scheduler.py,readonly",
+    "--entrypoint",
+    "/usr/bin/env",
+    "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "-i",
+    "HOME=/tmp",
+    "TMPDIR=/tmp",
+    "GLOO_SOCKET_IFNAME=lo",
+    "HYPER_PARALLEL_PLATFORM=torch",
+    "HYPER_PARALLEL_TEST_DEVICE_TYPE=cpu",
+    "HP_TEST_SOURCE_ROOT=/work/sources/hyper-parallel",
+    "PYTHONPATH=/work/sources/hyper-parallel",
+    "TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+    "PYTHONDONTWRITEBYTECODE=1",
+    "OMP_NUM_THREADS=1",
+    "MKL_NUM_THREADS=1",
+    "PATH=/work/envs/hp-pta212/bin:/usr/local/python3.12.14/bin:/usr/bin:/bin",
+    "LD_LIBRARY_PATH=/usr/local/python3.12.14/lib",
+    "bash",
+    "--noprofile",
+    "--norc",
+    "-c",
+    "source /work/runtime/cann920/cann/set_env.sh && exec /work/envs/hp-pta212/bin/python -B -m torch.distributed.run --nnodes=1 --master-addr=127.0.0.1 --master-port=62580 --nproc-per-node=2 --no-python /work/envs/hp-pta212/bin/python -B /work/diagnostic/cpu_gloo_mesh_fusion.py --mesh-shape 2 --comm-fusion false --output-dir /work/output"
+  ],
+  "arm": "green",
+  "child_exit_code": 0,
+  "container_id": "b5403114a73ffe1005c9bfcd3c26c4d849567d121e9a98c058447d22900d0c77",
+  "container_removed": true,
+  "elapsed": 32.94113039970398,
+  "files": {
+    "rank-0-both_false.json": {
+      "sha256": "acaa646fac9b388036a133779035edd6c1970afb043c0a8c808c5944f814a7f5",
+      "size": 8796
+    },
+    "rank-0-both_true.json": {
+      "sha256": "fbbebd6b34fd817d5fb3f053bba260e14be07afab37486aa09af8e292360288c",
+      "size": 8329
+    },
+    "rank-0-micro0_only_false.json": {
+      "sha256": "80f00eefaa2d0ba68b464b20a6c82bf6c23f63a33f648d1b6c6eebe383323daf",
+      "size": 8805
+    },
+    "rank-0-micro0_only_true.json": {
+      "sha256": "19d212c428b9547b058b5eff8b1e82565d5b5ef103dd7a6809e69612492ffdf8",
+      "size": 8338
+    },
+    "rank-1-both_false.json": {
+      "sha256": "4682f980d2c4f714e3e503da856faabca9f8ccaa940d1c8de96670ae11fde632",
+      "size": 8796
+    },
+    "rank-1-both_true.json": {
+      "sha256": "931c73aa0325c0d47d398e0aa176a7b3ed4dfc8b85f16e3c71abdd2888002f18",
+      "size": 8329
+    },
+    "rank-1-micro0_only_false.json": {
+      "sha256": "34d1ba71c7abaa6fa93b5205069111241a945754b7887f56b6553029dfa30b39",
+      "size": 8805
+    },
+    "rank-1-micro0_only_true.json": {
+      "sha256": "f8e196ca5664e7d85a8c9801a2393dd3c482c37204bbf097d6acb04be7f753fb",
+      "size": 8338
+    }
+  },
+  "fusion": "false",
+  "inspect_during": {
+    "device_cgroup_rules": null,
+    "device_requests": null,
+    "devices": [],
+    "id": "b5403114a73ffe1005c9bfcd3c26c4d849567d121e9a98c058447d22900d0c77",
+    "image": "sha256:5f9e677f439d11ab4e7c888f54b142335a27eee7411cbd2ce894a4798a70146d",
+    "mounts": [
+      {
+        "Destination": "/work/diagnostic",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": false,
+        "Source": "/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/diagnostic/green",
+        "Type": "bind"
+      },
+      {
+        "Destination": "/work/output",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": true,
+        "Source": "/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/runs/green-false-r1/output",
+        "Type": "bind"
+      },
+      {
+        "Destination": "/work/sources/hyper-parallel/hyper_parallel/core/fully_shard/hsdp_scheduler.py",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": false,
+        "Source": "/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/patched_scheduler.py",
+        "Type": "bind"
+      },
+      {
+        "Destination": "/usr/local/python3.12.14",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": false,
+        "Source": "/home/xxl/hp-mf-cann92-pr310-20261028/runtime/python3.12.14",
+        "Type": "bind"
+      },
+      {
+        "Destination": "/work/envs/hp-pta212",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": false,
+        "Source": "/home/xxl/hp-mf-cann92-pr310-20261028/envs/hp-pta212-hf521-cpu",
+        "Type": "bind"
+      },
+      {
+        "Destination": "/work/sources/hyper-parallel",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": false,
+        "Source": "/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/upstream",
+        "Type": "bind"
+      },
+      {
+        "Destination": "/work/runtime/cann920",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": false,
+        "Source": "/home/xxl/hp-mf-cann92-pr301-20261027/runtime/cann920",
+        "Type": "bind"
+      },
+      {
+        "Destination": "/usr/local/Ascend/driver",
+        "Mode": "",
+        "Propagation": "rprivate",
+        "RW": false,
+        "Source": "/usr/local/Ascend/driver",
+        "Type": "bind"
+      }
+    ],
+    "network_mode": "none",
+    "privileged": false
+  },
+  "inspect_error": null,
+  "pins": {
+    "arm": "green",
+    "diagnostic_pins_sha256": "bbb0bf02c073985b590e173a56f006041cea3002dbade05c426b34f7b4b227cc",
+    "fusion": "false",
+    "head": "5cde7c54ce3da8be8689d0783cf9b70d5306117a",
+    "manifest_sha256": "a06da217316eff5f307898e8822c6f98b21ac7e1117a5b326e38b60876460df6",
+    "original_sha256": "2d311ed2ee490370118100d457dfbfe4f773c7d2ba5997f180238a10a1ad4cdd",
+    "patch_sha256": "51abc1d50805960b50c334c8f5a5b5c4a5b2a5e0d7984686bae3d2e553499fe2",
+    "run_id": "green-false-r1",
+    "worker_sha256": "14e249a3565d17232d68384200abc00121f69f53f7802f818cf031466520e8e2"
+  },
+  "remote_run": "/home/xxl/hp-mf-cann92-pr310-20261028/runtime/tp-nosync-fix-cpu-v1/runs/green-false-r1",
+  "run_id": "green-false-r1",
+  "schema": "grad-sync-cpu-run-v1",
+  "source_after": {
+    "files": 2659,
+    "manifest_sha256": "a06da217316eff5f307898e8822c6f98b21ac7e1117a5b326e38b60876460df6",
+    "scheduler_sha256": "2d311ed2ee490370118100d457dfbfe4f773c7d2ba5997f180238a10a1ad4cdd"
+  },
+  "source_before": {
+    "files": 2659,
+    "manifest_sha256": "a06da217316eff5f307898e8822c6f98b21ac7e1117a5b326e38b60876460df6",
+    "scheduler_sha256": "2d311ed2ee490370118100d457dfbfe4f773c7d2ba5997f180238a10a1ad4cdd"
+  },
+  "timed_out": false
+}

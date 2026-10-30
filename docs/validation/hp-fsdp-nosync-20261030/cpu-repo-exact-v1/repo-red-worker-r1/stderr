@@ -1,0 +1,44 @@
+[W1030 04:38:53.044078570 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1030 04:38:57.738589080 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1030 04:38:57.758563170 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+W1030 04:38:59.028000 1 torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 44 closing signal SIGTERM
+E1030 04:38:59.061000 1 torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 0 (pid: 43) of binary: /work/envs/hp-pta212/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+pytest FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-30_04:38:59
+  host      : 39745d4f080a
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 44) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-30_04:38:59
+  host      : 39745d4f080a
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 43) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
