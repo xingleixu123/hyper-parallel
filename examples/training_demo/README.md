@@ -225,3 +225,6 @@ default also restores the optimizer and training state; add
 restore only weights. Append `--accelerator.ep_size=8` for expert parallelism, and
 `--model.config.num_nextn_predict_layers=0` to train without MTP like the
 MindFormers 29B reference.
+
+For the pinned three-layer single-NPU and four-NPU FSDP/CP/EP/selective-checkpoint recipes, see the
+[Chinese step-by-step reproduction guide](xing40/README.md).
