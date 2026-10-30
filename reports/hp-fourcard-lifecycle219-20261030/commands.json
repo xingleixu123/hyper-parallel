@@ -1,0 +1,52 @@
+{
+  "accuracy": {
+    "argv": [
+      "node",
+      "tools/plot.cjs",
+      "--headless",
+      "--x-min",
+      "1501",
+      "--x-max",
+      "2500",
+      "--out",
+      "<NEW_EMPTY_OUTPUT_DIRECTORY>",
+      "--alias",
+      "loss=LOSS | FSDP4-SAC(1a) / TP2-full(1a+219) | GBS4 LBS1 S4096",
+      "--alias",
+      "signed_delta=Signed LOSS TP-FSDP | +417/-582 | 1a+219",
+      "--alias",
+      "cumulative_signed_mean=Mean(TP-FSDP) = -0.000133451 | n=1000",
+      "site-inputs/data/01-fsdp-loss.jsonl",
+      "site-inputs/data/02-219-deferred-loss.jsonl",
+      "site-inputs/data/03-zero-guides.jsonl",
+      "site-inputs/data/04-219-deferred-delta.jsonl"
+    ],
+    "online": true
+  },
+  "performance": {
+    "argv": [
+      "node",
+      "tools/plot.cjs",
+      "--headless",
+      "--x-min",
+      "1511",
+      "--x-max",
+      "1540",
+      "--out",
+      "<NEW_EMPTY_OUTPUT_DIRECTORY>",
+      "--alias",
+      "step_seconds_max_rank=Step s (max4rank) | TP2-DP2 1a+219 GBS4 LBS1 S4096",
+      "--alias",
+      "peak_allocated_gib_max_rank=Peak allocated GiB (max4rank) | TP2-DP2 1a+219 GBS4",
+      "--alias",
+      "peak_reserved_gib_max_rank=Peak reserved GiB (max4rank) | TP2-DP2 1a+219 GBS4",
+      "site-inputs/data/05-219-sync-seconds.jsonl",
+      "site-inputs/data/06-219-deferred-seconds.jsonl",
+      "site-inputs/data/07-219-sync-peak-allocated.jsonl",
+      "site-inputs/data/08-219-deferred-peak-allocated.jsonl",
+      "site-inputs/data/09-219-sync-peak-reserved.jsonl",
+      "site-inputs/data/10-219-deferred-peak-reserved.jsonl"
+    ],
+    "online": true
+  }
+}

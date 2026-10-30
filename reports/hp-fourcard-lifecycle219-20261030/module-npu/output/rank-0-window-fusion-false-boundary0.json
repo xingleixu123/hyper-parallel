@@ -1,0 +1,131 @@
+{
+  "arm": "green",
+  "failures": [],
+  "fusion": false,
+  "last_micro": {
+    "expected": {
+      "common.weight": {
+        "equal_exact": true,
+        "expected_local_fp32": [
+          [
+            9.0,
+            9.0,
+            9.0,
+            9.0
+          ],
+          [
+            12.0,
+            12.0,
+            12.0,
+            12.0
+          ]
+        ]
+      },
+      "early.weight": {
+        "equal_exact": true,
+        "expected_local_fp32": [
+          [
+            3.0,
+            3.0,
+            3.0,
+            3.0
+          ],
+          [
+            2.0,
+            2.0,
+            2.0,
+            2.0
+          ]
+        ]
+      }
+    },
+    "input": [
+      [
+        1.0,
+        3.0,
+        3.0,
+        2.0
+      ]
+    ],
+    "loss": 20.625,
+    "micro": 2,
+    "observation": {
+      "common.weight": {
+        "fqn": "common.weight",
+        "main_grad": {
+          "dtype": "torch.float32",
+          "values": [
+            [
+              9.0,
+              9.0,
+              9.0,
+              9.0
+            ],
+            [
+              12.0,
+              12.0,
+              12.0,
+              12.0
+            ]
+          ]
+        },
+        "module": "common",
+        "pending_group_buckets": [],
+        "pending_reduce_partial": null,
+        "pending_unsharded": null
+      },
+      "early.weight": {
+        "fqn": "early.weight",
+        "main_grad": {
+          "dtype": "torch.float32",
+          "values": [
+            [
+              3.0,
+              3.0,
+              3.0,
+              3.0
+            ],
+            [
+              2.0,
+              2.0,
+              2.0,
+              2.0
+            ]
+          ]
+        },
+        "module": "early",
+        "pending_group_buckets": [],
+        "pending_reduce_partial": null,
+        "pending_unsharded": null
+      }
+    },
+    "tree_boundary": {
+      "root_bp_state": false,
+      "scheduler_states": {
+        "common": null,
+        "early": null,
+        "root": null
+      }
+    },
+    "use_early": false,
+    "window": 0
+  },
+  "rank": 0,
+  "run_id": "hp-pr1369-module-tree-125-green-v1",
+  "schema": "npu-hccl-window-boundary-v1",
+  "source_pins": {
+    "hyper_parallel/__init__.py": "cebadb2808b1809d3e97e83a8858cc792107bd962cea7665d7b906d81e8d8d4b",
+    "hyper_parallel/components/optim/mixed_precision_optimizer.py": "5dce5f65c1f7a3fa6873c6ee25398d16d4f36b535f29056cd1e535b784e61400",
+    "hyper_parallel/core/dtensor/device_mesh.py": "d36229a78ca50f193f0afc565da37e85f0cc2db7f477991a96e13177db20cf5d",
+    "hyper_parallel/core/fully_shard/api.py": "7d8eada67c9de039200380b32bd8392df28c9b819e8afff903839331d9a92280",
+    "hyper_parallel/core/fully_shard/hook_function.py": "34485ca58ac013603029fddf594d5f566ced469ff893f0517a4be7763974fb87",
+    "hyper_parallel/core/fully_shard/hsdp_param.py": "a59c0f3d82e2c44bf03447a70c26387732e91f7f8cbacd039effa5734b011aff",
+    "hyper_parallel/core/fully_shard/hsdp_scheduler.py": "219ce9346d528948dbe0755b50a261db025c87d1a6f207b893c22b8e9de0524d",
+    "hyper_parallel/core/fully_shard/hsdp_state.py": "1a0d222887990c622e3b3859364551a2f5a15b639cfbf6d1358e3add9b89ebf2",
+    "hyper_parallel/core/fully_shard/hsdp_utils.py": "d75122dea756fa141ad7ae67ff16e991ca0f9d19b1cda84b41d1cc30349c2491",
+    "hyper_parallel/core/fully_shard/param_group.py": "a939929814a787eac4b639c66ec03bc61761a4a3d16d4f122065f942c13955f0",
+    "hyper_parallel/core/fully_shard/utils.py": "455f7544c15ca018689e870d0c8d04d5decf418405470bd066123b506ab74833",
+    "hyper_parallel/core/optimizer/optimizer.py": "9e24e38e602e929ef8cc3a214710602452aa99abb2f94980a26afa29d7bf63c6"
+  },
+  "status": "passed"
+}

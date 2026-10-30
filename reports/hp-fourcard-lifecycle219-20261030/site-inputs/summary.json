@@ -1,0 +1,53 @@
+{
+  "builder_sha256": "24491cd758ec7c000069b03b3ac02664990b79dde5fe1849928023a939eb3da2",
+  "limitations": [
+    "FSDP reference and TP deferred differ in source, topology, recompute, and execution time.",
+    "Max rank local synchronized duration is not global makespan; 16384 tokens are nominal.",
+    "Peak allocator reserved is not physical HBM, activation, fragmentation, or leakage.",
+    "Zero guides are synthetic; zero-baseline website relative differences are not an acceptance test.",
+    "This builder does not replace the full-model restore and accuracy acceptance analysis."
+  ],
+  "loss_window": {
+    "absolute_signed_mean": 0.00013345050811767577,
+    "first_step": 1501,
+    "last_step": 2500,
+    "n": 1000,
+    "negative": 582,
+    "positive": 417,
+    "signed_mean_tp_minus_fsdp": -0.00013345050811767577,
+    "threshold_full_window_only": 0.005,
+    "within_full_window_threshold": true,
+    "zero": 1
+  },
+  "measured_window": {
+    "by_arm": {
+      "deferred": {
+        "max_seconds": 2.07240547,
+        "mean_seconds": 1.826096111666667,
+        "min_seconds": 1.8137341100000002,
+        "n": 30,
+        "nominal_tokens_per_second_from_mean": 8972.14549405421,
+        "population_std_seconds": 0.04577228415401042
+      },
+      "sync": {
+        "max_seconds": 2.33594792,
+        "mean_seconds": 2.0252030403333334,
+        "min_seconds": 2.0092206200000002,
+        "n": 30,
+        "nominal_tokens_per_second_from_mean": 8090.053033548337,
+        "population_std_seconds": 0.05776016914195674
+      }
+    },
+    "first_step": 1511,
+    "last_step": 1540
+  },
+  "mtp_loss": "N/A",
+  "run_ids": {
+    "deferred": "tp-lifecycle-219-accept-deferred-125-r1",
+    "sync": "tp-lifecycle-219-perf-sync-125-r1"
+  },
+  "scheduler_sha256": "219ce9346d528948dbe0755b50a261db025c87d1a6f207b893c22b8e9de0524d",
+  "schema": "tp-lifecycle-219-website-summary-v1",
+  "source_manifest_sha256": "a5ac2084985dd2c3c4ad5c774e07cbf3984a7269879f892410a122191045ebfe",
+  "status": "source_verified_not_plotted"
+}
