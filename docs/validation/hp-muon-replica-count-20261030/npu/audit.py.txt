@@ -1,0 +1,291 @@
+"""Read-only independent audit of the gated Muon candidate's JSON/NPY evidence."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+import numpy as np
+
+SHAPES = {'expert_a': (4, 16, 32), 'expert_b': (4, 16, 32),
+          'matrix_a': (16, 32), 'matrix_b': (16, 32)}
+NAMES = tuple(SHAPES)
+OPTIONS = {'lr': 1e-5, 'weight_decay': 0.1, 'matched_adamw_rms': 0.2,
+           'momentum': [0.95, 0.95], 'nesterov': True, 'ns_steps': 5,
+           'ns_variant': 'legacy', 'ns_epsilon': 1e-8, 'ns_epsilon_mode': 'clamp',
+           'ns_input_dtype': 'float32', 'ns_compute_dtype': 'bfloat16'}
+BASE = 'b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb'
+PATCH = 'a3e5d62341c61309d8b7fb1261f2b4bb15022448e3430ea514ec5731c86ee265'
+
+
+def checked_array(root, descriptor):
+    path = (root / descriptor['file']).resolve(strict=True)
+    if not path.is_relative_to(root):
+        raise ValueError('array outside evidence root')
+    a = np.load(path, allow_pickle=False)
+    if (a.dtype != np.float32 or list(a.shape) != descriptor['shape']
+            or descriptor['dtype'] != 'float32' or not np.isfinite(a).all()):
+        raise AssertionError('invalid array ' + str(path))
+    sha = hashlib.sha256(np.ascontiguousarray(a).tobytes()).hexdigest()
+    if sha != descriptor['sha256']:
+        raise AssertionError('array SHA mismatch ' + str(path))
+    return a
+
+
+def non_decay_metrics(previous, actual):
+    # Deliberately recompute with nextafter rather than the worker's spacing.
+    coefficient = np.float32(1.0 - 1e-5 * 0.1)
+    prediction = np.multiply(previous, coefficient, dtype=np.float32)
+    scale = np.maximum(np.abs(previous), np.abs(prediction))
+    ulp = (np.nextafter(scale, np.float32(np.inf)).astype(np.float64)
+           - scale.astype(np.float64))
+    residual = actual.astype(np.float64) - prediction.astype(np.float64)
+    magnitude = np.abs(residual)
+    return {'coefficient_fp32': float(coefficient), 'threshold_ulps': 4,
+            'over_threshold_elements': int(np.count_nonzero(magnitude > 4.0 * ulp)),
+            'max_residual_ulps': float(np.max(magnitude / ulp)),
+            'residual_l2': float(np.linalg.norm(residual.ravel())),
+            'max_abs_residual': float(np.max(magnitude))}
+
+
+def check_non_decay(previous, actual):
+    metrics = non_decay_metrics(previous, actual)
+    if metrics['over_threshold_elements'] <= 0:
+        raise AssertionError('no non-decay parameter update beyond 4 FP32 ULP: ' + repr(metrics))
+    return metrics
+
+
+def check_delta(ref, cur, ref_prev, cur_prev, ref_m, cur_m):
+    dr = ref.astype(np.float64) - ref_prev.astype(np.float64)
+    dc = cur.astype(np.float64) - cur_prev.astype(np.float64)
+    norm = float(np.linalg.norm(dr.ravel()))
+    cur_norm = float(np.linalg.norm(dc.ravel()))
+    error = float(np.linalg.norm((dr-dc).ravel()))
+    max_change = float(np.max(np.abs(dr)))
+    significant = np.abs(dr) >= max(1e-8, .05 * max_change)
+    missing = int(np.count_nonzero(significant & (np.abs(dc) < .05*np.abs(dr))))
+    max_momentum_error = float(np.max(np.abs(ref_m.astype(np.float64)-cur_m.astype(np.float64))))
+    row = {'delta_ref_l2': norm, 'delta_actual_l2': cur_norm,
+           'delta_error_l2': error, 'relative_delta_error': error/norm if norm else None,
+           'delta_ref_max_abs': max_change, 'significant_missing': missing,
+           'momentum_max_abs_error': max_momentum_error}
+    if norm <= 0 or cur_norm <= 0 or error/norm > .02 or missing:
+        raise AssertionError('nonzero update parity failure: ' + repr(row))
+    if not np.allclose(ref_m, cur_m, rtol=1e-5, atol=1e-7):
+        raise AssertionError('momentum parity failure: ' + repr(row))
+    return row
+
+
+def audit(root, phase):
+    root = Path(root).resolve(strict=True)
+    total = sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+    if total >= 64 * 1024 * 1024:
+        raise AssertionError('evidence size exceeds 64 MiB')
+    docs = [json.loads((root / ('rank-%d.json' % rank)).read_text(encoding='utf-8'))
+            for rank in range(4)]
+    release_raw = (root / 'device-release.json').read_bytes()
+    release = json.loads(release_raw)
+    release_sha = hashlib.sha256(release_raw).hexdigest()
+    worker_sha = hashlib.sha256(Path(__file__).with_name('worker.py').read_bytes()).hexdigest()
+    if (release.get('kind') != 'root-verified-physical-device-map'
+            or release.get('run_id') != 'muon-replica-count-npu-v2-' + phase
+            or release.get('worker_sha256') != worker_sha
+            or release.get('source_manifest_sha256') != BASE or release.get('overlay_sha256') != PATCH):
+        raise AssertionError('root release identity mismatch')
+    mapping = release.get('mapping', [])
+    if (len(mapping) != 4 or {x.get('rank') for x in mapping} != set(range(4))
+            or len({x.get('physical_card') for x in mapping}) != 4
+            or any(type(x.get('physical_card')) is not int or x['physical_card'] < 0 for x in mapping)):
+        raise AssertionError('root release physical mapping invalid')
+    ready_files = [json.loads((root / ('device-ready-rank-%d.json' % rank)).read_text(encoding='utf-8'))
+                   for rank in range(4)]
+    for rank, ready in enumerate(ready_files):
+        if (ready != docs[rank].get('device_ready') or ready.get('rank') != rank
+                or ready.get('local_rank') != rank or ready.get('current_device') != rank
+                or ready.get('worker_sha256') != worker_sha or ready.get('cid') != release.get('cid')
+                or ready.get('source_manifest_sha256') != BASE or ready.get('overlay_sha256') != PATCH
+                or ready.get('run_id') != release.get('run_id') or ready.get('phase') != phase
+                or docs[rank].get('device_release_sha256') != release_sha):
+            raise AssertionError('ready/release identity mismatch for rank %d' % rank)
+        attested = [w for w in release.get('workers', []) if w.get('rank') == rank]
+        if len(attested) != 1 or any(attested[0].get(k) != ready.get(k)
+                                     for k in ('pid', 'starttick', 'pid_namespace')):
+            raise AssertionError('release worker identity mismatch for rank %d' % rank)
+    cases = [('default', None), ('explicit1', 1), ('explicit2', 2)] if phase == 'control' else [
+        ('default', None), ('selfresume', None), ('resume_explicit1', 1)]
+    hashes = None
+    max_relative_delta, max_momentum_error, checked = 0.0, 0.0, 0
+    min_non_decay_ulps, total_non_decay_elements = float('inf'), 0
+    all_owners = {}
+    for rank, doc in enumerate(docs):
+        if (doc['rank'] != rank or doc['phase'] != phase or doc['status'] != 'complete'
+                or doc['pass'] is not True or doc['stage'] != 'complete'
+                or doc['source_manifest'] != BASE or doc['overlay'] != PATCH
+                or doc['source_files_verified'] != 2661):
+            raise AssertionError('rank did not complete: %d' % rank)
+        initial = {n: checked_array(root, doc['inputs']['initial'][n]) for n in NAMES}
+        gradients = [{n: checked_array(root, row[n]) for n in NAMES} for row in doc['inputs']['gradient']]
+        if (len(gradients) != 10 or any(tuple(initial[n].shape) != SHAPES[n] for n in NAMES)
+                or any(tuple(row[n].shape) != SHAPES[n] for row in gradients for n in NAMES)):
+            raise AssertionError('unexpected input shapes')
+        local_hashes = {'initial': {n: doc['inputs']['initial'][n]['sha256'] for n in NAMES},
+                        'gradients': [{n: row[n]['sha256'] for n in NAMES} for row in doc['inputs']['gradient']]}
+        if hashes is None:
+            hashes = local_hashes
+        elif hashes != local_hashes:
+            raise AssertionError('input array hashes differ between ranks')
+        owner_lists = {}
+        for case, count in cases:
+            item = doc['cases'][case]
+            if item['requested_count'] != count or item['effective_count'] != count:
+                raise AssertionError('effective replica setting')
+            if item['initial_pre_wrap'] != hashes['initial']:
+                raise AssertionError('actual pre-wrap hash mismatch')
+            if (not item['effective_options'] or any(g != OPTIONS for g in item['effective_options'])
+                    or not item['fp32_model_and_master_same_objects']):
+                raise AssertionError('runtime Muon settings or FP32 master mismatch')
+            owners = set()
+            records_seen = set()
+            for group in item['assignments']:
+                for rec in group['records']:
+                    n = rec['name']
+                    if n in records_seen or n not in NAMES:
+                        raise AssertionError('duplicate/missing assignment')
+                    records_seen.add(n)
+                    if group['is_shard'] != n.startswith('matrix_'):
+                        raise AssertionError('NS classification mismatch')
+                    if rec['owned_here']:
+                        owners.add(n)
+                expected_repl = [rank] if count == 1 else [rank % 2, rank % 2 + 2]
+                expected_shard = [2 * (rank // 2), 2 * (rank // 2) + 1]
+                if group['replicate_pgs'] != [expected_repl] or group['shard_pgs'] != [expected_shard]:
+                    raise AssertionError('unexpected assignment process group: ' + repr(group))
+            if records_seen != set(NAMES) or (count == 1 and owners != set(NAMES)):
+                raise AssertionError('incomplete owners/records')
+            owner_lists[case] = sorted(owners)
+            for n in NAMES:
+                layout = item['layouts'][n]
+                if (layout['initial_sha256'] != hashes['initial'][n]
+                        or layout['replicate_pg'] != [rank % 2, rank % 2 + 2]
+                        or layout['shard_pg'] != [2 * (rank // 2), 2 * (rank // 2) + 1]):
+                    raise AssertionError('initial layout or PG mismatch')
+            steps = item['steps']
+            wanted_steps = list(range(1, 11)) if case in ('default','explicit1','explicit2') else list(range(5, 11))
+            if [s['step'] for s in steps] != wanted_steps:
+                raise AssertionError('missing steps')
+            steps_by_number = {step['step']: step for step in steps}
+            for step in steps:
+                k = step['step']
+                if not step['group_steps_lr'] or any(g != {'step': k, 'lr': 1e-5} for g in step['group_steps_lr']):
+                    raise AssertionError('group step/lr mismatch')
+                for n in NAMES:
+                    for key in ('param', 'momentum'):
+                        arr = checked_array(root, step['values'][n][key])
+                        if tuple(arr.shape) != SHAPES[n]:
+                            raise AssertionError('wrong logical tensor shape')
+                        checked += 1
+                    exists = bool(step['state_before_sync'][n]['exists'])
+                    if case in ('selfresume', 'resume_explicit1') and k == 5:
+                        raw = step['raw_restored_state'][n]
+                        if raw['exists'] != exists or (n in owners and not exists):
+                            raise AssertionError('restored raw owner state missing')
+                        if exists:
+                            raw_array = checked_array(root, raw['value'])
+                            ref_full = checked_array(root, doc['cases']['default']['steps'][4]['values'][n]['momentum'])
+                            if not np.array_equal(raw_array, np.array_split(ref_full, 2, axis=0)[rank % 2]):
+                                raise AssertionError('raw restored state differs before any broadcast')
+                    elif exists != (n in owners):
+                        raise AssertionError('momentum owner mismatch')
+                if case in ('selfresume', 'resume_explicit1') and k == 5:
+                    continue
+                for n in NAMES:
+                    previous = initial[n] if k == 1 else checked_array(
+                        root, steps_by_number[k-1]['values'][n]['param'])
+                    actual = checked_array(root, step['values'][n]['param'])
+                    metrics = check_non_decay(previous, actual)
+                    recorded = step['non_decay'][n]
+                    if (recorded['coefficient_fp32'] != metrics['coefficient_fp32']
+                            or recorded['threshold_ulps'] != 4
+                            or recorded['over_threshold_elements'] != metrics['over_threshold_elements']
+                            or not np.isclose(recorded['max_residual_ulps'], metrics['max_residual_ulps'], rtol=1e-12)
+                            or not np.isclose(recorded['residual_l2'], metrics['residual_l2'], rtol=1e-12)
+                            or not np.isclose(recorded['max_abs_residual'], metrics['max_abs_residual'], rtol=1e-12)):
+                        raise AssertionError('worker/non-decay audit disagreement')
+                    min_non_decay_ulps = min(min_non_decay_ulps, metrics['max_residual_ulps'])
+                    total_non_decay_elements += metrics['over_threshold_elements']
+                calls = step['update_callbacks']
+                if ({c['name'] for c in calls} != owners or len(calls) != len(owners)
+                        or any(c['step'] != k or c['lr'] != 1e-5 for c in calls)):
+                    raise AssertionError('actual optimizer callback coverage')
+                for n in NAMES:
+                    grad = step['gradient_hashes'][n]
+                    if grad['full_sha256'] != hashes['gradients'][k-1][n]:
+                        raise AssertionError('actual full gradient mismatch')
+                    local = np.ascontiguousarray(np.array_split(gradients[k-1][n], 2, axis=0)[rank % 2])
+                    if grad['local_sha256'] != hashlib.sha256(local.tobytes()).hexdigest():
+                        raise AssertionError('actual local gradient mismatch')
+                original_replica = {tuple(layout['replicate_pg']) for layout in item['layouts'].values()}
+                assignment_replica = {tuple(pg) for a in item['assignments']
+                                      for pg in a['replicate_pgs'] if pg is not None}
+                shard_pgs = {tuple(pg) for a in item['assignments']
+                             for pg in a['shard_pgs'] if pg is not None}
+                replica_groups = (original_replica | assignment_replica) - shard_pgs
+                events = [e for e in step['broadcasts'] if e['stage'] == 'optimizer_step'
+                          and tuple(e['group']) in replica_groups]
+                if (count == 1 and events) or (count != 1 and not events):
+                    raise AssertionError('replica broadcast call mismatch')
+        all_owners[rank] = owner_lists
+        reference = {s['step']: s for s in doc['cases']['default']['steps']}
+        for case, _ in cases[1:]:
+            comparison = {s['step']: s for s in doc['cases'][case]['steps']}
+            start = 1 if phase == 'control' else 6
+            if phase == 'dcp':
+                for n in NAMES:
+                    for key in ('param', 'momentum'):
+                        a = checked_array(root, reference[5]['values'][n][key])
+                        b = checked_array(root, comparison[5]['values'][n][key])
+                        if not np.array_equal(a, b):
+                            raise AssertionError('native DCP did not exactly restore step 5')
+            for n in NAMES:
+                prev_ref = initial[n] if start == 1 else checked_array(root, reference[5]['values'][n]['param'])
+                prev_cur = initial[n] if start == 1 else checked_array(root, comparison[5]['values'][n]['param'])
+                for k in range(start, 11):
+                    ref = checked_array(root, reference[k]['values'][n]['param'])
+                    cur = checked_array(root, comparison[k]['values'][n]['param'])
+                    rm = checked_array(root, reference[k]['values'][n]['momentum'])
+                    cm = checked_array(root, comparison[k]['values'][n]['momentum'])
+                    m = check_delta(ref, cur, prev_ref, prev_cur, rm, cm)
+                    max_relative_delta = max(max_relative_delta, m['relative_delta_error'])
+                    max_momentum_error = max(max_momentum_error, m['momentum_max_abs_error'])
+                    prev_ref, prev_cur = ref, cur
+    # Each parameter has one owner per logical shard in a size-2 replicate group.
+    for case, count in cases:
+        for shard in (0, 1):
+            pair = (shard, shard+2)
+            for n in NAMES:
+                occurrences = sum(n in all_owners[r][case] for r in pair)
+                if occurrences != (2 if count == 1 else 1):
+                    raise AssertionError('global owner coverage mismatch')
+    return {'phase': phase, 'status': 'PASS', 'ranks': 4, 'np_arrays_checked': checked,
+            'output_bytes': total, 'max_relative_delta_error': max_relative_delta,
+            'max_momentum_abs_error': max_momentum_error, 'owners': all_owners,
+            'min_param_step_max_non_decay_ulps': min_non_decay_ulps,
+            'total_non_decay_over_4ulp_elements': total_non_decay_elements,
+            'scope': 'four-rank toy module; does not validate formal model, training or native1500'}
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('phase', choices=['control', 'dcp'])
+    ap.add_argument('evidence_dir')
+    args = ap.parse_args()
+    try:
+        report = audit(args.evidence_dir, args.phase)
+        print(json.dumps(report, indent=2, sort_keys=True, allow_nan=False))
+    except Exception as exc:
+        print(json.dumps({'phase': args.phase, 'status': 'FAIL', 'error': repr(exc)}, indent=2))
+        raise
+
+
+if __name__ == '__main__':
+    main()

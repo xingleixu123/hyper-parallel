@@ -1,0 +1,22 @@
+# v2 独立复审：数值门限、shape 与 PG 映射
+
+只读审计对象：[worker.py](worker.py) SHA-256 `b8403f7a9492c6510db36d7e7fe37c0affefbb40ab7eab2cfc151adec5e2721b`；[audit.py](audit.py) SHA-256 `8811f77a929e21f6ffefba0c7dbe03ef0fed3888a4744bad38a23bce8ef86d9b`。未修改 v1、v2 代码或旧证据；未运行 NPU、HCCL 或 DCP。
+
+## 结论
+
+对候选固定的递增 2×2 mesh，v2 的 singleton 禁播集合、四类张量的形状/分片、以及大于 4 ULP 的非纯衰减检查，在已审代码中没有发现阻断性问题。数值检查是有明确边界的诊断，不是 NS 数学 oracle，也不覆盖任意非递增 mesh。真实 NPU 上该阈值是否能稳定区分舍入和有效信号仍未验证。
+
+## PG 和 shape
+
+`mesh=[[0,1],[2,3]]` 且维度为 `(replicate, shard)` 时，各 rank 的原始 replica PG 为 `[0,2]`、`[1,3]`、`[0,2]`、`[1,3]`，shard PG 为 `[0,1]`、`[0,1]`、`[2,3]`、`[2,3]`；count=1 的 assignment PG 分别为 `[0]`、`[1]`、`[2]`、`[3]`。代码将原 replica 和 assignment replica 合并后减去 shard 组，在本固定拓扑上准确地覆盖两个 count=1 禁播集合，同时不把 shard relay 当 replica 广播。用 Python `-B` 在内存中枚举 4 rank × `None/1/2` 验证了这些集合关系；这是映射验证，不是通信实测。
+
+`expert_a/b` 的逻辑形状为 `(4,16,32)`、`matrix_a/b` 为 `(16,32)`；均沿 axis 0 分两份，对应的本地形状分别为 `(2,16,32)` 和 `(8,32)`。在上述 rank 排列上，`rank % 2` 选取 shard 切片正确。audit 验证输入和每步逻辑数组形状；worker 检查 placement 与实际梯度本地、逻辑内容。自恢复阶段第 6 步以前一步第 5 步的实际恢复值作为差分起点。
+
+## 非衰减阈值
+
+worker 用 `float32(1 - 1e-5 * 0.1)` 和前一步 FP32 数组计算纯衰减预测，要求每个参数每一步至少一个元素的偏差**严格大于** `4 × spacing(max(abs(previous), abs(prediction)))`。audit 从持久化数组重算，使用 `nextafter` 替代 `spacing`，并核对计数与指标。对本固定 FP32 量级，内存检查确认两种方法的 0、1、2、3、4 ULP 偏差都不触发，5 ULP 才触发；阈值方向和声明一致。
+
+此门槛能排除精确纯衰减及小于等于 4 ULP 的浮点差异，不能证明每个元素都被正确更新，也不能排除只出现极少数非衰减元素的错误实现。相对比较的 2% L2、5% 显著元素规则同样可能漏掉较小单元素更新，v2 README 已明确说明；不应将其表述为任何 missing update 必检出。4 ULP 是此候选的经验阈值，不可据此对未知 NPU 舍入模式作形式保证。
+
+作者报告本地 `python -B selftest.py` 和 `python -B audit_selftest.py` 通过：合成 control/dcp 中拒绝 singleton 广播和共同纯衰减、正常动量的负例；1 ULP 衰减舍入不被误作有效信号。这些测试是合成输入；本审计独立复核了代码和上述纯内存边界，并未复跑完整自检或将自检视为 NPU 证据。
+

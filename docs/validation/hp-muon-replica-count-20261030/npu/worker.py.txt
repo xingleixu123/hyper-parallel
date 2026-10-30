@@ -1,0 +1,582 @@
+"""Four-rank, gated Muon ownership / native-DCP diagnostic candidate.
+
+Not a launcher. Imports/HCCl and training require the root's explicit gate.
+"""
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import stat
+import sys
+import time
+import traceback
+
+BASE_SHA = 'b18fef99d3d55649c439d865718db90cfc1d0b1f6742bad1f7c87fd7d9a9a8cb'
+BASE_HEAD = '1a39572fef23819a2d2651b4bd53047a05a4892f'
+OVERLAY_REL = 'hyper_parallel/core/optimizer/muon.py'
+OVERLAY_SHA = 'a3e5d62341c61309d8b7fb1261f2b4bb15022448e3430ea514ec5731c86ee265'
+SOURCE = Path('/work/sources/hyper-parallel')
+MANIFEST = Path('/work/input/source-manifest.json')
+WORKER = Path('/work/input/worker.py')
+OUT = Path('/work/run')
+RUN_ID_PREFIX = 'muon-replica-count-npu-v2-'
+SHAPES = {'expert_a': (4, 16, 32), 'expert_b': (4, 16, 32),
+          'matrix_a': (16, 32), 'matrix_b': (16, 32)}
+OPTIONS = {'lr': 1e-5, 'weight_decay': 0.1, 'matched_adamw_rms': 0.2,
+           'momentum': 0.95, 'nesterov': True, 'ns_steps': 5,
+           'ns_variant': 'legacy', 'ns_epsilon': 1e-8,
+           'ns_epsilon_mode': 'clamp', 'ns_input_dtype': 'float32',
+           'ns_compute_dtype': 'bfloat16'}
+
+
+def file_hash(path):
+    h = hashlib.sha256()
+    with Path(path).open('rb') as f:
+        for block in iter(lambda: f.read(1024 * 1024), b''):
+            h.update(block)
+    return h.hexdigest()
+
+
+def verify_source():
+    if SOURCE.is_symlink() or not SOURCE.is_dir() or MANIFEST.is_symlink():
+        raise RuntimeError('invalid source/manifest root')
+    raw = MANIFEST.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != BASE_SHA:
+        raise RuntimeError('source manifest digest mismatch')
+    doc = json.loads(raw)
+    if (doc.get('schema') != 'cp2-source-manifest-draft-v1'
+            or doc.get('base_head') != BASE_HEAD or doc.get('dirty_files') != []):
+        raise RuntimeError('source manifest identity mismatch')
+    expected = {}
+    for row in doc['files']:
+        rel = row['relative_path']
+        if (not rel or rel.startswith('/') or rel in expected
+                or any(p in ('', '.', '..', '.git', '__pycache__', '.pytest_cache') for p in rel.split('/'))):
+            raise RuntimeError('invalid manifest path')
+        expected[rel] = row
+    if len(expected) != 2661 or OVERLAY_REL not in expected:
+        raise RuntimeError('wrong manifest inventory')
+    if expected[OVERLAY_REL]['sha256'] != '27e81dc93bcbbc4c3a288977ff3cab81f8e27c4f537d466d41c2830566aa4f10':
+        raise RuntimeError('wrong original Muon in manifest')
+    seen = set()
+    for parent, dirs, files in os.walk(SOURCE, followlinks=False):
+        directory = Path(parent)
+        for name in dirs[:]:
+            item = directory / name
+            if item.is_symlink():
+                raise RuntimeError('source directory symlink: ' + str(item))
+            if name in ('.git', '__pycache__', '.pytest_cache'):
+                if name == '__pycache__' and (any(item.glob('*.pyc')) or any(item.glob('*.pyo'))):
+                    raise RuntimeError('source bytecode cache is forbidden: ' + str(item))
+                dirs.remove(name)
+        for name in files:
+            item = directory / name
+            if item.is_symlink() or not stat.S_ISREG(item.stat().st_mode):
+                raise RuntimeError('source nonregular entry: ' + str(item))
+            if name.endswith(('.pyc', '.pyo')):
+                raise RuntimeError('source bytecode is forbidden: ' + str(item))
+            rel = item.relative_to(SOURCE).as_posix()
+            row = expected.get(rel)
+            if row is None:
+                raise RuntimeError('unexpected source entry: ' + rel)
+            if rel == OVERLAY_REL:
+                wanted = OVERLAY_SHA
+            else:
+                wanted = row['sha256']
+                if item.stat().st_size != row['size']:
+                    raise RuntimeError('source file size mismatch: ' + rel)
+            if file_hash(item) != wanted:
+                raise RuntimeError('source hash mismatch: ' + rel)
+            seen.add(rel)
+    if seen != set(expected):
+        raise RuntimeError('missing source files: ' + repr(sorted(set(expected) - seen)[:10]))
+    return len(seen)
+
+
+def non_decay_metrics(previous, actual):
+    # CPU-only comparison, independent of the NPU optimizer and its ordering.
+    import numpy as np
+    coefficient = np.float32(1.0 - OPTIONS['lr'] * OPTIONS['weight_decay'])
+    prediction = np.multiply(previous, coefficient, dtype=np.float32)
+    scale = np.maximum(np.abs(previous), np.abs(prediction))
+    ulp = np.spacing(scale).astype(np.float64)
+    residual = actual.astype(np.float64) - prediction.astype(np.float64)
+    magnitudes = np.abs(residual)
+    count = int(np.count_nonzero(magnitudes > 4.0 * ulp))
+    return {'coefficient_fp32': float(coefficient), 'threshold_ulps': 4,
+            'over_threshold_elements': count, 'max_residual_ulps': float(np.max(magnitudes / ulp)),
+            'residual_l2': float(np.linalg.norm(residual.ravel())),
+            'max_abs_residual': float(np.max(magnitudes))}
+
+
+def publish(path, obj):
+    # A no-replace atomic publication, never overwrite preexisting results.
+    temp = path.with_name('.' + path.name + '.' + str(os.getpid()) + '.tmp')
+    with temp.open('x', encoding='utf-8') as f:
+        json.dump(obj, f, sort_keys=True, indent=2, allow_nan=False)
+        f.flush()
+        os.fsync(f.fileno())
+    os.link(temp, path)
+    temp.unlink()
+
+
+def environment_guard():
+    phase = os.environ['HP_PHASE']
+    if phase not in ('control', 'dcp'):
+        raise RuntimeError('HP_PHASE must be control or dcp')
+    if os.environ.get('HP_TASK_ROOT') != '/work' or os.environ.get('HP_SOURCE') != str(SOURCE):
+        raise RuntimeError('invalid task root / source')
+    if os.environ.get('OUTPUT_DIR') != str(OUT) or not OUT.is_dir() or OUT.resolve() != OUT:
+        raise RuntimeError('invalid output path')
+    if Path(__file__).resolve() != WORKER or not sys.dont_write_bytecode:
+        raise RuntimeError('worker path or python -B guard')
+    if os.environ.get('PYTHONHASHSEED') != '0':
+        raise RuntimeError('PYTHONHASHSEED=0 required before Python startup')
+    rank, local = int(os.environ['RANK']), int(os.environ['LOCAL_RANK'])
+    if int(os.environ['WORLD_SIZE']) != 4 or rank not in range(4) or local != rank:
+        raise RuntimeError('expected four local ranks 0..3')
+    cid = os.environ['HP_DIAG_CID']
+    if not re.fullmatch(r'[a-f0-9]{12,64}', cid):
+        raise RuntimeError('invalid isolated container ID')
+    cards = [int(x) for x in os.environ['HP_PHYSICAL_CARDS'].split(',')]
+    if len(cards) != 4 or len(set(cards)) != 4 or min(cards) < 0:
+        raise RuntimeError('expected four distinct physical cards')
+    if (OUT / 'device-release.json').exists() or (OUT / ('rank-%d.json' % rank)).exists():
+        raise RuntimeError('stale run output or release')
+    return phase, rank, local, cid, cards
+
+
+def ready_gate(torch, phase, rank, local, cid, cards, result):
+    # Match the established identity handshake. Root validates the host PID,
+    # container namespace, cgroup and actual physical-card mapping before release.
+    torch.npu.set_device(local)
+    torch.empty(1, dtype=torch.float32, device='npu')
+    torch.npu.synchronize()
+    worker_sha = file_hash(WORKER)
+    proc_stat = Path('/proc/self/stat').read_text()
+    starttick = int(proc_stat[proc_stat.rfind(')') + 2:].split()[19])
+    ready = {'rank': rank, 'local_rank': local, 'pid': os.getpid(),
+             'starttick': starttick, 'pid_namespace': os.readlink('/proc/self/ns/pid'),
+             'current_device': int(torch.npu.current_device()),
+             'device_name': str(torch.npu.get_device_name()), 'worker_sha256': worker_sha,
+             'source_manifest_sha256': BASE_SHA, 'overlay_sha256': OVERLAY_SHA,
+             'phase': phase, 'run_id': RUN_ID_PREFIX + phase, 'cid': cid}
+    if ready['current_device'] != local:
+        raise RuntimeError('device selection mismatch')
+    publish(OUT / ('device-ready-rank-%d.json' % rank), ready)
+    result['device_ready'] = ready
+    release_path = OUT / 'device-release.json'
+    deadline = time.monotonic() + 180
+    while not release_path.is_file():
+        if time.monotonic() >= deadline:
+            raise TimeoutError('root physical-map release not received')
+        time.sleep(0.2)
+    raw = release_path.read_bytes()
+    proof = json.loads(raw)
+    mapping, workers = proof.get('mapping'), proof.get('workers')
+    if (proof.get('kind') != 'root-verified-physical-device-map'
+            or proof.get('run_id') != RUN_ID_PREFIX + phase or proof.get('cid') != cid
+            or proof.get('worker_sha256') != worker_sha
+            or proof.get('source_manifest_sha256') != BASE_SHA
+            or proof.get('overlay_sha256') != OVERLAY_SHA
+            or not isinstance(mapping, list) or len(mapping) != 4
+            or not isinstance(workers, list) or len(workers) != 4):
+        raise RuntimeError('invalid release identity')
+    if any(type(x.get('rank')) is not int or type(x.get('physical_card')) is not int for x in mapping):
+        raise RuntimeError('invalid physical mapping types')
+    if {x['rank']: x['physical_card'] for x in mapping} != dict(enumerate(cards)):
+        raise RuntimeError('physical mapping differs from approved card list')
+    own = [x for x in workers if x.get('rank') == rank]
+    if len(own) != 1 or any(own[0].get(k) != ready[k] for k in ('pid', 'starttick', 'pid_namespace')):
+        raise RuntimeError('release does not attest this worker identity')
+    result['device_release_sha256'] = hashlib.sha256(raw).hexdigest()
+
+
+def main(result):
+    phase, rank, local, cid, cards = environment_guard()
+    result.update({'phase': phase, 'stage': 'source_guard', 'source_manifest': BASE_SHA,
+                   'overlay': OVERLAY_SHA, 'rank': rank, 'scope': 'toy module, not formal training'})
+    result['source_files_verified'] = verify_source()
+    sys.path.insert(0, str(SOURCE))
+    import numpy as np
+    import torch
+    import torch_npu
+    import torch.distributed as dist
+    import hyper_parallel
+    if not Path(hyper_parallel.__file__).resolve().is_relative_to(SOURCE):
+        raise RuntimeError('imported hyper_parallel outside sealed source')
+    from hyper_parallel import DTensor, SkipDTensorDispatch, distribute_tensor, init_device_mesh
+    from hyper_parallel.core.dtensor.placement_types import Replicate, Shard
+    from hyper_parallel.core.fully_shard.api import fully_shard
+    from hyper_parallel.core.fully_shard.utils import MixedPrecisionPolicy
+    from hyper_parallel.core.optimizer import get_hyper_optimizer
+    from hyper_parallel.components.optim.mixed_precision_optimizer import Float16OptimizerWithFloat16Params
+
+    result.update({'torch': torch.__version__, 'torch_npu': getattr(torch_npu, '__version__', 'unknown')})
+    result['stage'] = 'physical_device_gate'
+    ready_gate(torch, phase, rank, local, cid, cards, result)
+    result['stage'] = 'hccl_init'
+    dist.init_process_group('hccl')
+    assert dist.get_rank() == rank and dist.get_world_size() == 4
+    mesh = init_device_mesh(device_type='npu', mesh_shape=(2, 2), mesh_dim_names=('replicate', 'shard'))
+    run_dir = OUT / ('rank-%d' % rank)
+    run_dir.mkdir(exist_ok=False)
+    broadcasts, current = [], {'case': None, 'step': None, 'stage': None}
+    result['all_broadcasts'] = broadcasts
+    original_broadcast = dist.broadcast
+
+    def traced_broadcast(tensor, *args, **kwargs):
+        group = kwargs.get('group')
+        if group is None and len(args) >= 2:
+            group = args[1]
+        src = kwargs.get('src', args[0] if args else None)
+        event = dict(current)
+        event.update({'src': src, 'group': list(dist.get_process_group_ranks(group)) if group is not None
+                      else list(range(4)), 'numel': tensor.numel(),
+                      'async_op': bool(kwargs.get('async_op', False))})
+        broadcasts.append(event)
+        return original_broadcast(tensor, *args, **kwargs)
+    dist.broadcast = traced_broadcast
+
+    def array(tensor):
+        a = tensor.detach().cpu().numpy().copy()
+        if a.dtype != np.float32 or not np.isfinite(a).all():
+            raise AssertionError('expected finite FP32 array')
+        return a
+
+    def arrhash(a):
+        return hashlib.sha256(np.ascontiguousarray(a).tobytes()).hexdigest()
+
+    def persist(label, a):
+        path = run_dir / (label + '.npy')
+        with path.open('xb') as f:
+            np.save(f, a, allow_pickle=False)
+        return {'file': str(path.relative_to(OUT)), 'shape': list(a.shape),
+                'dtype': str(a.dtype), 'sha256': arrhash(a)}
+
+    # Same concrete input arrays for every case, not only identical seeds.
+    rng = np.random.default_rng(20261030)
+    initial = {name: (rng.standard_normal(shape).astype(np.float32) * np.float32(.02))
+               for name, shape in SHAPES.items()}
+    gradients = [{name: (rng.standard_normal(shape).astype(np.float32) * np.float32(.05))
+                  for name, shape in SHAPES.items()} for _ in range(10)]
+    result['inputs'] = {'initial': {n: persist('input_initial_' + n, a) for n, a in initial.items()},
+                        'gradient': [{n: persist('input_grad_%02d_%s' % (i + 1, n), a)
+                                      for n, a in grads.items()} for i, grads in enumerate(gradients)]}
+
+    class Toy(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            for n, a in initial.items():
+                setattr(self, n, torch.nn.Parameter(torch.from_numpy(a.copy()).to('npu')))
+
+    def named(model):
+        return dict(model.named_parameters())
+
+    def build(case, count):
+        model = Toy()
+        real_initial = {n: arrhash(array(p)) for n, p in named(model).items()}
+        expected = {n: arrhash(a) for n, a in initial.items()}
+        if real_initial != expected:
+            raise AssertionError('pre-wrap actual weights do not match common arrays')
+        model = fully_shard(model, mesh=mesh, reshard_after_forward=True, mp_policy=MixedPrecisionPolicy())
+        params = named(model)
+        if set(params) != set(SHAPES):
+            raise AssertionError('parameter inventory mismatch')
+        layouts = {}
+        for n, p in params.items():
+            if (not isinstance(p, DTensor) or p.dtype != torch.float32 or len(p.placements) != 2
+                    or not isinstance(p.placements[0], Replicate) or not isinstance(p.placements[1], Shard)
+                    or p.placements[1].dim != 0):
+                raise AssertionError('unexpected FP32 HSDP layout: ' + n)
+            got = array(p.full_tensor())
+            if not np.array_equal(got, initial[n]):
+                raise AssertionError('actual logical initial parameter mismatch: ' + n)
+            layouts[n] = {'placements': [str(x) for x in p.placements], 'initial_sha256': arrhash(got),
+                          'local_shape': list(p.to_local().shape), 'logical_shape': list(p.shape),
+                          'replicate_pg': list(dist.get_process_group_ranks(p.device_mesh.get_group('replicate'))),
+                          'shard_pg': list(dist.get_process_group_ranks(p.device_mesh.get_group('shard')))}
+        calls = []
+        def post_update(param, local_tensor, context):
+            del local_tensor
+            calls.append({'name': getattr(param, 'model_name', None), 'step': context.step,
+                          'lr': context.lr, 'weight_decay': context.weight_decay})
+        kwargs = {'muon_' + k: v for k, v in OPTIONS.items()}
+        kwargs['muon_hsdp_replica_count'] = count
+        kwargs['muon_post_update_fn'] = post_update
+        chain = get_hyper_optimizer(model=model, muon_params=[{'params': list(params.values())}],
+                                    adamw_params=[], muon_kwargs=kwargs)
+        wrapper = Float16OptimizerWithFloat16Params(chain, model)
+        leaf = chain.optimizers_dict['muon']
+        if leaf.hsdp_replica_count != count:
+            raise AssertionError('effective replica setting %r != requested %r' % (leaf.hsdp_replica_count, count))
+        if any(p.dtype != torch.float32 for g in leaf.param_groups for p in g['params']):
+            raise AssertionError('optimizer master weights are not FP32')
+        effective_options = []
+        for g in leaf.param_groups:
+            actual = {key: g.get(key) for key in OPTIONS}
+            if tuple(actual['momentum']) != (OPTIONS['momentum'], OPTIONS['momentum']):
+                raise AssertionError('runtime momentum differs from formal setting')
+            for key, value in OPTIONS.items():
+                if key != 'momentum' and actual[key] != value:
+                    raise AssertionError('runtime Muon option mismatch: ' + key)
+            effective_options.append(actual)
+        identities = {id(p): n for n, p in params.items()}
+        assignments = []
+        owned = set()
+        for info in leaf._hsdp_assignment_batches.values():
+            for bg in info['batch_groups']:
+                for ass in bg['sub_batches']:
+                    entry = {'is_shard': bool(ass.is_shard), 'replicate_sizes': list(ass.replicate_sizes),
+                             'replicate_coord': list(ass.replicate_group_ranks),
+                             'replicate_pgs': [list(dist.get_process_group_ranks(g)) if g is not None else None for g in ass.replicate_pgs],
+                             'shard_pgs': [list(dist.get_process_group_ranks(g)) if g is not None else None for g in ass.shard_pgs],
+                             'records': []}
+                    for rec in ass.all_records:
+                        n = identities[id(rec.param)]
+                        is_owned = bool(ass.is_owned(rec))
+                        entry['records'].append({'name': n, 'index': rec.index, 'owned_here': is_owned,
+                                                 'owner_coord': list(ass.owner_rank_coord(rec))})
+                        if is_owned:
+                            owned.add(n)
+                        if bool(ass.is_shard) != n.startswith('matrix_'):
+                            raise AssertionError('wrong NS shard classification: ' + n)
+                        if count == 1 and not is_owned:
+                            raise AssertionError('count=1 must own every parameter')
+                    assignments.append(entry)
+        if {r['name'] for a in assignments for r in a['records']} != set(SHAPES):
+            raise AssertionError('incomplete assignment records')
+        result['cases'][case] = {'requested_count': count, 'effective_count': leaf.hsdp_replica_count,
+                                 'initial_pre_wrap': real_initial, 'layouts': layouts,
+                                 'effective_options': effective_options,
+                                 'fp32_model_and_master_same_objects': all(
+                                     any(p is model_p for g in leaf.param_groups for p in g['params'])
+                                     for model_p in params.values()),
+                                 'assignments': assignments, 'steps': [],
+                                 'current_callback_progress': calls}
+        return model, wrapper, leaf, calls, owned
+
+    def snapshot(case, step, model, leaf):
+        params = named(model)
+        state_before = {n: {'exists': 'momentum_buffer' in leaf.state.get(p, {}),
+                            'type': str(type(leaf.state.get(p, {}).get('momentum_buffer')))}
+                        for n, p in params.items()}
+        current.update({'case': case, 'step': step, 'stage': 'checkpoint_state_broadcast'})
+        leaf._broadcast_state_fused_for_ckpt()
+        values = {}
+        try:
+            for n, p in params.items():
+                buf = leaf.state[p]['momentum_buffer']
+                local_buf = buf.to_local() if isinstance(buf, DTensor) else buf
+                if local_buf.dtype != torch.float32:
+                    raise AssertionError('momentum not FP32: ' + n)
+                logical_buf = buf if isinstance(buf, DTensor) else DTensor.from_local(
+                    buf, p.device_mesh, p.placements, shape=tuple(p.shape))
+                p_arr, b_arr = array(p.full_tensor()), array(logical_buf.full_tensor())
+                values[n] = {'param': persist('%s_step%02d_param_%s' % (case, step, n), p_arr),
+                             'momentum': persist('%s_step%02d_momentum_%s' % (case, step, n), b_arr)}
+        finally:
+            leaf.cleanup_synced_state()
+        current.update({'stage': None})
+        return state_before, values
+
+    def update(case, step, model, wrapper, leaf, calls, owned):
+        params = named(model)
+        grad_hashes = {}
+        for n, p in params.items():
+            grad = distribute_tensor(torch.from_numpy(gradients[step-1][n].copy()).to('npu'),
+                                     p.device_mesh, p.placements)
+            expected_local = np.array_split(gradients[step-1][n], 2, axis=0)[rank % 2]
+            actual_local = array(grad.to_local())
+            if not np.array_equal(actual_local, expected_local):
+                raise AssertionError('actual local gradient mismatch: ' + n)
+            full_grad = array(grad.full_tensor())
+            if not np.array_equal(full_grad, gradients[step-1][n]):
+                raise AssertionError('actual logical gradient mismatch: ' + n)
+            grad_hashes[n] = {'local_sha256': arrhash(actual_local), 'full_sha256': arrhash(full_grad)}
+            p.grad = grad
+        del calls[:]
+        start = len(broadcasts)
+        current.update({'case': case, 'step': step, 'stage': 'optimizer_step'})
+        with SkipDTensorDispatch(no_skip={torch.zeros_like}):
+            wrapper.step()
+        wrapper.zero_grad()
+        torch.npu.synchronize()
+        current.update({'stage': None})
+        if {c['name'] for c in calls} != owned or len(calls) != len(owned):
+            raise AssertionError('actual update callbacks do not match ownership: %s %s' % (calls, owned))
+        if any(c['step'] != step or c['lr'] != OPTIONS['lr'] for c in calls):
+            raise AssertionError('callback step or LR mismatch')
+        groups = [{'step': g.get('step'), 'lr': g['lr']} for g in leaf.param_groups]
+        if any(g['step'] != step or g['lr'] != OPTIONS['lr'] for g in groups):
+            raise AssertionError('group step/LR mismatch')
+        before, values = snapshot(case, step, model, leaf)
+        for n in params:
+            if before[n]['exists'] != (n in owned):
+                raise AssertionError('actual momentum ownership mismatch for ' + n)
+        case_record = result['cases'][case]
+        prior_steps = case_record['steps']
+        if step != 1 and (not prior_steps or prior_steps[-1]['step'] != step-1):
+            raise AssertionError('missing actual prior parameter for non-decay check')
+        non_decay = {}
+        case_record['non_decay_progress'] = non_decay
+        for n in params:
+            previous = initial[n] if step == 1 else load_saved(prior_steps[-1]['values'][n]['param'])
+            actual = load_saved(values[n]['param'])
+            metrics = non_decay_metrics(previous, actual)
+            non_decay[n] = metrics
+            if metrics['over_threshold_elements'] <= 0:
+                raise AssertionError('no non-decay parameter update beyond 4 FP32 ULP: %s %s' % (n, metrics))
+        # Include both the original mesh replica PG and effective assignment
+        # PGs (including singleton count=1 PGs), never the shard groups.
+        original_replica = {tuple(layout['replicate_pg']) for layout in case_record['layouts'].values()}
+        assignment_replica = {tuple(pg) for a in case_record['assignments']
+                              for pg in a['replicate_pgs'] if pg is not None}
+        shard_pgs = {tuple(pg) for a in case_record['assignments']
+                     for pg in a['shard_pgs'] if pg is not None}
+        replica_groups = (original_replica | assignment_replica) - shard_pgs
+        step_broadcasts = broadcasts[start:]
+        replica_broadcasts = [event for event in step_broadcasts
+                              if event['stage'] == 'optimizer_step' and tuple(event['group']) in replica_groups]
+        if (leaf.hsdp_replica_count == 1 and replica_broadcasts) or (
+                leaf.hsdp_replica_count != 1 and not replica_broadcasts):
+            raise AssertionError('replica broadcast call mismatch: %s step %s events=%s' %
+                                 (case, step, replica_broadcasts))
+        case_record['steps'].append({'step': step, 'group_steps_lr': groups,
+                                     'gradient_hashes': grad_hashes,
+                                     'update_callbacks': list(calls),
+                                     'state_before_sync': before, 'non_decay': non_decay,
+                                     'broadcasts': step_broadcasts, 'values': values})
+
+    def load_saved(entry):
+        return np.load(OUT / entry['file'], allow_pickle=False)
+
+    def compare(case, ref='default', first=1, last=10, exact_step5=False):
+        rows = []
+        case_steps = {s['step']: s for s in result['cases'][case]['steps']}
+        ref_steps = {s['step']: s for s in result['cases'][ref]['steps']}
+        prev_ref, prev_cur = initial, initial
+        if first > 1:
+            prev_ref = {n: load_saved(ref_steps[first-1]['values'][n]['param']) for n in SHAPES}
+            prev_cur = {n: load_saved(case_steps[first-1]['values'][n]['param']) for n in SHAPES}
+        for step in range(first, last+1):
+            s, t = ref_steps[step], case_steps[step]
+            next_ref, next_cur = {}, {}
+            for n in SHAPES:
+                rp, cp = load_saved(s['values'][n]['param']), load_saved(t['values'][n]['param'])
+                rm, cm = load_saved(s['values'][n]['momentum']), load_saved(t['values'][n]['momentum'])
+                dr = rp.astype(np.float64)-prev_ref[n].astype(np.float64)
+                dc = cp.astype(np.float64)-prev_cur[n].astype(np.float64)
+                norm = float(np.linalg.norm(dr.ravel()))
+                err = float(np.linalg.norm((dc-dr).ravel()))
+                max_change = float(np.max(np.abs(dr)))
+                significant = np.abs(dr) >= max(1e-8, max_change * .05)
+                missing = int(np.count_nonzero(significant & (np.abs(dc) < np.abs(dr) * .05)))
+                mmax = float(np.max(np.abs(rm.astype(np.float64)-cm.astype(np.float64))))
+                row = {'step': step, 'name': n, 'ref_delta_l2': norm, 'delta_error_l2': err,
+                       'relative_delta_error': err/norm if norm else None,
+                       'delta_max_abs': max_change, 'significant_missing': missing,
+                       'momentum_max_abs_error': mmax, 'param_equal': bool(np.array_equal(rp,cp)),
+                       'momentum_equal': bool(np.array_equal(rm,cm))}
+                rows.append(row)
+                if (norm <= 0 or not float(np.linalg.norm(dc.ravel())) > 0 or err/norm > .02
+                        or missing or not np.allclose(rm, cm, rtol=1e-5, atol=1e-7)):
+                    raise AssertionError('update/momentum comparison failed: ' + repr(row))
+                next_ref[n], next_cur[n] = rp, cp
+            prev_ref, prev_cur = next_ref, next_cur
+        result['comparisons'][case + '_vs_' + ref] = rows
+
+    result['cases'], result['comparisons'] = {}, {}
+    result['stage'] = 'controls' if phase == 'control' else 'dcp_continuous'
+    if phase == 'control':
+        for case, count in (('default', None), ('explicit1', 1), ('explicit2', 2)):
+            model, wrapper, leaf, calls, owned = build(case, count)
+            for step in range(1, 11):
+                update(case, step, model, wrapper, leaf, calls, owned)
+            del model, wrapper, leaf
+        compare('explicit1')
+        compare('explicit2')
+        result['stage'] = 'complete'
+        result['pass'] = True
+    else:
+        from hyper_parallel.components.checkpoint.dcp_checkpointer import DistributedCheckpointer, initialize_optimizer_state
+        checkpoint = DistributedCheckpointer(extra_state_per_rank=True)
+        checkpoint_path = str(OUT / 'checkpoint' / 'global_step_5')
+        model, wrapper, leaf, calls, owned = build('default', None)
+        for step in range(1, 11):
+            update('default', step, model, wrapper, leaf, calls, owned)
+            if step == 5:
+                result['stage'] = 'native_dcp_save'
+                current.update({'case': 'default', 'step': 5, 'stage': 'native_dcp_save'})
+                payload = {'model': model.state_dict(), 'optimizer': wrapper.state_dict()}
+                checkpoint.save(checkpoint_path, payload, global_step=5, save_async=False)
+                leaf.cleanup_synced_state()
+                current.update({'stage': None})
+                result['dcp_saved'] = True
+        del model, wrapper, leaf
+        for case, count in (('selfresume', None), ('resume_explicit1', 1)):
+            result['stage'] = 'native_dcp_load_' + case
+            model, wrapper, leaf, calls, owned = build(case, count)
+            if not initialize_optimizer_state(wrapper):
+                raise RuntimeError('native checkpoint optimizer-state initialization returned false')
+            current.update({'case': case, 'step': 5, 'stage': 'native_dcp_load'})
+            payload = {'model': model.state_dict(), 'optimizer': wrapper.state_dict()}
+            payload = checkpoint.load(checkpoint_path, payload, strict_model=True)
+            model.load_state_dict(payload['model'], strict=True)
+            wrapper.load_state_dict(payload['optimizer'])
+            current.update({'stage': None})
+            if any(g.get('step') != 5 or g.get('lr') != OPTIONS['lr'] for g in leaf.param_groups):
+                raise AssertionError('DCP did not restore exact group step/LR')
+            # Inspect the actual load output *before* checkpoint broadcasts or cleanup.
+            # A broadcast must not repair a failed load and hide it from this check.
+            reference = result['cases']['default']['steps'][4]
+            raw_restore = {}
+            result['cases'][case]['raw_restore_progress'] = raw_restore
+            for n, p in named(model).items():
+                value = leaf.state.get(p, {}).get('momentum_buffer')
+                if value is None:
+                    if n in owned:
+                        raise AssertionError('restored owner missing momentum: ' + n)
+                    raw_restore[n] = {'exists': False}
+                    continue
+                local_value = value.to_local() if isinstance(value, DTensor) else value
+                local_arr = array(local_value)
+                ref_arr = load_saved(reference['values'][n]['momentum'])
+                expected_local = np.array_split(ref_arr, 2, axis=0)[rank % 2]
+                raw_restore[n] = {'exists': True, 'value': persist(
+                    '%s_restore_raw_momentum_%s' % (case, n), local_arr)}
+                if not np.array_equal(local_arr, expected_local):
+                    raise AssertionError('raw DCP momentum restore mismatch before any broadcast: ' + n)
+            before, values = snapshot(case, 5, model, leaf)
+            result['cases'][case]['steps'].append({'step': 5, 'group_steps_lr': [
+                {'step': g.get('step'), 'lr': g['lr']} for g in leaf.param_groups],
+                'state_before_sync': before, 'raw_restored_state': raw_restore, 'values': values})
+            for n in SHAPES:
+                for key in ('param', 'momentum'):
+                    x = load_saved(reference['values'][n][key])
+                    y = load_saved(values[n][key])
+                    if not np.array_equal(x, y):
+                        raise AssertionError('DCP restore step 5 changed %s %s' % (n, key))
+            result['stage'] = 'dcp_resume_updates_' + case
+            for step in range(6, 11):
+                update(case, step, model, wrapper, leaf, calls, owned)
+            compare(case, first=6, last=10)
+            del model, wrapper, leaf
+        result['stage'] = 'complete'
+        result['pass'] = True
+    dist.destroy_process_group()
+
+
+if __name__ == '__main__':
+    rank = int(os.environ.get('RANK', '-1'))
+    result = {'rank': rank, 'status': 'error', 'pass': False}
+    try:
+        main(result)
+        result['status'] = 'complete'
+    except BaseException:
+        result['error'] = traceback.format_exc()
+        raise
+    finally:
+        if rank in range(4) and OUT.is_dir() and os.environ.get('OUTPUT_DIR') == str(OUT):
+            publish(OUT / ('rank-%d.json' % rank), result)

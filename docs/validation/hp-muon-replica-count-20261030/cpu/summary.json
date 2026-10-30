@@ -1,0 +1,74 @@
+{
+  "description": "Selected and path-free summary of local CPU receipts; original receipts not packaged.",
+  "base_commit": "93572190d0f07ced830ee12e430459437df19851",
+  "python": "3.12.14",
+  "torch": "2.12.0+cpu",
+  "npu_exposed": false,
+  "early_test_sha256": "626a407e1f2ea1beaaa025859820c6de9f8e58102bb197c967f482006ed83fe5",
+  "final_test_sha256": "4984f002f7f2ca0e660eefdbcc71c084dccb0295f19bfa3926106a78e4e7548a",
+  "production_sha256": "6adfa1230c0625224fa0421acb534ea7897029e7f15ecac724c02f9256454d19",
+  "results": [
+    {
+      "test": "early",
+      "tree": "original",
+      "failed": 4,
+      "passed": 9,
+      "exit": 1,
+      "source_receipt_sha256": "e0c9459f81555361ba72320730ccdceccd2d5072dbfc0c8405695d0d8edea1b6",
+      "stdout_file": "early-red-stdout.txt",
+      "stdout_sha256": "8070ba1177822e8fe5d1f018cde959264f41a7e93a3f65c17be8112d22930cbf"
+    },
+    {
+      "test": "early",
+      "tree": "patched",
+      "failed": 0,
+      "passed": 13,
+      "exit": 0,
+      "source_receipt_sha256": "c3bd3f08c4d145fa736ca7eb2cc300b779f1c6ec30363396db5391300373e77a",
+      "stdout_file": "early-green-stdout.txt",
+      "stdout_sha256": "9def6fdf5569996e5ea72dcda4a1d33eb4960daa25f343cd496095da4d474a64"
+    },
+    {
+      "test": "final",
+      "tree": "original",
+      "failed": 4,
+      "passed": 9,
+      "exit": 1,
+      "source_receipt_sha256": "eaed535a9b122c016a9ba413c0c45bc2154b825a9657ccc13159940b1c5fc69a",
+      "stdout_file": "final-red-stdout.txt",
+      "stdout_sha256": "412ab4d36b2ef40cdf716a2dc195275cc10411e475a3ef629b78ea11f1c3727a"
+    },
+    {
+      "test": "final",
+      "tree": "patched",
+      "failed": 0,
+      "passed": 13,
+      "exit": 0,
+      "source_receipt_sha256": "1a58469316faa2689ea80ed31a9e18b27fcbf94587e772c7c3fc3153a7040bb2",
+      "stdout_file": "final-green-stdout.txt",
+      "stdout_sha256": "c8f3703f03130d79de21e2985daecce7a2679df4a58eea73c22313ba171073dd"
+    }
+  ],
+  "final_original_red": "4 failed, 9 passed",
+  "early_failure_parameters": [
+    1,
+    2,
+    0,
+    -1
+  ],
+  "extra_final_coverage": "state_dict load followed by reset",
+  "pytest_arguments": [
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--import-mode=importlib",
+    "tests/ut/core/optimizer/test_muon.py"
+  ],
+  "original_production_sha256": "a642fcb49b70054a2e8bda80eff9cd141c07b4072e5d42aae278a9452298ef39",
+  "final_red_failure_parameters": [
+    1,
+    2,
+    0,
+    -1
+  ]
+}

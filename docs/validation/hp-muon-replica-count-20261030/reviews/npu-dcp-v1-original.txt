@@ -1,0 +1,42 @@
+# 129 NPU DCP 独立抽查（max，v1）
+
+审查日期：2026-10-30。范围为只读检查已封存的 129 DCP 实验；未启动设备或修改既有证据。
+
+## 结论
+
+在本次固定的四 rank、row-major 2×2、FP32 toy 参数实验中，原生 DCP 从 default（replica count 为 None）的第 5 步检查点恢复到 None 和显式 1 两种配置。已核对的脚本流程会在原生加载完成后、**额外的取证用 checkpoint state broadcast 之前**读取和比较恢复后的本地 momentum；脚本没有用参考值手工修补恢复参数或 momentum。恢复后的第 5 步参数和 momentum 与连续分支一致，第 6–10 步两条恢复轨迹与连续分支一致；抽读的实际数组逐元素一致。结果支持此次具体布局与数据的跨 ownership 恢复，不证明任意 rank 排列和真实模型训练均正确。
+
+需要区分加载流程内部的通信：`native_dcp_load` 阶段本身确实发生了广播。因此，不能将该校验描述为“在任何广播之前”。它检查的是**完成原生加载及其内部通信后、脚本额外取证广播前**的恢复值。
+
+## 核查证据
+
+- 执行容器 `a452e176b4dc5a202c2deab8b45aadaaa98c9ebb29cc30045eaf5ccf13361323`，四 rank 均记录 `status=complete`、`pass=true`、`dcp_saved=true`；terminal 的 child exit code 为 0。此次目录命名为 v3，worker 内 run ID 仍是 `muon-replica-count-npu-v2-dcp`；两者并不冲突。[实际证据目录](npu-actual-v3-129-dcp-complete/) · [terminal](npu-actual-v3-129-dcp-complete/execute-terminal.json)
+- 实际 [worker.py](npu-reviewed-v3/worker.py) 的 SHA-256 为 `b8403f7a9492c6510db36d7e7fe37c0affefbb40ab7eab2cfc151adec5e2721b`，与四 rank 的 ready 记录一致。回读清单记录 947 个文件、5,812,152 字节；本次独立重算四个 rank JSON 的 SHA-256，与该清单和 terminal 中的值均相符。[回读清单](npu-readback-v3-129-dcp-complete.json)
+- 已归档的 [CPU 独立审计](npu-independent-audit-129-docker-v3-dcp.json) 报告 PASS，记录 704 个数组、最大相对更新差异 0、最大 momentum 绝对差异 0。本次没有重跑这套完整审计。
+
+## 恢复与比较的时序
+
+[worker.py](npu-reviewed-v3/worker.py) 第 503–565 行先运行连续 default 分支，并在第 5 步通过 `DistributedCheckpointer.save(..., save_async=False)` 保存。之后新建 selfresume 和 resume_explicit1 两个模型/优化器，调用原生 `initialize_optimizer_state` 建立可加载的状态槽，构造加载模板，再依次调用 `checkpoint.load`、`model.load_state_dict` 和 `wrapper.load_state_dict`。对 HyperMuon，源码中的初始化逻辑直接建立零 momentum 槽，并没有执行 Muon 更新：[dcp_checkpointer.py](../stage-profile-129-prep-v1/source-tree/hyper_parallel/components/checkpoint/dcp_checkpointer.py)。
+
+加载返回后，worker 检查 group step 为 5、lr 为 `1e-5`；读取每个参数的本地 `momentum_buffer`，与连续 default 的第 5 步完整 momentum 的对应 shard 切片逐元素比较，并保存 raw 数组。随后才调用 `snapshot()` 中额外的 `_broadcast_state_fused_for_ckpt()` 并在读取完成后清理临时状态。参考数组仅用于比较，源码中没有把参考数据复制回模型或优化器。`load_state_dict` 内正常的数据装载与 DCP 内部分发属于原生恢复流程。
+
+四 rank 的 raw 记录显示，两个恢复分支的四个参数在取证广播前均已有本地 momentum。第 5 步后续完整快照中的参数、momentum 由 worker 逐元素比较；完整 CPU 审计也检查了这一点。第 6–10 步，每 rank 的两组比较各含 20 条（5 步 × 4 参数），记录中 `param_equal` 和 `momentum_equal` 全为 true，最大相对更新误差均为 0。第 6、10 步 callback 中，selfresume 的 owner 与 default 相同；显式 1 的每 rank 均更新四个参数。
+
+## 原始数组抽样
+
+本次从 rank 0、3 选择 `expert_b`（逻辑形状 4×16×32）和 `matrix_a`（16×32），读取第 5、6、8、10 步三个分支的参数和 momentum，并读取两个恢复分支的第 5 步 raw 本地 momentum：共 104 次 NPY 读取，检查 dtype、shape、finite 和描述符内容 SHA-256。抽查结果：
+
+- 三个分支的所抽参数和 momentum 在每个抽样步均逐元素相等。
+- 两个恢复分支的 raw 本地 momentum 均逐元素等于 default 第 5 步相应 shard，且非零。本次包含 rank 0 的 `expert_b` 和 rank 3 的 `matrix_a`：它们在 default 中是非 owner，在显式 1 后成为 owner。
+
+所抽第 6、8、10 步只是独立抽样；第 7、9 步的完整情况引用上述四 rank 的比较记录及已归档审计，不冒称本次逐文件重做。
+
+## 通信边界
+
+四 rank 的 `all_broadcasts` 在 `native_dcp_load` 阶段分别记录：selfresume 每 rank 4 次，resume_explicit1 每 rank 2 次。selfresume 随后的 `checkpoint_state_broadcast` 另有每 rank 2 次；显式 1 的该快照阶段没有对应 replica broadcast。[rank 0 记录](npu-actual-v3-129-dcp-complete/rank-0.json) · [rank 3 记录](npu-actual-v3-129-dcp-complete/rank-3.json)
+
+此阶段标签覆盖模板构造、DCP 加载及两个 `load_state_dict` 调用，日志没有逐条调用栈。源码显示 optimizer `state_dict()` 可同步 optimizer state，DCP 文件读取也有异步广播分发：[optimizer.py](../stage-profile-129-prep-v1/source-tree/hyper_parallel/core/optimizer/optimizer.py) · [broadcast.py](../stage-profile-129-prep-v1/source-tree/hyper_parallel/core/distributed_checkpoint/broadcast.py) · [filesystem_storage.py](../stage-profile-129-prep-v1/source-tree/hyper_parallel/core/distributed_checkpoint/filesystem_storage.py)。这些路径与事件特征相符，但不凭现有粗粒度事件日志断言每条事件的确切调用栈。原生 DCP 的广播属于被测恢复流程，不是脚本用参考值修补状态；同时本证据不能证明各 rank 都独立从磁盘读取了各自全部数据。
+
+## 适用边界
+
+实验是固定梯度、10 步的四参数 toy 模型，FP32 model 与 master 为同一对象；每步插入了取证快照。它不覆盖 BF16 分离 master、真实模型训练、不同规模或任意 rank 排列，也不提供性能结论。两分支轨迹一致及非纯衰减信号并非独立的 Newton–Schulz 数学 oracle。此前初始化失败的旧 DCP 尝试与本次成功运行是不同容器和独立记录。
