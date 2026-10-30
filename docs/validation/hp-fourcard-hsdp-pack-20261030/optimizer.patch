@@ -1,0 +1,97 @@
+--- a/optimizer.py
++++ b/optimizer.py
+@@ -43,6 +43,8 @@
+ 
+ logger = logging.getLogger(__name__)
+ 
++
++import pack_observer as _hp_pack
+ 
+ class ChainedOptimizer:
+     """Composition wrapper that dispatches step/zero_grad to sub-optimizers."""
+@@ -894,7 +896,8 @@
+             if op_idx + 1 < len(broadcast_ops):
+                 # The next mesh dimension relays the data received here.
+                 # It must not read the shared buffer until this hop finishes.
+-                handle.wait()
++                with _hp_pack.wait_scope(batch_buffer, "relay"):
++                    handle.wait()
+             else:
+                 # Only the final hop may overlap with subsequent computation.
+                 handles.append(handle)
+@@ -1065,11 +1068,13 @@
+             List[torch.Tensor],
+         ] = defaultdict(list)
+ 
++        _hp_pack.begin_flush()
+         for record in flush_records:
+             src_coord = hsdp_assign.owner_rank_coord(record)
+             if not src_coord or any(c < 0 for c in src_coord):
+                 continue
+             local_tensor = to_local_if_dtensor(record.param.data)
++            _hp_pack.register_tensor(local_tensor, record, hsdp_assign, src_coord, dist)
+             key = (src_coord, local_tensor.dtype, hsdp_assign.replicate_pgs)
+             rank_dtype_tensors[key].append(local_tensor)
+ 
+@@ -1077,6 +1082,7 @@
+             if tensors:
+                 self._flush_key(key, tensors, async_op=True)
+ 
++        _hp_pack.end_flush()
+         while len(self._inflight) > self._max_inflight_batches:
+             self._wait_and_release_oldest()
+ 
+@@ -1125,6 +1131,9 @@
+             else:
+                 batch_buffer = buffer[:batch_total_size]
+ 
++            _hp_pack.register_pack(batch_buffer, batch_tensor_offsets, batch_total_size, alignment_elements,
++                                   src_coord, local_coord, replicate_pgs, dist, async_op, max_broadcast_bytes)
++
+             # Pack: owner rank
+             if local_coord == src_coord:
+                 for t, offset, actual_numel, padded_numel in batch_tensor_offsets:
+@@ -1141,8 +1150,10 @@
+                     self._inflight.append((batch_buffer, batch_tensor_offsets, handles))
+                 else:
+                     # No async work was enqueued on this rank, so unpack and free now.
+-                    for t, offset, actual_numel, _ in batch_tensor_offsets:
+-                        t.view(-1).copy_(batch_buffer[offset:offset + actual_numel])
++                    with _hp_pack.unpack_scope(batch_buffer):
++                        for t, offset, actual_numel, _ in batch_tensor_offsets:
++                            t.view(-1).copy_(batch_buffer[offset:offset + actual_numel])
++                    _hp_pack.release(batch_buffer)
+                     batch_buffer.untyped_storage().resize_(0)
+                     del batch_buffer
+             else:
+@@ -1150,8 +1161,10 @@
+                     batch_buffer, src_coord, replicate_pgs, local_coord,
+                 )
+                 # Unpack immediately for sync path
+-                for t, offset, actual_numel, _ in batch_tensor_offsets:
+-                    t.view(-1).copy_(batch_buffer[offset:offset + actual_numel])
++                with _hp_pack.unpack_scope(batch_buffer):
++                    for t, offset, actual_numel, _ in batch_tensor_offsets:
++                        t.view(-1).copy_(batch_buffer[offset:offset + actual_numel])
++                _hp_pack.release(batch_buffer)
+ 
+         if not async_op:
+             # Sync path: buffer can be freed immediately
+@@ -1162,11 +1175,14 @@
+         """Wait, unpack, and release the oldest inflight async batch."""
+         batch_buffer, batch_tensor_offsets, handles = self._inflight.pop(0)
+         for handle in handles:
+-            handle.wait()
++            with _hp_pack.wait_scope(batch_buffer, "final"):
++                handle.wait()
+ 
+         # Unpack after the async broadcast completes.
+-        for t, offset, actual_numel, _ in batch_tensor_offsets:
+-            t.view(-1).copy_(batch_buffer[offset:offset + actual_numel])
++        with _hp_pack.unpack_scope(batch_buffer):
++            for t, offset, actual_numel, _ in batch_tensor_offsets:
++                t.view(-1).copy_(batch_buffer[offset:offset + actual_numel])
++        _hp_pack.release(batch_buffer)
+ 
+         batch_buffer.untyped_storage().resize_(0)
+         del batch_buffer

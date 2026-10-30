@@ -1,0 +1,19 @@
+--- a/muon.py
++++ b/muon.py
+@@ -55,6 +55,8 @@
+     (2.8366, -3.0525, 1.2012),
+ )
+ 
++
++import pack_observer as _hp_pack
+ 
+ @dataclass
+ class NSInputTransform:
+@@ -445,6 +447,7 @@
+ 
+                 hsdp_assign = linear_batches[batch_idx]
+                 group = self.param_groups[group_idx]
++                _hp_pack.record_assignment(hsdp_assign, group, group_idx, batch_idx, to_local_if_dtensor)
+ 
+                 # Compute momentum for this assignment's owned params only.
+                 ns_inputs = self._update_muon_momentum(group, hsdp_assign.owned_params)
