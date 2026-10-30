@@ -34,3 +34,7 @@ red 中，提前 microbatch 使用、最后 microbatch 跳过的 `early.weight` 
 各 `receipt-extract.json` 保留原 receipt 的 inspect、源校验、退出、运行标识及嵌入文件的大小/哈希，并标明原 receipt SHA；它是提取件，不是原始 receipt。各组的独立 stdout、stderr、argv、summary 和实际结果以原字节保留。原始 receipt、SSH 返回的 Base64 数据封套、传输输入和收集封套有意不复制；原始 archive 仍在本地。原始 `artifact-hashes.json` 因此还索引了未装入本包的文件，不能要求其所有路径都在本包中存在。原始报告中对 archive 内容的描述也应按这一差异理解。
 
 包内不包含 YAML 文件、实际训练数据、凭据、整套源码或大型 trace。
+
+## 最终带类型标注的 launcher
+
+[追加验证证据](typing-update-v1/README.md)单独记录最终 `391848…` launcher 的双 rank CPU/Gloo 通过、轻量导入与原始日志。原 launcher `2f4305…` 的历史测试及 32 份独立诊断仍保留原始范围。Draft PR #1369 当前提交为 `b5839efa30640fa2ca4ab2a772f65f94a993ba2f`；本次只增加 pytest 类型导入和函数签名注解，scheduler 与 worker 字节未变。

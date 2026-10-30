@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "No YAML or archive files",
+    "UTF-8 text only",
+    "No long Base64 envelope (400 contiguous characters or more)",
+    "No common private-key, GitHub token, OpenAI key, AWS access-key or quoted credential-assignment patterns",
+    "No /home/<user> or Windows user-profile paths"
+  ],
+  "files_screened_before_audit": [
+    "copy-audit.json",
+    "cpu-validation/artifact-hashes.json",
+    "cpu-validation/flat-logs/rank-0-stderr.log",
+    "cpu-validation/flat-logs/rank-0-stdout.log",
+    "cpu-validation/flat-logs/rank-1-stderr.log",
+    "cpu-validation/flat-logs/rank-1-stdout.log",
+    "cpu-validation/flat-logs-map.json",
+    "cpu-validation/receipt-extract.json",
+    "cpu-validation/stderr",
+    "cpu-validation/stdout",
+    "cpu-validation/summary.json",
+    "cpu-validation/transport-exit.json",
+    "cpu-validation/validation.json",
+    "intent.json",
+    "launcher-typing.patch",
+    "README.md"
+  ],
+  "handling": "Raw rank logs are retained byte for byte. Receipt is an explicitly labeled extraction with source mount paths, remote argv and embedded data omitted. No complete source tree, real training data or actual YAML is included.",
+  "limitation": "Pattern screening does not prove the absence of every possible credential or sensitive value.",
+  "result": "No matches in screened files",
+  "schema": "typed-launcher-public-sensitive-audit-v1",
+  "scope": "Locally generated append-only evidence candidate; raw logs are pytest output and warnings from the CPU toy test."
+}

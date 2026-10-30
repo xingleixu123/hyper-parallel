@@ -1,0 +1,20 @@
+--- a/repo-patch/tests/torch/fully_shard/test_fully_shard_gradient_accumulation.py.txt
++++ b/repo-patch/tests/torch/fully_shard/test_fully_shard_gradient_accumulation.py.txt
+@@ -15,6 +15,8 @@
+ """Launch the CPU-only nested FSDP accumulation regression without importing Torch."""
+ import os
+ 
++from pytest import MonkeyPatch
++
+ from tests.common.distributed_launcher import torchrun_case
+ from tests.common.mark_utils import arg_mark
+ 
+@@ -22,7 +24,7 @@
+ 
+ 
+ @arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="allcards", essential_mark="essential")
+-def test_fully_shard_gradient_accumulation(monkeypatch):
++def test_fully_shard_gradient_accumulation(monkeypatch: MonkeyPatch) -> None:
+     """
+     Feature: Nested FSDP no-sync accumulation.
+     Description: Include a unit that participates only before the final microbatch.
