@@ -1,0 +1,178 @@
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f3afa67ba70 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f01ef073470 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f3afa67ba70 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f01ef073470 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=normal event=forward_pre before=NONE after=PRE_FORWARD root_bp_state=False
+FSDP_STATE_TRACE rank=1 scenario=normal event=forward_pre before=NONE after=PRE_FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f01ef073470 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f3afa67ba70 params=[weight]
+FSDP_STATE_TRACE rank=1 scenario=normal event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+FSDP_STATE_TRACE rank=0 scenario=normal event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 362] hook=backward_pre enter module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 366] hook=backward_pre action=unshard module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f01ef073470 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 362] hook=backward_pre enter module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 366] hook=backward_pre action=unshard module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f3afa67ba70 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f3afa67ba70 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f01ef073470 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=normal event=backward_pre before=FORWARD after=PRE_BACKWARD root_bp_state=True
+FSDP_STATE_TRACE rank=1 scenario=normal event=backward_pre before=FORWARD after=PRE_BACKWARD root_bp_state=True
+FSDP_STATE_TRACE rank=1 scenario=normal event=root_backward_enter before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True
+FSDP_STATE_TRACE rank=0 scenario=normal event=root_backward_enter before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 537] hook=root_backward_hook enter module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 382] hook=backward_hook enter module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 385] hook=backward_hook action=post_backward module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 302] post_backward module=HSDP_Block@7f01ef073470 enter reduce_grads=True comm_fusion=False reshard_after_backward=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 537] hook=root_backward_hook enter module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f01ef073470 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 375] post_backward module=HSDP_Block@7f01ef073470 launch=reduce_scatter param=weight all_reduce=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 382] hook=backward_hook enter module=HSDP_Block@7f3afa67ba70
+FSDP_STATE_TRACE rank=1 scenario=normal event=backward before=PRE_BACKWARD after=BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 543] hook=root_backward_hook action=final_reduce module=HSDP_Block@7f01ef073470
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 473] post_backward module=HSDP_Block@7f01ef073470 wait=reduce_scatter param=weight
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 385] hook=backward_hook action=post_backward module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 302] post_backward module=HSDP_Block@7f3afa67ba70 enter reduce_grads=True comm_fusion=False reshard_after_backward=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f3afa67ba70 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 375] post_backward module=HSDP_Block@7f3afa67ba70 launch=reduce_scatter param=weight all_reduce=False
+FSDP_STATE_TRACE rank=0 scenario=normal event=backward before=PRE_BACKWARD after=BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 543] hook=root_backward_hook action=final_reduce module=HSDP_Block@7f3afa67ba70
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 473] post_backward module=HSDP_Block@7f3afa67ba70 wait=reduce_scatter param=weight
+FSDP_STATE_TRACE rank=1 scenario=normal event=root_backward_exit before=PRE_BACKWARD after=NONE root_bp_state=False
+FSDP_STATE_TRACE rank=0 scenario=normal event=root_backward_exit before=PRE_BACKWARD after=NONE root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f01ee72bcb0 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f3afb19f590 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f01ee72bcb0 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f3afb19f590 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=non_reentrant event=forward_pre before=NONE after=PRE_FORWARD root_bp_state=False
+FSDP_STATE_TRACE rank=1 scenario=non_reentrant event=forward_pre before=NONE after=PRE_FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f3afb19f590 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f01ee72bcb0 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=non_reentrant event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+FSDP_STATE_TRACE rank=1 scenario=non_reentrant event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 362] hook=backward_pre enter module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 366] hook=backward_pre action=unshard module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 362] hook=backward_pre enter module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f3afb19f590 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 366] hook=backward_pre action=unshard module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f01ee72bcb0 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f01ee72bcb0 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f3afb19f590 params=[weight]
+FSDP_STATE_TRACE rank=1 scenario=non_reentrant event=backward_pre before=FORWARD after=PRE_BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f01ee72bcb0
+FSDP_STATE_TRACE rank=0 scenario=non_reentrant event=backward_pre before=FORWARD after=PRE_BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 251] hook=forward_pre skip module=HSDP_Block@7f01ee72bcb0 reason=pre_backward
+FSDP_STATE_TRACE rank=1 scenario=non_reentrant event=forward_pre before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 251] hook=forward_pre skip module=HSDP_Block@7f3afb19f590 reason=pre_backward
+FSDP_STATE_TRACE rank=0 scenario=non_reentrant event=forward_pre before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True
+FSDP_STATE_TRACE rank=1 scenario=non_reentrant event=root_backward_enter before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 537] hook=root_backward_hook enter module=HSDP_Block@7f01ee72bcb0
+FSDP_STATE_TRACE rank=0 scenario=non_reentrant event=root_backward_enter before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 382] hook=backward_hook enter module=HSDP_Block@7f01ee72bcb0
+
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 385] hook=backward_hook action=post_backward module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 302] post_backward module=HSDP_Block@7f01ee72bcb0 enter reduce_grads=True comm_fusion=False reshard_after_backward=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f01ee72bcb0 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 537] hook=root_backward_hook enter module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 375] post_backward module=HSDP_Block@7f01ee72bcb0 launch=reduce_scatter param=weight all_reduce=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 382] hook=backward_hook enter module=HSDP_Block@7f3afb19f590
+FSDP_STATE_TRACE rank=1 scenario=non_reentrant event=backward before=PRE_BACKWARD after=BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 543] hook=root_backward_hook action=final_reduce module=HSDP_Block@7f01ee72bcb0
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 473] post_backward module=HSDP_Block@7f01ee72bcb0 wait=reduce_scatter param=weight
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 385] hook=backward_hook action=post_backward module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 302] post_backward module=HSDP_Block@7f3afb19f590 enter reduce_grads=True comm_fusion=False reshard_after_backward=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f3afb19f590 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 375] post_backward module=HSDP_Block@7f3afb19f590 launch=reduce_scatter param=weight all_reduce=False
+FSDP_STATE_TRACE rank=0 scenario=non_reentrant event=backward before=PRE_BACKWARD after=BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 543] hook=root_backward_hook action=final_reduce module=HSDP_Block@7f3afb19f590
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 473] post_backward module=HSDP_Block@7f3afb19f590 wait=reduce_scatter param=weight
+FSDP_STATE_TRACE rank=1 scenario=non_reentrant event=root_backward_exit before=PRE_BACKWARD after=NONE root_bp_state=False
+FSDP_STATE_TRACE rank=0 scenario=non_reentrant event=root_backward_exit before=PRE_BACKWARD after=NONE root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f3af23f1a00 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f01e5da1e80 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f3af23f1a00 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=forward_pre before=NONE after=PRE_FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f01e5da1e80 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f3af23f1a00 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=forward_pre before=NONE after=PRE_FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f3af23f1a00 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f01e5da1e80 params=[weight]
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 249] hook=forward_pre enter module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 289] hook=forward_pre action=unshard module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f01e5da1e80 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f3af23f1a00 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=forward_pre before=FORWARD after=PRE_FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f3af23f1a00 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 362] hook=backward_pre enter module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 366] hook=backward_pre action=unshard module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f3af23f1a00 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f01e5da1e80 params=[weight]
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=forward_pre before=FORWARD after=PRE_FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 343] hook=forward enter module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 350] hook=forward action=reshard module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f01e5da1e80 params=[weight]
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=forward before=PRE_FORWARD after=FORWARD root_bp_state=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 362] hook=backward_pre enter module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 366] hook=backward_pre action=unshard module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 560] action=unshard module=HSDP_Block@7f01e5da1e80 async_op=False params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f3af23f1a00 params=[weight]
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=backward_pre before=FORWARD after=PRE_BACKWARD root_bp_state=True
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=root_backward_enter before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 537] hook=root_backward_hook enter module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 382] hook=backward_hook enter module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 385] hook=backward_hook action=post_backward module=HSDP_Block@7f3af23f1a00
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 302] post_backward module=HSDP_Block@7f3af23f1a00 enter reduce_grads=True comm_fusion=False reshard_after_backward=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f3af23f1a00 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 375] post_backward module=HSDP_Block@7f3af23f1a00 launch=reduce_scatter param=weight all_reduce=False
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 588] action=wait_unshard module=HSDP_Block@7f01e5da1e80 params=[weight]
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=backward_pre before=FORWARD after=PRE_BACKWARD root_bp_state=True
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=backward before=PRE_BACKWARD after=BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 543] hook=root_backward_hook action=final_reduce module=HSDP_Block@7f3af23f1a00
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=root_backward_enter before=PRE_BACKWARD after=PRE_BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 473] post_backward module=HSDP_Block@7f3af23f1a00 wait=reduce_scatter param=weight
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 537] hook=root_backward_hook enter module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 382] hook=backward_hook enter module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 385] hook=backward_hook action=post_backward module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 302] post_backward module=HSDP_Block@7f01e5da1e80 enter reduce_grads=True comm_fusion=False reshard_after_backward=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 547] action=reshard module=HSDP_Block@7f01e5da1e80 params=[weight]
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 375] post_backward module=HSDP_Block@7f01e5da1e80 launch=reduce_scatter param=weight all_reduce=False
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=backward before=PRE_BACKWARD after=BACKWARD root_bp_state=True
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_scheduler.py: 543] hook=root_backward_hook action=final_reduce module=HSDP_Block@7f01e5da1e80
+[DEBUG] [HP-FSDP]: 2026-10-30 20:18:28 [hsdp_state.py: 473] post_backward module=HSDP_Block@7f01e5da1e80 wait=reduce_scatter param=weight
+FSDP_STATE_TRACE rank=1 scenario=reentrant event=root_backward_exit before=PRE_BACKWARD after=NONE root_bp_state=False
+FSDP_STATE_TRACE rank=0 scenario=reentrant event=root_backward_exit before=PRE_BACKWARD after=NONE root_bp_state=False
+..
+
+1 passed in 10.97s
+1 passed in 10.95s

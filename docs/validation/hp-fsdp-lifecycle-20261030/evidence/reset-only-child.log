@@ -1,0 +1,153 @@
+FF
+=================================== FAILURES ===================================
+________________ test_child_backward_finalizes_the_shared_tree _________________
+
+    def test_child_backward_finalizes_the_shared_tree() -> None:
+        """Child-only backward must queue one root callback even with no input gradient hook."""
+        init_dist_gloo()
+        try:
+            assert dist.get_world_size() == 2, "This oracle expects two Gloo ranks"
+            mesh = init_device_mesh("cpu", (2,), mesh_dim_names=("fsdp",))
+            rank = dist.get_rank()
+            for fusion in (False, True):
+                for input_grad in (False, True):
+                    reference = _ConditionalModel()
+                    model = copy.deepcopy(reference)
+                    _wrap(model, mesh, fusion)
+                    with SkipDTensorDispatch():
+                        # Initialize ownership without putting root outputs in the backward graph.
+                        with torch.no_grad():
+                            model(_inputs(rank, 0), False)
+                        for step in range(2):
+                            for source_rank in range(2):
+                                reference.early(_inputs(source_rank, step)).sum().backward()
+                            inputs = _inputs(rank, step).requires_grad_(input_grad)
+                            model.early(inputs).sum().backward()
+>                           _check_gradients(model, reference)
+
+tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = HSDP_ConditionalModel(
+  (common): HSDP_Block()
+  (early): HSDP_Block()
+)
+reference = _ConditionalModel(
+  (common): _Block()
+  (early): _Block()
+)
+
+    def _check_gradients(model: nn.Module, reference: nn.Module) -> None:
+        expected_params = dict(reference.named_parameters())
+        rank = dist.get_rank()
+        for name, param in model.named_parameters():
+            actual = getattr(param, "main_grad", None)
+            expected = expected_params[name].grad
+            if expected is None:
+                assert actual is None, f"Unused parameter {name} unexpectedly has a gradient"
+            else:
+>               assert actual is not None, f"Missing main_grad for {name}"
+E               AssertionError: Missing main_grad for early.weight
+E               assert None is not None
+
+tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py:104: AssertionError
+
+=================================== FAILURES ===================================
+=========================== short test summary info ============================
+FAILED tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py::test_child_backward_finalizes_the_shared_tree
+________________ test_child_backward_finalizes_the_shared_tree _________________
+1 failed in 8.77s
+
+    def test_child_backward_finalizes_the_shared_tree() -> None:
+        """Child-only backward must queue one root callback even with no input gradient hook."""
+        init_dist_gloo()
+        try:
+            assert dist.get_world_size() == 2, "This oracle expects two Gloo ranks"
+            mesh = init_device_mesh("cpu", (2,), mesh_dim_names=("fsdp",))
+            rank = dist.get_rank()
+            for fusion in (False, True):
+                for input_grad in (False, True):
+                    reference = _ConditionalModel()
+                    model = copy.deepcopy(reference)
+                    _wrap(model, mesh, fusion)
+                    with SkipDTensorDispatch():
+                        # Initialize ownership without putting root outputs in the backward graph.
+                        with torch.no_grad():
+                            model(_inputs(rank, 0), False)
+                        for step in range(2):
+                            for source_rank in range(2):
+                                reference.early(_inputs(source_rank, step)).sum().backward()
+                            inputs = _inputs(rank, step).requires_grad_(input_grad)
+                            model.early(inputs).sum().backward()
+>                           _check_gradients(model, reference)
+
+tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = HSDP_ConditionalModel(
+  (common): HSDP_Block()
+  (early): HSDP_Block()
+)
+reference = _ConditionalModel(
+  (common): _Block()
+  (early): _Block()
+)
+
+    def _check_gradients(model: nn.Module, reference: nn.Module) -> None:
+        expected_params = dict(reference.named_parameters())
+        rank = dist.get_rank()
+        for name, param in model.named_parameters():
+            actual = getattr(param, "main_grad", None)
+            expected = expected_params[name].grad
+            if expected is None:
+                assert actual is None, f"Unused parameter {name} unexpectedly has a gradient"
+            else:
+>               assert actual is not None, f"Missing main_grad for {name}"
+E               AssertionError: Missing main_grad for early.weight
+E               assert None is not None
+
+tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py:104: AssertionError
+=========================== short test summary info ============================
+FAILED tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py::test_child_backward_finalizes_the_shared_tree
+1 failed in 8.74s
+W1030 20:08:50.035000 23569 torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 23574 closing signal SIGTERM
+E1030 20:08:50.105000 23569 torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 0 (pid: 23573) of binary: <TASK_ROOT>/repository/../venv/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+pytest FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-30_20:08:50
+  host      : CPU_HOST
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 23574)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 23574
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-30_20:08:50
+  host      : CPU_HOST
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 23573) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

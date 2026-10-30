@@ -1,0 +1,591 @@
+From 388ec460a163ae06e18b9189c490cf37da460f8a Mon Sep 17 00:00:00 2001
+From: xingleixu123 <a767769948@qq.com>
+Date: Fri, 30 Oct 2026 20:46:18 +0800
+Subject: [PATCH] fix(fully_shard): scope backward finalization to the module
+ tree
+
+---
+ .../core/fully_shard/hsdp_scheduler.py        |  18 +-
+ .../_test_fully_shard_backward_lifecycle.py   | 183 ++++++++++++++++++
+ ..._test_fully_shard_gradient_accumulation.py | 132 +++++++++++++
+ .../_test_fully_shard_hook_state_machine.py   |   6 +-
+ .../test_fully_shard_gradient_accumulation.py |  56 ++++++
+ .../test_fully_shard_register_hook.py         |  49 ++++-
+ 6 files changed, 432 insertions(+), 12 deletions(-)
+ create mode 100644 tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py
+ create mode 100644 tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py
+ create mode 100644 tests/torch/fully_shard/test_fully_shard_gradient_accumulation.py
+
+diff --git a/hyper_parallel/core/fully_shard/hsdp_scheduler.py b/hyper_parallel/core/fully_shard/hsdp_scheduler.py
+index ff107a6..ef2662c 100644
+--- a/hyper_parallel/core/fully_shard/hsdp_scheduler.py
++++ b/hyper_parallel/core/fully_shard/hsdp_scheduler.py
+@@ -77,6 +77,8 @@ class HSDPSchedulerContext:
+         # Compile tracing may enter the root more than once; initialize shared
+         # parameter state only on the first real forward.
+         self.lazy_init_done: bool = False
++        # The first participating unit queues the tree finalizer and owns
++        # this flag until backward communication and gradient application finish.
+         self.root_bp_state = False
+         # all_hsdp_schedulers (for one module tree structure), deduplicated at
+         # registration time because ``fully_shard`` may be given a module list
+@@ -522,9 +524,12 @@ class HSDPSchedulerV2:
+         """Execute backward pre hook."""
+         if self.scheduler_state == FSDPSchedulerState.PRE_BACKWARD:
+             return grad
+-        if self._is_root:
+-            Variable._execution_engine.queue_callback(self._root_backward_hook)
+-        self.scheduler_ctx.root_bp_state = True
++        # A backward may enter through a nested unit without traversing the
++        # root's outputs. The shared context owns one finalizer for the tree.
++        if not self.scheduler_ctx.root_bp_state:
++            root_scheduler = self.scheduler_ctx.root_module.hsdp_scheduler
++            Variable._execution_engine.queue_callback(root_scheduler._root_backward_hook)
++            self.scheduler_ctx.root_bp_state = True
+         self._hsdp_backward_pre_hook(self.cell, None)
+         return grad
+ 
+@@ -536,7 +541,6 @@ class HSDPSchedulerV2:
+         for hsdp_scheduler in self.scheduler_ctx.all_hsdp_schedulers:
+             # let modules which are not triggered backward_hook launch backward communication.
+             hsdp_scheduler._backward_hook()
+-        self.scheduler_ctx.root_bp_state = False
+         with torch.profiler.record_function(f"root_backward reduce:{self.hsdp_state.module_name}"):
+             logger.debug(
+                 "hook=root_backward_hook action=final_reduce module=%s",
+@@ -545,6 +549,12 @@ class HSDPSchedulerV2:
+             self._finalize_comm_fusion_reductions()
+             self._finalize_per_param_reductions()
+             self.launch_tp_replicate_reduce_and_apply()
++        self.scheduler_ctx.root_bp_state = False
++        # BACKWARD deduplicates hooks within one autograd execution. Inactive
++        # children must not carry it into the next backward; their no-sync
++        # gradients have a separate lifetime and must remain accumulated.
++        for scheduler in self.scheduler_ctx.all_hsdp_schedulers:
++            scheduler.scheduler_state = None
+ 
+     def check_state_prefetch_handles_consumed(self) -> None:
+         """Check that all parameters in the module tree consumed their prefetch work.
+diff --git a/tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py b/tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py
+new file mode 100644
+index 0000000..c80091b
+--- /dev/null
++++ b/tests/torch/fully_shard/_test_fully_shard_backward_lifecycle.py
+@@ -0,0 +1,183 @@
++# Copyright 2026 Huawei Technologies Co., Ltd
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++# http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++# ============================================================================
++"""Exercise module-tree backward boundaries using real CPU/Gloo autograd."""
++import copy
++
++import torch
++import torch.distributed as dist
++from torch import nn
++from torch.utils.checkpoint import checkpoint
++
++from hyper_parallel import SkipDTensorDispatch, init_device_mesh
++from hyper_parallel.core.fully_shard.api import _extend_module_with_hsdp_interface
++from hyper_parallel.core.fully_shard.hsdp_scheduler import HSDPSchedulerV2
++from hyper_parallel.core.fully_shard.utils import MixedPrecisionPolicy, OffloadPolicy
++from tests.torch.fully_shard._test_fully_shard_gradient_accumulation import _ConditionalModel, _inputs, _local
++from tests.torch.utils import init_dist_gloo
++
++
++class _CountingScheduler(HSDPSchedulerV2):
++    """Count final callbacks without replacing any production hook or collective."""
++
++    def __init__(self, *args: object, **kwargs: object) -> None:
++        """Initialize the scheduler and its completed-callback counter."""
++        self.final_callbacks = 0
++        super().__init__(*args, **kwargs)
++
++    def _root_backward_hook(self):
++        self.final_callbacks += 1
++        super()._root_backward_hook()
++
++
++class _CheckpointModel(_ConditionalModel):
++    """Checkpoint each nested unit while the root owns the outer autograd graph."""
++
++    def __init__(self, checkpoint_mode: str) -> None:
++        """Select how each child unit is recomputed during backward."""
++        super().__init__()
++        self.checkpoint_mode = checkpoint_mode
++
++    def _run_block(self, block: nn.Module, inputs: torch.Tensor) -> torch.Tensor:
++        if self.checkpoint_mode == "none":
++            return block(inputs)
++        return checkpoint(block, inputs, use_reentrant=self.checkpoint_mode == "reentrant")
++
++    def forward(self, inputs: torch.Tensor, use_early: bool) -> torch.Tensor:
++        """Run the selected units with the requested checkpoint implementation."""
++        result = self._run_block(self.common, inputs)
++        return result + self._run_block(self.early, inputs) if use_early else result
++
++
++def _wrap(model: nn.Module, mesh, fusion: bool, wrapping: str = "nested") -> None:
++    policy = MixedPrecisionPolicy(
++        param_dtype=torch.float32, reduce_dtype=torch.float32, output_dtype=torch.float32,
++        cast_forward_inputs=False, apply_grad_on_fp32_main_grad=True,
++    )
++    if wrapping == "nested":
++        units = (model.common, model.early, model)
++    elif wrapping == "grouped":
++        units = ((model.common, model.early), model)
++    else:
++        units = (model,)
++    for unit in units:
++        modules = unit if isinstance(unit, tuple) else (unit,)
++        for module in modules:
++            _extend_module_with_hsdp_interface(module)
++        scheduler = _CountingScheduler(
++            unit, mesh, True, None, policy, OffloadPolicy(), set(), set(), torch.device("cpu"), fusion,
++        )
++        for module in modules:
++            module.hsdp_scheduler = scheduler
++    model.set_reduce_op_type("sum")
++
++
++def _check_boundary(model: nn.Module, expected_callbacks: int) -> None:
++    root = model.hsdp_scheduler
++    assert root.final_callbacks == expected_callbacks, (
++        f"Expected {expected_callbacks} tree callbacks, got {root.final_callbacks}"
++    )
++    for scheduler in root.scheduler_ctx.all_hsdp_schedulers:
++        assert scheduler.scheduler_state is None, (
++            f"Backward state leaked for {scheduler.hsdp_state}: {scheduler.scheduler_state}"
++        )
++    assert not root.scheduler_ctx.root_bp_state, (
++        f"Expected an inactive backward context, got root_bp_state={root.scheduler_ctx.root_bp_state}"
++    )
++
++
++def _check_gradients(model: nn.Module, reference: nn.Module) -> None:
++    expected_params = dict(reference.named_parameters())
++    rank = dist.get_rank()
++    for name, param in model.named_parameters():
++        actual = getattr(param, "main_grad", None)
++        expected = expected_params[name].grad
++        if expected is None:
++            assert actual is None, f"Unused parameter {name} unexpectedly has a gradient"
++        else:
++            assert actual is not None, f"Missing main_grad for {name}"
++            torch.testing.assert_close(_local(actual), expected.chunk(2, dim=0)[rank], rtol=0, atol=0)
++    for scheduler in model.hsdp_scheduler.scheduler_ctx.all_hsdp_schedulers:
++        for param in scheduler.hsdp_state.hsdp_params:
++            assert param.unsharded_accumulated_grad is None, f"Unconsumed full gradient for {param}"
++            assert param.reduce_partial_output is None, f"Unconsumed partial for {param}"
++
++
++def _accumulation_case(mesh, fusion: bool, wrapping: str, checkpoint_mode: str, input_grad: bool) -> None:
++    reference = _ConditionalModel()
++    model = _CheckpointModel(checkpoint_mode)
++    _wrap(model, mesh, fusion, wrapping)
++    rank = dist.get_rank()
++    # Two accumulation windows on the same objects, without reset_iter_state.
++    # Retaining final grads between windows also checks exactly-once accumulation.
++    for window in range(2):
++        for source_rank in range(2):
++            for micro in range(3):
++                reference(_inputs(source_rank, micro + window), micro == 0).sum().backward()
++        with SkipDTensorDispatch():
++            for micro in range(3):
++                model.set_requires_gradient_sync(micro == 2)
++                inputs = _inputs(rank, micro + window).requires_grad_(input_grad)
++                model(inputs, micro == 0).sum().backward()
++                _check_boundary(model, window * 3 + micro + 1)
++                if micro < 2:
++                    params = [p for s in model.hsdp_scheduler.scheduler_ctx.all_hsdp_schedulers
++                              for p in s.hsdp_state.hsdp_params]
++                    assert any(p.unsharded_accumulated_grad is not None for p in params), (
++                        f"Expected pending no-sync gradients at window={window}, micro={micro}, got no buffers"
++                    )
++        _check_gradients(model, reference)
++
++
++def test_backward_boundaries_preserve_accumulation() -> None:
++    """Verify nested/single/grouped ownership, input hooks, and both checkpoint modes."""
++    init_dist_gloo()
++    try:
++        assert dist.get_world_size() == 2, f"Expected two Gloo ranks, got {dist.get_world_size()}"
++        mesh = init_device_mesh("cpu", (2,), mesh_dim_names=("fsdp",))
++        for fusion in (False, True):
++            for wrapping in ("single", "nested", "grouped"):
++                for input_grad in (False, True):
++                    _accumulation_case(mesh, fusion, wrapping, "none", input_grad)
++            for mode in ("non_reentrant", "reentrant"):
++                _accumulation_case(mesh, fusion, "nested", mode, True)
++    finally:
++        dist.destroy_process_group()
++
++
++def test_child_backward_finalizes_the_shared_tree() -> None:
++    """Child-only backward must queue one root callback even with no input gradient hook."""
++    init_dist_gloo()
++    try:
++        assert dist.get_world_size() == 2, f"Expected two Gloo ranks, got {dist.get_world_size()}"
++        mesh = init_device_mesh("cpu", (2,), mesh_dim_names=("fsdp",))
++        rank = dist.get_rank()
++        for fusion in (False, True):
++            for input_grad in (False, True):
++                reference = _ConditionalModel()
++                model = copy.deepcopy(reference)
++                _wrap(model, mesh, fusion)
++                with SkipDTensorDispatch():
++                    # Initialize ownership without putting root outputs in the backward graph.
++                    with torch.no_grad():
++                        model(_inputs(rank, 0), False)
++                    for step in range(2):
++                        for source_rank in range(2):
++                            reference.early(_inputs(source_rank, step)).sum().backward()
++                        inputs = _inputs(rank, step).requires_grad_(input_grad)
++                        model.early(inputs).sum().backward()
++                        _check_gradients(model, reference)
++                        _check_boundary(model, step + 1)
++    finally:
++        dist.destroy_process_group()
+diff --git a/tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py b/tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py
+new file mode 100644
+index 0000000..74ad0f1
+--- /dev/null
++++ b/tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py
+@@ -0,0 +1,132 @@
++# Copyright 2026 Huawei Technologies Co., Ltd
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++# http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++# ============================================================================
++"""Real Gloo regression for nested FSDP gradients across no-sync microbatches."""
++import copy
++
++import torch
++import torch.distributed as dist
++from torch import nn
++
++from hyper_parallel import SkipDTensorDispatch, init_device_mesh
++from hyper_parallel.core.fully_shard.api import HSDPModule, _extend_module_with_hsdp_interface
++from hyper_parallel.core.fully_shard.hsdp_scheduler import HSDPSchedulerV2
++from hyper_parallel.core.fully_shard.utils import MixedPrecisionPolicy, OffloadPolicy
++from tests.torch.utils import init_dist_gloo
++
++
++class _Block(nn.Module):
++    """Small linear block with deterministic, exactly representable weights."""
++
++    def __init__(self, offset: int) -> None:
++        """Create deterministic weights with a distinct offset per unit."""
++        super().__init__()
++        self.weight = nn.Parameter((torch.arange(16, dtype=torch.float32).reshape(4, 4) + offset) / 16)
++
++    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
++        """Apply the deterministic linear weight."""
++        return inputs @ self.weight
++
++
++class _ConditionalModel(nn.Module):
++    """Keep one nested unit optional while the root participates in both microbatches."""
++
++    def __init__(self) -> None:
++        """Construct one always-active unit and one conditional unit."""
++        super().__init__()
++        self.common = _Block(1)
++        self.early = _Block(3)
++
++    def forward(self, inputs: torch.Tensor, use_early: bool) -> torch.Tensor:
++        """Include the optional unit only in the selected microbatches."""
++        result = self.common(inputs)
++        return result + self.early(inputs) if use_early else result
++
++
++def _inputs(rank: int, micro: int) -> torch.Tensor:
++    return torch.tensor([[rank + 1.0, micro + 1.0, rank + micro + 1.0, 2.0]],
++                        dtype=torch.float32, requires_grad=True)
++
++
++def _local(tensor: torch.Tensor) -> torch.Tensor:
++    to_local = getattr(tensor, "to_local", None)
++    return (to_local() if callable(to_local) else tensor).detach()
++
++
++def _wrap_cpu_units(model: nn.Module, mesh, comm_fusion: bool) -> None:
++    # Match the CPU scheduler seam in _test_fully_shard_hook_state_machine.py.
++    # Public fully_shard rejects CPU; no production device check is overridden.
++    policy = MixedPrecisionPolicy(
++        param_dtype=torch.float32,
++        reduce_dtype=torch.float32,
++        output_dtype=torch.float32,
++        cast_forward_inputs=False,
++        apply_grad_on_fp32_main_grad=True,
++    )
++    for unit in (model.common, model.early, model):
++        _extend_module_with_hsdp_interface(unit)
++        unit.hsdp_scheduler = HSDPSchedulerV2(
++            unit, mesh, True, None, policy, OffloadPolicy(), set(), set(), torch.device("cpu"), comm_fusion,
++        )
++    model.set_reduce_op_type("sum")
++
++
++def _run_case(mesh, rank: int, comm_fusion: bool, branch_both: bool, sync_each: bool) -> None:
++    reference = _ConditionalModel()
++    model = copy.deepcopy(reference)
++    _wrap_cpu_units(model, mesh, comm_fusion)
++    reference_parameters = dict(reference.named_parameters())
++    for name, param in model.named_parameters():
++        expected = reference_parameters[name].detach().chunk(2, dim=0)[rank]
++        torch.testing.assert_close(_local(param), expected, rtol=0, atol=0)
++
++    # Ordinary PyTorch graph, independent of HP's scheduler and communication.
++    # SUM is explicit so the CPU test does not depend on Gloo AVG support.
++    for source_rank in range(2):
++        for micro in range(2):
++            reference(_inputs(source_rank, micro), branch_both or micro == 0).sum().backward()
++
++    with SkipDTensorDispatch():
++        for micro in range(2):
++            model.set_requires_gradient_sync(sync_each or micro == 1)
++            model(_inputs(rank, micro), branch_both or micro == 0).sum().backward()
++
++    for name, param in model.named_parameters():
++        actual = getattr(param, "main_grad", None)
++        assert actual is not None, (
++            f"Missing main_grad for {name}: fusion={comm_fusion}, branch_both={branch_both}, sync_each={sync_each}"
++        )
++        expected = reference_parameters[name].grad.chunk(2, dim=0)[rank]
++        torch.testing.assert_close(_local(actual), expected, rtol=0, atol=0)
++    for unit in model.modules():
++        if not isinstance(unit, HSDPModule):
++            continue
++        for param in unit.hsdp_scheduler.hsdp_state.hsdp_params:
++            assert param.unsharded_accumulated_grad is None, f"Unconsumed full gradient for {param}"
++            assert param.reduce_partial_output is None, f"Unconsumed reduction partial for {param}"
++
++
++def test_nested_no_sync_flushes_inactive_microbatch() -> None:
++    """Compare nested conditional gradients with an independent graph and check both reduction paths."""
++    init_dist_gloo()
++    try:
++        assert dist.get_world_size() == 2, f"Expected two Gloo ranks, got {dist.get_world_size()}"
++        rank = dist.get_rank()
++        mesh = init_device_mesh(device_type="cpu", mesh_shape=(2,), mesh_dim_names=("fsdp",))
++        for comm_fusion in (False, True):
++            for branch_both, sync_each in ((True, True), (True, False), (False, True), (False, False)):
++                _run_case(mesh, rank, comm_fusion, branch_both, sync_each)
++                dist.barrier()
++    finally:
++        dist.destroy_process_group()
+diff --git a/tests/torch/fully_shard/_test_fully_shard_hook_state_machine.py b/tests/torch/fully_shard/_test_fully_shard_hook_state_machine.py
+index 0a5dad4..fd57a31 100644
+--- a/tests/torch/fully_shard/_test_fully_shard_hook_state_machine.py
++++ b/tests/torch/fully_shard/_test_fully_shard_hook_state_machine.py
+@@ -157,7 +157,7 @@ def test_torch_fully_shard_hook_state_machine() -> None:
+             ("backward_pre", "FORWARD", "PRE_BACKWARD"),
+             ("root_backward_enter", "PRE_BACKWARD", "PRE_BACKWARD"),
+             ("backward", "PRE_BACKWARD", "BACKWARD"),
+-            ("root_backward_exit", "PRE_BACKWARD", "BACKWARD"),
++            ("root_backward_exit", "PRE_BACKWARD", "NONE"),
+         ],
+         "non_reentrant": [
+             ("forward_pre", "NONE", "PRE_FORWARD"),
+@@ -166,7 +166,7 @@ def test_torch_fully_shard_hook_state_machine() -> None:
+             ("forward_pre", "PRE_BACKWARD", "PRE_BACKWARD"),
+             ("root_backward_enter", "PRE_BACKWARD", "PRE_BACKWARD"),
+             ("backward", "PRE_BACKWARD", "BACKWARD"),
+-            ("root_backward_exit", "PRE_BACKWARD", "BACKWARD"),
++            ("root_backward_exit", "PRE_BACKWARD", "NONE"),
+         ],
+         "reentrant": [
+             ("forward_pre", "NONE", "PRE_FORWARD"),
+@@ -176,7 +176,7 @@ def test_torch_fully_shard_hook_state_machine() -> None:
+             ("backward_pre", "FORWARD", "PRE_BACKWARD"),
+             ("root_backward_enter", "PRE_BACKWARD", "PRE_BACKWARD"),
+             ("backward", "PRE_BACKWARD", "BACKWARD"),
+-            ("root_backward_exit", "PRE_BACKWARD", "BACKWARD"),
++            ("root_backward_exit", "PRE_BACKWARD", "NONE"),
+         ],
+     }
+ 
+diff --git a/tests/torch/fully_shard/test_fully_shard_gradient_accumulation.py b/tests/torch/fully_shard/test_fully_shard_gradient_accumulation.py
+new file mode 100644
+index 0000000..2941191
+--- /dev/null
++++ b/tests/torch/fully_shard/test_fully_shard_gradient_accumulation.py
+@@ -0,0 +1,56 @@
++# Copyright 2026 Huawei Technologies Co., Ltd
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++# http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++# ============================================================================
++"""Launch the CPU-only nested FSDP accumulation regression without importing Torch."""
++import os
++
++import pytest
++from pytest import MonkeyPatch
++
++from tests.common.distributed_launcher import torchrun_case
++from tests.common.mark_utils import arg_mark
++
++_WORKER = os.path.join(os.path.dirname(__file__), "_test_fully_shard_gradient_accumulation.py")
++
++
++@arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="allcards", essential_mark="essential")
++def test_fully_shard_gradient_accumulation(monkeypatch: MonkeyPatch) -> None:
++    """
++    Feature: Nested FSDP no-sync accumulation.
++    Description: Include a unit that participates only before the final microbatch.
++    Expectation: Both reduction paths match ordinary PyTorch and consume pending gradients.
++    """
++    monkeypatch.setenv("HYPER_PARALLEL_PLATFORM", "torch")
++    monkeypatch.setenv("HYPER_PARALLEL_TEST_DEVICE_TYPE", "cpu")
++    monkeypatch.setenv("TORCH_DEVICE_BACKEND_AUTOLOAD", "0")
++    torchrun_case(_WORKER, "test_nested_no_sync_flushes_inactive_microbatch", num_proc=2)
++
++
++@arg_mark(plat_marks=["cpu_linux"], level_mark="level0", card_mark="allcards", essential_mark="essential")
++@pytest.mark.parametrize("case_name", [
++    "test_backward_boundaries_preserve_accumulation",
++    "test_child_backward_finalizes_the_shared_tree",
++])
++def test_fully_shard_backward_lifecycle(monkeypatch: MonkeyPatch, case_name: str) -> None:
++    """Check backward lifetime and child-only finalization with independent process groups.
++
++    Feature: Module-tree backward lifecycle.
++    Description: Exercise nested/grouped ownership, checkpointing, and standalone child backwards.
++    Expectation: Each backward finalizes once; accumulated gradients match an independent graph.
++    """
++    monkeypatch.setenv("HYPER_PARALLEL_PLATFORM", "torch")
++    monkeypatch.setenv("HYPER_PARALLEL_TEST_DEVICE_TYPE", "cpu")
++    monkeypatch.setenv("TORCH_DEVICE_BACKEND_AUTOLOAD", "0")
++    worker = os.path.join(os.path.dirname(__file__), "_test_fully_shard_backward_lifecycle.py")
++    torchrun_case(worker, case_name, num_proc=2)
+diff --git a/tests/ut/core/fully_shard/test_fully_shard_register_hook.py b/tests/ut/core/fully_shard/test_fully_shard_register_hook.py
+index d896682..7e9414c 100644
+--- a/tests/ut/core/fully_shard/test_fully_shard_register_hook.py
++++ b/tests/ut/core/fully_shard/test_fully_shard_register_hook.py
+@@ -330,15 +330,17 @@ class TestRegisterPostBackwardHook(unittest.TestCase):
+ 
+ 
+ class TestRootBackwardCallback(unittest.TestCase):
+-    """Unit tests for root-only backward finalizer registration."""
++    """Unit tests for one finalizer per shared module-tree backward."""
+ 
+     @patch("hyper_parallel.core.fully_shard.hsdp_scheduler.Variable")
+     def test_root_backward_pre_hook_queues_finalizer(self, mock_variable):
+-        """Only the root scheduler should queue the end-of-backward callback."""
++        """A root pre-hook queues the tree's end-of-backward callback."""
+         scheduler = _make_scheduler_stub()
+         scheduler.scheduler_state = FSDPSchedulerState.FORWARD
+         scheduler._is_root = True
+         scheduler.cell = MagicMock()
++        scheduler.cell.hsdp_scheduler = scheduler
++        scheduler.scheduler_ctx.root_module = scheduler.cell
+         scheduler._hsdp_backward_pre_hook = MagicMock()
+         grad = torch.ones(1)
+ 
+@@ -351,18 +353,27 @@ class TestRootBackwardCallback(unittest.TestCase):
+         scheduler._hsdp_backward_pre_hook.assert_called_once_with(scheduler.cell, None)
+ 
+     @patch("hyper_parallel.core.fully_shard.hsdp_scheduler.Variable")
+-    def test_non_root_backward_pre_hook_does_not_queue_finalizer(self, mock_variable):
+-        """A child scheduler should run its pre-hook without queuing root finalization."""
++    def test_child_backward_pre_hook_queues_root_finalizer_once(self, mock_variable):
++        """A child can schedule root finalization; later siblings must not duplicate it."""
+         scheduler = _make_scheduler_stub()
+         scheduler.scheduler_state = FSDPSchedulerState.FORWARD
+         scheduler._is_root = False
+         scheduler.cell = MagicMock()
+         scheduler._hsdp_backward_pre_hook = MagicMock()
++        root = _make_scheduler_stub()
++        root.cell = MagicMock()
++        root.cell.hsdp_scheduler = root
++        root.scheduler_ctx = scheduler.scheduler_ctx
++        root.scheduler_ctx.root_module = root.cell
++        root.scheduler_state = FSDPSchedulerState.FORWARD
++        root._hsdp_backward_pre_hook = MagicMock()
+ 
+         scheduler._backward_pre_hook(torch.ones(1))
++        root._backward_pre_hook(torch.ones(1))
+ 
+-        mock_variable._execution_engine.queue_callback.assert_not_called()
++        mock_variable._execution_engine.queue_callback.assert_called_once_with(root._root_backward_hook)
+         scheduler._hsdp_backward_pre_hook.assert_called_once_with(scheduler.cell, None)
++        root._hsdp_backward_pre_hook.assert_called_once_with(root.cell, None)
+ 
+     @patch("hyper_parallel.core.fully_shard.hsdp_scheduler.Variable")
+     def test_repeated_backward_pre_hook_does_not_queue_again(self, mock_variable):
+@@ -510,16 +521,44 @@ class TestRootBackwardCallback(unittest.TestCase):
+         scheduler = _make_prefetch_scheduler([_make_prefetch_param("root.weight")])
+         child = _make_prefetch_scheduler([_make_prefetch_param("layers.0.weight")], scheduler_ctx=scheduler.scheduler_ctx)
+         scheduler.scheduler_ctx.root_bp_state = True
++        scheduler.scheduler_state = FSDPSchedulerState.BACKWARD
++        child.scheduler_state = FSDPSchedulerState.BACKWARD
++        pending_grad = torch.ones(1)
++        child.hsdp_state.hsdp_params[0].unsharded_accumulated_grad = pending_grad
++
++        def check_before_apply() -> None:
++            """Keep execution state active until communication results are applied."""
++            self.assertEqual(child.scheduler_state, FSDPSchedulerState.BACKWARD)
++            self.assertTrue(scheduler.scheduler_ctx.root_bp_state)
++
++        scheduler.launch_tp_replicate_reduce_and_apply.side_effect = check_before_apply
+ 
+         scheduler._root_backward_hook()
+ 
+         self.assertFalse(scheduler.scheduler_ctx.root_bp_state)
++        self.assertIsNone(scheduler.scheduler_state)
++        self.assertIsNone(child.scheduler_state)
++        self.assertIs(child.hsdp_state.hsdp_params[0].unsharded_accumulated_grad, pending_grad)
+         scheduler._backward_hook.assert_called_once_with()
+         child._backward_hook.assert_called_once_with()
+         scheduler._finalize_comm_fusion_reductions.assert_called_once_with()
+         scheduler._finalize_per_param_reductions.assert_called_once_with()
+         scheduler.launch_tp_replicate_reduce_and_apply.assert_called_once_with()
+ 
++    def test_failed_finalization_does_not_mark_the_tree_idle(self) -> None:
++        """A failed drain must not expose an apparently reusable backward context."""
++        scheduler = _make_prefetch_scheduler()
++        scheduler.scheduler_ctx.root_bp_state = True
++        scheduler.scheduler_state = FSDPSchedulerState.BACKWARD
++        scheduler._finalize_per_param_reductions.side_effect = RuntimeError("reduction failed")
++
++        with self.assertRaisesRegex(RuntimeError, "reduction failed"):
++            scheduler._root_backward_hook()
++
++        self.assertTrue(scheduler.scheduler_ctx.root_bp_state)
++        self.assertEqual(scheduler.scheduler_state, FSDPSchedulerState.BACKWARD)
++        scheduler.launch_tp_replicate_reduce_and_apply.assert_not_called()
++
+ 
+ class TestRecomputeForwardPrefetchGuard(unittest.TestCase):
+     """Unit tests for forward-prefetch suppression during activation recompute."""
+-- 
+2.43.0
+

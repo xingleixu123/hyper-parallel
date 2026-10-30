@@ -1,0 +1,146 @@
+F
+=================================== FAILURES ===================================
+_______________ test_nested_no_sync_flushes_inactive_microbatch ________________
+
+    def test_nested_no_sync_flushes_inactive_microbatch() -> None:
+        """Compare nested conditional gradients with an independent graph and check both reduction paths."""
+        init_dist_gloo()
+        try:
+            assert dist.get_world_size() == 2, f"Expected two Gloo ranks, got {dist.get_world_size()}"
+            rank = dist.get_rank()
+            mesh = init_device_mesh(device_type="cpu", mesh_shape=(2,), mesh_dim_names=("fsdp",))
+            for comm_fusion in (False, True):
+                for branch_both, sync_each in ((True, True), (True, False), (False, True), (False, False)):
+>                   _run_case(mesh, rank, comm_fusion, branch_both, sync_each)
+
+tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mesh = DeviceMesh(device_type='cpu', mesh_shape=(2,), mesh_dim_names=('fsdp',), rank_list=(0, 1))
+rank = 1, comm_fusion = False, branch_both = False, sync_each = False
+
+    def _run_case(mesh, rank: int, comm_fusion: bool, branch_both: bool, sync_each: bool) -> None:
+        reference = _ConditionalModel()
+        model = copy.deepcopy(reference)
+        _wrap_cpu_units(model, mesh, comm_fusion)
+        reference_parameters = dict(reference.named_parameters())
+        for name, param in model.named_parameters():
+            expected = reference_parameters[name].detach().chunk(2, dim=0)[rank]
+            torch.testing.assert_close(_local(param), expected, rtol=0, atol=0)
+    
+        # Ordinary PyTorch graph, independent of HP's scheduler and communication.
+        # SUM is explicit so the CPU test does not depend on Gloo AVG support.
+        for source_rank in range(2):
+            for micro in range(2):
+                reference(_inputs(source_rank, micro), branch_both or micro == 0).sum().backward()
+    
+        with SkipDTensorDispatch():
+            for micro in range(2):
+                model.set_requires_gradient_sync(sync_each or micro == 1)
+                model(_inputs(rank, micro), branch_both or micro == 0).sum().backward()
+    
+        for name, param in model.named_parameters():
+            actual = getattr(param, "main_grad", None)
+>           assert actual is not None, (
+                f"Missing main_grad for {name}: fusion={comm_fusion}, branch_both={branch_both}, sync_each={sync_each}"
+            )
+E           AssertionError: Missing main_grad for early.weight: fusion=False, branch_both=False, sync_each=False
+E           assert None is not None
+
+tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py:103: AssertionError
+=========================== short test summary info ============================
+FAILED tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py::test_nested_no_sync_flushes_inactive_microbatch
+1 failed in 5.72s
+F
+=================================== FAILURES ===================================
+_______________ test_nested_no_sync_flushes_inactive_microbatch ________________
+
+    def test_nested_no_sync_flushes_inactive_microbatch() -> None:
+        """Compare nested conditional gradients with an independent graph and check both reduction paths."""
+        init_dist_gloo()
+        try:
+            assert dist.get_world_size() == 2, f"Expected two Gloo ranks, got {dist.get_world_size()}"
+            rank = dist.get_rank()
+            mesh = init_device_mesh(device_type="cpu", mesh_shape=(2,), mesh_dim_names=("fsdp",))
+            for comm_fusion in (False, True):
+                for branch_both, sync_each in ((True, True), (True, False), (False, True), (False, False)):
+>                   _run_case(mesh, rank, comm_fusion, branch_both, sync_each)
+
+tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mesh = DeviceMesh(device_type='cpu', mesh_shape=(2,), mesh_dim_names=('fsdp',), rank_list=(0, 1))
+rank = 0, comm_fusion = False, branch_both = False, sync_each = False
+
+    def _run_case(mesh, rank: int, comm_fusion: bool, branch_both: bool, sync_each: bool) -> None:
+        reference = _ConditionalModel()
+        model = copy.deepcopy(reference)
+        _wrap_cpu_units(model, mesh, comm_fusion)
+        reference_parameters = dict(reference.named_parameters())
+        for name, param in model.named_parameters():
+            expected = reference_parameters[name].detach().chunk(2, dim=0)[rank]
+            torch.testing.assert_close(_local(param), expected, rtol=0, atol=0)
+    
+        # Ordinary PyTorch graph, independent of HP's scheduler and communication.
+        # SUM is explicit so the CPU test does not depend on Gloo AVG support.
+        for source_rank in range(2):
+            for micro in range(2):
+                reference(_inputs(source_rank, micro), branch_both or micro == 0).sum().backward()
+    
+        with SkipDTensorDispatch():
+            for micro in range(2):
+                model.set_requires_gradient_sync(sync_each or micro == 1)
+                model(_inputs(rank, micro), branch_both or micro == 0).sum().backward()
+    
+        for name, param in model.named_parameters():
+            actual = getattr(param, "main_grad", None)
+>           assert actual is not None, (
+                f"Missing main_grad for {name}: fusion={comm_fusion}, branch_both={branch_both}, sync_each={sync_each}"
+            )
+E           AssertionError: Missing main_grad for early.weight: fusion=False, branch_both=False, sync_each=False
+E           assert None is not None
+
+tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py:103: AssertionError
+=========================== short test summary info ============================
+FAILED tests/torch/fully_shard/_test_fully_shard_gradient_accumulation.py::test_nested_no_sync_flushes_inactive_microbatch
+1 failed in 5.73s
+E1030 20:04:55.485000 23236 torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 0 (pid: 23243) of binary: <TASK_ROOT>/venv/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/xxl/.cache/codex/hp-mf-cann92-pr301-20261027/cpu-env/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+pytest FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-30_20:04:55
+  host      : CPU_HOST
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 23244) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-30_20:04:55
+  host      : CPU_HOST
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 23243) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
