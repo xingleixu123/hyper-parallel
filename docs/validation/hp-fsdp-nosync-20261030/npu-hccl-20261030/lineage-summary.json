@@ -1,0 +1,61 @@
+{
+  "between_arms": "three previously ended idle task containers were stopped; worker gate wait changed 180 to 600 seconds",
+  "case_scope": {
+    "dtype": "FP32",
+    "fusion": [
+      false,
+      true
+    ],
+    "fusion_zero_copy": false,
+    "mesh_shape": [
+      2
+    ],
+    "optimizer_steps": 0,
+    "reduction": "SUM",
+    "world": 2
+  },
+  "green_v1": {
+    "case_files": 0,
+    "closed_readback_sha256": "e6fa230acd5b6e8f0b1659ed37abe0db9c04df216bae82f4a8d520c733a539c9",
+    "entry_exit": 1,
+    "not_a_numerical_result": true,
+    "outcome": "180-second preimport release wait expired before workers reached NPU init or numerical cases"
+  },
+  "green_v2": {
+    "entry_exit": 0,
+    "failed": 0,
+    "passed": 16,
+    "rank_terminal_count": 2
+  },
+  "limits": "Functional 2-rank toy data only. No timing A/B, full-model or HSDP 2x2 partial-only claim. Fusion flag is observed; internal fused bucket layout and collective trace were not observed.",
+  "red_v1": {
+    "entry_exit": 1,
+    "failed": 4,
+    "failing_case": "micro0_only_false, both fusion settings and both ranks",
+    "first_preimport_attempt": "Idle check failed; raw SMI was not retained, so no busy PID is inferred. Later root observation supported release.",
+    "passed": 12,
+    "rank_outcome_scope": "both terminal files recorded; elastic later reported rank0 exit1 and rank1 SIGTERM/-15",
+    "rank_terminal_count": 2
+  },
+  "runtime": {
+    "backend_scope": "worker requires successful HCCL PG initialization and checks rank/world/backend before cases; JSON does not itself contain PG membership or collective trace",
+    "cann": "9.2.0",
+    "device": "Ascend910B3",
+    "mapping_scope": "summary of separate root-reviewed device mapping; raw process and device mapping receipts remain private",
+    "physical_rank_to_card": [
+      0,
+      1
+    ],
+    "python": "3.12.14",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0.post3"
+  },
+  "schema": "npu-nosync-public-lineage-summary-v1",
+  "source": {
+    "green_only_scheduler_overlay_sha256": "51abc1d50805960b50c334c8f5a5b5c4a5b2a5e0d7984686bae3d2e553499fe2",
+    "head": "5cde7c54ce3da8be8689d0783cf9b70d5306117a",
+    "red_scheduler_sha256": "2d311ed2ee490370118100d457dfbfe4f773c7d2ba5997f180238a10a1ad4cdd",
+    "source_files": 2659,
+    "source_manifest_sha256": "a06da217316eff5f307898e8822c6f98b21ac7e1117a5b326e38b60876460df6"
+  }
+}

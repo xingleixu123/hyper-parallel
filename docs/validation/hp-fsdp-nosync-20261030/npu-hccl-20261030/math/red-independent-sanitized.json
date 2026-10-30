@@ -1,0 +1,910 @@
+{
+  "boundaries": "One actual 2-rank 1D SUM FP32 synthetic model, both fusion settings, red source. No optimizer step, full model, NPU performance, HSDP 2x2 or green inference.",
+  "counts": {
+    "failed": 4,
+    "passed": 12
+  },
+  "counts_by_fusion": {
+    "false": {
+      "failed": 2,
+      "passed": 6
+    },
+    "true": {
+      "failed": 2,
+      "passed": 6
+    }
+  },
+  "expected_both_main_grad": {
+    "rank0": [
+      [
+        6.0,
+        6.0,
+        6.0,
+        6.0
+      ],
+      [
+        6.0,
+        6.0,
+        6.0,
+        6.0
+      ]
+    ],
+    "rank1": [
+      [
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ],
+      [
+        8.0,
+        8.0,
+        8.0,
+        8.0
+      ]
+    ]
+  },
+  "expected_micro0_only_main_grad": {
+    "rank0": [
+      [
+        3.0,
+        3.0,
+        3.0,
+        3.0
+      ],
+      [
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    ],
+    "rank1": [
+      [
+        3.0,
+        3.0,
+        3.0,
+        3.0
+      ],
+      [
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    ]
+  },
+  "inputs_by_rank_micro": [
+    [
+      [
+        1,
+        1,
+        1,
+        2
+      ],
+      [
+        1,
+        2,
+        2,
+        2
+      ]
+    ],
+    [
+      [
+        2,
+        1,
+        2,
+        2
+      ],
+      [
+        2,
+        2,
+        3,
+        2
+      ]
+    ]
+  ],
+  "logical_weights": {
+    "common.weight": [
+      [
+        0.0625,
+        0.125,
+        0.1875,
+        0.25
+      ],
+      [
+        0.3125,
+        0.375,
+        0.4375,
+        0.5
+      ],
+      [
+        0.5625,
+        0.625,
+        0.6875,
+        0.75
+      ],
+      [
+        0.8125,
+        0.875,
+        0.9375,
+        1.0
+      ]
+    ],
+    "early.weight": [
+      [
+        0.1875,
+        0.25,
+        0.3125,
+        0.375
+      ],
+      [
+        0.4375,
+        0.5,
+        0.5625,
+        0.625
+      ],
+      [
+        0.6875,
+        0.75,
+        0.8125,
+        0.875
+      ],
+      [
+        0.9375,
+        1.0,
+        1.0625,
+        1.125
+      ]
+    ]
+  },
+  "method": "Direct derivative of sum(xW): dL/dW[i,j]=x[i] for each participating branch; rational arithmetic compared to raw observations without consulting worker oracle.",
+  "results": [
+    {
+      "actual_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "rank": 0,
+      "sha256": "28d5f266b5ceb1a40a4b3f89242bea5c70ede58bd4b682363b0078bd27f2ddcc",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_false",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "rank": 0,
+      "sha256": "718320b6df69f44638555b950849b401e51aaaf4997dcf73f41389c3b4a3ce0e",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "micro0_only_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "rank": 0,
+      "sha256": "6f59a622403655f673f453aa749550d511bda401d3a502cbab326cd27c384c55",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": null,
+      "actual_early_pending": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "case": "micro0_only_false",
+      "early_final": "missing_main_and_full_unsharded_micro0_pending",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "rank": 0,
+      "sha256": "0423726a587a99c722f4614d9c445b299852e5d02f340e0756b6b09678e18c8e",
+      "status": "failed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "rank": 0,
+      "sha256": "236ec4eccdbc1cc0d84a6a24aa1079eb97a19b51adf0e584a0442132a2630be2",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_false",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ],
+        [
+          6.0,
+          6.0,
+          6.0,
+          6.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        36.25
+      ],
+      "rank": 0,
+      "sha256": "9f7c2cd685a9bb10f6db7bf4ce2871da967c10d769f74c247f1beeb542693738",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "micro0_only_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "rank": 0,
+      "sha256": "e739ba882c99c6e48fc9e4f183aff96cd8bc59582133f8e58a929a28b03bf284",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": null,
+      "actual_early_pending": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "case": "micro0_only_false",
+      "early_final": "missing_main_and_full_unsharded_micro0_pending",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        26.75,
+        16.375
+      ],
+      "rank": 0,
+      "sha256": "bdbc5d5904f1c27e2ba61579a8292b738ff0981e646df632b3ae406331429551",
+      "status": "failed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "rank": 1,
+      "sha256": "3bb3d10ba49f1e88efba2129206c0ceadc3b9ba9dd70cab175ded29cd696a339",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_false",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "rank": 1,
+      "sha256": "7bd3a5d7db11081fa8701c0ae81a65a89e28848f5c283d45f0be1fbc6d799a81",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "micro0_only_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "rank": 1,
+      "sha256": "2ead1561206eab74cf29fed390e7265dd65fa9898d96af10460f83a4edad0d57",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": null,
+      "actual_early_pending": [
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "case": "micro0_only_false",
+      "early_final": "missing_main_and_full_unsharded_micro0_pending",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "fusion": false,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "rank": 1,
+      "sha256": "87ece946ff0b0d913285f61fb218b03194e2dd1d0c8377a0ee31d6f55420e1f0",
+      "status": "failed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "rank": 1,
+      "sha256": "f0cfdefb40549d5664db0c66b3be8f85ce2bb2b47ed33c69fa34e05da5edf2ac",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "both_false",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ],
+        [
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        43.75
+      ],
+      "rank": 1,
+      "sha256": "7533ea887cf71897136c9c635506c8f53b1c140deb8de0d10edf91cd0e8d211a",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "actual_early_pending": null,
+      "case": "micro0_only_true",
+      "early_final": "exact",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "rank": 1,
+      "sha256": "42645473cda137d8eff22cf83574233cf80e816cf6904ed7988de95a573cf4f2",
+      "status": "passed"
+    },
+    {
+      "actual_early_main_grad": null,
+      "actual_early_pending": [
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ],
+        [
+          2.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "case": "micro0_only_false",
+      "early_final": "missing_main_and_full_unsharded_micro0_pending",
+      "expected_early_main_grad": [
+        [
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        [
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ]
+      ],
+      "fusion": true,
+      "input_and_all_weights_checked": true,
+      "losses": [
+        34.25,
+        19.625
+      ],
+      "rank": 1,
+      "sha256": "adc3b9654a523ba2a3975f2c193ec9890db34942307acfd6fbc20ad28a4a5373",
+      "status": "failed"
+    }
+  ],
+  "sanitization": {
+    "excluded": "runtime process identifiers, namespace/mapping, full environment and private source paths; original local archive unchanged",
+    "source_sha256": "cb0a2d5adddabdd05ff800e80e57a0c984d41621d2b536a9c6ec2375e7a3e0d4"
+  },
+  "schema": "npu-nosync-red-independent-direct-math-v1",
+  "status": "review_complete",
+  "sum_rows": {
+    "both": [
+      6,
+      6,
+      8,
+      8
+    ],
+    "micro0": [
+      3,
+      2,
+      3,
+      4
+    ],
+    "micro1": [
+      3,
+      4,
+      5,
+      4
+    ]
+  }
+}

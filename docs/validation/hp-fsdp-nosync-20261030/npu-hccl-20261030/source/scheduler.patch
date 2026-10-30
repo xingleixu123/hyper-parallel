@@ -1,0 +1,19 @@
+--- a/hyper_parallel/core/fully_shard/hsdp_scheduler.py
++++ b/hyper_parallel/core/fully_shard/hsdp_scheduler.py
+@@ -241,6 +241,16 @@
+         """
+         if not isinstance(requires_grad_sync, bool):
+             raise ValueError(f"requires_grad_sync should be a bool, got {type(requires_grad_sync)}")
++        # A prior no-sync backward may leave a full gradient on a unit that
++        # the next microbatch skips. Re-enable its root backward fallback so
++        # the deferred gradient is reduced when synchronization resumes.
++        if (
++            requires_grad_sync
++            and not self.hsdp_state.reduce_grads
++            and self.scheduler_state == FSDPSchedulerState.BACKWARD
++            and any(param.unsharded_accumulated_grad is not None for param in self.hsdp_state.hsdp_params)
++        ):
++            self.scheduler_state = None
+         self.hsdp_state.set_requires_grad_sync(requires_grad_sync)
+ 
+     # pylint: disable=W0613
