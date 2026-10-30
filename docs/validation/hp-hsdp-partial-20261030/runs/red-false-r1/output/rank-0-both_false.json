@@ -1,0 +1,439 @@
+{
+  "case": "both_false",
+  "comm_fusion": false,
+  "dp_replicate_size": 2,
+  "dp_shard_size": 2,
+  "failures": [],
+  "fp32_main_grad": true,
+  "initial": [
+    {
+      "fqn": "common.weight",
+      "model_grad": null,
+      "model_main_grad": null,
+      "model_parameter": {
+        "dtype": "torch.float32",
+        "shape": [
+          2,
+          4
+        ],
+        "values": [
+          [
+            0.0625,
+            0.125,
+            0.1875,
+            0.25
+          ],
+          [
+            0.3125,
+            0.375,
+            0.4375,
+            0.5
+          ]
+        ]
+      },
+      "module": "common",
+      "pending_group_buckets": [],
+      "pending_reduce_partial": null,
+      "pending_unsharded": null,
+      "reduce_grads": true,
+      "requires_all_reduce": true,
+      "scheduler_state": null
+    },
+    {
+      "fqn": "early.weight",
+      "model_grad": null,
+      "model_main_grad": null,
+      "model_parameter": {
+        "dtype": "torch.float32",
+        "shape": [
+          2,
+          4
+        ],
+        "values": [
+          [
+            0.1875,
+            0.25,
+            0.3125,
+            0.375
+          ],
+          [
+            0.4375,
+            0.5,
+            0.5625,
+            0.625
+          ]
+        ]
+      },
+      "module": "early",
+      "pending_group_buckets": [],
+      "pending_reduce_partial": null,
+      "pending_unsharded": null,
+      "reduce_grads": true,
+      "requires_all_reduce": true,
+      "scheduler_state": null
+    }
+  ],
+  "mesh_shape": [
+    2,
+    2
+  ],
+  "oracle": {
+    "common.weight": {
+      "actual": {
+        "dtype": "torch.float32",
+        "shape": [
+          2,
+          4
+        ],
+        "values": [
+          [
+            20.0,
+            20.0,
+            20.0,
+            20.0
+          ],
+          [
+            12.0,
+            12.0,
+            12.0,
+            12.0
+          ]
+        ]
+      },
+      "equal_exact": true,
+      "expected_local_fp32": [
+        [
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        [
+          12.0,
+          12.0,
+          12.0,
+          12.0
+        ]
+      ]
+    },
+    "early.weight": {
+      "actual": {
+        "dtype": "torch.float32",
+        "shape": [
+          2,
+          4
+        ],
+        "values": [
+          [
+            20.0,
+            20.0,
+            20.0,
+            20.0
+          ],
+          [
+            12.0,
+            12.0,
+            12.0,
+            12.0
+          ]
+        ]
+      },
+      "equal_exact": true,
+      "expected_local_fp32": [
+        [
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        [
+          12.0,
+          12.0,
+          12.0,
+          12.0
+        ]
+      ]
+    }
+  },
+  "phases": [
+    {
+      "input": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          2.0
+        ]
+      ],
+      "loss": 26.75,
+      "micro": 0,
+      "observation": [
+        {
+          "fqn": "common.weight",
+          "model_grad": null,
+          "model_main_grad": null,
+          "model_parameter": {
+            "dtype": "torch.float32",
+            "shape": [
+              2,
+              4
+            ],
+            "values": [
+              [
+                0.0625,
+                0.125,
+                0.1875,
+                0.25
+              ],
+              [
+                0.3125,
+                0.375,
+                0.4375,
+                0.5
+              ]
+            ]
+          },
+          "module": "common",
+          "pending_group_buckets": [],
+          "pending_reduce_partial": null,
+          "pending_unsharded": {
+            "dtype": "torch.float32",
+            "shape": [
+              4,
+              4
+            ],
+            "values": [
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              [
+                2.0,
+                2.0,
+                2.0,
+                2.0
+              ]
+            ]
+          },
+          "reduce_grads": false,
+          "requires_all_reduce": false,
+          "scheduler_state": "BACKWARD"
+        },
+        {
+          "fqn": "early.weight",
+          "model_grad": null,
+          "model_main_grad": null,
+          "model_parameter": {
+            "dtype": "torch.float32",
+            "shape": [
+              2,
+              4
+            ],
+            "values": [
+              [
+                0.1875,
+                0.25,
+                0.3125,
+                0.375
+              ],
+              [
+                0.4375,
+                0.5,
+                0.5625,
+                0.625
+              ]
+            ]
+          },
+          "module": "early",
+          "pending_group_buckets": [],
+          "pending_reduce_partial": null,
+          "pending_unsharded": {
+            "dtype": "torch.float32",
+            "shape": [
+              4,
+              4
+            ],
+            "values": [
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              [
+                2.0,
+                2.0,
+                2.0,
+                2.0
+              ]
+            ]
+          },
+          "reduce_grads": false,
+          "requires_all_reduce": false,
+          "scheduler_state": "BACKWARD"
+        }
+      ],
+      "use_early": true
+    },
+    {
+      "input": [
+        [
+          1.0,
+          2.0,
+          2.0,
+          2.0
+        ]
+      ],
+      "loss": 36.25,
+      "micro": 1,
+      "observation": [
+        {
+          "fqn": "common.weight",
+          "model_grad": null,
+          "model_main_grad": {
+            "dtype": "torch.float32",
+            "shape": [
+              2,
+              4
+            ],
+            "values": [
+              [
+                20.0,
+                20.0,
+                20.0,
+                20.0
+              ],
+              [
+                12.0,
+                12.0,
+                12.0,
+                12.0
+              ]
+            ]
+          },
+          "model_parameter": {
+            "dtype": "torch.float32",
+            "shape": [
+              2,
+              4
+            ],
+            "values": [
+              [
+                0.0625,
+                0.125,
+                0.1875,
+                0.25
+              ],
+              [
+                0.3125,
+                0.375,
+                0.4375,
+                0.5
+              ]
+            ]
+          },
+          "module": "common",
+          "pending_group_buckets": [],
+          "pending_reduce_partial": null,
+          "pending_unsharded": null,
+          "reduce_grads": true,
+          "requires_all_reduce": true,
+          "scheduler_state": "BACKWARD"
+        },
+        {
+          "fqn": "early.weight",
+          "model_grad": null,
+          "model_main_grad": {
+            "dtype": "torch.float32",
+            "shape": [
+              2,
+              4
+            ],
+            "values": [
+              [
+                20.0,
+                20.0,
+                20.0,
+                20.0
+              ],
+              [
+                12.0,
+                12.0,
+                12.0,
+                12.0
+              ]
+            ]
+          },
+          "model_parameter": {
+            "dtype": "torch.float32",
+            "shape": [
+              2,
+              4
+            ],
+            "values": [
+              [
+                0.1875,
+                0.25,
+                0.3125,
+                0.375
+              ],
+              [
+                0.4375,
+                0.5,
+                0.5625,
+                0.625
+              ]
+            ]
+          },
+          "module": "early",
+          "pending_group_buckets": [],
+          "pending_reduce_partial": null,
+          "pending_unsharded": null,
+          "reduce_grads": true,
+          "requires_all_reduce": true,
+          "scheduler_state": "BACKWARD"
+        }
+      ],
+      "use_early": true
+    }
+  ],
+  "rank": 0,
+  "rank_coordinate": [
+    0,
+    0
+  ],
+  "reduction": "SUM",
+  "schema": "cpu-gloo-mesh-fusion-two-micro-v2",
+  "shard_rank": 0,
+  "source_origin": "/work/sources/hyper-parallel/hyper_parallel/__init__.py",
+  "source_root": "/work/sources/hyper-parallel",
+  "status": "passed",
+  "torch_version": "2.12.0+cpu",
+  "world_size": 4
+}

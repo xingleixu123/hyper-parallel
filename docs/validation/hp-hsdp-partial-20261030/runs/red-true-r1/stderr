@@ -1,0 +1,63 @@
+[W1030 05:35:36.176268490 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1030 05:36:04.236750450 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1030 05:36:04.298487610 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1030 05:36:05.475860410 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W1030 05:36:05.608364190 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+/work/envs/hp-pta212/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+  if self.device.type != 'cpu':
+W1030 05:36:06.496000 1 torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 43 closing signal SIGTERM
+W1030 05:36:06.501000 1 torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 45 closing signal SIGTERM
+E1030 05:36:30.545000 1 torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 0 (pid: 42) of binary: /work/envs/hp-pta212/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+/work/diagnostic/cpu_gloo_mesh_fusion.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-10-30_05:36:06
+  host      : 7a14576527e6
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 44) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-10-30_05:36:30
+  host      : 7a14576527e6
+  rank      : 1 (local_rank: 1)
+  exitcode  : -15 (pid: 43)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 43
+[3]:
+  time      : 2026-10-30_05:36:30
+  host      : 7a14576527e6
+  rank      : 3 (local_rank: 3)
+  exitcode  : -15 (pid: 45)  (SIGTERM)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 45
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-10-30_05:36:06
+  host      : 7a14576527e6
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 42) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
