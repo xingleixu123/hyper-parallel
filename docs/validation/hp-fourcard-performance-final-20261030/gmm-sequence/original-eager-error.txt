@@ -1,0 +1,40 @@
+Traceback (most recent call last):
+  File "/work/scripts/worker.py", line 188, in <module>
+    main(state)
+  File "/work/scripts/worker.py", line 145, in main
+    output=fn(v['x'],v['w1'],v['w2'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/scripts/worker.py", line 139, in fn
+    z=grouped_matmul(x,w1,bias=None,group_list=ends,group_type=0,group_list_type=0,gemm_fusion=False)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/sources/hyper-parallel/hyper_parallel/components/functional/grouped_matmul.py", line 173, in grouped_matmul
+    return GMMFunction.apply(original_weight, x, weight, bias, group_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/autograd/function.py", line 596, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/sources/hyper-parallel/hyper_parallel/components/functional/grouped_matmul.py", line 42, in forward
+    outputs = torch_npu.npu_grouped_matmul(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/_ops.py", line 1275, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1298, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/work/scripts/worker.py", line 97, in __torch_dispatch__
+    return func(*args, **(kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/envs/hp-pta212/lib/python3.12/site-packages/torch/_ops.py", line 871, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: npu_grouped_matmul:../third_party/op-plugin/op_plugin/ops/opapi/GroupedMatmulKernelNpuOpApi.cpp:429 NPU function error: call aclnnGroupedMatmul failed, error code is 161002
+[ERROR] 2026-10-30-00:11:33 (PID:12, Device:0, RankID:-1) ERR00100 PTA call acl api failed.
+[PID: 12] 2026-10-30-00:11:33.913.847 AclNN_Parameter_Error(EZ1001): In op [grouped_matmul], when groupType == -1(no split) and y is separated, [splitItem] is invalid, got [3]. Constraint:[splitItem should be 0 or 1].
+TraceBack (most recent call last):
+        In op [grouped_matmul], when groupType == -1(no split), parameter check failed.
+        In op [grouped_matmul], groupType specific parameter check failed.
+

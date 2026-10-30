@@ -1,0 +1,999 @@
+{
+  "schema": "gmm-sequence-fix-public-projection-v1",
+  "root_audit": {
+    "status": "root_full_exported_values_verified",
+    "closed_files": 57,
+    "full_NPY_arrays": 36,
+    "same_actual_inputs_as_original_failed_List_and_unchanged_Tensor": true,
+    "output_gradient_tensor_comparisons_to_unchanged_Tensor": 32,
+    "all_bitwise_equal": true,
+    "maximum_absolute_error": 0.0,
+    "CPU": {
+      "red_methods": 4,
+      "red_sequence_subtest_errors": 4,
+      "green_methods": 4,
+      "green_errors": 0
+    },
+    "counts": {
+      "eager-1": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      },
+      "eager-2": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      },
+      "fixed-1": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 1
+      },
+      "fixed-2": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 1
+      },
+      "original-1": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 2
+      },
+      "original-2": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 2
+      },
+      "tuple-eager-1": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      },
+      "tuple-eager-2": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      }
+    },
+    "base_source_manifest_scope": "base host tree before explicit read-only GMM overlay",
+    "source_overlay": {
+      "hyper_parallel/components/functional/grouped_matmul.py": "9ac03602f50857c28b33812c44fb1ef2fd9b14ad2fa4369964069a24c66da0c8"
+    },
+    "scope": "BF16 small fixture, actual device4; no training rerun, optimizer, native List-overload SAC or performance claim",
+    "performance_memory_boundary": "Existing Tensor object stays unchanged; integer sequence allocates/copies a device int64 boundary tensor. No end-to-end speed or HBM delta claimed."
+  },
+  "source": {
+    "source_head": "96143af9b4ea12ddf0bd3854fc521ca86df7cc90",
+    "original_gmm_sha256": "f696a1724727149fb51c56de85fdb0e389e53acc65fcb51f46bea026faee493b",
+    "patched_gmm_sha256": "9ac03602f50857c28b33812c44fb1ef2fd9b14ad2fa4369964069a24c66da0c8",
+    "PTA_wheel_version": "2.12.0.post3",
+    "PTA_recorded_git": "6b88d20d143ef15243c44f3582f37c480e786f2e",
+    "op_plugin_submodule_pin": "79a42714ebf7662b5a3f7361f2b86ebb3dc4a1e3"
+  },
+  "preflight_versions": {
+    "cann_install_info": "package_name=Ascend-cann-toolkit\nversion=9.2.0\ninnerversion=V100R001C12SPC001B237\ncompatible_version=[V100R001C15],[V100R001C23],[V100R001C10],[V100R001C11],[V100R001C12]\narch=aarch64\nos=linux\npath=/work/runtime/cann920/cann-9.2.0\n",
+    "cann_set_env_sha256": "c7a39560b70e554c6d514db176292412dcad242653325d836e2374dc35fb310c",
+    "numpy": "1.26.4",
+    "python": "3.12.14 (main, Sep 15 2026, 22:16:20) [GCC 11.4.0]",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0.post3",
+    "torch_npu_imported": false
+  },
+  "input_hashes": {
+    "grad": "d0a038211b3ff29b6ac5d29db7abb187664789e05fdb3ac158761e7baee86c53",
+    "w1": "c71b0a1995eaa5edc573cf44d0844e5c37086d76af666eb78ce5e9daca45fe38",
+    "w2": "245d09c1ba4df9b05602c61db8d4a636f902094fd19a1c70f206d56aa76f6fac",
+    "x": "b4a80c4a16a606b2c58ace47d2bb6f71ecdb18f880c442fc9dc448fc89191068"
+  },
+  "comparison": {
+    "eager-1": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    },
+    "eager-2": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    },
+    "fixed-1": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    },
+    "fixed-2": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    },
+    "original-1": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    },
+    "original-2": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    },
+    "tuple-eager-1": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    },
+    "tuple-eager-2": {
+      "output": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w1_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "w2_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      },
+      "x_grad": {
+        "bitwise_equal": true,
+        "finite": true,
+        "max_abs": 0.0
+      }
+    }
+  },
+  "runs": {
+    "eager-1": {
+      "cache_entry_mutation_allowed": null,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "list",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "eager-1-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "eager-1-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "eager-1-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "eager-1-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    },
+    "eager-2": {
+      "cache_entry_mutation_allowed": null,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "list",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "eager-2-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "eager-2-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "eager-2-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "eager-2-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    },
+    "fixed-1": {
+      "cache_entry_mutation_allowed": false,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 1
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "recompute"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "list",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "fixed-1-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "fixed-1-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "fixed-1-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "fixed-1-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    },
+    "fixed-2": {
+      "cache_entry_mutation_allowed": false,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 1
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "recompute"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "list",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "fixed-2-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "fixed-2-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "fixed-2-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "fixed-2-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    },
+    "original-1": {
+      "cache_entry_mutation_allowed": false,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 2
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "recompute"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "recompute"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "list",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "original-1-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "original-1-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "original-1-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "original-1-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    },
+    "original-2": {
+      "cache_entry_mutation_allowed": false,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2,
+        "recompute|npu.npu_grouped_matmul.default": 2
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "recompute"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "recompute"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "list",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "original-2-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "original-2-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "original-2-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "original-2-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    },
+    "tuple-eager-1": {
+      "cache_entry_mutation_allowed": null,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "tuple",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "tuple-eager-1-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "tuple-eager-1-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "tuple-eager-1-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "tuple-eager-1-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    },
+    "tuple-eager-2": {
+      "cache_entry_mutation_allowed": null,
+      "clones_verified": true,
+      "counts": {
+        "backward|npu.npu_grouped_matmul.default": 4,
+        "forward|npu.npu_grouped_matmul.default": 2
+      },
+      "events": [
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "forward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        },
+        {
+          "op": "npu.npu_grouped_matmul.default",
+          "phase": "backward"
+        }
+      ],
+      "group_list_kind": "tuple",
+      "group_list_unchanged": true,
+      "tensors": {
+        "output": {
+          "file": "tuple-eager-2-output.npy",
+          "file_sha256": "30f195e34ea459417e6c958638659648d59a7ee8a588729245a7dd1edf4c4277",
+          "finite": true,
+          "original_bytes_sha256": "e9d8e868a4e65b83187dfdcfe3097d381e0549a568b5ca740f7b7c4b870e0fc7",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "w1_grad": {
+          "file": "tuple-eager-2-w1_grad.npy",
+          "file_sha256": "15b1e88d55a5b68a24eb9607d5d3b8bb9541307f419c525dd393aa714be8a45d",
+          "finite": true,
+          "original_bytes_sha256": "68cfb93a631f0e9d64cb06587d0a768e9c0e3138d46472040d9a22a043270bdd",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            64,
+            128
+          ],
+          "stored_dtype": "float32"
+        },
+        "w2_grad": {
+          "file": "tuple-eager-2-w2_grad.npy",
+          "file_sha256": "935aeed96f36d5f6e12ceb8186c92de9121c23c843dda80a08e8d2b3fd004f07",
+          "finite": true,
+          "original_bytes_sha256": "d5957afa77cb0eacee6e100124e8dc52e14422c0b96d8c132abef70a25684b56",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            2,
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        },
+        "x_grad": {
+          "file": "tuple-eager-2-x_grad.npy",
+          "file_sha256": "22fd1e4745bf9fcde699aca93f1c42defa80bf0a86632a3d15b2a3955c5cdc98",
+          "finite": true,
+          "original_bytes_sha256": "c9bbe049a39cb5ab96ac91bda682a88809ccef24c15a827530377f563cc0311e",
+          "original_dtype": "torch.bfloat16",
+          "shape": [
+            128,
+            64
+          ],
+          "stored_dtype": "float32"
+        }
+      }
+    }
+  },
+  "raw_tensor_storage": "All36 complete NPY arrays retained locally; this public projection records their individual metadata and byte hashes, not the arrays themselves.",
+  "original_eager_error_scope": "List input; first GMM forward before checkpoint/SAC"
+}

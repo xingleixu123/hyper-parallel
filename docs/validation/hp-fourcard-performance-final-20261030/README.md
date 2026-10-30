@@ -4,7 +4,7 @@
 
 ## 本模型上的结果
 
-| 同条件集合 | 测得的稳态平均秒/步 | 含义与边界 |
+| 同条件集合 | 测得的计时窗口平均秒/步 | 含义与边界 |
 |---|---:|---|
 | 125 FSDP4，反向顺序 no-RAF → full-RAF | 0.754402 / 0.780831 | 前向后保留参数本次降低耗时 3.385%，名义吞吐 21717.9 / 20982.8 token/s；各30点CV约0.382% / 0.406% |
 | 129 HSDP2×2 → FSDP4，两对 | 1.168668 / 0.779871；1.178738 / 0.788007 | 两对比约1.50；保留全部尖峰，属于该配置与机器的观察 |
@@ -15,7 +15,7 @@
 
 no-RAF首轮0.758296s、早先同机full参考0.784551s与反向配对方向一致。反向配对的timed allocated四卡范围为16.625064–16.625071 / 16.688892–16.688899 GiB，reserved为16.865234 / 16.962891 GiB。本模型没有观察到峰值惩罚；这不意味着其他规模保留参数也没有显存代价。EP2复测allocated约14.30073GiB、reserved16.30664GiB，体现本次显存与耗时取舍。
 
-![同源、同主机分组的全部稳态逐步耗时](figures/timing.png)
+![同源、同主机分组的全部计时窗口逐步耗时](figures/timing.png)
 
 ![allocator与去重storage分列；各卡原值在JSON](figures/memory.png)
 
@@ -63,3 +63,9 @@ FSDP4参数为Shard(0)的[4]网格；HSDP为[R2,S2]，网格给出shard组[0,1]/
 所有计时点保留。各run离散占卡查询及unknown/incomplete原样留存，不能证明连续独占；新复测release前结束大hash/DCP I/O，另节点末期小JSON可能重叠，未声称零干扰。EP/CP参考和少量短窗不作普适排名。图为标准绘图库本地渲染，尚非log.javazero.top网站导出；本轮网站工具因URL安全核验终止，未绕过限制。统计日志已准备供后续导入。Terra medium实际委派，接口无Fast选择器。
 
 历史证据：[两对H/F、两对SAC及旧profiler](https://github.com/xingleixu123/hyper-parallel/tree/4eac5f2d06bf78d720e6599af8b1473f026e7a8b/docs/validation/hp-fourcard-performance-pairs-20261030)、[模块NPU及replay](https://github.com/xingleixu123/hyper-parallel/tree/8c79b8ca54ce5829e877b8ae444e96a315fdcccc/docs/validation/hp-fourcard-npu-evidence-20261030)。
+
+## 新增收尾验证（2026-10-30）
+
+[四卡HSDP归一化NPU实测](hsdp-normalization/README.md)和[独立验收范围复核](acceptance-review.md)补充本归档：FP32直接通信算术完全一致，融合开/关AVG模块梯度最大误差各1.79e-7。该结果不解释性能差异或1804异常。表中的“计时窗口平均”指10步预热后的30点均值，未主张已完成长时间平稳性检验。用户最新明确暂不画图；网站输入、现有页面和配置保留，未继续网站导出。
+
+另见[GMM整数序列接口兼容修复及NPU回归](gmm-sequence/README.md)：该问题独立于SAC注册，32项输出/梯度与未改Tensor控制逐位一致；完整小tensor在本机保留，公开投影不替代原值。
