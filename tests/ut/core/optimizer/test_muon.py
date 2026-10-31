@@ -15,12 +15,15 @@
 
 """Unit tests for the Muon optimizer."""
 
+from collections import defaultdict
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
 
-from hyper_parallel.core.optimizer.muon import Muon
+from hyper_parallel.core.optimizer.muon import Muon, zeropower_via_newtonschulz5
+from hyper_parallel.core.optimizer.muon_shard import build_pad_ns_inputs
 from hyper_parallel.core.optimizer.optimizer import BaseDistributedOptimizer
 
 
@@ -151,3 +154,184 @@ def test_async_hierarchical_broadcast_waits_between_mesh_dimensions():
     first_work.wait.assert_called_once_with()
     final_work.wait.assert_not_called()
     assert handles == [final_work]
+
+
+def test_ns_normalizes_in_fp32_before_low_precision_compute():
+    """Clamping applies to the FP32 norm, including zero and sub-epsilon inputs."""
+    values = torch.tensor([[[3e-10], [4e-10]], [[0.0], [0.0]]])
+
+    direction = zeropower_via_newtonschulz5(
+        values, steps=0, epsilon=1e-8, epsilon_mode="clamp",
+        compute_dtype=torch.bfloat16)
+
+    # The first Frobenius norm is 5e-10, so the denominator is exactly epsilon.
+    expected = torch.tensor([[[0.03], [0.04]], [[0.0], [0.0]]], dtype=torch.bfloat16)
+    torch.testing.assert_close(direction, expected, rtol=0, atol=0)
+    assert direction.dtype == torch.bfloat16
+    assert torch.isfinite(direction).all()
+
+
+@pytest.mark.parametrize("use_transform", [False, True])
+def test_muon_precision_policy_preserves_normalization_and_scaling_boundaries(use_transform):
+    """Both restoration paths scale in the iteration dtype before restoring buffers."""
+    optimizer = Muon.__new__(Muon)
+    optimizer.state = defaultdict(dict)
+    optimizer.reshape_fn = None
+    optimizer.ns_transform_fn = (lambda _name, _tensor: None) if use_transform else None
+    optimizer.zeropower_fn = None
+    optimizer.momentum_update_fn = None
+    parameter = torch.nn.Parameter(torch.zeros(2, 1))
+    parameter.model_name = "weight"
+    parameter.grad = torch.tensor([[3e-9], [4e-9]])
+    group = _plain_ns_group(
+        momentum=0.95, nesterov=False, ns_variant="custom",
+        ns_coefficients=((1.0, 0.0, 0.0),), ns_epsilon=1e-8,
+        ns_input_dtype="float32", ns_compute_dtype="bfloat16", ns_epsilon_mode="clamp",
+        lr=1e-5, apply_lr_in_update=True)
+
+    inputs = optimizer._update_muon_momentum(group, [parameter])  # pylint: disable=protected-access
+    assert inputs[parameter].dtype == torch.float32
+    torch.testing.assert_close(inputs[parameter], parameter.grad, rtol=0, atol=0)
+    updates = optimizer._compute_batched_ns_updates(  # pylint: disable=protected-access
+        [parameter], inputs, group, no_shard=True)
+
+    # One identity polynomial leaves the clamped direction [0.3, 0.4].
+    # Quantize that direction, then scale once in BF16; restore into FP32 storage.
+    direction = torch.tensor([[0.3], [0.4]], dtype=torch.bfloat16)
+    expected = (direction * (-1e-5 * (2 ** 0.5) * 0.2)).float()
+    assert updates[parameter].dtype == torch.float32
+    torch.testing.assert_close(updates[parameter], expected, rtol=0, atol=0)
+    torch.testing.assert_close(optimizer.state[parameter]["momentum_buffer"], parameter.grad, rtol=0, atol=0)
+
+    parameter = torch.nn.Parameter(torch.zeros(2, 1))
+    zero_parameter = torch.nn.Parameter(torch.zeros(2, 1))
+    parameter.model_name = "weight"
+    zero_parameter.model_name = "zero_weight"
+    parameter.grad = torch.tensor([[3e-9], [4e-9]])
+    zero_parameter.grad = torch.zeros_like(zero_parameter)
+    optimizer = Muon(
+        [parameter, zero_parameter], lr=1e-5, weight_decay=0.0, momentum=0.95, nesterov=False,
+        ns_steps=1, ns_variant="custom", ns_coefficients=((1.0, 0.0, 0.0),), ns_epsilon=1e-8,
+        ns_input_dtype="float32", ns_compute_dtype="bfloat16", ns_epsilon_mode="clamp",
+        apply_lr_in_update=True, ns_transform_fn=(lambda _name, _tensor: None) if use_transform else None,
+    )
+
+    optimizer.step()
+
+    # The norm is clamped to 1e-8, so the direction is [0.3, 0.4].
+    # The identity polynomial and shape/LR scaling are applied in BF16.
+    direction = torch.tensor([[0.3], [0.4]], dtype=torch.bfloat16)
+    expected = (direction * (-1e-5 * (2 ** 0.5) * 0.2)).float()
+    torch.testing.assert_close(parameter.detach(), expected, rtol=0, atol=0)
+    torch.testing.assert_close(optimizer.state[parameter]["momentum_buffer"], parameter.grad, rtol=0, atol=0)
+    torch.testing.assert_close(zero_parameter.detach(), torch.zeros_like(zero_parameter), rtol=0, atol=0)
+
+
+def test_ns_padding_uses_explicit_dtype_on_empty_ranks():
+    """A rank without gradients must use the same collective dtype as populated ranks."""
+    parameter = torch.nn.Parameter(torch.ones(2, 2, dtype=torch.float32))
+    ns_input = torch.ones_like(parameter, dtype=torch.bfloat16)
+    populated = build_pad_ns_inputs([parameter], {parameter: ns_input}, dtype=torch.bfloat16)
+    empty = build_pad_ns_inputs([parameter], {}, dtype=torch.bfloat16)
+
+    assert populated[0] is ns_input
+    assert empty[0].dtype == populated[0].dtype
+    torch.testing.assert_close(empty[0], torch.zeros_like(ns_input), rtol=0, atol=0)
+    with pytest.raises(ValueError, match="same dtype"):
+        build_pad_ns_inputs([parameter], {parameter: ns_input}, dtype=torch.float32)
+
+    parameter = torch.nn.Parameter(torch.ones(2, 2, dtype=torch.bfloat16))
+    optimizer = Muon([parameter], ns_input_dtype="float32")
+    assignment = SimpleNamespace(owned_records=[SimpleNamespace(param=parameter, index=0)], layout_spec=None)
+    captured = []
+
+    def capture_allgather(inputs, *_args, **_kwargs):
+        captured.append(inputs[0].clone())
+        return [None]
+
+    with patch.object(optimizer, "_get_shard_info", return_value=((2,), (1,), (None,), 2)), \
+            patch("hyper_parallel.core.optimizer.muon.fused_allgather_dtensor_params",
+                  side_effect=capture_allgather):
+        for inputs in ({}, {parameter: torch.ones(2, 2, dtype=torch.float32)}):
+            optimizer._gather_and_compute_shard_updates(  # pylint: disable=protected-access
+                [parameter], inputs, assignment, {0: (0,)}, optimizer.param_groups[0], None)
+        with pytest.raises(ValueError, match="same dtype"):
+            optimizer._gather_and_compute_shard_updates(  # pylint: disable=protected-access
+                [parameter], {parameter: torch.ones_like(parameter)}, assignment,
+                {0: (0,)}, optimizer.param_groups[0], None)
+
+    torch.testing.assert_close(captured[0], torch.zeros(2, 2, dtype=torch.float32), rtol=0, atol=0)
+    torch.testing.assert_close(captured[1], torch.ones(2, 2, dtype=torch.float32), rtol=0, atol=0)
+
+    # A BF16 pack would round these values before they reach the FP32 parameter.
+    receiver = torch.nn.Parameter(torch.zeros(2, 2))
+    update = torch.tensor([[1.001, -1.002], [0.1234567, -0.2345678]])
+    pack_optimizer = Muon([receiver], lr=1.0, weight_decay=0.0, ns_input_dtype="float32")
+    with patch.object(pack_optimizer, "_get_shard_info", return_value=((1,), (0,), (None,), 1)):
+        pack_optimizer._fused_broadcast_and_apply(  # pylint: disable=protected-access
+            [receiver], {receiver: update}, {receiver: (0,)}, pack_optimizer.param_groups[0],
+            SimpleNamespace(layout_spec=None))
+    torch.testing.assert_close(receiver.detach(), -update, rtol=0, atol=0)
+
+
+@pytest.mark.parametrize("options", [
+    {"ns_input_dtype": "float16"},
+    {"ns_compute_dtype": "float16"},
+    {"ns_epsilon_mode": "unknown"},
+])
+def test_muon_rejects_unsupported_precision_options(options):
+    """Invalid precision policies fail before distributed setup."""
+    with pytest.raises(ValueError, match="ns_"):
+        Muon([torch.nn.Parameter(torch.ones(2, 2))], **options)
+
+
+def test_muon_rejects_built_in_precision_policy_with_custom_ns():
+    """Custom callbacks cannot silently ignore built-in normalization options."""
+    with pytest.raises(ValueError, match="built-in"):
+        Muon([torch.nn.Parameter(torch.ones(2, 2))],
+             zeropower_fn=lambda value, steps: value, ns_epsilon_mode="clamp")
+
+
+@pytest.mark.parametrize("replica_count", [1, 2])
+def test_muon_preserves_explicit_replica_count_across_cache_rebuilds(replica_count: int) -> None:
+    """An explicit subgroup size must not be replaced by the topology heuristic."""
+    parameter = torch.nn.Parameter(torch.ones(2, 2, device="cpu"))
+    with patch.object(Muon, "_auto_deduce_replica_count", return_value=None) as deduce:
+        optimizer = Muon([parameter], hsdp_replica_count=replica_count)
+        assert optimizer.hsdp_replica_count == replica_count, (
+            f"expected explicit size={replica_count}, got={optimizer.hsdp_replica_count}"
+        )
+        optimizer.load_state_dict(optimizer.state_dict())
+        optimizer.reset_optimizer_parameters()
+        assert optimizer.hsdp_replica_count == replica_count, (
+            f"expected explicit size={replica_count}, got={optimizer.hsdp_replica_count}"
+        )
+    deduce.assert_not_called()
+
+
+def test_muon_without_explicit_replica_count_keeps_automatic_selection() -> None:
+    """An omitted size still follows automatic selection when caches are rebuilt."""
+    parameter = torch.nn.Parameter(torch.ones(2, 2, device="cpu"))
+    with patch.object(Muon, "_auto_deduce_replica_count", side_effect=[None, 2, None]) as deduce:
+        optimizer = Muon([parameter])
+        assert optimizer.hsdp_replica_count is None, (
+            f"expected automatic full replica group, got={optimizer.hsdp_replica_count}"
+        )
+        optimizer.reset_optimizer_parameters()
+        assert optimizer.hsdp_replica_count == 2, (
+            f"expected automatic size=2, got={optimizer.hsdp_replica_count}"
+        )
+        optimizer.reset_optimizer_parameters()
+        assert optimizer.hsdp_replica_count is None, (
+            f"expected automatic full replica group, got={optimizer.hsdp_replica_count}"
+        )
+    assert deduce.call_count == 3, f"expected three automatic selections, got={deduce.call_count}"
+
+
+@pytest.mark.parametrize("replica_count", [0, -1])
+def test_muon_validates_explicit_replica_count_before_topology_selection(replica_count: int) -> None:
+    """Invalid explicit sizes must reach the existing subgroup validation."""
+    parameter = torch.nn.Parameter(torch.ones(2, 2, device="cpu"))
+    with patch.object(Muon, "_auto_deduce_replica_count", return_value=None):
+        with pytest.raises(ValueError, match="must be positive"):
+            Muon([parameter], hsdp_replica_count=replica_count)
