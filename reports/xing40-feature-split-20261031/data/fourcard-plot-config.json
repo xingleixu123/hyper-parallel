@@ -1,0 +1,104 @@
+{
+  "website": "https://log.javazero.top/",
+  "render": {
+    "website": "https://log.javazero.top/",
+    "site_mode": "online",
+    "input_mode": "original",
+    "step_keyword": "step",
+    "matching_rules": [
+      {
+        "name": "标称全局吞吐（tokens/s）",
+        "mode": "keyword",
+        "keyword": "nominal_tokens_per_second="
+      },
+      {
+        "name": "四卡全局时间跨度（s）",
+        "mode": "keyword",
+        "keyword": "global_span_s="
+      },
+      {
+        "name": "四卡最大逐步峰值allocated（GiB）",
+        "mode": "keyword",
+        "keyword": "max_rank_peak_allocated_GiB="
+      }
+    ]
+  },
+  "metrics": [
+    {
+      "key": "标称全局吞吐（tokens/s）",
+      "label": "标称全局吞吐（tokens/s）"
+    },
+    {
+      "key": "四卡全局时间跨度（s）",
+      "label": "四卡全局时间跨度（s）"
+    },
+    {
+      "key": "四卡最大逐步峰值allocated（gib）",
+      "label": "四卡最大逐步峰值allocated（GiB）"
+    }
+  ],
+  "chart_config": {
+    "downsampleEnabled": false,
+    "downsampleThreshold": 2000,
+    "yAxisType": "linear",
+    "smoothing": "none",
+    "smoothingWindow": 10,
+    "showStats": true,
+    "chartType": "line",
+    "combinedView": false,
+    "annotations": [],
+    "showAnomalies": false,
+    "experimentalAnomalies": false,
+    "experimentalAnnotations": false
+  },
+  "axis": {
+    "min": "1511",
+    "max": "1540"
+  },
+  "title": {
+    "expected": "HP 6f979dd0 特性拆分复测 · 实际 step 1511–1540",
+    "observed": "HP 6f979dd0 特性拆分复测 · 实际 step 1511–1540",
+    "hp_head": "6f979dd0",
+    "x_kind": "recorded_step",
+    "min": 1511,
+    "max": 1540,
+    "point_count": 360
+  },
+  "source_points_sha256": "57b974ed23510dea1160f66f60faff903d4a6dd03226bd681e6439c55ed94710",
+  "review": {
+    "reviewer": "root",
+    "status": "passed",
+    "group": "fourcard",
+    "window": [
+      1511,
+      1540
+    ],
+    "mode_evidence": {
+      "headless": {
+        "analysis.json": "bc8d2a6cb4295bca01cee9d29b3e03a7e5be260f7a969ff8ca3914b762faf2e6",
+        "display-proof.json": "3ddb0379c01d3a345ce406108f696193a6404187a9ac4da89d196bab92e10275",
+        "title-proof.json": "0eec903724c2425221dc8055c523cdd2aa5ee966d72b1bccfe068b66177e735f",
+        "axis-proof.json": "2f4455aff6106409dac2040bd5c72e033f9e9ae6320677e6c0762b2f4a0bfcc2",
+        "source-points.csv": "7e596b7856364e59bddfe0e52f55b8b879a5d0aec3d2e0aa8d1ede006d6d891b"
+      },
+      "visible": {
+        "analysis.json": "bc8d2a6cb4295bca01cee9d29b3e03a7e5be260f7a969ff8ca3914b762faf2e6",
+        "display-proof.json": "3ddb0379c01d3a345ce406108f696193a6404187a9ac4da89d196bab92e10275",
+        "title-proof.json": "0eec903724c2425221dc8055c523cdd2aa5ee966d72b1bccfe068b66177e735f",
+        "axis-proof.json": "2f4455aff6106409dac2040bd5c72e033f9e9ae6320677e6c0762b2f4a0bfcc2",
+        "source-points.csv": "7e596b7856364e59bddfe0e52f55b8b879a5d0aec3d2e0aa8d1ede006d6d891b"
+      }
+    },
+    "figures_sha256": {
+      "01_标称全局吞吐_tokens_s.png": "af2392b4c73fa67681eae91e6c4fc7cbf5859a6c6301b39383cb68b1b22b6f7a",
+      "02_四卡全局时间跨度_s.png": "056c24d1344904d982d5c930c8b6a467178401e4154b5a4e5ec99aee420e0af1",
+      "03_四卡最大逐步峰值allocated_gib.png": "f0d316924c3811e32e26cac9bd3f6b88c64e5678c83fe7f0befda3aaf38f1e72"
+    },
+    "visual_review": true,
+    "no_smoothing_or_downsampling": true,
+    "title_matches_tested_head": true,
+    "visible_page_open": true,
+    "source": "Source-traceable real ledger/CSV exports. Fourcard throughput is nominal tokens, memory plot is max rank allocator peak allocated GiB.",
+    "limits": "Native chart Value axes are explained in report captions. Website URL does not encode a shareable run."
+  }
+}
