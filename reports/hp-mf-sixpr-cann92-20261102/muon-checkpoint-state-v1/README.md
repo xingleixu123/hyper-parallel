@@ -1,6 +1,6 @@
 # Muon checkpoint 非 owner 状态：独立诊断
 
-本证据针对 ordinary native checkpoint 恢复后非 owner Muon momentum 生命周期。正式配置为3层 Xing40（2 Dense + 1 MoE）、S4096、GBS4/LBS1；旧源码 `2dd33e02f46fc5d6810e806b9d7d4717cf10a3e4`，新源码 `f827186ea3416b58371603210140ee32ff08b04f` 包含 e5978afd2817f83eaedf41c609226cd4242bab7c 的四文件 cherry-pick。四臂是125同卡串行 HSDP old/new 与 TP2 FFN replicate old/new：各从同一1500 checkpoint恢复，1501–1570共70步、前20步预热、后50步记录。这不是ABBA，也不是完整1000步验收。
+本证据针对 ordinary native checkpoint 恢复后非 owner Muon momentum 生命周期。正式配置为3层 Xing40（2 Dense + 1 MoE）、S4096、GBS4/LBS1；旧源码 `2dd33e02f46fc5d6810e806b9d7d4717cf10a3e4`，新源码 `f827186ea3416b58371603210140ee32ff08b04f` 包含 e5978afd2817f83eaedf41c609226cd4242bab7c 的四文件 cherry-pick。原HP HSDP/TP 基线均为 full activation checkpoint。四臂是125同卡串行 HSDP old/new 与 TP2 FFN replicate old/new：各从同一1500 checkpoint恢复，1501–1570共70步、前20步预热、后50步记录。这不是ABBA，也不是完整1000步验收。
 
 新源码清理前四rank完整local状态逐字段等于此前独立全局CPU验证的目标；依据实际assignment，清理后只移除非owner momentum，model/main alias、owner状态、Adam、组及恢复extra/样本不变。HSDP四rank删除12/12/16/16项（56），TP为8/11/8/11项（38）。每rank实际逻辑slot字节及helper allocated、reserved前后见 [正式短跑摘要](formal-70-summary.json)；allocated变化含allocator等因素，不能直接等同slot逻辑字节。70步实际raw、prepared、sampler、框架RNG摘要，old/new四rank逐项一致；不推断独立kernel RNG。
 
@@ -14,3 +14,13 @@
 独立 tiny 合成 HSDP2×2 原生 callback 回归中，清理前与共同producer canonical、清理后权威状态及steps2–4与旧A一致；sync和async checkpoint各7个全局tensor、31个group字段经无设备CPU native DCP独立读回，与旧A实际rank切片逐值一致，见 [tiny 对照](tiny-compare.json)、[全局读回](tiny-global-readback.json)和[内存时序](tiny-memory-timeline.json)。这是合成模块，不能替代正式模型1000步验收。旧B产生worker结果但controller因rank identity changed失败，该旧案例不改判为闭合成功。
 
 单卡 MF/HP 满足既定窗口数值条件不证明 Muon 分组或算法等价；相关选择仍在确认。主线完整数值/性能见 [四卡报告](../fourcard-report-v2/README.md)。
+
+## CPU 最小 callback 复现
+
+在已检出的 HyperParallel 源码根目录，使用能导入其依赖和 PyTorch 的 CPU Python 环境：
+
+```bash
+PYTHONPATH=. python -B reports/hp-mf-sixpr-cann92-20261102/muon-checkpoint-state-v1/minimal-callback-repro.py
+```
+
+[复现脚本](minimal-callback-repro.py)中的同步 writer 是 CPU 模拟：它确认写入时 replica 仍存在，并在返回后观察优化器 state；它不执行真实 NPU I/O、分布式通信或完整 DCP 保存。实际 before/after 均运行 rc0，见 [结果](minimal-callback-results.json)：旧 `4144bb242f1a696308e75bd609cb61c9143b3d8f` writer看到replica，返回后仍有replica（2条state）；修复 `e5978afd2817f83eaedf41c609226cd4242bab7c` writer仍看到replica，返回后仅owner保留（1条state）。真实 NPU 和全局DCP读回证据另见本页前文。公开脚本只在已运行原件前增加 Apache-2.0 版权头，其程序体逐字节一致，AST等价核验见 [收据](minimal-repro-identity.json)。

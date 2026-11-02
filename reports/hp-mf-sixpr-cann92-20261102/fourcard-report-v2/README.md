@@ -4,6 +4,9 @@
 
 同一闭合 FSDP step1500 原生 checkpoint 为恢复起点，模型为 Xing40 配置的 3 层（2 Dense + 1 MoE）、序列4096、GBS4/LBS1、每次更新16,384有效 token，MTP关闭（N/A）。冻结 HP source `2dd33e02f46fc5d6810e806b9d7d4717cf10a3e4`，来自 master `4144bb242f1a696308e75bd609cb61c9143b3d8f`、本轮六 PR 和单独 CE兼容提交；本报告的1000步原始数据不包含后续 Muon checkpoint 清理修复或 CP Ulysses2 候选。
 
+
+**重算配置口径：**原始 base 是 MindFormers 格式，原始四层配置为 full、覆盖层 0–3；本轮 MF 实际缩为三层并以 full 覆盖 0–2。HP 单卡及四卡 FSDP、HSDP、TP、CP、EP 的 activation checkpoint 均为 full；SAC 臂是从 full 改为 selective 的对照，并非从关闭重算切换。配置标签与本报告实际窗口的数值、时序和观测边界相互独立。
+
 每个已闭合实验均比较 1501–2500 的完整1000次更新。表中差值为各配置 rank0 的 native global loss 减125主机连续 FSDP rank0 native global loss；CP/TP 副本 rank 的 global loss 不重复求和。既定数值条件是**完整窗口最终** `abs(mean(diff)) ≤ 0.005`，不是每个 step 的差值阈值；MAE 和最大绝对差用于诊断。原始逐步值见 [fourcard-loss-1501-2500.csv](fourcard-loss-1501-2500.csv)。
 
 | 配置 | signed mean | abs(mean) | 正 / 负 / 零 | MAE | max abs（step） |

@@ -2,6 +2,8 @@
 
 基于本轮 MF1500 转换状态，HP 原生恢复后完成 1501–2500 连续 1000 次更新；HP controller finished、returncode 0、容器移除，worker passed。恢复收据记录模型、master、优化器槽、参数组及 native extra state 精确一致。MF 原始训练调用返回，但原 runner 的终态 maps guard 错将已 unlink 共享内存识别为库导致 exit1；条件性收据不能证明终态 inode/权限连续性。原失败保留，不能称 MF 正常退出。MS 2.10 / CANN 9.2 是用户选择保留的实验栈，未找到该组合的官方配套声明。
 
+本轮原始 base 为 MindFormers 格式：原始四层使用 full 重算覆盖 0–3，实际三层 MF 运行将 full 范围调整为 0–2；HP 单卡使用 full activation checkpoint。
+
 比较逐优化步 HP `loss_native`（两 micro 返回值之和）减 MF float32 callback 原值，不做平滑。1000 步 signed mean −0.00251027512550354、abs(mean) 0.00251027512550354，满足既定 ≤ 0.005 数值门槛；103 正、897 负、0 零。MAE 0.0027149217128753663，最大绝对差 0.02550530433654785，发生在 step 1778（差为负）；MAE 和最大差为诊断，无附加阈值。MTP 按配置关闭，MTP LOSS 为 N/A。数值达标不证明 Muon 或跨框架算法语义等价，且受 MF 终态缺口限制。
 
 实际输入比较共 8000 项（1000 步×2 micro×4 字段）全部相同；每 micro 有效 token 4096、每 step 8192；1000 步 HP stdout 中 step loss 与原始 ledger 一致，ledger 两个 native micro 返回值之和等于该值；HP 默认 RNG 每步前后摘要相同，并非声称框架间 RNG 状态等价。逐步主臂原值和差值保留在 paired-loss.csv，完整统计见 statistics.json。独立计算与原统计工具一致。
@@ -13,7 +15,7 @@
 
 消融经恢复后仅改变 native Muon ns_variant，两个 run 均 finished/rc0，legacy 300 步 actual 2400 字段、token 数及默认 RNG 前后摘要核对通过；上述仅比较相同窗口，不以 300 步推断 1000 步或证明其他因素因果。消融主臂的 300 步与整体 1000 步不可互换。
 
-原始证据已逐文件核对采集前后文件身份与 SHA；本公开包仅包含原始配对 loss 值、统计与版本摘要；不含原始样本、私有 YAML、RNG bytes 或 checkpoint。MF ledger SHA256 为 f7b40a1d3e9167de74757eeacf2b9209449939e3a34ed3c3c3f223277262ea45，HP 主臂 ledger SHA256 为 384cb8b6bc22152631156f4b299745aca2d7797f684e89a5371646b4b00b42e1。四卡验收尚待。
+原始证据已逐文件核对采集前后文件身份与 SHA；本公开包仅包含原始配对 loss 值、统计与版本摘要；不含原始样本、私有 YAML、RNG bytes 或 checkpoint。MF ledger SHA256 为 f7b40a1d3e9167de74757eeacf2b9209449939e3a34ed3c3c3f223277262ea45，HP 主臂 ledger SHA256 为 384cb8b6bc22152631156f4b299745aca2d7797f684e89a5371646b4b00b42e1。四卡已闭合结果另见 [四卡报告](fourcard-report-v2/README.md)。
 
 ## HP1500 原生 checkpoint 的独立 CPU 读回
 
