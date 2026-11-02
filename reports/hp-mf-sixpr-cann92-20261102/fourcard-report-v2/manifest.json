@@ -1,0 +1,508 @@
+{
+  "status": "public_candidate_not_published",
+  "source_commit": "2dd33e02f46fc5d6810e806b9d7d4717cf10a3e4",
+  "base_master": "4144bb242f1a696308e75bd609cb61c9143b3d8f",
+  "model_scope": "3 layers, 2 Dense + 1 MoE, S4096, MTP off",
+  "GBS": 4,
+  "LBS": 1,
+  "difference": "case rank0 global loss minus 125 FSDP continuous rank0 global loss",
+  "performance": "step 1521\u20132499 max 4 rank elapsed, 16384 tokens/update",
+  "abba": "129 same host, each arm 1521\u20131570, A1/B1/B2/A2; 20 step warmup",
+  "tp_scope": "attention, embedding and head TP2; FFN replicate; standard loss_parallel",
+  "selective_scope": "four actual wrapper modules in one-step diagnostic; full 1000-step numeric report remains separate",
+  "source_files": {
+    "fourcard-fsdp4-formal-audit-v1/comparison.csv": {
+      "sha256": "c085cfc87624ddf4518018ee5bfbe71bb6b79d0c0e89d7b65169ce9604a11732",
+      "bytes": 413391
+    },
+    "fourcard-fsdp4-formal-audit-v1/comparison.json": {
+      "sha256": "787f255ea559d18a64d21a70c74b635daddd67f4cd0a639c93186d5237f23629",
+      "bytes": 5718
+    },
+    "fourcard-cp-formal-audit-v1/paired-rank0.csv": {
+      "sha256": "f78c2a5bdf24d0c7bd0eb8df13e62ca412e36370a6ad7780e3a9f1d0d0d3ccc2",
+      "bytes": 121431
+    },
+    "fourcard-cp-formal-audit-v1/analysis.json": {
+      "sha256": "c36f6ad0555fa867f87d14b5aea107cf45f9f23f76b88925b8ffb6429ed9b7a2",
+      "bytes": 5999
+    },
+    "fourcard-ep-formal-audit-v1/comparison.csv": {
+      "sha256": "0c4603712735384ea004d96c9b7bdccc1d6a9ee5f6459aaf58df8cef1a7db788",
+      "bytes": 413446
+    },
+    "fourcard-ep-formal-audit-v1/comparison.json": {
+      "sha256": "295c42c09b048d13f10ba1f66c7d6725eab8d8d60b5edf420adaf6b90687dc19",
+      "bytes": 6005
+    },
+    "fourcard-hsdp-formal-audit-v2/loss.csv": {
+      "sha256": "607eb3912c37f7b1ec67511ebdd2155ca31940d8d4a9f5ba1f2548d86c8ddb6f",
+      "bytes": 266077
+    },
+    "fourcard-hsdp-formal-audit-v2/analysis.json": {
+      "sha256": "6f14d1501d750dd063584776a9075cc10ffe6c9455246718505548b8ba64cdbf",
+      "bytes": 4684
+    },
+    "fourcard-tp-formal-audit-v2/paired-rank0.csv": {
+      "sha256": "e023c29e9ecfb1f7436ff4c14054c5d0863b7627163861bdce99124623cc01c0",
+      "bytes": 119696
+    },
+    "fourcard-tp-formal-audit-v2/analysis.json": {
+      "sha256": "6537753066713040a47b7d0a30c69d367481ea6cae5647ba3f6053885e8ab92e",
+      "bytes": 5986
+    },
+    "fourcard-selective-formal-audit-v2/loss.csv": {
+      "sha256": "4d37636211b291256d7d4f215ea4fc3285fa3173463e1903124d037ba3a6ae13",
+      "bytes": 266282
+    },
+    "fourcard-selective-formal-audit-v2/analysis.json": {
+      "sha256": "45779863bd72122507071ad23849bfd00f4fda0ace0d25bef7580c8fd314f00c",
+      "bytes": 4690
+    },
+    "plot-inputs-final-v1/manifest.json": {
+      "sha256": "51fc0ed61a0931d892151a071ca77dcb9009bfa5679e93ab28d9e8b53763e9db",
+      "bytes": 62408
+    },
+    "fourcard-perf-abba-audit-v1/summary-abba.json": {
+      "sha256": "ef609745581ad2941f6fc500452c4f39baa2c7191c538dda163f8e8a15fb3f36",
+      "bytes": 13633
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/controller.json": {
+      "sha256": "37e5868f961fb3efe92f5f0e03beba3c28633461bdad70365e8bc0e1d1cfa5b4",
+      "bytes": 14429
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-0/step-observations.jsonl": {
+      "sha256": "9c41c2ecb37e486bce540051e4362f26b893d99f22afe11a11d21203503ef639",
+      "bytes": 220455
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-0/complete.json": {
+      "sha256": "c0b2211c9899e16b3592e3d9917786e7cc12c219541dcb15e7444524c33633af",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-1/step-observations.jsonl": {
+      "sha256": "3b52df9c9a02c927a1aef3e32512c37e18f80795a751f7609a317191874c57d2",
+      "bytes": 220457
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-1/complete.json": {
+      "sha256": "2fb436bf3cd118b5d54551d643219acb86b5b006390392aed389dc37a271de9b",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-2/step-observations.jsonl": {
+      "sha256": "0b9ba7b91075fc23dbcb92cc9bf4eefefab02770b472fea7b86f3123c9cb528f",
+      "bytes": 220451
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-2/complete.json": {
+      "sha256": "7a51af95b16efb8084790ceb4ba206939468408d17793474ae4950f330b97705",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-3/step-observations.jsonl": {
+      "sha256": "f6543090a36f5555de54d1f7bb37b524109390f9c6c9542d2606d57d94bfd1f6",
+      "bytes": 220459
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a1-1500to1570-v2/rank-3/complete.json": {
+      "sha256": "e90a1adfaae3877c236dc7b0b93582ba65aec71ba3002de5081a721d3d5ae97c",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/controller.json": {
+      "sha256": "152cfac63b0bc421c670f68be6ae075c593b75b53983a24376d10193ae9aee69",
+      "bytes": 14430
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-0/step-observations.jsonl": {
+      "sha256": "0a99c6b79b23f9c0c717af34d6613b6859419e916cebd2ad84fdb25c1a679dec",
+      "bytes": 133082
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-0/complete.json": {
+      "sha256": "44a8b690217349fb974bf7ee240b842192b79142ed26532b255c2df280544e3f",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-1/step-observations.jsonl": {
+      "sha256": "4c5287ae5b3d4bbddcee369eb62e099374858995ad90a415b541709eb8be21db",
+      "bytes": 133084
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-1/complete.json": {
+      "sha256": "2b882f8be0b115d886ebb6d9f5304e9138b3ec695b8b077a88bea30ea7889366",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-2/step-observations.jsonl": {
+      "sha256": "062b6466e83bbd823240c256d958dd194fe6b888715c80f1bcd1baf357e54924",
+      "bytes": 133087
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-2/complete.json": {
+      "sha256": "0e959084d2b95415f228b99861bb808900e24ac63baa7f21ef7b83ed3812963d",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-3/step-observations.jsonl": {
+      "sha256": "67af7312a78727c56184fa2500e70226a615a45be7f0dbe96b6b1b31eb625784",
+      "bytes": 133086
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b1-1500to1570-v2/rank-3/complete.json": {
+      "sha256": "12df7267e4e0b416ea22b11d8e12e81206d7ede3e836328800688d4252aadb96",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/controller.json": {
+      "sha256": "8f2ffc82fd0c4d25a3d69015e4b0647c2b10b63a2b93b1c015085163afc5f865",
+      "bytes": 14430
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-0/step-observations.jsonl": {
+      "sha256": "f10565471c25bea969c5d17cf1ed674972ee869c788edbbc4381b5c3bf255f7f",
+      "bytes": 133081
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-0/complete.json": {
+      "sha256": "e99ea6923ba06746dbbec255933b3e4ab7df82718f00f51f0d9966fd240cbb9c",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-1/step-observations.jsonl": {
+      "sha256": "ca2d97615a67cc98cdf643a363a59ab28c81be0a566139f752b21df5be021649",
+      "bytes": 133089
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-1/complete.json": {
+      "sha256": "cb4ba3ce114e356eb3537a36e7c1d5ad5ed5ea2357d16cc5c3a8f9429989e9d0",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-2/step-observations.jsonl": {
+      "sha256": "f55a7598054195b002aa9efb33fd5757f409ff606ae5de52898477c98af48d1a",
+      "bytes": 133072
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-2/complete.json": {
+      "sha256": "f1ab1f5f9a47357275602dd6e11984215a836c737b6ff3aa0bdca2c67e52d4f5",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-3/step-observations.jsonl": {
+      "sha256": "153c8e12ab7f2e1cb9149827cd45f7549d2eb9de237bc1560db68da6fef984d7",
+      "bytes": 133076
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-b2-1500to1570-v2/rank-3/complete.json": {
+      "sha256": "c7d7b0652fdb96902c288980eab1ca556c9859263875a0a26948d8d31c33b705",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/controller.json": {
+      "sha256": "dd688f86cd34fde0f741175fa7441913f09cbf16286b331dbd3aa4c2b5334e05",
+      "bytes": 14430
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-0/step-observations.jsonl": {
+      "sha256": "37de8a9470249e5a5139f566d4014e7b77e1059e621d03cf01797cd216006815",
+      "bytes": 220473
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-0/complete.json": {
+      "sha256": "5b6c0acccf2c6cfe5664ca14db3703d34e95432a85e5ba59f9dca3362964eb50",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-1/step-observations.jsonl": {
+      "sha256": "7f18ed6ce422454f5f68e0f34b75156f6426a030b79fb6491b37ad7ffb287a3f",
+      "bytes": 220461
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-1/complete.json": {
+      "sha256": "423c7ad9f36ea918c5379d7260af090b9ad693068ecacffbe48ffa8c878682f2",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-2/step-observations.jsonl": {
+      "sha256": "19b95092dbe980a2388037add01a8683091c138e6959ecb17cb0c758b516f2e2",
+      "bytes": 220470
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-2/complete.json": {
+      "sha256": "bc1765fa9d30321d4d888d3c242b537fe076a8c1be0d02e654c4cd7722cffff3",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-3/step-observations.jsonl": {
+      "sha256": "dcad718d365c44bc11f989fa0a4b901d0ab302fb6ea451ca255f853d69807ca5",
+      "bytes": 220463
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-fsdp4-a2-1500to1570-v2/rank-3/complete.json": {
+      "sha256": "339bf6427fb5c257c05920ed884914577e219595efa93b10dc04278dcbc1ae75",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/controller.json": {
+      "sha256": "c033e7d209cb5351725740506532eb91ed08d73fd64f32161c21b06a411ef358",
+      "bytes": 14446
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-0/step-observations.jsonl": {
+      "sha256": "e2c633dedbe0170b33664d1701d93a2ea6f2c55b81afa54540cfaf64ba2ad53e",
+      "bytes": 350353
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-0/complete.json": {
+      "sha256": "d8a9cbeea1f9383b9ad6bfaadd5cef61069406b6132df256a2a84f179a0e77c9",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-1/step-observations.jsonl": {
+      "sha256": "37b953c2e025e2f612e084810c5f20333cc3867c8249118d44252eebce00e48b",
+      "bytes": 350353
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-1/complete.json": {
+      "sha256": "6ef26177ae04ee2aa80b5e39a515b6e22829305fe74079c6731afdea5f72c3d3",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-2/step-observations.jsonl": {
+      "sha256": "bad84d61756d36923d04ec34c6b818c01a5609caaa76ad86c4b8ab146e610cdf",
+      "bytes": 350346
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-2/complete.json": {
+      "sha256": "9a7da2fc641da92133f1aa4da40b1a9daebea27244259289e46afcde5ade181d",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-3/step-observations.jsonl": {
+      "sha256": "90cb871d1410ccd323d51a1ed076887be1a49914320a42121cd1654ff32ef403",
+      "bytes": 350332
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a1-1500to1570-v4/rank-3/complete.json": {
+      "sha256": "a070f8ce0898f5fb6939bb0239a2b5347ef1ced5560dec9fd4540adc45750d81",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/controller.json": {
+      "sha256": "899631a99b288f397f7d9bcbb66bf8b29871855c1ca15189e34a79b233929967",
+      "bytes": 14446
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-0/step-observations.jsonl": {
+      "sha256": "91c7a9dc36752fc7e90e4817b5e1e7ad56b8ba8e7ef1cecedd6735b7bc0cb7e9",
+      "bytes": 174823
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-0/complete.json": {
+      "sha256": "3e3bec073d9cf38cdeb4738770a8ebbe6245bdc510ed1220b189ab83c1165222",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-1/step-observations.jsonl": {
+      "sha256": "f9d204b0a778cc4d0f8a5c76c2a07d56a018411b37a0cdb1d815ac3dd66209dd",
+      "bytes": 174811
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-1/complete.json": {
+      "sha256": "6505a979f038120e99df3d8e2d1777827edee12e9651f06b44ff1b3346cb1bbb",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-2/step-observations.jsonl": {
+      "sha256": "156af7f5f80789fa77586f97d5ef4cb9c6eb58d86288f0279a18b5f2319805bb",
+      "bytes": 174813
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-2/complete.json": {
+      "sha256": "855b9c18d6f046daf7cfd9bddc5d132b74277f70d17e0150481661581363b6d9",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-3/step-observations.jsonl": {
+      "sha256": "d048fc8ebedcfacb3f933c20d416bb09332f5252caf2b9821ab1f160ee8f0b51",
+      "bytes": 174822
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b1-1500to1570-v4/rank-3/complete.json": {
+      "sha256": "8c25d10a2f4de9b93a592f486439b84a76cfc7fc5cfe0f59bf2a08d1c409c15e",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/controller.json": {
+      "sha256": "5d0b37de2eada9e664e3ddcebe95c354f8cc38472f9a074f400a8f86aca49f66",
+      "bytes": 14446
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-0/step-observations.jsonl": {
+      "sha256": "3acb5bb94535c3810abc6ea2799318d16f9942aae63df28e2db40e59a0af249a",
+      "bytes": 174798
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-0/complete.json": {
+      "sha256": "3f85542d05b48ddc6485f7bd6bd92ca480989f7d63022b403bd9bfa2a711c760",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-1/step-observations.jsonl": {
+      "sha256": "172eac234ccc8b3edb1337745a0d5dd7864f38bd43252dc6d09d09191a63a69e",
+      "bytes": 174799
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-1/complete.json": {
+      "sha256": "4aaad7c214c41e54483645b5ec62f103198e54ed8b6434d19368848cf21f0d7c",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-2/step-observations.jsonl": {
+      "sha256": "d32a979cb89113fc228fd285fa0b8725a0b9d464af518bc50366fa228e7bd62d",
+      "bytes": 174804
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-2/complete.json": {
+      "sha256": "8e2358fcb2eae034854ea40d0b4f216f57e7d8a4977efcc672f805805d912433",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-3/step-observations.jsonl": {
+      "sha256": "2338565931d89e3f446640d8de91382693a7e1502a146676f2e8ee779b721a15",
+      "bytes": 174810
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-b2-1500to1570-v4/rank-3/complete.json": {
+      "sha256": "3e06d3df5be0a841c0b9f2069a70d03202caafa8d8ac59230822b67fcf10da42",
+      "bytes": 319
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/controller.json": {
+      "sha256": "b5882708afcf6b3fa9136db51f347697159e946de2c1a0f17078a0ba2661271a",
+      "bytes": 14446
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-0/step-observations.jsonl": {
+      "sha256": "d252b3c2c0d534ff481cce254740e8c09910b8e8ece2e5f3e207fcf81e23762f",
+      "bytes": 350383
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-0/complete.json": {
+      "sha256": "24b4019b32af2b1a25ad5a47b6e6aa9e7a067c84dd51f7fd71bea6c0ae5d28b8",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-1/step-observations.jsonl": {
+      "sha256": "6bda7f2c56036756321fcfdb2c93f9fb9ef5726e437a128073cf06cc831236e0",
+      "bytes": 350369
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-1/complete.json": {
+      "sha256": "8a943f4a434de4f07b3e59cc9b557cde1e7f154d0640cd4b3571778c3b67fcd6",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-2/step-observations.jsonl": {
+      "sha256": "7e7e697240932083fe51b281ebe140c97323d485c7eeb7bc51d7409713a618e7",
+      "bytes": 350338
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-2/complete.json": {
+      "sha256": "d1afff3e513c5ba90596d1249081960d50c35f43417b591dadb6ae6a0ad74efe",
+      "bytes": 317
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-3/step-observations.jsonl": {
+      "sha256": "963a42511fd6bcbece8a4e5de25c00707f37800e1a5f2da2b9ef2e3a3aec4dcb",
+      "bytes": 350357
+    },
+    "fourcard-perf-abba-audit-v1/fourcard-runs/perfdiag-cp2dp2-a2-1500to1570-v4/rank-3/complete.json": {
+      "sha256": "92eb6c9dba6e986e39f839ba8f037f1e4b95cb5147136a6b0fd47de28c4fc867",
+      "bytes": 317
+    },
+    "fourcard-fsdp4-formal-audit-v1/formal/rank-0/step-observations.jsonl": {
+      "sha256": "5dbe6917171d2129a51eef1352d5cbe5d0a2c27c4f23d60d610a1ddecbef5cd2",
+      "bytes": 7734142
+    },
+    "fourcard-fsdp4-formal-audit-v1/formal/rank-1/step-observations.jsonl": {
+      "sha256": "e92223536f9455b322480e33e75f62c63c031bcebb31f825bba33cd5f5ec790a",
+      "bytes": 7734131
+    },
+    "fourcard-fsdp4-formal-audit-v1/formal/rank-2/step-observations.jsonl": {
+      "sha256": "861dcac45f07b072470301980c230f2943d4794d954bf57c6ae4bea7bd15e5b4",
+      "bytes": 7734121
+    },
+    "fourcard-fsdp4-formal-audit-v1/formal/rank-3/step-observations.jsonl": {
+      "sha256": "ea4e5f0fd89496a491207509ffa0e1f0378cf7ba7a2a4b85b7ca895b67e152ef",
+      "bytes": 7734158
+    },
+    "fourcard-fsdp4-formal-audit-v1/resume/rank-0/step-observations.jsonl": {
+      "sha256": "6e2bdf3492fd904b8e4b84dcab1a65f17c00047774832e1aacf91c7d9bbb6648",
+      "bytes": 3094388
+    },
+    "fourcard-fsdp4-formal-audit-v1/resume/rank-1/step-observations.jsonl": {
+      "sha256": "ea0a801db2372a846c44109ab7f56567e55624ba8d2c6418a284c6b57b81f269",
+      "bytes": 3094313
+    },
+    "fourcard-fsdp4-formal-audit-v1/resume/rank-2/step-observations.jsonl": {
+      "sha256": "347df19795925184b69cdc2ae1eedc496b3c5061a9436ad9d993fde49e4628a3",
+      "bytes": 3094372
+    },
+    "fourcard-fsdp4-formal-audit-v1/resume/rank-3/step-observations.jsonl": {
+      "sha256": "ef91bf18b41745a7519fd27b22ff29466a57dc801b544894f8b84ba2682bf50c",
+      "bytes": 3094399
+    },
+    "fourcard-cp-formal-audit-v1/cp/rank-0/step-observations.jsonl": {
+      "sha256": "c7c4434d4c80c7ca4a8fcc394f001cce50029d3d1f8a52511bae33f6344d1a76",
+      "bytes": 4950282
+    },
+    "fourcard-cp-formal-audit-v1/cp/rank-1/step-observations.jsonl": {
+      "sha256": "cdcfdce1f7a6d66973bfc002195446f658c27a0738fc8ba6bd8f42e7e2be4f79",
+      "bytes": 4950294
+    },
+    "fourcard-cp-formal-audit-v1/cp/rank-2/step-observations.jsonl": {
+      "sha256": "e3f442181be7a660d553256520fa6d53f02396e97a807999c90190da76ddc575",
+      "bytes": 4950246
+    },
+    "fourcard-cp-formal-audit-v1/cp/rank-3/step-observations.jsonl": {
+      "sha256": "a612cfaebd0bae11d79dcd0e748ac612e8da9e0692e2d8d2da038dbe976e6d43",
+      "bytes": 4950303
+    },
+    "fourcard-ep-formal-audit-v1/ep/rank-0/step-observations.jsonl": {
+      "sha256": "74b4a3aeab37f60b6c60cb054f9540105d2e4d67bc4ce17b0dd34a2f2dbffcfa",
+      "bytes": 3094285
+    },
+    "fourcard-ep-formal-audit-v1/ep/rank-1/step-observations.jsonl": {
+      "sha256": "d0ddaa13e3a9258e9db6cc52077707eb426ff09a55264f5db01dd6987a7c61fa",
+      "bytes": 3094263
+    },
+    "fourcard-ep-formal-audit-v1/ep/rank-2/step-observations.jsonl": {
+      "sha256": "7de52d18d3a33b52f165b3624931719b3f0fb48a66bb6d2353e072c50c343163",
+      "bytes": 3094303
+    },
+    "fourcard-ep-formal-audit-v1/ep/rank-3/step-observations.jsonl": {
+      "sha256": "7e1eed0c995b2164454e576b9a7205931ba1263d14e36931e385ecd66456f9bc",
+      "bytes": 3094320
+    },
+    "fourcard-hsdp-formal-audit-v2/hsdp/rank-0/step-observations.jsonl": {
+      "sha256": "fcd50c5e6dd61b93f229a7aed0a9403119a8542b1e98c7e259a7a8812ed0175c",
+      "bytes": 3094108
+    },
+    "fourcard-hsdp-formal-audit-v2/hsdp/rank-1/step-observations.jsonl": {
+      "sha256": "130e564223f6d7a01970d08d9ce96f4293d59d7e40cff28bbd2edbebf3c56251",
+      "bytes": 3094014
+    },
+    "fourcard-hsdp-formal-audit-v2/hsdp/rank-2/step-observations.jsonl": {
+      "sha256": "be21e80aeaa80436ef3bb6f83c3fc12a6843425e574d2db1053260dd74aaf64b",
+      "bytes": 3094098
+    },
+    "fourcard-hsdp-formal-audit-v2/hsdp/rank-3/step-observations.jsonl": {
+      "sha256": "321ff05597db466ab96a91cf3e8adc043a4f40b6073b770ea54eeb10b15608d6",
+      "bytes": 3094139
+    },
+    "fourcard-tp-formal-audit-v2/tp/rank-0/step-observations.jsonl": {
+      "sha256": "bea014a50295a4904ffafd6265abc1d4f94de36706e998a2b66510819785bb05",
+      "bytes": 4950102
+    },
+    "fourcard-tp-formal-audit-v2/tp/rank-1/step-observations.jsonl": {
+      "sha256": "36c9d4992b09ed249464e682833e4a61a0a8e8cfc8e7aefe4c278ad494d3a263",
+      "bytes": 4950104
+    },
+    "fourcard-tp-formal-audit-v2/tp/rank-2/step-observations.jsonl": {
+      "sha256": "3bf2f66c6e94412f553d7e3d32a652ae86c0ff277674dcc96ad0714696c2c3b9",
+      "bytes": 4950118
+    },
+    "fourcard-tp-formal-audit-v2/tp/rank-3/step-observations.jsonl": {
+      "sha256": "5353f3c9ddddbc0bc44c7347b32e85f96670dedcabfa43a299048606ae306c42",
+      "bytes": 4950110
+    },
+    "fourcard-selective-formal-audit-v2/selective/rank-0/step-observations.jsonl": {
+      "sha256": "1f3c56737ef027266ea774aee104d7459f8bf2d747d9851967a4cfac48e14e2b",
+      "bytes": 3094299
+    },
+    "fourcard-selective-formal-audit-v2/selective/rank-1/step-observations.jsonl": {
+      "sha256": "e34ff4259f374bd77db7f1f228fd8509e1f307efb51bcf54b84832ce34c2eec3",
+      "bytes": 3094325
+    },
+    "fourcard-selective-formal-audit-v2/selective/rank-2/step-observations.jsonl": {
+      "sha256": "bcf768df408e99d2806556fbdd137ad5d88795ef6c2dc008f5d6662f8c0eda5d",
+      "bytes": 3094279
+    },
+    "fourcard-selective-formal-audit-v2/selective/rank-3/step-observations.jsonl": {
+      "sha256": "a44151e90f66354cae932d1c0f5a365f5c86a0694fe223425b32d7f49a2a42d7",
+      "bytes": 3094301
+    },
+    "sac-one-step-coverage-audit-v5/analysis.json": {
+      "sha256": "99d8b9b26b375fcde0eaf9678669e27566c86a86c08a15c52db24dc16008aec0",
+      "bytes": 3405
+    }
+  },
+  "no_private_yaml_or_sample_contents": true,
+  "outputs": {
+    "abba-steps-1521-1570.csv": {
+      "sha256": "779362c5bb1bbeefb90e724a461cb87824996ba516072537e79e9aa13bcd265c",
+      "bytes": 58731
+    },
+    "fourcard-loss-1501-2500.csv": {
+      "sha256": "27318f381abfe7a9179e1c3af55baa8651d4cbdfece6d9a2678ae1ad9b22632c",
+      "bytes": 267751
+    },
+    "README.md": {
+      "sha256": "80f5bd54bab3f370dfdf05c20be6a7333d10083e20ecf658812f9174ea97e0df",
+      "bytes": 6938
+    },
+    "sac-one-step-summary.json": {
+      "sha256": "99d8b9b26b375fcde0eaf9678669e27566c86a86c08a15c52db24dc16008aec0",
+      "bytes": 3405
+    },
+    "statistics.json": {
+      "sha256": "bcbbf39af051037e061ed08b6acc960bb88df95f3b3da0319003aa8a598c4e53",
+      "bytes": 9377
+    }
+  },
+  "validation": {
+    "loss_rows": 1000,
+    "abba_rows": 400,
+    "cases": 6,
+    "abba_arms": 8,
+    "source_sha256_rechecked": 114,
+    "no_new_threshold": true,
+    "mtp": "N/A",
+    "not_published": true
+  }
+}
