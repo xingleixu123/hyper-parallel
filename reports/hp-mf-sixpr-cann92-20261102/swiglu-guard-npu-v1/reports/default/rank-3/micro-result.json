@@ -1,0 +1,49 @@
+{
+  "kind": "isolated_micro_module_not_training",
+  "rank": 3,
+  "case": "default",
+  "phase": "initializing",
+  "shape": {
+    "H": 16,
+    "I": 32,
+    "B": 2,
+    "S": 8
+  },
+  "dtype": "bfloat16",
+  "tol": {
+    "rtol": 0.008,
+    "atol": 0.0
+  },
+  "mesh": {
+    "shape": [
+      2,
+      2
+    ],
+    "names": [
+      "dp",
+      "tp"
+    ],
+    "coordinate": [
+      1,
+      1
+    ],
+    "tp_group_ranks": [
+      2,
+      3
+    ]
+  },
+  "actual_shared_weight_sha256": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "41d8cbcbdb1212b52c66a63e175a2b8c58f1423fe5d769ba1c5eca7da2ee05a6",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "20ab77b27d020a4f7bdd432a34e24db77872e1b7a9ae2001aca689b138f0508a"
+  },
+  "reference_weight_sha256": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "41d8cbcbdb1212b52c66a63e175a2b8c58f1423fe5d769ba1c5eca7da2ee05a6",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "20ab77b27d020a4f7bdd432a34e24db77872e1b7a9ae2001aca689b138f0508a"
+  },
+  "input_sha256": "fc89544396b324660a88b784d0d415612ef16d97cf9bdea7a79f613aba65e985",
+  "classification": "exception",
+  "exception": "ValueError",
+  "message": "model.layers.0.mlp.shared_experts.linear_fc1.weight: native SwiGLUMLP packs [gate, up] along output channels; ordinary TP output-channel sharding does not preserve matched gate/up sections. Chunk-aware packed TP is not supported. Use TP Replicate for the packed projection with compatible input/output contracts, or use separate gate/up projections.",
+  "traceback": "Traceback (most recent call last):\n  File \"/work/scripts/fourcard/entry.py\", line 87, in main\n    plan=ShardingPlanner(plan_overrides=overrides).plan(model,tp,tp_size=2,sequence_parallel=False,loss_parallel=True)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/sources/hyper-parallel/hyper_parallel/distributed/_builder/planner.py\", line 375, in plan\n    plan, param_roles, param_metadata = self._build_plan(\n                                        ^^^^^^^^^^^^^^^^^\n  File \"/work/sources/hyper-parallel/hyper_parallel/distributed/_builder/planner.py\", line 458, in _build_plan\n    self._finalize_boundary_specs(\n  File \"/work/sources/hyper-parallel/hyper_parallel/distributed/_builder/planner.py\", line 283, in _finalize_boundary_specs\n    self._finalize_swiglu_tp_guard(plan, model, tp_size=tp_size)\n  File \"/work/sources/hyper-parallel/hyper_parallel/distributed/_builder/planner.py\", line 1083, in _finalize_swiglu_tp_guard\n    raise ValueError(\nValueError: model.layers.0.mlp.shared_experts.linear_fc1.weight: native SwiGLUMLP packs [gate, up] along output channels; ordinary TP output-channel sharding does not preserve matched gate/up sections. Chunk-aware packed TP is not supported. Use TP Replicate for the packed projection with compatible input/output contracts, or use separate gate/up projections.\n",
+  "fused_swiglu_calls": 0
+}
