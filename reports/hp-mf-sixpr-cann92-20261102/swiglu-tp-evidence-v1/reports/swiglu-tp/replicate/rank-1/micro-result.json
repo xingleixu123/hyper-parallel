@@ -1,0 +1,116 @@
+{
+  "kind": "isolated_micro_module_not_training",
+  "rank": 1,
+  "case": "replicate",
+  "phase": "backward_complete",
+  "shape": {
+    "H": 16,
+    "I": 32,
+    "B": 2,
+    "S": 8
+  },
+  "dtype": "bfloat16",
+  "tol": {
+    "rtol": 0.008,
+    "atol": 0.0
+  },
+  "mesh": {
+    "shape": [
+      2,
+      2
+    ],
+    "names": [
+      "dp",
+      "tp"
+    ],
+    "coordinate": [
+      0,
+      1
+    ],
+    "tp_group_ranks": [
+      0,
+      1
+    ]
+  },
+  "actual_shared_weight_sha256": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "41d8cbcbdb1212b52c66a63e175a2b8c58f1423fe5d769ba1c5eca7da2ee05a6",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "20ab77b27d020a4f7bdd432a34e24db77872e1b7a9ae2001aca689b138f0508a"
+  },
+  "reference_weight_sha256": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "41d8cbcbdb1212b52c66a63e175a2b8c58f1423fe5d769ba1c5eca7da2ee05a6",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "20ab77b27d020a4f7bdd432a34e24db77872e1b7a9ae2001aca689b138f0508a"
+  },
+  "input_sha256": "fc89544396b324660a88b784d0d415612ef16d97cf9bdea7a79f613aba65e985",
+  "placements": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "{<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Replicate(), <MeshAxisName.EP: 'ep'>: Replicate()}",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "{<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Replicate(), <MeshAxisName.EP: 'ep'>: Replicate()}"
+  },
+  "contracts": {
+    "model.layers.0.mlp.shared_experts.linear_fc1": {
+      "in_src": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "in_dst": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_src": "{'output': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_dst": "{'output': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}"
+    },
+    "model.layers.0.mlp.shared_experts.linear_fc2": {
+      "in_src": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "in_dst": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_src": "{'output': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_dst": "{'output': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}"
+    }
+  },
+  "source_shards": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "((Replicate(),), DeviceMesh(device_type='npu', mesh_shape=(2,), mesh_dim_names=('tp',), rank_list=(0, 1)))",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "((Replicate(),), DeviceMesh(device_type='npu', mesh_shape=(2,), mesh_dim_names=('tp',), rank_list=(0, 1)))"
+  },
+  "local_parameters": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": {
+      "shape": [
+        64,
+        16
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "41d8cbcbdb1212b52c66a63e175a2b8c58f1423fe5d769ba1c5eca7da2ee05a6"
+    },
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": {
+      "shape": [
+        16,
+        32
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "20ab77b27d020a4f7bdd432a34e24db77872e1b7a9ae2001aca689b138f0508a"
+    }
+  },
+  "actual_input_sha256": "fc89544396b324660a88b784d0d415612ef16d97cf9bdea7a79f613aba65e985",
+  "forward": {
+    "max_abs": 0.0,
+    "rtol": 0.008,
+    "atol": 0.0,
+    "close": true
+  },
+  "input_gradient": {
+    "max_abs": 0.0,
+    "rtol": 0.008,
+    "atol": 0.0,
+    "close": true
+  },
+  "weight_gradients": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": {
+      "max_abs": 0.0,
+      "rtol": 0.008,
+      "atol": 0.0,
+      "close": true
+    },
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": {
+      "max_abs": 0.0,
+      "rtol": 0.008,
+      "atol": 0.0,
+      "close": true
+    }
+  },
+  "classification": "compared",
+  "fused_swiglu_calls": 1,
+  "cpu_profiler_collectives": {
+    "aclnnReduceSum": 1
+  }
+}

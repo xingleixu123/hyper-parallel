@@ -1,0 +1,95 @@
+{
+  "kind": "isolated_micro_module_not_training",
+  "rank": 0,
+  "case": "default",
+  "phase": "applied",
+  "shape": {
+    "H": 16,
+    "I": 32,
+    "B": 2,
+    "S": 8
+  },
+  "dtype": "bfloat16",
+  "tol": {
+    "rtol": 0.008,
+    "atol": 0.0
+  },
+  "mesh": {
+    "shape": [
+      2,
+      2
+    ],
+    "names": [
+      "dp",
+      "tp"
+    ],
+    "coordinate": [
+      0,
+      0
+    ],
+    "tp_group_ranks": [
+      0,
+      1
+    ]
+  },
+  "actual_shared_weight_sha256": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "41d8cbcbdb1212b52c66a63e175a2b8c58f1423fe5d769ba1c5eca7da2ee05a6",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "20ab77b27d020a4f7bdd432a34e24db77872e1b7a9ae2001aca689b138f0508a"
+  },
+  "reference_weight_sha256": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "41d8cbcbdb1212b52c66a63e175a2b8c58f1423fe5d769ba1c5eca7da2ee05a6",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "20ab77b27d020a4f7bdd432a34e24db77872e1b7a9ae2001aca689b138f0508a"
+  },
+  "input_sha256": "fc89544396b324660a88b784d0d415612ef16d97cf9bdea7a79f613aba65e985",
+  "placements": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "{<MeshAxisName.TP: 'tp'>: Shard(dim=0), <MeshAxisName.CP: 'cp'>: Replicate(), <MeshAxisName.EP: 'ep'>: Replicate()}",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "{<MeshAxisName.TP: 'tp'>: Shard(dim=0), <MeshAxisName.CP: 'cp'>: Replicate(), <MeshAxisName.EP: 'ep'>: Replicate()}"
+  },
+  "contracts": {
+    "model.layers.0.mlp.shared_experts.linear_fc1": {
+      "in_src": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "in_dst": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_src": "{'output': {<MeshAxisName.TP: 'tp'>: Partial(reduce_op='sum'), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_dst": "{'output': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}"
+    },
+    "model.layers.0.mlp.shared_experts.linear_fc2": {
+      "in_src": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "in_dst": "{'hidden_states': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_src": "{'output': {<MeshAxisName.TP: 'tp'>: Partial(reduce_op='sum'), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}",
+      "out_dst": "{'output': {<MeshAxisName.TP: 'tp'>: Replicate(), <MeshAxisName.CP: 'cp'>: Shard(dim=1), <MeshAxisName.EP: 'ep'>: Replicate()}}"
+    }
+  },
+  "source_shards": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": "((Shard(dim=0),), DeviceMesh(device_type='npu', mesh_shape=(2,), mesh_dim_names=('tp',), rank_list=(0, 1)))",
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": "((Shard(dim=0),), DeviceMesh(device_type='npu', mesh_shape=(2,), mesh_dim_names=('tp',), rank_list=(0, 1)))"
+  },
+  "local_parameters": {
+    "model.layers.0.mlp.shared_experts.linear_fc1.weight": {
+      "shape": [
+        32,
+        16
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "6a48af8983a62cb00bcd250ec7790eed259f29c7174df0cf2d3edd081c1a5868"
+    },
+    "model.layers.0.mlp.shared_experts.linear_fc2.weight": {
+      "shape": [
+        8,
+        32
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "f9853c92d43381e2e0169904a114b7e3dbb59334a0554e6b71018c52dfdcc723"
+    }
+  },
+  "actual_input_sha256": "fc89544396b324660a88b784d0d415612ef16d97cf9bdea7a79f613aba65e985",
+  "classification": "exception",
+  "exception": "RuntimeError",
+  "message": "matmul_implement_npu:../third_party/op-plugin/op_plugin/ops/opapi/MatmulKernelNpuOpApi.cpp:94 NPU function error: call aclnnMatmul failed, error code is 161002\n[ERROR] 2026-11-02-17:12:16 (PID:52, Device:0, RankID:0) ERR00100 PTA call acl api failed.\n[PID: 52] 2026-11-02-17:12:16.111.850 AclNN_Parameter_Error(EZ1001): The k-axis of the two inputs are different [2, 8, 16], [32, 8]\n",
+  "traceback": "Traceback (most recent call last):\n  File \"/work/scripts/fourcard/entry.py\", line 97, in main\n    y=model(xin);report['phase']='forward_complete'\n      ^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1778, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1789, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/scripts/fourcard/entry.py\", line 31, in forward\n    def forward(self,x): return self.model(x)\n                                ^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1778, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1789, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/scripts/fourcard/entry.py\", line 28, in forward\n    def forward(self,x): return self.layers[0](x)\n                                ^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1778, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1789, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/scripts/fourcard/entry.py\", line 25, in forward\n    def forward(self,x): return self.mlp(x)\n                                ^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1778, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1789, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/scripts/fourcard/entry.py\", line 22, in forward\n    def forward(self,x): return self.shared_experts(x)\n                                ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1778, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1789, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/sources/hyper-parallel/hyper_parallel/components/modules/swiglu_mlp.py\", line 186, in forward\n    return self.linear_fc2(intermediate_parallel)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1778, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1789, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/sources/hyper-parallel/hyper_parallel/distributed/_builder/forward_rewriter.py\", line 425, in production_forward\n    outputs = original_forward(*args, **kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/work/env/lib/python3.12/site-packages/torch/nn/modules/linear.py\", line 134, in forward\n    return F.linear(input, self.weight, self.bias)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: matmul_implement_npu:../third_party/op-plugin/op_plugin/ops/opapi/MatmulKernelNpuOpApi.cpp:94 NPU function error: call aclnnMatmul failed, error code is 161002\n[ERROR] 2026-11-02-17:12:16 (PID:52, Device:0, RankID:0) ERR00100 PTA call acl api failed.\n[PID: 52] 2026-11-02-17:12:16.111.850 AclNN_Parameter_Error(EZ1001): The k-axis of the two inputs are different [2, 8, 16], [32, 8]\n\n",
+  "fused_swiglu_calls": 1,
+  "cpu_profiler_collectives": {
+    "_AllReduce": 1,
+    "c10d::allreduce_": 1,
+    "HcclAllreduce": 1
+  }
+}
