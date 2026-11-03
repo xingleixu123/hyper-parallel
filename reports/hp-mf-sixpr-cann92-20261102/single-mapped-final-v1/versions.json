@@ -1,0 +1,175 @@
+{
+  "scope": "single-card HP+PTA vs MF+HP+MindSpore continuation, step 1501-2500",
+  "model": {
+    "layers": 3,
+    "dense_layers": 2,
+    "moe_layers": 1,
+    "global_batch_size": 2,
+    "local_batch_size": 1,
+    "sequence_length": 4096,
+    "original_horizon": 2500,
+    "learning_rate": 1e-05,
+    "mtp": "disabled; MTP LOSS N/A"
+  },
+  "hp": {
+    "actual_source_commit": "c419d1356af9eccec8377e636a6d9e5a2b7a285b",
+    "actual_source_tree": "82e641d37ea1073eb8690a4345cbc7f6fee23767",
+    "public_logical_feature_commit": "909a4fcce3b990b749095e253837bd22119de6f3",
+    "public_feature_scope": "Only the following two production adapter files were verified byte-identical to the tested source; the public head itself was not independently run on NPU.",
+    "layout_sha256": "84bc2594d6c4207ceea4e545370938f6796fdd53772909752d1591739ed9482c",
+    "optimizer_adapter_sha256": "570fe51e3321fe41d718ef7d0a112ac1948ea9214d83163041b482b338417317",
+    "muon_core_sha256": "a642fcb49b70054a2e8bda80eff9cd141c07b4072e5d42aae278a9452298ef39",
+    "configuration_sha256": "9b19545cd93ea676f5a8c2156cfd3a1003c26f0c58d365921f908ab18a177509",
+    "source_manifest_sha256": "1a5ed0ae5182fa450139e2a9e2d7dc981e961a063b23d82b645bf9a25a1b46c4",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0.post3",
+    "muon_options": {
+      "ns_variant": "legacy",
+      "ns_epsilon": 1e-08,
+      "ns_steps": 5,
+      "ns_coefficients": null
+    },
+    "actual_source_availability": "The tested integrated c419 tree is publicly available at the pinned commit and new branch.",
+    "integrated_source_chain": [
+      {
+        "commit": "356ac94d9254e966f076bc065789dfc93754adec",
+        "role": "pure six-PR integration base"
+      },
+      {
+        "commit": "2dd33e02f46fc5d6810e806b9d7d4717cf10a3e4",
+        "role": "existing Xing40 CE / TP loss-parallel compatibility; one model file +11/-8; single-card does not use TP branch"
+      },
+      {
+        "commit": "f827186ea3416b58371603210140ee32ff08b04f",
+        "role": "checkpoint non-owner lifecycle fix; single-card has no non-owner"
+      },
+      {
+        "commit": "c419d1356af9eccec8377e636a6d9e5a2b7a285b",
+        "role": "tested integration with model logical Muon boundaries"
+      }
+    ],
+    "actual_source_publication": {
+      "repository": "https://github.com/xingleixu123/hyper-parallel",
+      "branch": "codex/hp-mf-sixpr-logical-c419-20261102",
+      "commit_url": "https://github.com/xingleixu123/hyper-parallel/tree/c419d1356af9eccec8377e636a6d9e5a2b7a285b",
+      "tree": "82e641d37ea1073eb8690a4345cbc7f6fee23767",
+      "publication_receipt_sha256": "1ce9c2a5ce89089c7e7000ce95b395ed557157d37ec82a5d130e822686aa0d83"
+    },
+    "python": "3.12.14",
+    "numpy": "1.26.4",
+    "transformers": "5.21.0",
+    "architecture": "aarch64",
+    "cann": "9.2.0B237",
+    "official_master_base": "4144bb242f1a696308e75bd609cb61c9143b3d8f",
+    "six_pr_numbers": [
+      1171,
+      1413,
+      1420,
+      1425,
+      1358,
+      1362
+    ],
+    "six_pr_integrated_commits_chronological": [
+      {
+        "sha": "581c91f3b99f20b6bf816cac32f5f986e643a016",
+        "role": "parameter-specific FSDP mixed precision"
+      },
+      {
+        "sha": "79aa82e7e3e3514e11af23c6e0839caf3158f247",
+        "role": "Xing40 model integration"
+      },
+      {
+        "sha": "3a9e915fb18b5a8126bdff187b4c525f2e7e3f3d",
+        "role": "SwiGLU export correction"
+      },
+      {
+        "sha": "d71260fc0672efc8346c198cda63acc14372b5ec",
+        "role": "MLA and MoE context parallel adapters"
+      },
+      {
+        "sha": "355a58962b886de7cca3ff70897f76ce9e126fd7",
+        "role": "remove context parallel adapter limits"
+      },
+      {
+        "sha": "089fcff48fac1ba30482a57cbe5683278febb9be",
+        "role": "Ulysses context parallel support"
+      },
+      {
+        "sha": "5724c32b3f0b2caf99e1403de3744e01e2621a7e",
+        "role": "checkpoint recognition for NPU operators"
+      },
+      {
+        "sha": "356ac94d9254e966f076bc065789dfc93754adec",
+        "role": "normalize integer grouped matmul boundaries"
+      }
+    ],
+    "six_pr_commit_note": "Integrated commits in this tested chain; not a claim that these hashes are current upstream PR heads."
+  },
+  "mf": {
+    "source_commit": "52f614eeb91c6e873d37bdbb5b880c82926ae9f6",
+    "hyper_parallel_source_commit": "c69f8f70317268337314285f62d81bd5970c791a",
+    "configuration_sha256": "8a8f3bb11bbe688de165e183af81984feafa1ea1f583ecb187a43accad089e6a",
+    "mindspore": "2.10.0",
+    "mindspore_commit": "2a0200772404851a42e2ee4ecce9445d52725b19",
+    "cann": "9.2.0B237",
+    "combination_status": "experimental; not represented as an official supported combination; accepted for this experiment"
+  },
+  "private_configuration_archive": {
+    "version": "v6",
+    "commit": "565682bf00c3e74ec80ad43113cae51c0c7e50e8",
+    "status": "published and four files readback verified",
+    "url": "https://github.com/xingleixu123/mindformers-private/tree/565682bf00c3e74ec80ad43113cae51c0c7e50e8/private_review/hp-mf-sixpr-cann92-20261102-single-mapped-v6",
+    "visibility": "private",
+    "snapshot_time_scope": "At snapshot creation, final acceptance awaited ROOT aggregation. This report summarizes already recorded numerical verification and CPU checkpoint readback evidence without altering the historical snapshot.",
+    "publication_receipt_sha256": "3a6ece0295a5f21d03bfaddd02b7bb6f2eb0d8d052f25fab250480c5e88c917d"
+  },
+  "related_issue_pull_requests": {
+    "logical_muon": {
+      "issue": "https://github.com/hf1s/hyper-parallel/issues/318",
+      "pull_request": "https://github.com/hf1s/hyper-parallel/pull/319"
+    },
+    "checkpoint_lifecycle": {
+      "issue": "https://github.com/mindspore-ai/hyper-parallel/issues/1430",
+      "pull_request": "https://github.com/mindspore-ai/hyper-parallel/pull/1431"
+    },
+    "existing_model_tp_loss_parallel_pr": "https://github.com/mindspore-ai/hyper-parallel/pull/1426",
+    "ns_mapping": "existing native legacy and epsilon options; no new core Muon PR"
+  },
+  "hardware": {
+    "device": "Ascend 910B3",
+    "memory_gib": 64,
+    "server_label": "125",
+    "physical_card": 2,
+    "scope": "single card"
+  },
+  "configuration_sha256": {
+    "hp_single_mapped": "9b19545cd93ea676f5a8c2156cfd3a1003c26f0c58d365921f908ab18a177509",
+    "mf_formal": "8a8f3bb11bbe688de165e183af81984feafa1ea1f583ecb187a43accad089e6a",
+    "original_base": "ccc920386d930a1b55a782575485b9cd0d0b02a3a319d2586dff9a55120d8fd4"
+  },
+  "data_identity": {
+    "dataset_bin": {
+      "bytes": 4645101328,
+      "sha256": "6b925f342504c3eae80c5bde3163ff5924ad36b262bc6a276839a6f3f817ea3c"
+    },
+    "dataset_idx": {
+      "bytes": 18610322,
+      "sha256": "d535e502d62368e7a195b27a9a717543534ee1eaa9b4f9ce45f4d08d746cb5cd"
+    },
+    "mf_reference_cache": {
+      "document_index.npy": {
+        "bytes": 3722184,
+        "sha256": "4c1b135944d7fdec25b593a7c9436a451a1428c5b7b06c214c66a33cd2c8226e"
+      },
+      "sample_index.npy": {
+        "bytes": 4536368,
+        "sha256": "8be63e7b96ec2f2f1462cf100907e01fbb96858256fd071f45613816e375ace7"
+      },
+      "shuffle_index.npy": {
+        "bytes": 1134184,
+        "sha256": "484d0800cccde790b43d1e91c8663cad05a39d8427fb3d1272d34b6de22f6643"
+      }
+    },
+    "scope": "Identities from previously captured dataset and MF formal-cache evidence; no data, samples or cache contents published."
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "public-single-mapped-plot-config-v1",
+  "website": "https://log.javazero.top/",
+  "website_access_note": "The ordinary site URL opens the tool; it is not a persistent share link for this run.",
+  "x_axis": "recorded step",
+  "first_step": 1501,
+  "last_step": 2500,
+  "point_count": 6000,
+  "point_count_explanation": "Six input series of 1000 points: MF loss, HP loss, HP-minus-MF, cumulative signed mean, and two constant zero reference series. The zero and derived series are not additional training measurements.",
+  "input_provenance": "Scalar input logs were derived from the original closed training ledgers; loss and delta values are traceable to paired-loss1000.csv. Cumulative means and constant zero baselines are derived values.",
+  "source_paired_csv_sha256": "6dc75d68e9efc38246c21ef1b3edcafc0e738dd63981183c08e97e3f96b2641d",
+  "website_input_mode": "original (site setting; input files are derived scalar logs)",
+  "series": [
+    {
+      "label": "01_MF.log",
+      "sha256": "27630639e9be612e7d1ca53811e347db73f4aef6d43e8be7be3e9b3f3938c7bc",
+      "points": 1000,
+      "first_step": 1501,
+      "last_step": 2500
+    },
+    {
+      "label": "02_HP.log",
+      "sha256": "e6b33881a0e75f920954d997226f55f345ba66992232e29ea10d3c5e53075aab",
+      "points": 1000,
+      "first_step": 1501,
+      "last_step": 2500
+    },
+    {
+      "label": "03_delta_zero.log",
+      "sha256": "59e65660499e2656541c5bce5c17ba78a648fd2f8d4a19f2659726a3be95ef9b",
+      "points": 1000,
+      "first_step": 1501,
+      "last_step": 2500
+    },
+    {
+      "label": "04_HP_minus_MF.log",
+      "sha256": "237cb75ff25d56adb4b27d36d69afd9ae83d02f5ad80d4af63946b5277754823",
+      "points": 1000,
+      "first_step": 1501,
+      "last_step": 2500
+    },
+    {
+      "label": "05_running_mean_zero.log",
+      "sha256": "45c4ec411208c64b9a6738b83e4bade00586640d9289193fe114b0f6a981298d",
+      "points": 1000,
+      "first_step": 1501,
+      "last_step": 2500
+    },
+    {
+      "label": "06_cumulative_signed_mean.log",
+      "sha256": "a96465930d897a6dfe8d40fd0fb04f3e258b80c3aa2b8ed82bb03dff339dd70c",
+      "points": 1000,
+      "first_step": 1501,
+      "last_step": 2500
+    }
+  ],
+  "step_keyword": "step",
+  "matching_rules": [
+    {
+      "name": "LOSS｜MF52f vs HPc419｜GBS2 LBS1 S4096",
+      "mode": "keyword",
+      "keyword": "loss="
+    },
+    {
+      "name": "有符号差值 HP−MF｜470正 530负",
+      "mode": "keyword",
+      "keyword": "loss_delta="
+    },
+    {
+      "name": "累计有符号均值｜最终绝对值0.00003160≤0.005",
+      "mode": "keyword",
+      "keyword": "loss_running_mean="
+    }
+  ],
+  "smoothing": false,
+  "downsampling": false,
+  "zero_baseline_relative_limitation": "The website displays relative error as 0 when the reference is zero; do not use that relative value to judge either zero-baseline chart.",
+  "figures": [
+    {
+      "file": "figures/loss-overlay.png",
+      "website_card_source": "card-01.png",
+      "sha256": "088f57dd504ddd8496c9c30ddc8192787cfc898a1b507b9d5277a84c1150de6b",
+      "website_title": "📊 LOSS｜MF52f vs HPc419｜GBS2 LBS1 S4096",
+      "x_first_step": 1501,
+      "x_last_step": 2500
+    },
+    {
+      "file": "figures/signed-delta.png",
+      "website_card_source": "card-03.png",
+      "sha256": "6a2f8812704e4e2472656c0e408c60f61b972839d9f8d2c2613715ce786986b7",
+      "website_title": "📊 有符号差值 HP−MF｜470正 530负",
+      "x_first_step": 1501,
+      "x_last_step": 2500
+    },
+    {
+      "file": "figures/cumulative-mean.png",
+      "website_card_source": "card-05.png",
+      "sha256": "3b24fea0d0019405b98fa6b4c3cd61afb9591c9ae5a362c51483fc276f22b7cd",
+      "website_title": "📊 累计有符号均值｜最终绝对值0.00003160≤0.005",
+      "x_first_step": 1501,
+      "x_last_step": 2500
+    }
+  ],
+  "image_provenance": "Unmodified PNG screenshots of native website cards; original local exports retained separately.",
+  "loss_overlay_note": "The red and blue loss curves overlap closely; consult the signed-delta chart."
+}
