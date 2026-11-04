@@ -32,26 +32,7 @@ __all__ = ["xing4_ep_compute_fn"]
 @local_compute
 def xing4_ep_compute_fn(*, module: Any, mesh: Any, tp_mesh: Any, cp_mesh: Any,
                          ep_mesh: Any) -> Callable:
-    """Dispatch the MoE's routed experts over ``ep_mesh``.
-
-    The module keeps its own forward: pad tokens, the shared experts, the router's
-    balance loss and token counts are the same with and without expert parallelism.
-    Only the routed branch runs through the framework EP executor.
-
-    Args:
-        module: MoE layer to parallelize.
-        mesh: Unused global mesh.
-        tp_mesh: Unused tensor-parallel mesh.
-        cp_mesh: Unused context-parallel mesh.
-        ep_mesh: Expert-parallel mesh.
-
-    Returns:
-        The MoE forward, whose routed branch now runs through the installed EP executor.
-
-    Raises:
-        ValueError: From ``build_ep_compute``, if no expert-parallel mesh is given or ``module``
-            lacks ``gate``, ``experts`` or ``shared_experts``.
-    """
+    """Dispatch routed experts while retaining local shared experts and router state."""
     del mesh, tp_mesh, cp_mesh
     if not isinstance(module.experts, GroupedExperts):
         raise ValueError("Xing4 EP requires the grouped experts replacement before binding the executor")
