@@ -1,0 +1,24 @@
+# Xing4 合入依赖与去重
+
+状态依据 `final-dependencies.json` 的 2026-11-05 22:00（UTC+8）快照。所核最新 master 为 `435ccc0287056af621c3f5fda0182e27284967e5`；实际运行使用的是包含模型 head `fdce1a9a2285f1ab76f4c73d4e68b620b134eaea` 的复合源码 manifest `7dd9613c60843e646e15f6bb9879f477c201d63824793859e5386bd8059d8f4f`，两者不是同一源码身份。尚未验证逐项删掉条件 PR 后的最小组合；“运行包含”不自动证明条件路径被触发。各 Draft 保持原状态，精度和 CI 结论以独立最终证据为准。
+
+| 优先级 / 类别 | PR 与关联 issue | 运行包含与合入关系 |
+|---|---|---|
+| P0 · 公共导出 | [#1420](https://github.com/mindspore-ai/hyper-parallel/pull/1420) · [#1326](https://github.com/mindspore-ai/hyper-parallel/issues/1326) | open；运行包含，解决 SwiGLU 同名导出冲突。非空截断或计算精度策略另见 #356。 |
+| P0 · 归一化与 aux | [#1410](https://github.com/mindspore-ai/hyper-parallel/pull/1410) + [dz-ssk#7](https://github.com/dz-ssk/hyper-parallel/pull/7) · [#1418](https://github.com/mindspore-ai/hyper-parallel/issues/1418)、[hf1s#355](https://github.com/hf1s/hyper-parallel/issues/355) | #1410 open，#7 Draft 且尚未被吸收；运行包含融合增量。建议先由 #1410 吸收 #7，再按最终 head 合入；保留单卡 legacy 与四卡 token 目标。#7 已覆盖 [#1441](https://github.com/mindspore-ai/hyper-parallel/pull/1441) 的各 foundation 分支 aux 倍率绑定，不要求 #1441 单独合入。 |
+| P0 · 公共初始化 | [#1470](https://github.com/mindspore-ai/hyper-parallel/pull/1470) · [#1469](https://github.com/mindspore-ai/hyper-parallel/issues/1469) | Draft；运行包含。支持 FSDP 后 guarded `constant_` 初始化，相关两文件与 PR head 一致。 |
+| P0 · 模型与 CP | [#1439](https://github.com/mindspore-ai/hyper-parallel/pull/1439) · [#1466](https://github.com/mindspore-ai/hyper-parallel/issues/1466)、[#1464](https://github.com/mindspore-ai/hyper-parallel/issues/1464)、[#1456](https://github.com/mindspore-ai/hyper-parallel/issues/1456)、[#1395](https://github.com/mindspore-ai/hyper-parallel/issues/1395)、[#1397](https://github.com/mindspore-ai/hyper-parallel/issues/1397) | Draft；运行包含 fdce。适用的 CP 增量已整合 [#1425](https://github.com/mindspore-ai/hyper-parallel/pull/1425)，后者 closed、未 merge，无需叠加旧实现。 |
+| 条件 · Muon 状态 | [#1431](https://github.com/mindspore-ai/hyper-parallel/pull/1431) · [#1430](https://github.com/mindspore-ai/hyper-parallel/issues/1430) | Draft；运行包含状态清理能力。多 rank checkpoint 持久化及恢复后的非 owner momentum 生命周期与内存问题，单卡没有非 owner rank；未证明删除后会导致本轮数值失败，不列为无条件数值 P0。 |
+| 条件 · 选择性重计算 | [#1358](https://github.com/mindspore-ai/hyper-parallel/pull/1358) · [#1357](https://github.com/mindspore-ai/hyper-parallel/issues/1357) | Draft；运行复合文件包含 PTA attention/GMM overload 注册。只有采用相应 SAC 策略时按其作用评估，一般分层重计算不自动证明触发。 |
+| 条件 · GMM 整数序列 | [#1362](https://github.com/mindspore-ai/hyper-parallel/pull/1362) · [#1361](https://github.com/mindspore-ai/hyper-parallel/issues/1361) | Draft；运行包含该文件。修复 list/tuple group list；本次 GroupedExperts 使用 tensor cumsum，不据此声称条件已触发。 |
+| 条件 · 激活策略 | [hf1s#356](https://github.com/hf1s/hyper-parallel/pull/356) · [hf1s#354](https://github.com/hf1s/hyper-parallel/issues/354) | fork Draft，基于 #1420；运行包含相关实现，但本轮关闭非空 clamp/compute-dtype 策略。需要该策略时才按能力与实际版本组合评估；不得称已合入主仓。 |
+| 条件 · 专家反向转换 | [#1442](https://github.com/mindspore-ai/hyper-parallel/pull/1442) · [hf1s#357](https://github.com/hf1s/hyper-parallel/issues/357) | Draft；运行包含相应文件，修复专家反向转换单例维度；普通 DCP 续训不自动要求该路径。 |
+| 条件 · HF 部分加载 | [#1468](https://github.com/mindspore-ai/hyper-parallel/pull/1468) · [#1467](https://github.com/mindspore-ai/hyper-parallel/issues/1467) | Draft；被忽略的缺失 persistent 参数或 buffer 仍需初始化时适用；本轮完整 MF/DCP 状态恢复不等同该入口，不无条件列入。 |
+| 条件 · CP mask | [#1461](https://github.com/mindspore-ai/hyper-parallel/pull/1461) · [#1460](https://github.com/mindspore-ai/hyper-parallel/issues/1460) | Draft；二维 pairwise mask 语义条件项，本轮无 mask 验证不能推广至该场景。 |
+| 路线协调 | [#1453](https://github.com/mindspore-ai/hyper-parallel/pull/1453) · [#1418](https://github.com/mindspore-ai/hyper-parallel/issues/1418) | open；与 #1410 + #7 的整步 token 归一化和 aux 实现重叠，上游择一整合，不能机械双重合入；旧冻结结果不等于该 PR 新 head 验证。 |
+| 已合入 | [#1386](https://github.com/mindspore-ai/hyper-parallel/pull/1386) · [#1390](https://github.com/mindspore-ai/hyper-parallel/issues/1390)；[#1171](https://github.com/mindspore-ai/hyper-parallel/pull/1171) | 均已合入所核 master，分别提供公共 MTP 和参数级 FSDP precision；运行包含，无需重复合入。 |
+| 不叠加旧方案 | [#1413](https://github.com/mindspore-ai/hyper-parallel/pull/1413)、[#1435](https://github.com/mindspore-ai/hyper-parallel/pull/1435)、[#1426](https://github.com/mindspore-ai/hyper-parallel/pull/1426) | 旧 Xing4 模型主体及其 TP loss 替代方案，不是当前 #1439 的额外合入前置；不由此声称其所有变体均已覆盖。 |
+| 无需单独合入 | [#1455](https://github.com/mindspore-ai/hyper-parallel/pull/1455) · [#1454](https://github.com/mindspore-ai/hyper-parallel/issues/1454) | Draft 的通用 chain posthook；#1439 使用已存在的 Muon native leaf posthook，本轮无需该 PR；[#1459](https://github.com/mindspore-ai/hyper-parallel/issues/1459) 的通用 swap/hook 兼容问题仍单独跟踪。 |
+| 尚未替代 | [#1407](https://github.com/mindspore-ai/hyper-parallel/pull/1407) | Draft；Experts-owned EP 在完整模型、checkpoint、FSDP 和 NPU 的替代验证尚不完整，不作为当前 #1439 已验 adapter 的合入前置。 |
+
+逐文件身份和未触发条件的证据见 [runtime-dependency-delta.md](runtime-dependency-delta.md)；精确 head 与状态见 [final-dependencies.json](final-dependencies.json)。

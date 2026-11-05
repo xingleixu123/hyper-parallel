@@ -1,0 +1,1 @@
+每组步数均为1501–2500，无平滑。single/parallel 为 LOSS 与乘0.1前 MTPLOSS 原值；*_delta 为有符号差值；*_cumulative 为从1501到当前步的累计有符号均值。单卡方向 HP−MF；并行方向待测−当前fdce FSDP replay。zero 与 ±0.005 为数学参考线，非训练样本。0.005仅约束完整窗口终点均值，不是逐步阈值。parallel不是新fdce连续0–2500基线，主要连续基线比较见raw-values/fourcard-versus-continuous-fsdp.csv。
