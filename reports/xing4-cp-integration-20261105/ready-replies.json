@@ -1,0 +1,26 @@
+[
+  {
+    "comment_id": 4475845264,
+    "body": "感谢建议。已改为向框架 Muon 叶优化器注册原生 `register_step_post_hook`，不再使用 ChainedOptimizer 扩展；本 builder 按 AdamW、Muon 顺序执行，Q/K 仅归 Muon，混精 wrapper 在 chain 返回后回写 FP32 主权重。#1454 / #1455 不再是本 PR 前置；它们涉及通用 chain callback，状态维持原样，不因此关闭。CPU 与 NPU 小探针已验证真实 builder、三步 FP32 重绑及首步独立缩放公式；不据此宣称多卡或长期训练已验收。"
+  },
+  {
+    "comment_id": 4475905678,
+    "body": "接受风险。Trainer 安装 swap 前本模型已注册 Muon hook；通用 swap 构造器在进行 offload 前检查既有 leaf step pre/post hook 并明确拒绝，避免此组合静默训练。通用 late registration、global hook 及完整 swap hook 语义在 [#1459](https://github.com/mindspore-ai/hyper-parallel/issues/1459) 跟踪，当前不声称全支持。CPU 与 NPU 小探针覆盖 dispatcher 与 Muon/Adam 直接入口、已有 hook 拒绝及无 hook 正常 step；这不代表 swap DMA 或 HSDP 已验证。"
+  },
+  {
+    "comment_id": 4475925241,
+    "body": "接受建议。启用 QKClip 时，在构造阶段逐个检查所有 attention 的 q_b_proj / kv_b_proj 可训练且其参数身份属于 Muon；无 attention、冻结或归 AdamW 时显式报错。FP32 main 重绑发生在此后，hook 缩放 main copy，CPU 与 NPU 小探针检查重绑及回写。该契约要求所有这些投影都由 Muon 管理，不能宣称支持任意混合归属。"
+  },
+  {
+    "comment_id": 4476138012,
+    "body": "抽出 `_expand_key_value` 是为了让公共 MLA 与 Xing 的 RoPE 定制路径共享 KV 投影、reshape 和拆分，Xing 仅覆写必要的旋转精度与拼接。公共原 forward 同样调用此方法；该边界避免复制实现，未把 Xing 策略写入公共方法。欢迎对扩展点位置继续讨论。"
+  },
+  {
+    "comment_id": 4476142089,
+    "body": "当前 master 的 TextParallelBatch 已负责 CP 分片并提供当前分片的 shift_labels；它没有提供 MTP 每个深度的跨片 next-token。这里的 method replacement 只补分片边界，并在全局序列末尾补 pad。可以把这类位移上移为通用 batch 能力，但现有接口直接删除此交换会丢每片边界；需要多深度及片长小于深度的等价验证。"
+  },
+  {
+    "comment_id": 4476144198,
+    "body": "Trainer 已负责 loss_fn 和 microbatch/token 权重。这里每层 MTP 的有效 token 数不同，因此先分别跨 CP 求 numerator/count 并归一化，再交 Trainer 现有后续处理；master 现有单 `loss_sum`/`valid_token_count` 协议不能直接表达多个深度的不同分母。若转入 Trainer，应先提供多深度 loss 协议并验证 CP/DP 梯度归一化，不应叠加重复归约。"
+  }
+]

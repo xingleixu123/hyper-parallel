@@ -1,0 +1,454 @@
+[W1105 05:24:09.753840320 ToKernelNpu.cpp:40] Warning: Device do not support double dtype now, dtype cast replace with float. (function operator())
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________________ test_mla_npu_bfloat16 _____________________________
+
+    def test_mla_npu_bfloat16() -> None:
+        """
+        Feature: BF16 MLA context parallelism with native QK192/V128 attention.
+        Description: Execute CP8 expanded and latent-KV strategies against the original non-CP module.
+        Expectation: Outputs, loss, input gradients and parameter gradients satisfy the existing BF16 tolerances.
+        """
+>       _tp_suite(_npu_device(), torch.bfloat16, ((1, int(os.environ["WORLD_SIZE"]), False),))
+
+/work/probes/_test_mla_cp_reference4d.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/work/probes/_test_mla_cp_reference4d.py:357: in _tp_suite
+    _gradient_composition(
+/work/probes/_test_mla_cp_reference4d.py:290: in _gradient_composition
+    actual = checkpoint(forward, local_hidden, use_reentrant=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/utils/checkpoint.py:518: in checkpoint
+    ret = function(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/probes/_test_mla_cp_reference4d.py:288: in forward
+    return parallel(inputs, position_embeddings=local_positions, **metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1778: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1789: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/probes/_test_mla_cp_reference4d.py:181: in forward
+    return self.self_attn(hidden_states, **kwargs)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1778: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1789: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/source/hyper_parallel/distributed/_builder/forward_rewriter.py:425: in production_forward
+    outputs = original_forward(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/source/hyper_parallel/distributed/_builder/forward_rewriter.py:903: in adapted
+    return user_fwd(*args, **kwargs)          # production: straight passthrough
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/source/hyper_parallel/models/deepseek_v3/adapter/distributed/context_parallel.py:116: in cp_forward
+    attn_output, attn_weights = runtime(
+/work/source/hyper_parallel/distributed/context_parallel/mla_context_parallel.py:492: in __call__
+    output = self.attention_interface(
+/work/source/hyper_parallel/components/functional/npu_fusion_attention.py:408: in npu_fusion_attention_forward
+    output = torch_npu.npu_fusion_attention(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='npu.npu_fusion_attention')>
+args = (tensor([[[[ 0.2910,  0.0693,  0.1104,  ...,  0.4238, -0.1572, -0.9609],
+          [ 0.8359, -0.3281, -0.7148,  ..., -...        9.6680e-02, -6.2256e-02]]]], device='npu:0', dtype=torch.bfloat16,
+       grad_fn=<CloneBackward0>), 4, 'BNSD')
+kwargs = {'pse': None, 'padding_mask': None, 'atten_mask': tensor([[[[False,  True,  True,  ...,  True,  True,  True],
+        ...se],
+          [ True,  True,  True,  ..., False, False, False]]]], device='npu:0'), 'scale': 0.05268321206355334, ...}
+
+    def __call__(self, /, *args: _P.args, **kwargs: _P.kwargs) -> _T:
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            # pyrefly: ignore [bad-argument-type]
+            return _call_overload_packet_from_python(self, *args, **kwargs)
+>       return self._op(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       RuntimeError: npu_fusion_attention:../third_party/op-plugin/op_plugin/ops/opapi/FlashAttentionKernelNpuOpApi.cpp:1563 NPU function error: call aclnnFlashAttentionScore failed, error code is 161001
+E       [ERROR] 2026-11-05-05:24:08 (PID:44, Device:0, RankID:0) ERR00100 PTA call acl api failed.
+E       [PID: 44] 2026-11-05-05:24:08.489.398 Invalid_Argument_Tensor_Shape(EZ0009): Parameter atten_mask of FlashAttentionScore has incorrect shape [64, 1, 64, 64]. Reason: B=[2], N=[4], Sq=[64], Skv=[64], supported atten_mask shape can be [B, N, Sq, Skv], [B, 1, Sq, Skv], [1, 1, Sq, Skv] and [Sq, Skv].
+E               Solution: Check whether the shape of input/output tensor is correct.
+E       TraceBack (most recent call last):
+E               fail to analyze context info.[FUNC:GetShapeAttrsInfo][FILE:flash_attention_score_tiling_general.cpp][LINE:981]
+E               Failed to execute operator aclnnFlashAttentionScore_1789_FlashAttentionScore. Reason: Failed to execute tiling.
+E               Kernel GetWorkspace failed. opType: 31
+E               FlashAttentionScore launch kernel failed.
+E               Parameter l0FlashAttentionScoreOuts[0] of aclnnFlashAttentionScore_1789 is invalid. Reason: cannot be nullptr.
+
+/work/env/lib/python3.12/site-packages/torch/_ops.py:1275: RuntimeError
+----------------------------- Captured stdout call -----------------------------
+{"tp": 1, "cp": 2, "mesh_axes": ["tp", "cp"], "strategy": "expanded_ulysses", "dtype": "torch.bfloat16", "packed": null, "causal": true, "overlap": false, "ulysses_degree": 2, "kv_exchange": "all_gather", "gradient_relative_l2": 0.0034935857826597634, "backward_passes": 2}
+{"tp": 1, "cp": 2, "mesh_axes": ["tp", "cp"], "strategy": "expanded_ulysses", "dtype": "torch.bfloat16", "packed": [3, 73, 129, 256], "causal": true, "overlap": true, "ulysses_degree": 2, "kv_exchange": "all_gather", "gradient_relative_l2": 0.0032783717388538847, "backward_passes": 2}
+----------------------------- Captured stderr call -----------------------------
+[W1105 05:24:04.787053200 ProcessGroupHCCL.cpp:1372] Warning: The watchdog timeout 180000ms(which is set by init_process_group) is less than or equal to HCCL execution timeout 1836000ms! The plog may not be recorded. (function ProcessGroupHCCL)
+[rank0]:[W1105 05:24:04.802408150 NPUCachingAllocator.cpp:203] Warning: The current CANN and Soc versions require processing for 32 padding size, with memory allocation. (function operator())
+=============================== warnings summary ===============================
+../work/env/lib/python3.12/site-packages/torch_npu/utils/_error_code.py:103
+  /work/env/lib/python3.12/site-packages/torch_npu/utils/_error_code.py:103: SyntaxWarning: invalid escape sequence '\['
+    self.npu_exception = "\[ERROR\] [0-9\-\:]* \(PID:\d*, Device:\-?\d*, RankID:\-?\d*\) ERR\d{5}"
+
+../work/env/lib/python3.12/site-packages/torch_npu/optim/npu_fused_rmsprop.py:16
+  /work/env/lib/python3.12/site-packages/torch_npu/optim/npu_fused_rmsprop.py:16: SyntaxWarning: invalid escape sequence '\s'
+    learning rate is thus :math:`\alpha/(\sqrt{v} + \epsilon)` where :math:`\alpha`
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:132
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:132: SyntaxWarning: invalid escape sequence '\e'
+    公式1: fast_gelu(x)=$$\frac{x}{1+e^{-1.702\begin{vmatrix}x\end{vmatrix}}}e^{0.851x(x-\begin{vmatrix}x\end{vmatrix})
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1624
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1624: SyntaxWarning: invalid escape sequence '\_'
+    softmax_layout: string类型，可选参数，用于控制TND场景下softmax的输出（softmax_max和softmax_sum）的数据排布方式。当前仅在input\_layout=“TND”时进行配置，仅支持传入“TND”。默认情况下，softmax的输出排布为NTD排布；传入TND时，softmax的输出排布为TND排布。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1929
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1929: SyntaxWarning: invalid escape sequence '\_'
+    softmax_layout: string类型，可选参数，用于控制TND场景下softmax的输出（softmax_max和softmax_sum）的数据排布方式。当前仅在input\_layout=“TND”时进行配置，仅支持传入“TND”。默认情况下，softmax的输出排布为NTD排布；传入TND时，softmax的输出排布为TND排布。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:3575
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:3575: SyntaxWarning: invalid escape sequence '\e'
+    $$rotate = diag(rotate1, rotate2, rotate3) = \begin{pmatrix}rotate1&0&0\\0&rotate2&0\\0&0&rotate3\\\end{pmatrix}$$
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4194
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4194: SyntaxWarning: invalid escape sequence '\m'
+    算子功能：MhcSinkhornBackward是MhcSinkhorn的反向算子。mHC（Manifold-Constrained Hyper-Connections）架构中的MhcSinkhorn算子对输入矩阵做sinkhorn变换得到双随机矩阵$\mathbf{H}_{\text{res}}$，输出的双随机矩阵的所有元素≥0、每一行之和为1且每一列之和为1 (具有范数保持、组合封闭性和凸组合几何解释三大特性)。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4398
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4398: SyntaxWarning: invalid escape sequence '\('
+    outputs = swiglu\(x, dim = -1) = swish(A) * B = A * sigmoid(A) * B
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4513
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4513: SyntaxWarning: invalid escape sequence '\o'
+    x_{l+1} = (H_{l}^{res})^{T} \times x_l + h_{l}^{out} \otimes H_{t}^{post}
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6735
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6735: SyntaxWarning: invalid escape sequence '\s'
+    令 $B$ 表示batch size，$L_i$ 表示第i个序列的长度，$T=\sum_i^B L_i$ 表示累积序列长度。$N_k$ 表示key的头数，$N_v$ 表示value的头数，$D_k$ 表示key向量的维度，$D_v$ 表示value向量的维度。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6815
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6815: SyntaxWarning: invalid escape sequence '\s'
+    令 $B$ 表示batch size，$L_i$ 表示第i个序列的长度，$T=\sum_i^B L_i$ 表示累积序列长度。$N_k$ 表示key的头数，$N_v$ 表示value的头数，$D_k$ 表示key向量的维度，$D_v$ 表示value向量的维度。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:7704
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:7704: SyntaxWarning: invalid escape sequence '\s'
+    scale_value: float类型, 代表缩放系数, 用来约束梯度, 其默认值为1.0, 典型值为$\frac{1}{\sqrt{D}}$; 数据类型为float32.
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8200
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8200: SyntaxWarning: invalid escape sequence '\_'
+    sparse模式支持sparse\_mode=4且传入mask；当sparse\_mode=4时，要求preTokens >= -actual\_seq\_qlen、nextTokens >= -actual\_seq\_kvlen、preTokens + nextTokens >= 0；
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8735
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8735: SyntaxWarning: invalid escape sequence '\_'
+    sparse模式支持sparse\_mode=4且传入mask；当sparse\_mode=4时，要求preTokens >= -actual\_seq\_qlen、nextTokens >= -actual\_seq\_kvlen、preTokens + nextTokens >= 0；
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:10608
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:10608: SyntaxWarning: invalid escape sequence '\s'
+    out(i,j)=skip1_{i,j}+skip2Optional_{i,j}+\sum_{k=0}^{K}(scales_{i,k}*(expandPermutedRows_{expandedSrcToDstRow_{i+k*num_rows},j}+bias_{expertid,j}))
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:11650
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:11650: SyntaxWarning: invalid escape sequence '\>'
+    >-   H：表示嵌入向量的长度，取值\>0。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12094
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12094: SyntaxWarning: invalid escape sequence '\s'
+    令 $B$ 表示batch size，$L_i$ 表示第i个序列的长度，$T=\sum_i^B L_i$ 表示累积序列长度。$N_k$ 表示key的头数，$N_v$ 表示value的头数，$D_k$ 表示key向量的维度，$D_v$ 表示value向量的维度。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12163
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12163: SyntaxWarning: invalid escape sequence '\['
+    gamma: Device侧的Tensor类型，表示数据缩放因子；shape支持1-8维度，数据格式支持ND。shape需要满足gamma_shape = input_shape\[n:\], n < input_shape.dims()。数据类型支持FLOAT32、FLOAT16、BFLOAT16，与input数据类型保持一致。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12263
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12263: SyntaxWarning: invalid escape sequence '\['
+    gamma：Device侧的Tensor类型，数据缩放因子。shape支持1-8维，数据格式支持ND，数据类型支持FLOAT16、BFLOAT16。shape需要满足gamma_shape = x_shape\[n:\], n < x_shape.dims()。数据类型、数据格式需要与入参x1保持一致。不支持空tensor。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:13444
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:13444: SyntaxWarning: invalid escape sequence '\~'
+    - B（batchsize）：取值范围为1\~65536。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:14129
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:14129: SyntaxWarning: invalid escape sequence '\_'
+    v=8*ks\_max
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15040
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15040: SyntaxWarning: invalid escape sequence '\q'
+    (1)\qquad f_t &=\sigma(W_f[h_{t-1}, x_t] + b_f) \\
+
+F../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15174
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15174: SyntaxWarning: invalid escape sequence '\m'
+    | 输入拼接 | $\mathbf{z}_t = \begin{bmatrix} \mathbf{h}_{t-1} \\ \mathbf{x}_t \end{bmatrix}$ |
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15688
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15688: SyntaxWarning: invalid escape sequence '\_'
+    x\_g = x[group\_list[g-1] : group\_list[g], ...]
+
+_test_mla_cp_reference4d.py::test_mla_npu_bfloat16
+  /work/env/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    if self.device.type != 'cpu':
+
+_test_mla_cp_reference4d.py::test_mla_npu_bfloat16
+  /work/source/hyper_parallel/core/utils/communication.py:470: FutureWarning: torch.distributed.nn.functional.all_to_all_single is deprecated, use torch.distributed._functional_collectives.all_to_all_single instead.
+    return dist_func.all_to_all_single(output_tensor, input_data, group=group)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../work/probes/_test_mla_cp_reference4d.py::test_mla_npu_bfloat16 - Ru...
+1 failed, 26 warnings in 28.10s
+                                                                        [100%]
+=================================== FAILURES ===================================
+____________________________ test_mla_npu_bfloat16 _____________________________
+
+    def test_mla_npu_bfloat16() -> None:
+        """
+        Feature: BF16 MLA context parallelism with native QK192/V128 attention.
+        Description: Execute CP8 expanded and latent-KV strategies against the original non-CP module.
+        Expectation: Outputs, loss, input gradients and parameter gradients satisfy the existing BF16 tolerances.
+        """
+>       _tp_suite(_npu_device(), torch.bfloat16, ((1, int(os.environ["WORLD_SIZE"]), False),))
+
+/work/probes/_test_mla_cp_reference4d.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/work/probes/_test_mla_cp_reference4d.py:357: in _tp_suite
+    _gradient_composition(
+/work/probes/_test_mla_cp_reference4d.py:290: in _gradient_composition
+    actual = checkpoint(forward, local_hidden, use_reentrant=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/_compile.py:54: in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/utils/checkpoint.py:518: in checkpoint
+    ret = function(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/probes/_test_mla_cp_reference4d.py:288: in forward
+    return parallel(inputs, position_embeddings=local_positions, **metadata)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1778: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1789: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/probes/_test_mla_cp_reference4d.py:181: in forward
+    return self.self_attn(hidden_states, **kwargs)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1778: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/env/lib/python3.12/site-packages/torch/nn/modules/module.py:1789: in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/source/hyper_parallel/distributed/_builder/forward_rewriter.py:425: in production_forward
+    outputs = original_forward(*args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/source/hyper_parallel/distributed/_builder/forward_rewriter.py:903: in adapted
+    return user_fwd(*args, **kwargs)          # production: straight passthrough
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/work/source/hyper_parallel/models/deepseek_v3/adapter/distributed/context_parallel.py:116: in cp_forward
+    attn_output, attn_weights = runtime(
+/work/source/hyper_parallel/distributed/context_parallel/mla_context_parallel.py:492: in __call__
+    output = self.attention_interface(
+/work/source/hyper_parallel/components/functional/npu_fusion_attention.py:408: in npu_fusion_attention_forward
+    output = torch_npu.npu_fusion_attention(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='npu.npu_fusion_attention')>
+args = (tensor([[[[ 0.1465, -0.0366,  0.0703,  ..., -0.6016, -1.0625,  0.6562],
+          [ 0.1338, -0.3066, -0.2080,  ..., -... ..., -0.5703,  0.0464, -0.0038]]]],
+       device='npu:1', dtype=torch.bfloat16, grad_fn=<CloneBackward0>), 4, 'BNSD')
+kwargs = {'pse': None, 'padding_mask': None, 'atten_mask': tensor([[[[False,  True,  True,  ...,  True,  True,  True],
+        ...se],
+          [ True,  True,  True,  ..., False, False, False]]]], device='npu:1'), 'scale': 0.05268321206355334, ...}
+
+    def __call__(self, /, *args: _P.args, **kwargs: _P.kwargs) -> _T:
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            # pyrefly: ignore [bad-argument-type]
+            return _call_overload_packet_from_python(self, *args, **kwargs)
+>       return self._op(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       RuntimeError: npu_fusion_attention:../third_party/op-plugin/op_plugin/ops/opapi/FlashAttentionKernelNpuOpApi.cpp:1563 NPU function error: call aclnnFlashAttentionScore failed, error code is 161001
+E       [ERROR] 2026-11-05-05:24:08 (PID:45, Device:1, RankID:1) ERR00100 PTA call acl api failed.
+E       [PID: 45] 2026-11-05-05:24:08.489.113 Invalid_Argument_Tensor_Shape(EZ0009): Parameter atten_mask of FlashAttentionScore has incorrect shape [64, 1, 64, 64]. Reason: B=[2], N=[4], Sq=[64], Skv=[64], supported atten_mask shape can be [B, N, Sq, Skv], [B, 1, Sq, Skv], [1, 1, Sq, Skv] and [Sq, Skv].
+E               Solution: Check whether the shape of input/output tensor is correct.
+E       TraceBack (most recent call last):
+E               fail to analyze context info.[FUNC:GetShapeAttrsInfo][FILE:flash_attention_score_tiling_general.cpp][LINE:981]
+E               Failed to execute operator aclnnFlashAttentionScore_1787_FlashAttentionScore. Reason: Failed to execute tiling.
+E               Kernel GetWorkspace failed. opType: 31
+E               FlashAttentionScore launch kernel failed.
+E               Parameter l0FlashAttentionScoreOuts[0] of aclnnFlashAttentionScore_1787 is invalid. Reason: cannot be nullptr.
+
+/work/env/lib/python3.12/site-packages/torch/_ops.py:1275: RuntimeError
+=============================== warnings summary ===============================
+../work/env/lib/python3.12/site-packages/torch_npu/utils/_error_code.py:103
+  /work/env/lib/python3.12/site-packages/torch_npu/utils/_error_code.py:103: SyntaxWarning: invalid escape sequence '\['
+    self.npu_exception = "\[ERROR\] [0-9\-\:]* \(PID:\d*, Device:\-?\d*, RankID:\-?\d*\) ERR\d{5}"
+
+../work/env/lib/python3.12/site-packages/torch_npu/optim/npu_fused_rmsprop.py:16
+  /work/env/lib/python3.12/site-packages/torch_npu/optim/npu_fused_rmsprop.py:16: SyntaxWarning: invalid escape sequence '\s'
+    learning rate is thus :math:`\alpha/(\sqrt{v} + \epsilon)` where :math:`\alpha`
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:132
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:132: SyntaxWarning: invalid escape sequence '\e'
+    公式1: fast_gelu(x)=$$\frac{x}{1+e^{-1.702\begin{vmatrix}x\end{vmatrix}}}e^{0.851x(x-\begin{vmatrix}x\end{vmatrix})
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1624
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1624: SyntaxWarning: invalid escape sequence '\_'
+    softmax_layout: string类型，可选参数，用于控制TND场景下softmax的输出（softmax_max和softmax_sum）的数据排布方式。当前仅在input\_layout=“TND”时进行配置，仅支持传入“TND”。默认情况下，softmax的输出排布为NTD排布；传入TND时，softmax的输出排布为TND排布。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1929
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:1929: SyntaxWarning: invalid escape sequence '\_'
+    softmax_layout: string类型，可选参数，用于控制TND场景下softmax的输出（softmax_max和softmax_sum）的数据排布方式。当前仅在input\_layout=“TND”时进行配置，仅支持传入“TND”。默认情况下，softmax的输出排布为NTD排布；传入TND时，softmax的输出排布为TND排布。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:3575
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:3575: SyntaxWarning: invalid escape sequence '\e'
+    $$rotate = diag(rotate1, rotate2, rotate3) = \begin{pmatrix}rotate1&0&0\\0&rotate2&0\\0&0&rotate3\\\end{pmatrix}$$
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4194
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4194: SyntaxWarning: invalid escape sequence '\m'
+    算子功能：MhcSinkhornBackward是MhcSinkhorn的反向算子。mHC（Manifold-Constrained Hyper-Connections）架构中的MhcSinkhorn算子对输入矩阵做sinkhorn变换得到双随机矩阵$\mathbf{H}_{\text{res}}$，输出的双随机矩阵的所有元素≥0、每一行之和为1且每一列之和为1 (具有范数保持、组合封闭性和凸组合几何解释三大特性)。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4398
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4398: SyntaxWarning: invalid escape sequence '\('
+    outputs = swiglu\(x, dim = -1) = swish(A) * B = A * sigmoid(A) * B
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4513
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:4513: SyntaxWarning: invalid escape sequence '\o'
+    x_{l+1} = (H_{l}^{res})^{T} \times x_l + h_{l}^{out} \otimes H_{t}^{post}
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6735
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6735: SyntaxWarning: invalid escape sequence '\s'
+    令 $B$ 表示batch size，$L_i$ 表示第i个序列的长度，$T=\sum_i^B L_i$ 表示累积序列长度。$N_k$ 表示key的头数，$N_v$ 表示value的头数，$D_k$ 表示key向量的维度，$D_v$ 表示value向量的维度。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6815
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:6815: SyntaxWarning: invalid escape sequence '\s'
+    令 $B$ 表示batch size，$L_i$ 表示第i个序列的长度，$T=\sum_i^B L_i$ 表示累积序列长度。$N_k$ 表示key的头数，$N_v$ 表示value的头数，$D_k$ 表示key向量的维度，$D_v$ 表示value向量的维度。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:7704
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:7704: SyntaxWarning: invalid escape sequence '\s'
+    scale_value: float类型, 代表缩放系数, 用来约束梯度, 其默认值为1.0, 典型值为$\frac{1}{\sqrt{D}}$; 数据类型为float32.
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8200
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8200: SyntaxWarning: invalid escape sequence '\_'
+    sparse模式支持sparse\_mode=4且传入mask；当sparse\_mode=4时，要求preTokens >= -actual\_seq\_qlen、nextTokens >= -actual\_seq\_kvlen、preTokens + nextTokens >= 0；
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8735
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:8735: SyntaxWarning: invalid escape sequence '\_'
+    sparse模式支持sparse\_mode=4且传入mask；当sparse\_mode=4时，要求preTokens >= -actual\_seq\_qlen、nextTokens >= -actual\_seq\_kvlen、preTokens + nextTokens >= 0；
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:10608
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:10608: SyntaxWarning: invalid escape sequence '\s'
+    out(i,j)=skip1_{i,j}+skip2Optional_{i,j}+\sum_{k=0}^{K}(scales_{i,k}*(expandPermutedRows_{expandedSrcToDstRow_{i+k*num_rows},j}+bias_{expertid,j}))
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:11650
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:11650: SyntaxWarning: invalid escape sequence '\>'
+    >-   H：表示嵌入向量的长度，取值\>0。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12094
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12094: SyntaxWarning: invalid escape sequence '\s'
+    令 $B$ 表示batch size，$L_i$ 表示第i个序列的长度，$T=\sum_i^B L_i$ 表示累积序列长度。$N_k$ 表示key的头数，$N_v$ 表示value的头数，$D_k$ 表示key向量的维度，$D_v$ 表示value向量的维度。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12163
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12163: SyntaxWarning: invalid escape sequence '\['
+    gamma: Device侧的Tensor类型，表示数据缩放因子；shape支持1-8维度，数据格式支持ND。shape需要满足gamma_shape = input_shape\[n:\], n < input_shape.dims()。数据类型支持FLOAT32、FLOAT16、BFLOAT16，与input数据类型保持一致。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12263
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:12263: SyntaxWarning: invalid escape sequence '\['
+    gamma：Device侧的Tensor类型，数据缩放因子。shape支持1-8维，数据格式支持ND，数据类型支持FLOAT16、BFLOAT16。shape需要满足gamma_shape = x_shape\[n:\], n < x_shape.dims()。数据类型、数据格式需要与入参x1保持一致。不支持空tensor。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:13444
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:13444: SyntaxWarning: invalid escape sequence '\~'
+    - B（batchsize）：取值范围为1\~65536。
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:14129
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:14129: SyntaxWarning: invalid escape sequence '\_'
+    v=8*ks\_max
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15040
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15040: SyntaxWarning: invalid escape sequence '\q'
+    (1)\qquad f_t &=\sigma(W_f[h_{t-1}, x_t] + b_f) \\
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15174
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15174: SyntaxWarning: invalid escape sequence '\m'
+    | 输入拼接 | $\mathbf{z}_t = \begin{bmatrix} \mathbf{h}_{t-1} \\ \mathbf{x}_t \end{bmatrix}$ |
+
+../work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15688
+  /work/env/lib/python3.12/site-packages/torch_npu/_op_plugin_docs.py:15688: SyntaxWarning: invalid escape sequence '\_'
+    x\_g = x[group\_list[g-1] : group\_list[g], ...]
+
+_test_mla_cp_reference4d.py::test_mla_npu_bfloat16
+  /work/env/lib/python3.12/site-packages/torch_npu/utils/storage.py:55: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()
+    if self.device.type != 'cpu':
+
+_test_mla_cp_reference4d.py::test_mla_npu_bfloat16
+  /work/source/hyper_parallel/core/utils/communication.py:470: FutureWarning: torch.distributed.nn.functional.all_to_all_single is deprecated, use torch.distributed._functional_collectives.all_to_all_single instead.
+    return dist_func.all_to_all_single(output_tensor, input_data, group=group)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../work/probes/_test_mla_cp_reference4d.py::test_mla_npu_bfloat16 - Ru...
+1 failed, 26 warnings in 28.10s
+W1105 05:24:13.263000 1 torch/distributed/elastic/multiprocessing/api.py:1014] Sending process 45 closing signal SIGTERM
+E1105 05:24:13.378000 1 torch/distributed/elastic/multiprocessing/api.py:988] failed (exitcode: 1) local_rank: 0 (pid: 44) of binary: /work/env/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/work/env/lib/python3.12/site-packages/torch/distributed/run.py", line 1020, in <module>
+    main()
+  File "/work/env/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/work/env/lib/python3.12/site-packages/torch/distributed/run.py", line 1016, in main
+    run(args)
+  File "/work/env/lib/python3.12/site-packages/torch/distributed/run.py", line 1007, in run
+    elastic_launch(
+  File "/work/env/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 191, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/env/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 371, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+pytest FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-11-05_05:24:13
+  host      : localhost.localdomain
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 45) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-11-05_05:24:13
+  host      : localhost.localdomain
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 44) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

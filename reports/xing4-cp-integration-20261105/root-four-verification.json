@@ -1,0 +1,158 @@
+{
+  "scope": "Four-card native step5->6-105 regression, 100 updates; not 1500->2500 full acceptance",
+  "batch": {
+    "GBS": 4,
+    "LBS": 1
+  },
+  "comparisons": {
+    "fsdp4": {
+      "LOSS": {
+        "count": 100,
+        "signed_mean": 0.0,
+        "abs_signed_mean": 0.0,
+        "positive": 0,
+        "negative": 0,
+        "zero": 100,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "max_abs_step": 6
+      },
+      "MTPLOSS": {
+        "count": 100,
+        "signed_mean": 0.0,
+        "abs_signed_mean": 0.0,
+        "positive": 0,
+        "negative": 0,
+        "zero": 100,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "max_abs_step": 6
+      }
+    },
+    "ep2": {
+      "LOSS": {
+        "count": 100,
+        "signed_mean": 5.773399084340269e-05,
+        "abs_signed_mean": 5.773399084340269e-05,
+        "positive": 54,
+        "negative": 45,
+        "zero": 1,
+        "mae": 0.00031114154410431637,
+        "max_abs": 0.0010044301863736393,
+        "max_abs_step": 39
+      },
+      "MTPLOSS": {
+        "count": 100,
+        "signed_mean": -8.233936025144217e-05,
+        "abs_signed_mean": 8.233936025144217e-05,
+        "positive": 42,
+        "negative": 58,
+        "zero": 0,
+        "mae": 0.0003978528096318179,
+        "max_abs": 0.00130907779880296,
+        "max_abs_step": 90
+      }
+    },
+    "cp2dp2": {
+      "LOSS": {
+        "count": 100,
+        "signed_mean": 5.70461456556437e-05,
+        "abs_signed_mean": 5.70461456556437e-05,
+        "positive": 60,
+        "negative": 40,
+        "zero": 0,
+        "mae": 0.00035333213324753034,
+        "max_abs": 0.0011959782696830956,
+        "max_abs_step": 105
+      },
+      "MTPLOSS": {
+        "count": 100,
+        "signed_mean": -8.436037278055863e-05,
+        "abs_signed_mean": 8.436037278055863e-05,
+        "positive": 45,
+        "negative": 55,
+        "zero": 0,
+        "mae": 0.00044281179469777497,
+        "max_abs": 0.001690983772277832,
+        "max_abs_step": 37
+      }
+    },
+    "tp2cp2": {
+      "LOSS": {
+        "count": 100,
+        "signed_mean": 1.9890428033129127e-05,
+        "abs_signed_mean": 1.9890428033129127e-05,
+        "positive": 53,
+        "negative": 47,
+        "zero": 0,
+        "mae": 0.00034366124519138455,
+        "max_abs": 0.0010974953255260544,
+        "max_abs_step": 94
+      },
+      "MTPLOSS": {
+        "count": 100,
+        "signed_mean": -1.8627031027786954e-05,
+        "abs_signed_mean": 1.8627031027786954e-05,
+        "positive": 52,
+        "negative": 48,
+        "zero": 0,
+        "mae": 0.0004089294210254657,
+        "max_abs": 0.0013541173754436642,
+        "max_abs_step": 12
+      }
+    }
+  },
+  "proof": {
+    "fsdp4": {
+      "ranks": 4,
+      "steps": 100,
+      "global_samples": 400,
+      "verified_field_records": 2000,
+      "rank_metrics_equal": true,
+      "restore_scope": "independent full DCP equality",
+      "global_dcp_bindings": 624
+    },
+    "ep2": {
+      "ranks": 4,
+      "steps": 100,
+      "global_samples": 400,
+      "verified_field_records": 2000,
+      "rank_metrics_equal": true,
+      "restore_scope": "independent full DCP equality"
+    },
+    "cp2dp2": {
+      "ranks": 4,
+      "steps": 100,
+      "global_samples": 400,
+      "verified_field_records": 4000,
+      "rank_metrics_equal": true,
+      "restore_scope": "independent full DCP equality"
+    },
+    "tp2cp2": {
+      "ranks": 4,
+      "steps": 100,
+      "global_samples": 400,
+      "verified_field_records": 8000,
+      "rank_metrics_equal": true,
+      "restore_scope": "independent full DCP equality"
+    }
+  },
+  "raw_sha256": {
+    "regression\\results\\fsdp4\\rank-0\\steps.json": "af377cb91500cb381a8766e5119bd98967f806248927f3c0e13c7aa539315c28",
+    "regression\\results\\fsdp4\\rank-1\\steps.json": "97ede23f671b23b7224356ad703f0a5e53efa61f663578799d001591ac24a039",
+    "regression\\results\\fsdp4\\rank-2\\steps.json": "fdfd4af5a4ec792cdcfc9a2bebe3450488fdb46ae04db1e34bcd95eed7421006",
+    "regression\\results\\fsdp4\\rank-3\\steps.json": "97541dc448188f1d91de61c5c837a9ce1150ddf2888e49e76644c052703337c5",
+    "regression\\results\\ep2\\rank-0\\steps.json": "cc4080ffdd127daf7a21908fd31c8fca1ae472abd5295b33255887fa2b1d39ea",
+    "regression\\results\\ep2\\rank-1\\steps.json": "4f4ea3d0f8ce1b59744d807b38301974b7db6672097ab7dbe4649786d757ae1e",
+    "regression\\results\\ep2\\rank-2\\steps.json": "49aa5024b9b0ded6818b7a7c74d8fb1535b20d232e362950db510aeb4b2d4d9e",
+    "regression\\results\\ep2\\rank-3\\steps.json": "25726a77b757fc51e54ed1ec7087881ae3d0e667d199aaf22b2ed6447109e18c",
+    "regression\\results\\cp2dp2\\rank-0\\steps.json": "72e4f98239d6fb7f3b1136312773dea737500295ba9fd72cdbc39692848d04b6",
+    "regression\\results\\cp2dp2\\rank-1\\steps.json": "10e05f9c6187db0451b9017a673c14bc1ebd29ff6f0bda75a180b56d97b42cbb",
+    "regression\\results\\cp2dp2\\rank-2\\steps.json": "dc8ee20b220de568c2b73f2cea2536e10ba6529e03db7c8c0d2db5bd32b7a225",
+    "regression\\results\\cp2dp2\\rank-3\\steps.json": "1af96421e680cc7214c44cca39772c2b0f05b4bc953951bd9a7d9caba168bf79",
+    "regression\\results\\tp2cp2\\rank-0\\steps.json": "4cbbfb7e49e4de4f1ccb6ed9f73ebe54bcea775646ce2f930dbe334955834157",
+    "regression\\results\\tp2cp2\\rank-1\\steps.json": "20d2c36a62d7401036130a5583cc55fab4243ca7d92fecfa778235fd4b2a48d6",
+    "regression\\results\\tp2cp2\\rank-2\\steps.json": "34025422f02c6e0f947f36978ae75eea9830139800cd594eb866b107f87e4380",
+    "regression\\results\\tp2cp2\\rank-3\\steps.json": "6012ad2cd0ba0aa1fdcb056853f731e31a0dee1fdd71d398ae31bdf6f4a91d4e"
+  }
+}

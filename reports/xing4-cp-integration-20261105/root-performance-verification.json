@@ -1,0 +1,164 @@
+{
+  "scope": "Serial isolated short regression; 5 warmup +15 measured steps, synchronized max-rank time including sample hashes; not intrinsic model benchmark",
+  "old_source": "frozen d780 composite (not immediate f96 parent)",
+  "new_source": "e2a128bcd273 composite with tested current model and six 1caf Git blobs",
+  "GBS": 4,
+  "LBS": 1,
+  "sequence": 4096,
+  "results": {
+    "perfold2-fsdp4": {
+      "mean_seconds": 0.8320801719867935,
+      "median_seconds": 0.8325539398938417,
+      "std_seconds": 0.0023303183746290063,
+      "min_seconds": 0.8261907399864867,
+      "max_seconds": 0.8349676099605858,
+      "cv_percent": 0.2800593564277352,
+      "sequences_per_second": 4.807229080401025,
+      "input_tokens_per_second": 19690.410313322598,
+      "per_card_memory": [
+        {
+          "rank": 0,
+          "peak_allocated_bytes": 19709140992,
+          "peak_reserved_bytes": 22309502976
+        },
+        {
+          "rank": 1,
+          "peak_allocated_bytes": 19709140992,
+          "peak_reserved_bytes": 22309502976
+        },
+        {
+          "rank": 2,
+          "peak_allocated_bytes": 19709140992,
+          "peak_reserved_bytes": 22311600128
+        },
+        {
+          "rank": 3,
+          "peak_allocated_bytes": 19709134848,
+          "peak_reserved_bytes": 22311600128
+        }
+      ],
+      "raw_sha256": [
+        "8276bcf05cdbb20c701dfb1083c5aff0fd000c3c138fe3b721f3ac006ccc7524",
+        "fbf6872f1b90f23325acf1e425128b18c18ddd15bfbb5752d59db19dcc9abe32",
+        "b2ad4b2bc36e4e3115dcd40d38b1cf657dc6183cbb9e3ffb9f1971c7ba811f01",
+        "f43f3b3b4c95a5b31e68edfeb270e591d300f7824c696fd027bd68bf5c3cd379"
+      ]
+    },
+    "perfnew-fsdp4": {
+      "mean_seconds": 0.8322845099726692,
+      "median_seconds": 0.8321099299937487,
+      "std_seconds": 0.002034639520676617,
+      "min_seconds": 0.8273033800069243,
+      "max_seconds": 0.835921449935995,
+      "cv_percent": 0.24446442247776914,
+      "sequences_per_second": 4.80604883554946,
+      "input_tokens_per_second": 19685.57603041059,
+      "per_card_memory": [
+        {
+          "rank": 0,
+          "peak_allocated_bytes": 19709140992,
+          "peak_reserved_bytes": 22309502976
+        },
+        {
+          "rank": 1,
+          "peak_allocated_bytes": 19709140992,
+          "peak_reserved_bytes": 22309502976
+        },
+        {
+          "rank": 2,
+          "peak_allocated_bytes": 19709140992,
+          "peak_reserved_bytes": 22309502976
+        },
+        {
+          "rank": 3,
+          "peak_allocated_bytes": 19709134848,
+          "peak_reserved_bytes": 22311600128
+        }
+      ],
+      "raw_sha256": [
+        "d6e1fac48d697dd1a8599e7ec18fcb174bc85aa432912cd12290095afb1b1879",
+        "969120bd64e016a2db3b33e8a5755596df6c40a6d4d19d394aa2b3f8dc01a903",
+        "0a953e5021350d890fe4f0f82342fb061a67d0d72a9a2576081edc9e2e1224b9",
+        "4fce6e24a1da4172a698f2b034335738f0364c6f9e4f74237de8c8e7a780d042"
+      ],
+      "change_vs_old_percent": 0.024557487698317892
+    },
+    "perfold2-cp2dp2": {
+      "mean_seconds": 1.2319137906810889,
+      "median_seconds": 1.2330797599861398,
+      "std_seconds": 0.0031444711899303126,
+      "min_seconds": 1.2265009300317615,
+      "max_seconds": 1.235722710029222,
+      "cv_percent": 0.25525091233793457,
+      "sequences_per_second": 3.2469804545239467,
+      "input_tokens_per_second": 13299.631941730086,
+      "per_card_memory": [
+        {
+          "rank": 0,
+          "peak_allocated_bytes": 22114806784,
+          "peak_reserved_bytes": 23311941632
+        },
+        {
+          "rank": 1,
+          "peak_allocated_bytes": 22116826624,
+          "peak_reserved_bytes": 23234347008
+        },
+        {
+          "rank": 2,
+          "peak_allocated_bytes": 22117783040,
+          "peak_reserved_bytes": 23150460928
+        },
+        {
+          "rank": 3,
+          "peak_allocated_bytes": 22117224448,
+          "peak_reserved_bytes": 23395827712
+        }
+      ],
+      "raw_sha256": [
+        "2468977cb3ddb214b05339a5d16b6a15cd3b248b3fd0edb7afa6e4e427cca0e6",
+        "e3a043ad056afc6c44fa6552b6a841a5af9ce40d10e5ccef7c7ce62e9938322a",
+        "bd12097a1e20b41aa9e5a15bb00b6ecc9c130eae3462d704d6a2440da800b2b8",
+        "2822c6375cae695c77abc1e83328aa2c95c5eb5defcc1e84e53f43d06babe345"
+      ]
+    },
+    "perfnew-cp2dp2": {
+      "mean_seconds": 1.227035484664763,
+      "median_seconds": 1.2261358400573954,
+      "std_seconds": 0.003868334543786354,
+      "min_seconds": 1.2219106799457222,
+      "max_seconds": 1.2367629499640316,
+      "cv_percent": 0.3152585717472724,
+      "sequences_per_second": 3.2598894245449106,
+      "input_tokens_per_second": 13352.507082935954,
+      "per_card_memory": [
+        {
+          "rank": 0,
+          "peak_allocated_bytes": 22114806784,
+          "peak_reserved_bytes": 23311941632
+        },
+        {
+          "rank": 1,
+          "peak_allocated_bytes": 22117230592,
+          "peak_reserved_bytes": 23395827712
+        },
+        {
+          "rank": 2,
+          "peak_allocated_bytes": 22114806784,
+          "peak_reserved_bytes": 23311941632
+        },
+        {
+          "rank": 3,
+          "peak_allocated_bytes": 22117224448,
+          "peak_reserved_bytes": 23395827712
+        }
+      ],
+      "raw_sha256": [
+        "39dcc5a8cbc242f2c5be766cd31d6b091ae1b29cd22ad476c3994d2bc376d36c",
+        "e38d90da12541ccb8b8ec6a9bc7069f084b0394b29768bf2a9f8d7f69a90b8be",
+        "9da68a39a1b30304b79eec173513a06954b447a1532debb88857f7580ab9e46c",
+        "d90d52a53bfe96a70c4c9872ce7747699d2742a6038dcc2ea5b388150ac84bd8"
+      ],
+      "change_vs_old_percent": -0.3959941071549067
+    }
+  }
+}
