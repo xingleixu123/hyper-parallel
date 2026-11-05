@@ -1,0 +1,218 @@
+{
+  "environment": {
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0.post3",
+    "source": "571d9cb9bfb6c878c59e6d40f3ccc75c1cc359c5",
+    "matching_pr_head": "0854496de0004a01c04678d3f49983d2bf14ea27",
+    "device": "Ascend910B3",
+    "dtype": "bf16 inputs, fp32 phi/alpha/beta",
+    "shape": [
+      1,
+      16,
+      4,
+      512
+    ],
+    "seed": 107,
+    "sinkhorn_iterations": 20,
+    "eps": 1e-06,
+    "upstream": "seeded nonuniform fp32"
+  },
+  "mix_asymmetry": {
+    "max_abs": 0.7411753535270691,
+    "rmse": 0.2544896602630615,
+    "reference_rms": 0.3404465615749359
+  },
+  "comparisons": {
+    "public__vs__oracle_srcdest": {
+      "out": {
+        "max_abs": 0.0001220703125,
+        "rmse": 6.743495646333031e-07,
+        "reference_rms": 0.7875169515609741
+      },
+      "grad_x": {
+        "max_abs": 0.0078125,
+        "rmse": 4.315845944802277e-05,
+        "reference_rms": 1.8104928731918335
+      },
+      "grad_phi": {
+        "max_abs": 9.5367431640625e-06,
+        "rmse": 1.2209017086206586e-06,
+        "reference_rms": 11.118618965148926
+      },
+      "grad_alpha": {
+        "max_abs": 1.1444091796875e-05,
+        "rmse": 6.607249360968126e-06,
+        "reference_rms": 24.278284072875977
+      },
+      "grad_beta": {
+        "max_abs": 2.86102294921875e-06,
+        "rmse": 1.2225008276800509e-06,
+        "reference_rms": 11.373470306396484
+      }
+    },
+    "public_transposed__vs__oracle_destsrc": {
+      "out": {
+        "max_abs": 1.52587890625e-05,
+        "rmse": 8.429369557916289e-08,
+        "reference_rms": 0.7886953949928284
+      },
+      "grad_x": {
+        "max_abs": 7.62939453125e-06,
+        "rmse": 4.222908600581832e-08,
+        "reference_rms": 1.8263752460479736
+      },
+      "grad_phi": {
+        "max_abs": 9.5367431640625e-06,
+        "rmse": 1.2601803973666392e-06,
+        "reference_rms": 11.453773498535156
+      },
+      "grad_alpha": {
+        "max_abs": 8.58306884765625e-06,
+        "rmse": 4.955436907039257e-06,
+        "reference_rms": 10.217855453491211
+      },
+      "grad_beta": {
+        "max_abs": 2.86102294921875e-06,
+        "rmse": 1.1303949349894538e-06,
+        "reference_rms": 10.972107887268066
+      }
+    },
+    "xing_post__vs__public_transposed": {
+      "out": {
+        "max_abs": 0.0,
+        "rmse": 0.0,
+        "reference_rms": 0.7886953949928284
+      },
+      "grad_x": {
+        "max_abs": 0.0,
+        "rmse": 0.0,
+        "reference_rms": 1.8263752460479736
+      },
+      "grad_phi": {
+        "max_abs": 0.0,
+        "rmse": 0.0,
+        "reference_rms": 11.453773498535156
+      },
+      "grad_alpha": {
+        "max_abs": 0.0,
+        "rmse": 0.0,
+        "reference_rms": 10.217859268188477
+      },
+      "grad_beta": {
+        "max_abs": 0.0,
+        "rmse": 0.0,
+        "reference_rms": 10.972107887268066
+      }
+    },
+    "public__vs__public_transposed": {
+      "out": {
+        "max_abs": 1.625,
+        "rmse": 0.25421619415283203,
+        "reference_rms": 0.7886953949928284
+      },
+      "grad_x": {
+        "max_abs": 7.234375,
+        "rmse": 0.8261052370071411,
+        "reference_rms": 1.8263752460479736
+      },
+      "grad_phi": {
+        "max_abs": 64.86217498779297,
+        "rmse": 8.683393478393555,
+        "reference_rms": 11.453773498535156
+      },
+      "grad_alpha": {
+        "max_abs": 29.967811584472656,
+        "rmse": 17.301923751831055,
+        "reference_rms": 10.217859268188477
+      },
+      "grad_beta": {
+        "max_abs": 17.47479248046875,
+        "rmse": 6.839158058166504,
+        "reference_rms": 10.972107887268066
+      }
+    },
+    "oracle_srcdest__vs__oracle_destsrc": {
+      "out": {
+        "max_abs": 1.625,
+        "rmse": 0.25421619415283203,
+        "reference_rms": 0.7886953949928284
+      },
+      "grad_x": {
+        "max_abs": 7.234375,
+        "rmse": 0.8261050581932068,
+        "reference_rms": 1.8263752460479736
+      },
+      "grad_phi": {
+        "max_abs": 64.86216735839844,
+        "rmse": 8.683393478393555,
+        "reference_rms": 11.453773498535156
+      },
+      "grad_alpha": {
+        "max_abs": 29.967809677124023,
+        "rmse": 17.301923751831055,
+        "reference_rms": 10.217855453491211
+      },
+      "grad_beta": {
+        "max_abs": 17.47479248046875,
+        "rmse": 6.839158058166504,
+        "reference_rms": 10.972107887268066
+      }
+    },
+    "public__vs__official": {
+      "out": {
+        "max_abs": 1.625,
+        "rmse": 0.2541724741458893,
+        "reference_rms": 0.7890978455543518
+      },
+      "grad_x": {
+        "max_abs": 7.234375,
+        "rmse": 0.8260088562965393,
+        "reference_rms": 1.8273142576217651
+      },
+      "grad_phi": {
+        "max_abs": 64.79051971435547,
+        "rmse": 8.682600021362305,
+        "reference_rms": 11.457449913024902
+      },
+      "grad_alpha": {
+        "max_abs": 30.12848472595215,
+        "rmse": 17.395658493041992,
+        "reference_rms": 10.262528419494629
+      },
+      "grad_beta": {
+        "max_abs": 17.460302352905273,
+        "rmse": 6.836526870727539,
+        "reference_rms": 10.996745109558105
+      }
+    },
+    "public_transposed__vs__official": {
+      "out": {
+        "max_abs": 0.015625,
+        "rmse": 0.0030908677726984024,
+        "reference_rms": 0.7890978455543518
+      },
+      "grad_x": {
+        "max_abs": 0.125,
+        "rmse": 0.008926793932914734,
+        "reference_rms": 1.8273142576217651
+      },
+      "grad_phi": {
+        "max_abs": 0.4661540985107422,
+        "rmse": 0.05539723113179207,
+        "reference_rms": 11.457449913024902
+      },
+      "grad_alpha": {
+        "max_abs": 0.292999267578125,
+        "rmse": 0.2057344615459442,
+        "reference_rms": 10.262528419494629
+      },
+      "grad_beta": {
+        "max_abs": 0.18005752563476562,
+        "rmse": 0.05545543506741524,
+        "reference_rms": 10.996745109558105
+      }
+    }
+  },
+  "contract": "oracle_srcdest sums axis source of h_res[source,dest]; oracle_destsrc implements h_res[dest,source] @ residual; both use identical public pre output",
+  "note": "This tests operator dataflow and both interpretations; public consumer orientation cannot be declared wrong without its source model contract."
+}
