@@ -1,0 +1,148 @@
+{
+  "window": [
+    86,
+    105
+  ],
+  "excluded_initial_updates": 80,
+  "timing": "per-step NPU synchronize before/after; max over four ranks; includes sample hashing",
+  "scope": "paired historical runs, not a randomized isolated benchmark; BF16 probe and aborted EP excluded",
+  "throughput": "nominal input tokens/s = 4 * 4096 / mean(max-rank seconds)",
+  "memory": "Torch NPU allocator peaks per optimization step; allocated/reserved, not full driver HBM",
+  "configurations": {
+    "fsdp4": {
+      "previous_1caf": {
+        "mean_seconds": 0.8312880345096346,
+        "median_seconds": 0.831367080041673,
+        "p95_seconds": 0.8342974199913442,
+        "min_seconds": 0.8273788699880242,
+        "max_seconds": 0.834339139983058,
+        "stdev_seconds": 0.0019020240859518875,
+        "nominal_tokens_per_second": 19709.17337895366,
+        "per_rank_peak_allocated_gib": [
+          18.355567932128906,
+          18.355567932128906,
+          18.355567932128906,
+          18.355562210083008
+        ],
+        "per_rank_peak_reserved_gib": [
+          20.77734375,
+          20.77734375,
+          20.779296875,
+          20.779296875
+        ]
+      },
+      "candidate": {
+        "mean_seconds": 0.8302900539769326,
+        "median_seconds": 0.830016084946692,
+        "p95_seconds": 0.8325806399807334,
+        "min_seconds": 0.8260424899635836,
+        "max_seconds": 0.8334664099384099,
+        "stdev_seconds": 0.0016563571813142195,
+        "nominal_tokens_per_second": 19732.863138036802,
+        "per_rank_peak_allocated_gib": [
+          18.355568885803223,
+          18.355568885803223,
+          18.355568885803223,
+          18.355563163757324
+        ],
+        "per_rank_peak_reserved_gib": [
+          20.77734375,
+          20.77734375,
+          20.779296875,
+          20.779296875
+        ]
+      },
+      "mean_time_change_percent": -0.1200523153555011
+    },
+    "cp2dp2": {
+      "previous_1caf": {
+        "mean_seconds": 1.227966989512788,
+        "median_seconds": 1.2271971100126393,
+        "p95_seconds": 1.2332175099290907,
+        "min_seconds": 1.2226813200395554,
+        "max_seconds": 1.2359342300333083,
+        "stdev_seconds": 0.00338708154930673,
+        "nominal_tokens_per_second": 13342.378207170346,
+        "per_rank_peak_allocated_gib": [
+          20.59601879119873,
+          20.598276138305664,
+          20.59601879119873,
+          20.598270416259766
+        ],
+        "per_rank_peak_reserved_gib": [
+          21.712890625,
+          21.791015625,
+          21.712890625,
+          21.7890625
+        ]
+      },
+      "candidate": {
+        "mean_seconds": 1.2253367580124177,
+        "median_seconds": 1.2257822550600395,
+        "p95_seconds": 1.2268949099816382,
+        "min_seconds": 1.2218537199078128,
+        "max_seconds": 1.2274234700016677,
+        "stdev_seconds": 0.0014055063561479648,
+        "nominal_tokens_per_second": 13371.018124499911,
+        "per_rank_peak_allocated_gib": [
+          20.596019744873047,
+          20.59827709197998,
+          20.596019744873047,
+          20.598271369934082
+        ],
+        "per_rank_peak_reserved_gib": [
+          21.7109375,
+          21.7890625,
+          21.7109375,
+          21.7890625
+        ]
+      },
+      "mean_time_change_percent": -0.21419399078584922
+    },
+    "tp2cp2": {
+      "previous_1caf": {
+        "mean_seconds": 3.530195872974582,
+        "median_seconds": 3.529417755024042,
+        "p95_seconds": 3.5366824599914253,
+        "min_seconds": 3.5225423199590296,
+        "max_seconds": 3.5399052299326286,
+        "stdev_seconds": 0.004596025771516155,
+        "nominal_tokens_per_second": 4641.102247449703,
+        "per_rank_peak_allocated_gib": [
+          21.34996271133423,
+          21.35490894317627,
+          21.35060739517212,
+          21.353936195373535
+        ],
+        "per_rank_peak_reserved_gib": [
+          23.138671875,
+          23.14453125,
+          22.76171875,
+          22.767578125
+        ]
+      },
+      "candidate": {
+        "mean_seconds": 3.5292009290191344,
+        "median_seconds": 3.53036409500055,
+        "p95_seconds": 3.5328251800965518,
+        "min_seconds": 3.522563880076632,
+        "max_seconds": 3.534486070042476,
+        "stdev_seconds": 0.0032426178327154423,
+        "nominal_tokens_per_second": 4642.410655987666,
+        "per_rank_peak_allocated_gib": [
+          21.349693298339844,
+          21.354909896850586,
+          21.350632190704346,
+          21.35393714904785
+        ],
+        "per_rank_peak_reserved_gib": [
+          23.3203125,
+          23.14453125,
+          22.76171875,
+          22.767578125
+        ]
+      },
+      "mean_time_change_percent": -0.028183817307825265
+    }
+  }
+}
