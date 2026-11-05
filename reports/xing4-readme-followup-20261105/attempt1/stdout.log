@@ -1,0 +1,100 @@
+....................F.                                                   [100%]
+=================================== FAILURES ===================================
+________ test_hf_partial_load_preserves_router_and_initializes_missing _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_hf_partial_load_preserves0')
+
+    def test_hf_partial_load_preserves_router_and_initializes_missing(tmp_path):
+        from safetensors.torch import save_file
+        values=config(vocab_size=32,num_attention_heads=2,num_key_value_heads=2,q_lora_rank=4,kv_lora_rank=4,qk_rope_head_dim=4,qk_nope_head_dim=4,v_head_dim=4,num_nextn_predict_layers=0,max_position_embeddings=64)
+        c=Xing4_0Config(**values)
+>       model=Xing4ForCausalLM(c)
+              ^^^^^^^^^^^^^^^^^^^
+
+../scripts/hp-inventory/test_followup.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../sources/hyper-parallel/hyper_parallel/models/xing_4/adapter/training.py:206: in __init__
+    self.model = Xing4Model(config)
+                 ^^^^^^^^^^^^^^^^^^
+../sources/hyper-parallel/hyper_parallel/models/xing_4/adapter/training.py:138: in __init__
+    self.layers = nn.ModuleList(
+../env/lib/python3.12/site-packages/torch/nn/modules/container.py:364: in __init__
+    self += modules
+../env/lib/python3.12/site-packages/torch/nn/modules/container.py:413: in __iadd__
+    return self.extend(modules)
+           ^^^^^^^^^^^^^^^^^^^^
+../env/lib/python3.12/site-packages/torch/nn/modules/container.py:498: in extend
+    for i, module in enumerate(modules):
+                     ^^^^^^^^^^^^^^^^^^
+../sources/hyper-parallel/hyper_parallel/models/xing_4/adapter/training.py:139: in <genexpr>
+    Xing4DecoderLayer(config, index, source=layer) for index, layer in enumerate(self.layers))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sources/hyper-parallel/hyper_parallel/models/xing_4/adapter/training.py:92: in __init__
+    if config.attention_softmax_scale is not None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../env/lib/python3.12/site-packages/transformers/configuration_utils.py:655: in __getattribute__
+    return super().__getattribute__(key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Xing4_0Config {
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "bos_token_id": 1,
+  "chunk_loss_size": 4,
+  ...nsformers_version": "5.21.0",
+  "use_cache": false,
+  "use_pad_tokens": false,
+  "v_head_dim": 4,
+  "vocab_size": 32
+}
+
+key = 'attention_softmax_scale'
+
+    def __getattribute__(self, key: str) -> Any:
+        # In heterogeneous configs, per-layer attributes are ambiguous on the global config.
+        # Callers must read them from a concrete layer unless they explicitly opt into the global value.
+        heterogeneity_spec = super().__getattribute__("__dict__").get("_heterogeneity_spec")
+        if heterogeneity_spec is not None:
+            if key in heterogeneity_spec.per_layer_attributes:
+                if not super().__getattribute__("allow_global_per_layer_attribute_access"):
+                    raise AmbiguousGlobalPerLayerAttributeError(
+                        f"'{key}' is a per-layer attribute and may vary across layers. Access it via the individual layer "
+                        f"configs instead (e.g. config.per_layer_config[i].{key}). To read the global config value from "
+                        f"config.{key} anyway, set `allow_global_per_layer_attribute_access` to `True` on the config. "
+                        f"Warning: only do this if the caller can safely handle heterogeneous configs; code that assumes "
+                        f"a homogeneous model may use the global value incorrectly."
+                    )
+    
+                logger.warning_once(
+                    f"Reading global config value for per-layer attribute `{key}` on a heterogeneous config. "
+                    "Only do this if the caller can safely handle heterogeneous configs; code that assumes a homogeneous "
+                    "model may use the global value incorrectly."
+                )
+    
+>       return super().__getattribute__(key)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'Xing4_0Config' object has no attribute 'attention_softmax_scale'
+
+../env/lib/python3.12/site-packages/transformers/integrations/heterogeneity/configuration_utils.py:312: AttributeError
+=============================== warnings summary ===============================
+scripts/hp-inventory/test_followup.py: 20 warnings
+  /work/env/lib/python3.12/site-packages/transformers/configuration_utils.py:720: FutureWarning: `rope_scaling` is deprecated and will be removed in a future version. Set `rope_parameters` instead, with `rope_type` and `rope_theta` included.
+    warnings.warn(
+
+scripts/hp-inventory/test_followup.py::test_router_padding_accumulation_recompute_and_disabled
+  /work/sources/hyper-parallel/hyper_parallel/models/xing_4/adapter/moe.py:71: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:437.)
+    padding = (padding.view(1, self.padding, self.top_k) % self.num_experts).expand(batch, -1, -1)
+
+scripts/hp-inventory/test_followup.py::test_router_meta_materialization_and_legacy_dcp
+  /work/env/lib/python3.12/site-packages/torch/distributed/checkpoint/utils.py:485: UserWarning: torch.distributed is disabled, unavailable or uninitialized, assuming the intent is to save in a single process.
+    return func(*args, **kwargs)
+
+scripts/hp-inventory/test_followup.py::test_router_meta_materialization_and_legacy_dcp
+  /work/env/lib/python3.12/site-packages/torch/distributed/checkpoint/utils.py:485: UserWarning: torch.distributed is disabled, unavailable or uninitialized, assuming the intent is to load in a single process.
+    return func(*args, **kwargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../scripts/hp-inventory/test_followup.py::test_hf_partial_load_preserves_router_and_initializes_missing
+1 failed, 21 passed, 23 warnings in 12.02s

@@ -1,0 +1,28 @@
+/home/xxl/.cache/codex/hp-mf-master-sixpr-20261102-venv/lib/python3.12/site-packages/transformers/configuration_utils.py:723: FutureWarning: `rope_scaling` is deprecated and will be removed in a future version. Set `rope_parameters` instead, with `rope_type` and `rope_theta` included.
+  warnings.warn(
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 125.46it/s]
+Loading weights:   0%|          | 0/5 [00:00<?, ?it/s]Loading weights: 100%|██████████| 5/5 [00:00<00:00, 3528.78it/s]
+/mnt/d/Obsidian Vault D/hyperllal/HP-MF-Master-SixPR-20261102/xing4-readme-followup-20261105/hf-guard-regression.py:56: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:838.)
+  "weight": float(loaded.gate.weight[0,0]),
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 615.27it/s]
+Loading weights:   0%|          | 0/4 [00:00<?, ?it/s]Loading weights: 100%|██████████| 4/4 [00:00<00:00, 11096.04it/s]
+[transformers] [1mActualHF LOAD REPORT[0m from: /tmp/hf-guard-nr96qnm8
+Key                          | Status  | 
+-----------------------------+---------+-
+gate.e_score_correction_bias | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 1422.76it/s]
+Loading weights:   0%|          | 0/6 [00:00<?, ?it/s]Loading weights: 100%|██████████| 6/6 [00:00<00:00, 4318.09it/s]
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 2851.33it/s]
+Loading weights:   0%|          | 0/5 [00:00<?, ?it/s]Loading weights: 100%|██████████| 5/5 [00:00<00:00, 23723.44it/s]
+[transformers] [1mActualHF LOAD REPORT[0m from: /tmp/hf-guard-m55l0cjf
+Key      | Status  | 
+---------+---------+-
+hc.hc_fn | MISSING | 
+
+Notes:
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+RESULT_JSON {"cases": {"all_present": {"base": 4.0, "bias": 3.0, "count": 19, "scale": 2.0, "weight": 7.0}, "count": {"base": 4.0, "bias": 3.0, "count": 0, "scale": 2.0, "weight": 7.0}, "count_bias": {"base": 4.0, "bias": 0.0, "count": 0, "scale": 2.0, "weight": 7.0}, "hc_fn": {"base": 4.0, "bias": 3.0, "count": 19, "scale": 2.0, "weight": 7.0}}, "random_hash": {"gate._token_counts": "66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925", "gate.e_score_correction_bias": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb", "gate.weight": "cd48f9696528d442814a6818d5ec1b3185ebb773ca23b4f1d511e76b824a098d", "hc.hc_base": "2ea9ab9198d1638007400cd2c3bef1cc745b864b76011a0e1bc52180ac6452d4", "hc.hc_fn": "df303f0176583c36f5ba261a5236ebbb9393ff0ed751fb261d3994bbe7be8066", "hc.hc_scale": "96998ed49fff9bdf4e562a273026112fcffac295c34b3b68e86593fb29909605"}}

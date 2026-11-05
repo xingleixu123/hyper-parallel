@@ -1,0 +1,20 @@
+......................                                                   [100%]
+=============================== warnings summary ===============================
+scripts/hp-inventory/test_followup.py: 20 warnings
+  /work/env/lib/python3.12/site-packages/transformers/configuration_utils.py:720: FutureWarning: `rope_scaling` is deprecated and will be removed in a future version. Set `rope_parameters` instead, with `rope_type` and `rope_theta` included.
+    warnings.warn(
+
+scripts/hp-inventory/test_followup.py::test_router_padding_accumulation_recompute_and_disabled
+  /work/sources/hyper-parallel/hyper_parallel/models/xing_4/adapter/moe.py:71: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:437.)
+    padding = (padding.view(1, self.padding, self.top_k) % self.num_experts).expand(batch, -1, -1)
+
+scripts/hp-inventory/test_followup.py::test_router_meta_materialization_and_legacy_dcp
+  /work/env/lib/python3.12/site-packages/torch/distributed/checkpoint/utils.py:485: UserWarning: torch.distributed is disabled, unavailable or uninitialized, assuming the intent is to save in a single process.
+    return func(*args, **kwargs)
+
+scripts/hp-inventory/test_followup.py::test_router_meta_materialization_and_legacy_dcp
+  /work/env/lib/python3.12/site-packages/torch/distributed/checkpoint/utils.py:485: UserWarning: torch.distributed is disabled, unavailable or uninitialized, assuming the intent is to load in a single process.
+    return func(*args, **kwargs)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+22 passed, 23 warnings in 12.44s
