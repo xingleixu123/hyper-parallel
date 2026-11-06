@@ -1,0 +1,2005 @@
+{
+  "head": "eb1121470917789ce641e3f12b4b6bad65b6ba54",
+  "capture": "review-source-provenance.json",
+  "capture_sha256": "58f2ef70f7f037296071da8be5b215094775ad7b22f3820bf213daa0b296e3ef",
+  "counts": {
+    "threads": 44,
+    "inline_comments": 82,
+    "timeline_items": 148,
+    "review_events": 50,
+    "conversation_comments": 16
+  },
+  "remote_mutation_policy": "Read-only. No resolve, replies, review submission, issue transitions or source edits.",
+  "threads": [
+    {
+      "key": "T01",
+      "thread_id": "PRRT_kwDORZ_sKs6zZ97G",
+      "root_comment_id": 4462484211,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462484211",
+      "original_path": "hyper_parallel/models/xing_4/adapter/conversion/grouped_experts.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "独立专家实现及公共复用",
+      "classification": "主体已落实/接口载体有依据保留",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 316,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L316",
+      "evidence_and_action": "独立conversion/grouped_experts.py已移除；构造期直接建立公共GroupedExperts。source=nn.Module载体仍存在，提供公共构造器必须的packed参数与布局字段，没有重新实现GMM。",
+      "existing_issue_pr_or_boundary": "#1477；旧转换问题#1456",
+      "latest_comment_at": "2026-11-04T10:54:33Z",
+      "comment_ids": [
+        4462484211,
+        4466599382
+      ]
+    },
+    {
+      "key": "T02",
+      "thread_id": "PRRT_kwDORZ_sKs6zZ_7Y",
+      "root_comment_id": 4462497711,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462497711",
+      "original_path": "hyper_parallel/models/xing4/adapter/policies/activation_checkpointing.py",
+      "original_line": 13,
+      "remote_is_resolved_unchanged": false,
+      "topic": "独立重计算文件",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/adapter/registration.py",
+      "head_line": 30,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/registration.py#L30",
+      "evidence_and_action": "仅RecomputePolicy(region_patterns)声明主干和MTP；独立activation_checkpointing.py不存在。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-04T10:54:36Z",
+      "comment_ids": [
+        4462497711,
+        4466599828
+      ]
+    },
+    {
+      "key": "T03",
+      "thread_id": "PRRT_kwDORZ_sKs6zaEEG",
+      "root_comment_id": 4462525951,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462525951",
+      "original_path": "hyper_parallel/models/xing_4/modeling_xing_4.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "继承官方Xing模型",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 76,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L76",
+      "evidence_and_action": "直接导入bundled官方Xing4类；Xing4Model/ForCausalLM/Decoder/Router等继承官方类，未改用DSV3底座。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-04T10:57:01Z",
+      "comment_ids": [
+        4462525951,
+        4466619801
+      ]
+    },
+    {
+      "key": "T04",
+      "thread_id": "PRRT_kwDORZ_sKs6zaE76",
+      "root_comment_id": 4462531999,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462531999",
+      "original_path": "hyper_parallel/models/xing_4/modeling_xing_4.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "reference前缀与冗余包装",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 476,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L476",
+      "evidence_and_action": "无reference前缀；训练入口保留必要的官方子类。官方三文件与冻结reference manifest逐字相同。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-04T10:57:04Z",
+      "comment_ids": [
+        4462531999,
+        4466620150
+      ]
+    },
+    {
+      "key": "T05",
+      "thread_id": "PRRT_kwDORZ_sKs6ziiZx",
+      "root_comment_id": 4466118410,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466118410",
+      "original_path": "hyper_parallel/models/xing_4/adapter/moe/layers.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "大量MoE适配及能力复用",
+      "classification": "主体已落实/训练语义有依据保留",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 348,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L348",
+      "evidence_and_action": "router/MoE/MTP与构造集中在modeling；执行复用GroupedExperts/MLAAttention/MTPLayer。自定义路由保留训练aux、bias、hash及group语义，官方推理router本身不覆盖这些目标。",
+      "existing_issue_pr_or_boundary": "#1477；辅助倍率另见hf1s#355/#1441",
+      "latest_comment_at": "2026-11-04T10:57:06Z",
+      "comment_ids": [
+        4466118410,
+        4466620523
+      ]
+    },
+    {
+      "key": "T06",
+      "thread_id": "PRRT_kwDORZ_sKs6zijE-",
+      "root_comment_id": 4466123082,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466123082",
+      "original_path": "hyper_parallel/models/xing_4/adapter/runtime/model.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "模型专用mHC兼容算术",
+      "classification": "已落实且CPU独立区分通过",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 444,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L444",
+      "evidence_and_action": "_post仅在共享接口边界转置mix；非对称矩阵独立Hx参考的输出及四项梯度全部零差。历史fdce已含同向转置，不能把它当本轮新修复。",
+      "existing_issue_pr_or_boundary": "hf1s#359；#1477已含对应语义",
+      "latest_comment_at": "2026-11-04T10:57:09Z",
+      "comment_ids": [
+        4466123082,
+        4466620910
+      ]
+    },
+    {
+      "key": "T07",
+      "thread_id": "PRRT_kwDORZ_sKs6zijVp",
+      "root_comment_id": 4466124923,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466124923",
+      "original_path": "hyper_parallel/models/xing_4/.gitattributes",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "删除.gitattributes",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/adapter/registration.py",
+      "head_line": 15,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/registration.py#L15",
+      "evidence_and_action": "1477新增文件清单无xing_4/.gitattributes；三个官方源文件保持原字节，未以属性改写源码。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-04T10:57:12Z",
+      "comment_ids": [
+        4466124923,
+        4466621266
+      ]
+    },
+    {
+      "key": "T08",
+      "thread_id": "PRRT_kwDORZ_sKs6zikHn",
+      "root_comment_id": 4466130247,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466130247",
+      "original_path": "setup.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "撤销setup.py变动",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/adapter/registration.py",
+      "head_line": 15,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/registration.py#L15",
+      "evidence_and_action": "1477相对base的19文件清单无setup.py，使用既有打包。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-04T10:57:15Z",
+      "comment_ids": [
+        4466130247,
+        4466621706
+      ]
+    },
+    {
+      "key": "T09",
+      "thread_id": "PRRT_kwDORZ_sKs6ziyyf",
+      "root_comment_id": 4466230866,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466230866",
+      "original_path": "hyper_parallel/components/functional/mhc_post.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "不修改公共mhc_post",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 54,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L54",
+      "evidence_and_action": "公共mhc_post.py不在1477 diff，且与历史冻结运行源sha256一致；布局适配留在Xing decoder。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-04T10:57:17Z",
+      "comment_ids": [
+        4466230866,
+        4466622034
+      ]
+    },
+    {
+      "key": "T10",
+      "thread_id": "PRRT_kwDORZ_sKs6zjO9P",
+      "root_comment_id": 4466419147,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466419147",
+      "original_path": "hyper_parallel/models/xing_4/config.json",
+      "original_line": 1,
+      "remote_is_resolved_unchanged": false,
+      "topic": "固定config.json外置",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 646,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L646",
+      "evidence_and_action": "新PR无模型规格config.json或训练YAML入仓；create_config接收外部字段。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-04T10:57:19Z",
+      "comment_ids": [
+        4466419147,
+        4466622291
+      ]
+    },
+    {
+      "key": "T11",
+      "thread_id": "PRRT_kwDORZ_sKs6z461P",
+      "root_comment_id": 4475698652,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475698652",
+      "original_path": "hyper_parallel/models/xing_4/adapter/configuration.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "合并configuration与builder",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 646,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L646",
+      "evidence_and_action": "create_config与build_model均在modeling_xing4_0.py；旧configuration.py/builder.py不存在。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:15Z",
+      "comment_ids": [
+        4475698652,
+        4480848669
+      ]
+    },
+    {
+      "key": "T12",
+      "thread_id": "PRRT_kwDORZ_sKs6z5QYp",
+      "root_comment_id": 4475844486,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475844486",
+      "original_path": "hyper_parallel/models/xing_4/adapter/registration.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "未被引用的replacement provider",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/adapter/registration.py",
+      "head_line": 66,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/registration.py#L66",
+      "evidence_and_action": "注册不再声明replacements provider；三种语义模块由构造直接安装。CP/EP provider通过ModelAdapterSpec使用。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T22:56:00Z",
+      "comment_ids": [
+        4475844486,
+        4480849117,
+        4487055012
+      ]
+    },
+    {
+      "key": "T13",
+      "thread_id": "PRRT_kwDORZ_sKs6z5Qgp",
+      "root_comment_id": 4475845264,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475845264",
+      "original_path": "hyper_parallel/models/xing_4/adapter/optim/muon.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "Muon原生posthook及swap",
+      "classification": "模型路线已落实/通用swap仍有边界",
+      "head_path": "hyper_parallel/models/xing_4/adapter/optim/muon.py",
+      "head_line": 72,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/optim/muon.py#L72",
+      "evidence_and_action": "向Muon叶优化器注册原生step posthook，随后FP32 wrapper复制main回model。swap包装前对既有leaf hook报错，CPU真实检查通过；late/global hook完整兼容不在此修复。",
+      "existing_issue_pr_or_boundary": "#1459；#1455/#1454非本轮前置",
+      "latest_comment_at": "2026-11-05T05:46:41Z",
+      "comment_ids": [
+        4475845264,
+        4475905678,
+        4477048178,
+        4477048346
+      ]
+    },
+    {
+      "key": "T14",
+      "thread_id": "PRRT_kwDORZ_sKs6z5ZdA",
+      "root_comment_id": 4475905775,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475905775",
+      "original_path": "hyper_parallel/models/xing_4/adapter/moe.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "moe.py合并训练实现",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 178,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L178",
+      "evidence_and_action": "router与MoE均进入modeling；旧adapter/moe.py不存在。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:20Z",
+      "comment_ids": [
+        4475905775,
+        4480849589
+      ]
+    },
+    {
+      "key": "T15",
+      "thread_id": "PRRT_kwDORZ_sKs6z5cUp",
+      "root_comment_id": 4475925241,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475925241",
+      "original_path": "hyper_parallel/models/xing_4/adapter/optim/muon.py",
+      "original_line": 110,
+      "remote_is_resolved_unchanged": false,
+      "topic": "QKClip投影归属及requires_grad",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/adapter/optim/muon.py",
+      "head_line": 72,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/optim/muon.py#L72",
+      "evidence_and_action": "正阈值时构造阶段检查每个q_b/kv_b可训练且identity属于Muon；hook缩放main_param，FP32 wrapper在leaf step后回写。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T05:46:43Z",
+      "comment_ids": [
+        4475925241,
+        4477048568
+      ]
+    },
+    {
+      "key": "T16",
+      "thread_id": "PRRT_kwDORZ_sKs6z5shd",
+      "root_comment_id": 4476024276,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476024276",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": 2,
+      "remote_is_resolved_unchanged": false,
+      "topic": "training.py命名",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 15,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L15",
+      "evidence_and_action": "训练主体已改为models/xing_4/modeling_xing4_0.py；注册路径同步。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:23Z",
+      "comment_ids": [
+        4476024276,
+        4480849975
+      ]
+    },
+    {
+      "key": "T17",
+      "thread_id": "PRRT_kwDORZ_sKs6z6AZu",
+      "root_comment_id": 4476138012,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476138012",
+      "original_path": "hyper_parallel/components/modules/mla_attention.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "共享MLA额外扩展点",
+      "classification": "已撤回公共改动/必要子类保留",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 161,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L161",
+      "evidence_and_action": "1477未修改components/modules/mla_attention.py；子类复用_project_latents并仅保留FP32旋转与拼接舍入差异。旧回复中的_expand_key_value不是当前接口。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T05:46:45Z",
+      "comment_ids": [
+        4476138012,
+        4477048840
+      ]
+    },
+    {
+      "key": "T18",
+      "thread_id": "PRRT_kwDORZ_sKs6z6BAN",
+      "root_comment_id": 4476142089,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476142089",
+      "original_path": "hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py",
+      "original_line": 108,
+      "remote_is_resolved_unchanged": false,
+      "topic": "CP MTP位移应由谁提供",
+      "classification": "有依据保留/公共提升待设计",
+      "head_path": "hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py",
+      "head_line": 110,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py#L110",
+      "evidence_and_action": "TextParallelBatch给出当前分片shift_labels，模型逐深度位移仍需next-shard首token。当前method replacement重复交换并仅填全局尾，不应直接删除。",
+      "existing_issue_pr_or_boundary": "#1477；公共MTP#1386不含CP分片",
+      "latest_comment_at": "2026-11-05T05:48:00Z",
+      "comment_ids": [
+        4476142089,
+        4477055825
+      ]
+    },
+    {
+      "key": "T19",
+      "thread_id": "PRRT_kwDORZ_sKs6z6BTK",
+      "root_comment_id": 4476144198,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476144198",
+      "original_path": "hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py",
+      "original_line": 131,
+      "remote_is_resolved_unchanged": false,
+      "topic": "CP loss与Trainer职责",
+      "classification": "有依据保留/多目标协议待公共化",
+      "head_path": "hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py",
+      "head_line": 132,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py#L132",
+      "evidence_and_action": "每深度先各自跨CP聚合sum/count，Trainer再做共享foundation外层微批/DP权重；不同MTP有效分母不能合成一个。应先提供多分母协议，不能重复归约。",
+      "existing_issue_pr_or_boundary": "#1386；#1410 closed未合并；dz-ssk#7；#1453路线重叠",
+      "latest_comment_at": "2026-11-06T08:01:59Z",
+      "comment_ids": [
+        4476144198,
+        4477056044,
+        4490278065
+      ]
+    },
+    {
+      "key": "T20",
+      "thread_id": "PRRT_kwDORZ_sKs6z6Wfm",
+      "root_comment_id": 4476285672,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476285672",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": 360,
+      "remote_is_resolved_unchanged": false,
+      "topic": "重复HC包装与epsilon位置",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 428,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L428",
+      "evidence_and_action": "decoder先设mHC epsilon，再直接安装Xing4FusedHyperConnection；没有可被二次replacement覆盖的过渡训练HC包装。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:26Z",
+      "comment_ids": [
+        4476285672,
+        4476476650,
+        4480850406
+      ]
+    },
+    {
+      "key": "T21",
+      "thread_id": "PRRT_kwDORZ_sKs6z6oU9",
+      "root_comment_id": 4476404636,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476404636",
+      "original_path": "hyper_parallel/models/xing_4/adapter/builder.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "HC覆盖/类型校验",
+      "classification": "已通过构造不变量取代",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 429,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L429",
+      "evidence_and_action": "两处HC在每个decoder构造期固定为四值fused类，消除了漏配replacement导致三/四返回值冲突，故不再需要plan覆盖扫描。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:28Z",
+      "comment_ids": [
+        4476404636,
+        4480850829
+      ]
+    },
+    {
+      "key": "T22",
+      "thread_id": "PRRT_kwDORZ_sKs6z60Ls",
+      "root_comment_id": 4476484034,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476484034",
+      "original_path": "hyper_parallel/models/xing_4/adapter/configuration.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "mHC clamp能力边界",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 95,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L95",
+      "evidence_and_action": "_REQUIRED_OPTIONS要求hc_sinkhorn_clamp及h_res两边界为None；非空拒绝。MF目标已明确noclamp。SwiGLU的非空选项是不同问题，不由此检查覆盖。",
+      "existing_issue_pr_or_boundary": "#1477；SwiGLU另见hf1s#354/#356",
+      "latest_comment_at": "2026-11-05T13:12:31Z",
+      "comment_ids": [
+        4476484034,
+        4480851210
+      ]
+    },
+    {
+      "key": "T23",
+      "thread_id": "PRRT_kwDORZ_sKs6z64QP",
+      "root_comment_id": 4476511406,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476511406",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "pre/post与官方源码不改",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 432,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L432",
+      "evidence_and_action": "官方HF三文件保持原字节；训练decoder暴露内联post边界，pre直接构造共享融合模块。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:33Z",
+      "comment_ids": [
+        4476511406,
+        4480851617
+      ]
+    },
+    {
+      "key": "T24",
+      "thread_id": "PRRT_kwDORZ_sKs6z7Qi6",
+      "root_comment_id": 4476673821,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476673821",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "初始化写法/HF guard",
+      "classification": "有独立证据保留",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 453,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L453",
+      "evidence_and_action": "新增公共RMSNorm/GroupedExperts官方初始化不认识；官方HC分支还引用不存在的fn/base/scale。实际nn.init在HF guard内保留三项已加载HC值；直接zero_会绕过guard。",
+      "existing_issue_pr_or_boundary": "#1466；部分加载loader另为#1467/#1468，非本轮完整DCP前置",
+      "latest_comment_at": "2026-11-06T02:27:38Z",
+      "comment_ids": [
+        4476673821,
+        4480852017,
+        4488389399
+      ]
+    },
+    {
+      "key": "T25",
+      "thread_id": "PRRT_kwDORZ_sKs6z9FSW",
+      "root_comment_id": 4477449370,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477449370",
+      "original_path": "hyper_parallel/models/xing_4/adapter/distributed/expert_parallel.py",
+      "original_line": 45,
+      "remote_is_resolved_unchanged": false,
+      "topic": "明确只支持grouped-GEMM",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 355,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L355",
+      "evidence_and_action": "非EP和EP均使用公共GroupedExperts，无ModuleList-loop分支；EP compute已并入modeling。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-06T06:52:55Z",
+      "comment_ids": [
+        4477449370,
+        4480852410,
+        4489822122
+      ]
+    },
+    {
+      "key": "T26",
+      "thread_id": "PRRT_kwDORZ_sKs60BdZF",
+      "root_comment_id": 4479302597,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479302597",
+      "original_path": "hyper_parallel/models/xing_4/adapter/conversion/module_replacement.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "大函数校验与专家打包",
+      "classification": "主体已收敛/加载能力缩减须明示",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 316,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L316",
+      "evidence_and_action": "构造期直接按shape分配packed参数，删除大型来源/hook/策略校验与替换映射。其边界是只支持冷启动/同名转换训练checkpoint；不支持官方HF权重。",
+      "existing_issue_pr_or_boundary": "#1477；旧#1456不能当官方HF入口已支持",
+      "latest_comment_at": "2026-11-05T13:12:40Z",
+      "comment_ids": [
+        4479302597,
+        4480852724
+      ]
+    },
+    {
+      "key": "T27",
+      "thread_id": "PRRT_kwDORZ_sKs60BeXX",
+      "root_comment_id": 4479308908,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479308908",
+      "original_path": "hyper_parallel/models/xing_4/adapter/conversion/module_replacement.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "从权重shape读取维度",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 329,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L329",
+      "evidence_and_action": "intermediate_size, hidden_size直接来自首个gate.shape；专家数来自len(experts)。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:43Z",
+      "comment_ids": [
+        4479308908,
+        4480853210
+      ]
+    },
+    {
+      "key": "T28",
+      "thread_id": "PRRT_kwDORZ_sKs60B7yr",
+      "root_comment_id": 4479501581,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479501581",
+      "original_path": "hyper_parallel/core/multicore/modules/_precision.py",
+      "original_line": 19,
+      "remote_is_resolved_unchanged": false,
+      "topic": "不改公共_precision.py",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 68,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L68",
+      "evidence_and_action": "公共helper相对base无diff，复用原preserve_fp32_parameters；不新增同义helper。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:46Z",
+      "comment_ids": [
+        4479501581,
+        4480853657
+      ]
+    },
+    {
+      "key": "T29",
+      "thread_id": "PRRT_kwDORZ_sKs60B8rX",
+      "root_comment_id": 4479507617,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479507617",
+      "original_path": "hyper_parallel/models/xing_4/adapter/moe.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "MoE归并training",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 178,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L178",
+      "evidence_and_action": "当前进一步归并到modeling；旧moe.py/training.py都不在模型树。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T13:12:48Z",
+      "comment_ids": [
+        4479507617,
+        4480854025
+      ]
+    },
+    {
+      "key": "T30",
+      "thread_id": "PRRT_kwDORZ_sKs60RfBA",
+      "root_comment_id": 4486127122,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4486127122",
+      "original_path": "hyper_parallel/models/xing_4/adapter/conversion/module_replacement.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "max-logits是训练必要语义",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 129,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L129",
+      "evidence_and_action": "MLA构造固定训练aware接口；仅开启正QK阈值时记录detached逐头max，由Muon hook消费清空，无需recipe替换决定该语义。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-05T21:12:23Z",
+      "comment_ids": [
+        4486127122
+      ]
+    },
+    {
+      "key": "T31",
+      "thread_id": "PRRT_kwDORZ_sKs60SmI7",
+      "root_comment_id": 4486603546,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4486603546",
+      "original_path": "hyper_parallel/models/xing_4/adapter/builder.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "builder过量校验",
+      "classification": "主体已删除/非空激活选项遗漏",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 646,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L646",
+      "evidence_and_action": "旧build_model遍历策略/HC扫描已删除。实际create_config却未实现正文声称的swiglu_limit/compute_dtype非空拒绝，需独立修配置契约。",
+      "existing_issue_pr_or_boundary": "#1477；相关hf1s#354/#356，当前入口另有遗漏",
+      "latest_comment_at": "2026-11-05T22:02:54Z",
+      "comment_ids": [
+        4486603546
+      ]
+    },
+    {
+      "key": "T32",
+      "thread_id": "PRRT_kwDORZ_sKs60VX1b",
+      "root_comment_id": 4487803057,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4487803057",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "dense/shared SwiGLU交给plan",
+      "classification": "已落实普通路径/条件选项有缺口",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 424,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L424",
+      "evidence_and_action": "dense和shared保留官方MLP，recipe可替换SwiGLUMLP；routed专家构造直接GMM。swiglu_policy已删除但非空配置仍被静默接受，当前noclamp无此触发。",
+      "existing_issue_pr_or_boundary": "#1477；相关hf1s#354/#356",
+      "latest_comment_at": "2026-11-06T02:23:46Z",
+      "comment_ids": [
+        4487803057,
+        4488367376
+      ]
+    },
+    {
+      "key": "T33",
+      "thread_id": "PRRT_kwDORZ_sKs60WfgY",
+      "root_comment_id": 4488289341,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4488289341",
+      "original_path": "hyper_parallel/models/xing_4/adapter/conversion/module_replacement.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "GroupedExperts接受packed源",
+      "classification": "接口约束仍存在/有依据保留",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 333,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L333",
+      "evidence_and_action": "公共GroupedExperts只接收有gate_up/down参数的源module；当前仍建轻量carrier。减少载体只能通过公共按维度构造API，不应把载体消失写成已完成。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-06T02:09:44Z",
+      "comment_ids": [
+        4488289341
+      ]
+    },
+    {
+      "key": "T34",
+      "thread_id": "PRRT_kwDORZ_sKs60WqXp",
+      "root_comment_id": 4488362832,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4488362832",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": null,
+      "remote_is_resolved_unchanged": false,
+      "topic": "torch_npu导入放开头",
+      "classification": "代码已落实/正文陈旧",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 46,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L46",
+      "evidence_and_action": "当前真实代码顶层import torch_npu；正文称调用时导入与代码不符。该文件本就需NPU相关rotary接口，不声称CPU无桩可导入。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-06T02:22:53Z",
+      "comment_ids": [
+        4488362832
+      ]
+    },
+    {
+      "key": "T35",
+      "thread_id": "PRRT_kwDORZ_sKs60ZyzT",
+      "root_comment_id": 4489698765,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4489698765",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": 241,
+      "remote_is_resolved_unchanged": false,
+      "topic": "训练语义模块不要replacement",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 423,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L423",
+      "evidence_and_action": "MLA、fused mHC、grouped专家均构造期确定；仅dense/shared性能替换和分布式forward仍交recipe。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-06T06:31:55Z",
+      "comment_ids": [
+        4489698765
+      ]
+    },
+    {
+      "key": "T36",
+      "thread_id": "PRRT_kwDORZ_sKs60aaKD",
+      "root_comment_id": 4489956136,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4489956136",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": 286,
+      "remote_is_resolved_unchanged": false,
+      "topic": "打包carrier写法奇怪",
+      "classification": "公共接口限制/设计意见保留",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 333,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L333",
+      "evidence_and_action": "carrier仍存在但精简为公共GroupedExperts实际所需字段；没有发现当前完整DCP路径的功能错误，不能用风格意见臆造故障。",
+      "existing_issue_pr_or_boundary": "#1477；公共构造接口可另议",
+      "latest_comment_at": "2026-11-06T07:14:01Z",
+      "comment_ids": [
+        4489956136
+      ]
+    },
+    {
+      "key": "T37",
+      "thread_id": "PRRT_kwDORZ_sKs60avHO",
+      "root_comment_id": 4490093737,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490093737",
+      "original_path": "hyper_parallel/core/optimizer/swap_optimizer_base.py",
+      "original_line": 1920,
+      "remote_is_resolved_unchanged": false,
+      "topic": "swap正式兼容方案",
+      "classification": "后续公共能力/现有failfast保留",
+      "head_path": "hyper_parallel/core/optimizer/swap_optimizer_base.py",
+      "head_line": 1919,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/core/optimizer/swap_optimizer_base.py#L1919",
+      "evidence_and_action": "真实swap pipeline直接调用adapter.step_batch绕过leaf.step，不能只删failfast。当前组合明确拒绝；正式hook生命周期需要独立公共修复。",
+      "existing_issue_pr_or_boundary": "#1459",
+      "latest_comment_at": "2026-11-06T07:35:07Z",
+      "comment_ids": [
+        4490093737
+      ]
+    },
+    {
+      "key": "T38",
+      "thread_id": "PRRT_kwDORZ_sKs60a8rG",
+      "root_comment_id": 4490182677,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490182677",
+      "original_path": "hyper_parallel/models/_transformers/model_builder.py",
+      "original_line": 945,
+      "remote_is_resolved_unchanged": false,
+      "topic": "回退FP32-buffer builder增量",
+      "classification": "已回退/仅条件BF16-init边界",
+      "head_path": "hyper_parallel/models/_transformers/model_builder.py",
+      "head_line": 925,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/_transformers/model_builder.py#L925",
+      "evidence_and_action": "1477无model_builder.py diff，也没有fp32_buffer_names支持。FP32初始化可通过；BF16目标与Router保护的FP32 buffer会冲突，CPU已复现。正文称保留该能力错误。",
+      "existing_issue_pr_or_boundary": "#1477；router FP32必要性参照#1464",
+      "latest_comment_at": "2026-11-06T07:48:15Z",
+      "comment_ids": [
+        4490182677
+      ]
+    },
+    {
+      "key": "T39",
+      "thread_id": "PRRT_kwDORZ_sKs60bECX",
+      "root_comment_id": 4490231387,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490231387",
+      "original_path": "hyper_parallel/models/_transformers/model_builder.py",
+      "original_line": 974,
+      "remote_is_resolved_unchanged": false,
+      "topic": "删除model_builder额外改动",
+      "classification": "已落实回退",
+      "head_path": "hyper_parallel/models/_transformers/model_builder.py",
+      "head_line": 925,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/_transformers/model_builder.py#L925",
+      "evidence_and_action": "该公共文件不在1477的19文件diff；不把删除PR增量误解成删除库上所有dtype校验。当前MF目标使用FP32初始化/主权重。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-06T07:55:10Z",
+      "comment_ids": [
+        4490231387
+      ]
+    },
+    {
+      "key": "T40",
+      "thread_id": "PRRT_kwDORZ_sKs60bKNm",
+      "root_comment_id": 4490271564,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490271564",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": 208,
+      "remote_is_resolved_unchanged": false,
+      "topic": "TP+EP完整序列aux统计",
+      "classification": "已确认条件缺口",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 282,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L282",
+      "evidence_and_action": "router只绑定CP统计组；D-10 EP+SP真实边界保留TP序列分片，未聚合TP时变为分片各自aux。普通TP/普通SP先allgather时则不得盲加TP。CPU域判别1.125 vs1.35，真路径设计另附。",
+      "existing_issue_pr_or_boundary": "旧CP问题hf1s#338/#341及主仓#1395仅作相关背景；不是hf1s#355同因",
+      "latest_comment_at": "2026-11-06T08:14:07Z",
+      "comment_ids": [
+        4490271564,
+        4490363221
+      ]
+    },
+    {
+      "key": "T41",
+      "thread_id": "PRRT_kwDORZ_sKs60bMcz",
+      "root_comment_id": 4490286623,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490286623",
+      "original_path": "hyper_parallel/models/xing_4/adapter/distributed/expert_parallel.py",
+      "original_line": 43,
+      "remote_is_resolved_unchanged": false,
+      "topic": "删除独立EP文件",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 620,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L620",
+      "evidence_and_action": "xing4_ep_compute_fn已与MoE同处modeling；adapter/distributed/expert_parallel.py不存在。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-06T08:03:12Z",
+      "comment_ids": [
+        4490286623
+      ]
+    },
+    {
+      "key": "T42",
+      "thread_id": "PRRT_kwDORZ_sKs60bfjc",
+      "root_comment_id": 4490410837,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490410837",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": 99,
+      "remote_is_resolved_unchanged": false,
+      "topic": "MLA不要模块替换",
+      "classification": "已落实",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 423,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L423",
+      "evidence_and_action": "每个decoder直接构造Xing4MLAAttention，标准class不再有@module_replacement。",
+      "existing_issue_pr_or_boundary": "#1477",
+      "latest_comment_at": "2026-11-06T08:20:55Z",
+      "comment_ids": [
+        4490410837
+      ]
+    },
+    {
+      "key": "T43",
+      "thread_id": "PRRT_kwDORZ_sKs60bgQ7",
+      "root_comment_id": 4490415486,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490415486",
+      "original_path": "hyper_parallel/models/xing_4/adapter/training.py",
+      "original_line": 241,
+      "remote_is_resolved_unchanged": false,
+      "topic": "专家不替换与HF权重行为",
+      "classification": "构造已落实/官方HF入口明确不支持",
+      "head_path": "hyper_parallel/models/xing_4/modeling_xing4_0.py",
+      "head_line": 28,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/modeling_xing4_0.py#L28",
+      "evidence_and_action": "当前构造丢弃ModuleList源权重、使用packed空参数后初始化或DCP恢复，无注册的官方权重转换。from_config固定load_base_model=False；官方HF全量加载/导出不构成本轮已支持能力。",
+      "existing_issue_pr_or_boundary": "#1477；需另立官方HF支持工作，不由MF/DCP通过证明",
+      "latest_comment_at": "2026-11-06T08:21:34Z",
+      "comment_ids": [
+        4490415486
+      ]
+    },
+    {
+      "key": "T44",
+      "thread_id": "PRRT_kwDORZ_sKs60b_-L",
+      "root_comment_id": 4490623406,
+      "review_url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490623406",
+      "original_path": "hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py",
+      "original_line": 91,
+      "remote_is_resolved_unchanged": false,
+      "topic": "aux域绑定移出CP适配",
+      "classification": "尚未落实结构意见",
+      "head_path": "hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py",
+      "head_line": 91,
+      "source_url": "https://github.com/mindspore-ai/hyper-parallel/blob/eb1121470917789ce641e3f12b4b6bad65b6ba54/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py#L91",
+      "evidence_and_action": "xing4_moe_cp_wrapper仍在CP模块内写gate.aux_loss_cp_group。应迁到通用router统计绑定并按实际token分片选组；不能直接删除，否则CP-only退为局部序列目标。",
+      "existing_issue_pr_or_boundary": "#1477；可复用现有V4.1 sequence_load_balancing_loss，需小范围公共提升",
+      "latest_comment_at": "2026-11-06T08:49:49Z",
+      "comment_ids": [
+        4490623406
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "id": 4462484211,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462484211",
+      "created_at": "2026-11-04T01:23:51Z",
+      "body": "为什么需要这个文件，没有已有的实现吗？或者已有的实现能少量修改吗",
+      "disposition": "inline thread mapped to T01"
+    },
+    {
+      "id": 4462497711,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462497711",
+      "created_at": "2026-11-04T01:26:11Z",
+      "body": "你重计算为什么需要一个文件。你看下库上dsv41咋做的相关的，是不是少量修改，尽可能复用库上能力",
+      "disposition": "inline thread mapped to T02"
+    },
+    {
+      "id": 4462525951,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462525951",
+      "created_at": "2026-11-04T01:30:31Z",
+      "body": "类似这样的 为什么没有导入trans的xing，然后一些embedding类似继承的是xing4XXX",
+      "disposition": "inline thread mapped to T03"
+    },
+    {
+      "id": 4462531999,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4462531999",
+      "created_at": "2026-11-04T01:31:36Z",
+      "body": "类似不应该有reference的前缀？ 然后你看下是不是有比较多的能继承",
+      "disposition": "inline thread mapped to T04"
+    },
+    {
+      "id": 5761890960,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5761890960",
+      "created_at": "2026-11-04T01:31:55Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466118410,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466118410",
+      "created_at": "2026-11-04T09:54:49Z",
+      "body": "我们也有啊 为啥要写这么多呢 到底改什么了。为啥不能用我们的 或者提供的modeling 4那个文件，为啥要修改，修改也应该很少啊",
+      "disposition": "inline thread mapped to T05"
+    },
+    {
+      "id": 4466123082,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466123082",
+      "created_at": "2026-11-04T09:55:25Z",
+      "body": "为啥还有这种写法，",
+      "disposition": "inline thread mapped to T06"
+    },
+    {
+      "id": 4466124923,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466124923",
+      "created_at": "2026-11-04T09:55:39Z",
+      "body": "没必要的删掉啊",
+      "disposition": "inline thread mapped to T07"
+    },
+    {
+      "id": 4466130247,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466130247",
+      "created_at": "2026-11-04T09:56:19Z",
+      "body": "没必要的删掉啊",
+      "disposition": "inline thread mapped to T08"
+    },
+    {
+      "id": 5766535484,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5766535484",
+      "created_at": "2026-11-04T09:56:26Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 6628078023,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6628078023",
+      "created_at": "2026-11-04T10:07:21Z",
+      "body": "可以把GroupedExperts权重转换统一放到module_replacement.py",
+      "disposition": "architecture instruction: see T01/T26/T33; current construction route supersedes old replacement organization"
+    },
+    {
+      "id": 5766709527,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5766709527",
+      "created_at": "2026-11-04T10:08:52Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466230866,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466230866",
+      "created_at": "2026-11-04T10:08:53Z",
+      "body": "这里不需要修改，后续非融合计划删除",
+      "disposition": "inline thread mapped to T09"
+    },
+    {
+      "id": 6628331972,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6628331972",
+      "created_at": "2026-11-04T10:22:22Z",
+      "body": "- 看了一下，感觉可以以modeling_xing4_0.py为主体完成训练接入，将router、moe、mlp等训练逻辑放在模型实现中，减少 adapter中的子类包装。高性能模块替换及权重转换集中在module_replacement.py，ep等继续放在distributed里。\r\n- 基本顺序就是我们以 https://huggingface.co/XingChen-AGI/Xing4.0-29B-A4B/blob/main/modeling_xing4_0.py 为基础，然后把这个改为能够训练接入，作为hyper models下的modeling_xing4_0.py ，这样可以减少adapter适配；然后我们再做一些权重转换、并行适配之类的。\r\n- 另外我们其实和deepseekv4很像的。https://mp.weixin.qq.com/s/tSUxd6ia2fqwMRNXKkQJDw ， 所以类似config.json、tokenizer.json和tokenizer_config.json，可以让用户提前下好模型资产 不需要放到hyper上",
+      "disposition": "architecture instruction: see T03/T05/T10/T14/T25/T41/T43; assets stay external; training semantics in modeling"
+    },
+    {
+      "id": 4466419147,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466419147",
+      "created_at": "2026-11-04T10:32:15Z",
+      "body": "这个别加进代码仓里，这是具体的模型规格，应该是类似ckpt那样放在外面供hyper-parallel去读取的",
+      "disposition": "inline thread mapped to T10"
+    },
+    {
+      "id": 5766943345,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5766943345",
+      "created_at": "2026-11-04T10:33:24Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466599382,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466599382",
+      "created_at": "2026-11-04T10:54:33Z",
+      "body": "已删除独立 grouped_experts.py，将 MLA/GMM 替换与权重转换集中在 adapter/conversion/module_replacement.py。专家执行继续复用公共 GroupedExperts；仅保留官方 ModuleList 到共享打包参数的转换、可逆 checkpoint 映射及必要接口签名适配。真实配置命中主干和 MTP 两处专家，恢复回归通过。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T01"
+    },
+    {
+      "id": 5767162481,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767162481",
+      "created_at": "2026-11-04T10:54:33Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466599828,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466599828",
+      "created_at": "2026-11-04T10:54:36Z",
+      "body": "已删除独立重计算适配文件，使用库上的 RecomputePolicy(region_patterns) 声明 model.layers.* / mtp.layers.*，由共享调度实现重计算。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T02"
+    },
+    {
+      "id": 5767162961,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767162961",
+      "created_at": "2026-11-04T10:54:36Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466619801,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466619801",
+      "created_at": "2026-11-04T10:57:01Z",
+      "body": "底座使用本地保留的官方 Xing4_0Config、Xing4_0Model、Xing4_0ForCausalLM 及官方注意力、MLP、路由模块，HP 训练实现继续继承这些 Xing4 类，没有改用 DSV3 底座。按此前原源码不改的要求，官方文件保持原名原始字节；训练接线集中到模型目录 modeling_xing_4.py。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T03"
+    },
+    {
+      "id": 5767187375,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767187375",
+      "created_at": "2026-11-04T10:57:01Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466620150,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466620150",
+      "created_at": "2026-11-04T10:57:04Z",
+      "body": "已移除 reference 前缀和空构造包装，直接继承官方 Xing4 类；配置构建沿用共享 HyperAutoModelForCausalLM，不再增加下载/固定 revision 入参。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T04"
+    },
+    {
+      "id": 5767187814,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767187814",
+      "created_at": "2026-11-04T10:57:04Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466620523,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466620523",
+      "created_at": "2026-11-04T10:57:06Z",
+      "body": "已移除 adapter/moe 和 adapter/runtime 目录，将 router/MoE/MLP/MTP 的训练接线集中到模型目录；删除额外专家容器及未使用的 hash/固定路由支线。learned Top-K 直接调用官方实现，执行复用公共 MLA、GroupedExperts、SwiGLU、MTPLayer。剩余差异是训练辅助目标与状态、精度策略、mHC/MTP 训练接线及 EP/CP 接口。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T05"
+    },
+    {
+      "id": 5767188257,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767188257",
+      "created_at": "2026-11-04T10:57:06Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466620910,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466620910",
+      "created_at": "2026-11-04T10:57:09Z",
+      "body": "已删除 MF 专用兼容开关。官方 Xing4 定义 H_res @ streams；共享 post 算子使用 source-first 布局，因此仅在接口边界转置。非对称矩阵的独立数学参考验证了输出和四项输入梯度，不再依赖 MF 特制算术。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T06"
+    },
+    {
+      "id": 5767188743,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767188743",
+      "created_at": "2026-11-04T10:57:09Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466621266,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466621266",
+      "created_at": "2026-11-04T10:57:12Z",
+      "body": "已删除 .gitattributes。官方三个 Python 文件的 Git blob 与构建产物均核验原始 SHA256，未修改源码内容或文件名。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T07"
+    },
+    {
+      "id": 5767189171,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767189171",
+      "created_at": "2026-11-04T10:57:12Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466621706,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466621706",
+      "created_at": "2026-11-04T10:57:15Z",
+      "body": "已移除 setup.py 增量，使用库上现有打包规则。三个官方 Python 文件已实际构建并逐一核验 SHA256；固定 config.json 也已按新意见移到仓库外。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T08"
+    },
+    {
+      "id": 5767189654,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767189654",
+      "created_at": "2026-11-04T10:57:15Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466622034,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466622034",
+      "created_at": "2026-11-04T10:57:17Z",
+      "body": "已撤回本 PR 对共享 mhc_post.py 的修改，该文件与目标 master 完全一致。模型直接调用现有接口，NPU 使用融合路径；本轮不新增非融合开关。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T09"
+    },
+    {
+      "id": 5767190091,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767190091",
+      "created_at": "2026-11-04T10:57:17Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4466622291,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4466622291",
+      "created_at": "2026-11-04T10:57:19Z",
+      "body": "已从代码 PR 移除固定 config.json，原文件作为外部模型资产独立归档。HP 训练配方传入等价模型字段，不要求配置 key/value 与 MF 字面一致。\n\n对应本轮 `14d9ccce`。保留原线程供继续检视。",
+      "disposition": "inline thread mapped to T10"
+    },
+    {
+      "id": 5767190436,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5767190436",
+      "created_at": "2026-11-04T10:57:19Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 6628913897,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6628913897",
+      "created_at": "2026-11-04T10:57:23Z",
+      "body": "已按这两条建议合并结构：GroupedExperts 权重转换和 MLA 高性能替换统一到 `adapter/conversion/module_replacement.py`；router/MoE/MLP/MTP 的训练接线移到模型目录，EP 继续在 `adapter/distributed`。删除共享 mHC 修改、固定 config.json、setup.py 增量与 .gitattributes，文件数 26→17，净删 264 行。\n\n按任务此前明确的“官方源码原名原样保留”要求，官方 `modeling_xing4_0.py` 保持字节不变，HP 训练入口位于相邻的 `modeling_xing_4.py`，继续继承官方构造和模块；没有把整套模型重写在 adapter 内。\n\nCPU 两组前后向 364 项张量逐位一致，复用 18 tests / 20 subtests 通过；125 卡 5 的真实 MF5→HP6–10 恢复短跑通过。完整 1000 步报告保留原冻结版本归属，本轮不把短跑当成新的完整验收。原有评论与 review 均保留，未自动解决线程。\n\n<!-- xing4-review-consolidated-14d9ccce -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6644789427,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6644789427",
+      "created_at": "2026-11-04T23:18:30Z",
+      "body": "/check-pr\n\n<!-- codex-check-pr head=0854496de0004a01c04678d3f49983d2bf14ea27 body=644562ec2e4c77f39a102862910e613aded41351f9556d17871524ac20cdd56a -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6646605010,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6646605010",
+      "created_at": "2026-11-05T00:57:54Z",
+      "body": "本轮已按 [0854496d 逐项复核报告](https://github.com/xingleixu123/hyper-parallel/blob/38e15663f80add490bcd322b5788ba9bae24a8a3/reports/xing4-review-0854496d-20261105/README.md) 更新至 f96dd5b0，仍为三个commit，原检视记录保留。\n\n补充答复 Cui 的结构建议和 hf1s 对三处差异的提问：\n\n1. 按随后确认的组织方式，官方三个文件原名原字节保留在 transformer/；官方 Xing4 的配置、backbone构造和模块继续复用，训练 forward/loss/MTP/router 差异留在 adapter/，融合替换和权重转换集中在 conversion/module_replacement.py，并行计划仍使用公共provider/plan_overrides。固定config.json不入仓。\n2. 参考mHC借用已有DeepseekV4HyperConnection的FP32投影/稳定化Sinkhorn执行，但不是换成DSV3底座，也不声称和官方BF16/epsilon/clamp执行逐位相同。目标NPU配方必须通过融合替换，使用公共mhc_pre/post；clamp与CMHC明确关闭。未准备dtype的裸from_config不算通过的训练入口。\n3. decoder改写仅拆出官方内联mHC pre/post边界，保留融合pre返回residual的反向通路。Xing官方是H@streams，公共post接受source-first；非对称NPU前反向和独立公式支持边界转置。MF也同时提供两种方向，故不能无条件给公共模块翻转。\n4. Q/K latent norm的eps由训练配置rms_norm_eps确定；attention scaling只有显式attention_softmax_scale时才覆盖，否则保留官方值。mHC norm用独立配置字段。这里保持配置语义，不要求与MF的key/value字面相同。\n\n本轮实际修复：专家替换拒绝不能保持语义的forward/类型/激活策略（#1456）；EP只透传公共fix_router，默认关闭；Muon仍使用框架算法，QKClip改为调用独立公共hook PR #1455（#1454），不再改写step。#1386、#1420、#1425和可选#356按真实条件列为前置，不复制在途实现。\n\n最终文件已在129 NPU验证：专家42项旧/新固定输入及前反向逐位一致，公共hook三次主权重更新逐位一致；真实MF1500→HP1501–1505恢复65模型项/91槽/61主权重别名，40项实际样本字段一致，学习率日程不变。5步仅为当前集成回归，已有完整1000步结果仍归属冻结组合571d9cb9。原四卡1500→2500长程与受控性能测量尚未完成。\n\n<!-- xing4-review-response-f96dd5b0 -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6646623032,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6646623032",
+      "created_at": "2026-11-05T00:59:07Z",
+      "body": "/check-pr\n\n<!-- codex-review-followup head=f96dd5b091f75ba4ec827f73e079b3b21e9174db body=1c56b589c47a91043252f95c91f0a7a6d17e7a361ee455975e33663558be3bc1 -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 4475698652,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475698652",
+      "created_at": "2026-11-05T01:59:11Z",
+      "body": "这个文件似乎可以和builder放在一起吧 ；都是把yaml里面的model.config变成Xing4_0Config然后给builder。感觉完全可以和builder文件merge起来，也不需要那么多校验",
+      "disposition": "inline thread mapped to T11"
+    },
+    {
+      "id": 4475844486,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475844486",
+      "created_at": "2026-11-05T02:20:36Z",
+      "body": "这个def没地方用到吧\n",
+      "disposition": "inline thread mapped to T12"
+    },
+    {
+      "id": 4475845264,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475845264",
+      "created_at": "2026-11-05T02:20:44Z",
+      "body": "感觉没必要在#1455为chained optimizer新增register_step_post_hook并在此调用。chained optimizer里内含muon和adamw两个优化器，均是torch.optim.Optimizer的子类，直接调用muon.register_step_post_hook就好 也更符合“qk clip用来解决muon优化过程中的logit爆炸问题”的语义",
+      "disposition": "inline thread mapped to T13"
+    },
+    {
+      "id": 4475905678,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475905678",
+      "created_at": "2026-11-05T02:31:09Z",
+      "body": "register_step_post_hook的调用可能在swap场景下被跳过，但这是swap的缺陷，可以先在xing4.0的场景下屏蔽swap，然后联系相关开发者讨论兼容register_step_post_hook的修复方案",
+      "disposition": "inline thread mapped to T13"
+    },
+    {
+      "id": 4475905775,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475905775",
+      "created_at": "2026-11-05T02:31:11Z",
+      "body": "这个文件用不用参考modeling_deepseek_v41.py 放进training.py里面？\n也就这一个需要调用的地方。\n\n",
+      "disposition": "inline thread mapped to T14"
+    },
+    {
+      "id": 4475925241,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4475925241",
+      "created_at": "2026-11-05T02:34:39Z",
+      "body": "这种实现会不考虑其是否实际属于muon管理的参数 || required_grad == True就直接进行缩放。或许可以结合上面说的注册到muon的post hook，然后调用时候会判断参数是否是muon管理的参数，是的话再进行缩放。不过在该模型场景下直接这样做应该没啥问题，看你要不要考虑泛化了",
+      "disposition": "inline thread mapped to T15"
+    },
+    {
+      "id": 5778943265,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5778943265",
+      "created_at": "2026-11-05T02:35:13Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4476024276,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476024276",
+      "created_at": "2026-11-05T02:47:58Z",
+      "body": "是不是改个名字",
+      "disposition": "inline thread mapped to T16"
+    },
+    {
+      "id": 4476138012,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476138012",
+      "created_at": "2026-11-05T03:01:20Z",
+      "body": "这个需要单独抽取出来吗",
+      "disposition": "inline thread mapped to T17"
+    },
+    {
+      "id": 5779311022,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5779311022",
+      "created_at": "2026-11-05T03:01:20Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4476142089,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476142089",
+      "created_at": "2026-11-05T03:02:05Z",
+      "body": "这个要在这里做还是trainer提供？",
+      "disposition": "inline thread mapped to T18"
+    },
+    {
+      "id": 5779315943,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5779315943",
+      "created_at": "2026-11-05T03:02:05Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4476144198,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476144198",
+      "created_at": "2026-11-05T03:02:30Z",
+      "body": "loss的处理是trainer负责的吧",
+      "disposition": "inline thread mapped to T19"
+    },
+    {
+      "id": 5779318588,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5779318588",
+      "created_at": "2026-11-05T03:02:30Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4476285672,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476285672",
+      "created_at": "2026-11-05T03:28:34Z",
+      "body": "这个融合算子需要吗，在这里构造一次，然后被module_replacement替换了",
+      "disposition": "inline thread mapped to T20"
+    },
+    {
+      "id": 4476404636,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476404636",
+      "created_at": "2026-11-05T03:50:52Z",
+      "body": "这个校验是不是有点奇怪。",
+      "disposition": "inline thread mapped to T21"
+    },
+    {
+      "id": 4476476650,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476476650",
+      "created_at": "2026-11-05T04:04:41Z",
+      "body": "似乎只用吧self.input_norm.eps = config.mhc_layernorm_epsilon移到后面的Xing4DecoderLayer的init就可以了\n",
+      "disposition": "inline thread mapped to T20"
+    },
+    {
+      "id": 4476484034,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476484034",
+      "created_at": "2026-11-05T04:06:08Z",
+      "body": "ref里面好像是用的clamp版的算子，这里拒绝了；\n我们目前框架的mhc应该还不支持",
+      "disposition": "inline thread mapped to T22"
+    },
+    {
+      "id": 4476511406,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476511406",
+      "created_at": "2026-11-05T04:11:20Z",
+      "body": "这几行都可以靠plan_overrides替换，但是def _post不行\n这个似乎是开源代码部分class Xing4_0HyperConnection 有forward可以直接替换，但是里面没有post得在这里写一份\n\n如果能修改开源代码 似乎就方便很多",
+      "disposition": "inline thread mapped to T23"
+    },
+    {
+      "id": 4476673821,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4476673821",
+      "created_at": "2026-11-05T04:42:07Z",
+      "body": "稍微有点怪 但是不知道有什么好的写法",
+      "disposition": "inline thread mapped to T24"
+    },
+    {
+      "id": 6650766862,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6650766862",
+      "created_at": "2026-11-05T05:45:52Z",
+      "body": "[![CLA assistant check](https://cla-assistant.io/pull/badge/signed)](https://cla-assistant.io/mindspore-ai/hyper-parallel?pullRequest=1439) <br/>All committers have signed the CLA.",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 4477048178,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477048178",
+      "created_at": "2026-11-05T05:46:39Z",
+      "body": "<!-- xing4-cp-integration-1caf044a-4475845264 -->\n感谢建议。已改为向框架 Muon 叶优化器注册原生 `register_step_post_hook`，不再使用 ChainedOptimizer 扩展；本 builder 按 AdamW、Muon 顺序执行，Q/K 仅归 Muon，混精 wrapper 在 chain 返回后回写 FP32 主权重。#1454 / #1455 不再是本 PR 前置；它们涉及通用 chain callback，状态维持原样，不因此关闭。CPU 与 NPU 小探针已验证真实 builder、三步 FP32 重绑及首步独立缩放公式；不据此宣称多卡或长期训练已验收。\n\n已追加于 1caf044a；[本轮恢复、样本、数值及模块回归证据](https://github.com/xingleixu123/hyper-parallel/blob/470a3a56385b366a63b26b4fcb353a81f764bafc/reports/xing4-cp-integration-20261105/README.md)。",
+      "disposition": "inline thread mapped to T13"
+    },
+    {
+      "id": 5780420789,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5780420789",
+      "created_at": "2026-11-05T05:46:39Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4477048346,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477048346",
+      "created_at": "2026-11-05T05:46:41Z",
+      "body": "<!-- xing4-cp-integration-1caf044a-4475905678 -->\n接受风险。Trainer 安装 swap 前本模型已注册 Muon hook；通用 swap 构造器在进行 offload 前检查既有 leaf step pre/post hook 并明确拒绝，避免此组合静默训练。通用 late registration、global hook 及完整 swap hook 语义在 [#1459](https://github.com/mindspore-ai/hyper-parallel/issues/1459) 跟踪，当前不声称全支持。CPU 与 NPU 小探针覆盖 dispatcher 与 Muon/Adam 直接入口、已有 hook 拒绝及无 hook 正常 step；这不代表 swap DMA 或 HSDP 已验证。\n\n已追加于 1caf044a；[本轮恢复、样本、数值及模块回归证据](https://github.com/xingleixu123/hyper-parallel/blob/470a3a56385b366a63b26b4fcb353a81f764bafc/reports/xing4-cp-integration-20261105/README.md)。",
+      "disposition": "inline thread mapped to T13"
+    },
+    {
+      "id": 5780421004,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5780421004",
+      "created_at": "2026-11-05T05:46:41Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4477048568,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477048568",
+      "created_at": "2026-11-05T05:46:43Z",
+      "body": "<!-- xing4-cp-integration-1caf044a-4475925241 -->\n接受建议。启用 QKClip 时，在构造阶段逐个检查所有 attention 的 q_b_proj / kv_b_proj 可训练且其参数身份属于 Muon；无 attention、冻结或归 AdamW 时显式报错。FP32 main 重绑发生在此后，hook 缩放 main copy，CPU 与 NPU 小探针检查重绑及回写。该契约要求所有这些投影都由 Muon 管理，不能宣称支持任意混合归属。\n\n已追加于 1caf044a；[本轮恢复、样本、数值及模块回归证据](https://github.com/xingleixu123/hyper-parallel/blob/470a3a56385b366a63b26b4fcb353a81f764bafc/reports/xing4-cp-integration-20261105/README.md)。",
+      "disposition": "inline thread mapped to T15"
+    },
+    {
+      "id": 5780421257,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5780421257",
+      "created_at": "2026-11-05T05:46:43Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4477048840,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477048840",
+      "created_at": "2026-11-05T05:46:45Z",
+      "body": "<!-- xing4-cp-integration-1caf044a-4476138012 -->\n抽出 `_expand_key_value` 是为了让公共 MLA 与 Xing 的 RoPE 定制路径共享 KV 投影、reshape 和拆分，Xing 仅覆写必要的旋转精度与拼接。公共原 forward 同样调用此方法；该边界避免复制实现，未把 Xing 策略写入公共方法。欢迎对扩展点位置继续讨论。\n\n已追加于 1caf044a；[本轮恢复、样本、数值及模块回归证据](https://github.com/xingleixu123/hyper-parallel/blob/470a3a56385b366a63b26b4fcb353a81f764bafc/reports/xing4-cp-integration-20261105/README.md)。",
+      "disposition": "inline thread mapped to T17"
+    },
+    {
+      "id": 5780421580,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5780421580",
+      "created_at": "2026-11-05T05:46:45Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4477055825,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477055825",
+      "created_at": "2026-11-05T05:48:00Z",
+      "body": "<!-- xing4-cp-integration-1caf044a-4476142089 -->\n当前 master 的 TextParallelBatch 已负责 CP 分片并提供当前分片的 shift_labels；它没有提供 MTP 每个深度的跨片 next-token。这里的 method replacement 只补分片边界，并在全局序列末尾补 pad。可以把这类位移上移为通用 batch 能力，但现有接口直接删除此交换会丢每片边界；需要多深度及片长小于深度的等价验证。\n\n已追加于 1caf044a；[本轮恢复、样本、数值及模块回归证据](https://github.com/xingleixu123/hyper-parallel/blob/470a3a56385b366a63b26b4fcb353a81f764bafc/reports/xing4-cp-integration-20261105/README.md)。",
+      "disposition": "inline thread mapped to T18"
+    },
+    {
+      "id": 5780430354,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5780430354",
+      "created_at": "2026-11-05T05:48:00Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4477056044,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477056044",
+      "created_at": "2026-11-05T05:48:03Z",
+      "body": "<!-- xing4-cp-integration-1caf044a-4476144198 -->\nTrainer 已负责 loss_fn 和 microbatch/token 权重。这里每层 MTP 的有效 token 数不同，因此先分别跨 CP 求 numerator/count 并归一化，再交 Trainer 现有后续处理；master 现有单 `loss_sum`/`valid_token_count` 协议不能直接表达多个深度的不同分母。若转入 Trainer，应先提供多深度 loss 协议并验证 CP/DP 梯度归一化，不应叠加重复归约。\n\n已追加于 1caf044a；[本轮恢复、样本、数值及模块回归证据](https://github.com/xingleixu123/hyper-parallel/blob/470a3a56385b366a63b26b4fcb353a81f764bafc/reports/xing4-cp-integration-20261105/README.md)。",
+      "disposition": "inline thread mapped to T19"
+    },
+    {
+      "id": 5780430619,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5780430619",
+      "created_at": "2026-11-05T05:48:03Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 6650833066,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6650833066",
+      "created_at": "2026-11-05T05:50:32Z",
+      "body": "/check-pr\n\n<!-- codex-cp-integration command=/check-pr head=1caf044aa35f4e69ade9938039f587281f14a3be body=537f851902f9dcbbef2055804d39376d2cbddd3441ea85d50dd6692cd73f725b -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6650833529,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6650833529",
+      "created_at": "2026-11-05T05:50:34Z",
+      "body": "/check-cla\n\n<!-- codex-cp-integration command=/check-cla head=1caf044aa35f4e69ade9938039f587281f14a3be body=537f851902f9dcbbef2055804d39376d2cbddd3441ea85d50dd6692cd73f725b -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 5778745039,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5778745039",
+      "created_at": "2026-11-05T06:33:38Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4477449370,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4477449370",
+      "created_at": "2026-11-05T06:51:46Z",
+      "body": "这里isinstance(module.experts, GroupedExperts)和写死use_grouped_gemm=True会导致moe部分强制走grouped_gemm分支。\n如果期望仅保留该分支，则直接在modeling里面实现grouped-gemm版本，并删除这里的配置；如果希望保留for-loop专家计算版本做精度比对基线，则删除这里的校验，use_grouped_gemm改为可配置参数\n",
+      "disposition": "inline thread mapped to T25"
+    },
+    {
+      "id": 6653136840,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6653136840",
+      "created_at": "2026-11-05T08:15:33Z",
+      "body": "已逐项复核1105 README，并仅追加 [7f4a3fd7](https://github.com/mindspore-ai/hyper-parallel/commit/7f4a3fd7cac6da3c465743b57d832042bcc4ae29)：6个逻辑文件，+76/−13；原4提交保留，未改写或resolve原检视记录，官方HF三文件原字节不变。\n\n- 确认并修复路由持久计数与偏置的dtype风险（#1464）；复用公共精度转换机制，不把buffer改成Parameter。\n- 保留公共GroupedExperts/#356，补充非空策略消费能力检查（#1456）以及必要的配置、chunk size、MLA输入契约。\n- 未机械采纳删透传forward建议：真实单卡/四卡构建反例显示它承担ModuleList替换签名，删除会在恢复前失败，因此恢复并补充正负例验证。\n- 最新master已合入#1386，继续复用公共MTP；#1203在padding、重计算和bias数学定义上存在差异，不能直接替换。Muon及FSDP/TP/EP/CP计划保持复用。\n\n[逐项采纳/保留理由](https://github.com/xingleixu123/hyper-parallel/blob/c7f67b63abcdd3a9b0c00bf2f3876aa634cce73a/reports/xing4-readme-review-20261105/review-decisions.md) · [真实NPU、恢复/样本、数值与性能证据](https://github.com/xingleixu123/hyper-parallel/blob/c7f67b63abcdd3a9b0c00bf2f3876aa634cce73a/reports/xing4-readme-review-20261105/README.md)。20项NPU专项、MF1500→HP1501–1505和四卡四布局各100步回归完成；不据此宣称新完整1000步验收。历史lint诊断21项未新增；TP×CP rank0 reserved增加186MiB，限制均已披露。依赖顺序和当前报告同步总issue hf1s/hyper-parallel#353。\n\n<!-- xing4-readme-review-response-7f4a3fd7 -->\n",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6653138818,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6653138818",
+      "created_at": "2026-11-05T08:15:40Z",
+      "body": "/check-pr\n\n<!-- codex-readme-review command=/check-pr head=7f4a3fd7cac6da3c465743b57d832042bcc4ae29 body=58a99ca4b11bcf85d58e615a2faac9c391d5d253849465bda62cf34552fa92dd -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6655204763,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6655204763",
+      "created_at": "2026-11-05T10:05:17Z",
+      "body": "已复核1105 README新增第零章，追加e4013cfb（4文件+11/−14），原五个提交及检视保留。\n\n确认并修复了实际部分加载缺陷：直接Tensor.zero_/fill_会绕过HF初始化保护，覆盖同模块已加载router bias和mHC状态；改用现有nn.init，见#1466。同seed随机初始化逐项一致，已提供非零计数仍保留。FP32 helper直接复用原名，去掉额外别名。\n\n计数持久性继续保留。正常成功步保存常为零，但非持久化会改变旧DCP schema并丢弃非零计数；已有MF1500和FSDP step5恢复不能当作官方HF冷启动证据。进一步定位到公共loader会把ignore-missing同时当成免初始化，独立草稿#1468（#1467）修复此共性问题，未混入本模型PR。\n\nSwiGLU非空策略继续依赖并复用#356，#1420仅为导出调整。当前partial检查是固定实现的过渡保护，不是通用能力协议；不重复增加一套激活实现。透明forward保留并补充必要签名说明。\n\n[逐项判断、原始输出与源码绑定](https://github.com/xingleixu123/hyper-parallel/blob/7d12f0f85a1d90ce6faf2781480eaaceb6e7fd1c/reports/xing4-readme-followup-20261105/README.md)。本模型CPU24项/14子测试、受控卡5专项22项完成；公共loader有单独CPU及NPU before/after。新HF部分加载测试先CPU加载后转NPU，公共loader补测才在NPU张量上初始化，范围已区分。\n\n本轮不重跑完整训练、四卡100步或吞吐测量，旧数值曲线保留原提交归属；官方HF完整冷启动仍有MTP权重边界，未宣称全部打通。未新增库内UT/ST，外部证据不等同CI绿色。总跟踪hf1s#353已更新优先级和条件依赖。\n\n<!-- xing4-followup-review-e4013cfb -->\n",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6655208512,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6655208512",
+      "created_at": "2026-11-05T10:05:29Z",
+      "body": "/check-pr\n\n<!-- codex-1105-followup command=/check-pr head=e4013cfb2539d81709015cada6a788517a7a28e0 body=2e309c5457f277e3b87e472a62f06e242aa88de33dccb623be4c9675ad295228 -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 4479302597,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479302597",
+      "created_at": "2026-11-05T10:28:15Z",
+      "body": "这里是否有必要添加一个大函数做校验和weight打包？",
+      "disposition": "inline thread mapped to T26"
+    },
+    {
+      "id": 4479308908,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479308908",
+      "created_at": "2026-11-05T10:28:56Z",
+      "body": "这里为什么不是直接从weight的shape里面读取hidden_size, intermediate_size",
+      "disposition": "inline thread mapped to T27"
+    },
+    {
+      "id": 5780923421,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5780923421",
+      "created_at": "2026-11-05T10:29:00Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4479501581,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479501581",
+      "created_at": "2026-11-05T10:49:10Z",
+      "body": "这个文件不应该改",
+      "disposition": "inline thread mapped to T28"
+    },
+    {
+      "id": 4479507617,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4479507617",
+      "created_at": "2026-11-05T10:49:47Z",
+      "body": "这个文件应该放在training.py",
+      "disposition": "inline thread mapped to T29"
+    },
+    {
+      "id": 5783673841,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5783673841",
+      "created_at": "2026-11-05T10:49:54Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 6658844798,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6658844798",
+      "created_at": "2026-11-05T13:11:02Z",
+      "body": "/check-pr\n\n<!-- codex-ci-request head=fdce1a9a2285f1ab76f4c73d4e68b620b134eaea body_sha256=579f7762b64c19bdaaea4a88544630bb4e1912178ee9d214fdbde1a0ba26de69 command=check-pr -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 4480848669,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480848669",
+      "created_at": "2026-11-05T13:12:15Z",
+      "body": "已在 fdce1a9a 将配置创建合并进 builder.py，保留 create_config 和真实需要的别名冲突、训练配置及 mHC clamp 边界检查；旧 configuration.py 已删除。",
+      "disposition": "inline thread mapped to T11"
+    },
+    {
+      "id": 5785456485,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785456485",
+      "created_at": "2026-11-05T13:12:15Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480849117,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480849117",
+      "created_at": "2026-11-05T13:12:18Z",
+      "body": "这个函数由 XING4_ADAPTER_SPEC.replacements 引用，用于延迟加载 replacement provider；保留是为了让模型发现阶段不必提前加载相关实现。已用真实 provider 调用验证。",
+      "disposition": "inline thread mapped to T12"
+    },
+    {
+      "id": 5785457086,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785457086",
+      "created_at": "2026-11-05T13:12:18Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480849589,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480849589",
+      "created_at": "2026-11-05T13:12:20Z",
+      "body": "已在 fdce1a9a 将 Router、MLP 和 MoE 的训练适配合入 training.py，并更新 replacement 和 CP 导入；官方三个 HF 文件保持原始字节。",
+      "disposition": "inline thread mapped to T14"
+    },
+    {
+      "id": 5785457637,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785457637",
+      "created_at": "2026-11-05T13:12:20Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480849975,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480849975",
+      "created_at": "2026-11-05T13:12:23Z",
+      "body": "当前保留 training.py 命名，训练 Router/MoE 也已集中到该文件；注册架构名不变，减少无实质收益的接口改名。",
+      "disposition": "inline thread mapped to T16"
+    },
+    {
+      "id": 5785458147,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785458147",
+      "created_at": "2026-11-05T13:12:23Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480850406,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480850406",
+      "created_at": "2026-11-05T13:12:26Z",
+      "body": "已按建议移除中间 Xing4HyperConnection 包装，在 decoder 初始化时保留原 HF HC 并设置 norm epsilon，再由 plan 替换为 fused HC。参数与 norm 对象身份、真实替换签名及部分加载值保护已检查；去掉重复初始化会改变相同 seed 的冷启动随机序列。",
+      "disposition": "inline thread mapped to T20"
+    },
+    {
+      "id": 5785458670,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785458670",
+      "created_at": "2026-11-05T13:12:26Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480850829,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480850829",
+      "created_at": "2026-11-05T13:12:28Z",
+      "body": "已删除重复的模型类型判断，保留 HC 的 plan 覆盖检查：如果某个 HF HC 没被 fused replacement 覆盖，在构建阶段报错，避免运行到 decoder 才因三项/四项返回值契约冲突而失败。",
+      "disposition": "inline thread mapped to T21"
+    },
+    {
+      "id": 5785459238,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785459238",
+      "created_at": "2026-11-05T13:12:28Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480851210,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480851210",
+      "created_at": "2026-11-05T13:12:31Z",
+      "body": "当前共享 fused mHC 不提供参考实现的 clamp 语义，本轮训练配置明确关闭 clamp；配置非空时继续拒绝，避免静默改变模型数学。未来补齐公共能力后可再扩展。",
+      "disposition": "inline thread mapped to T22"
+    },
+    {
+      "id": 5785459720,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785459720",
+      "created_at": "2026-11-05T13:12:31Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480851617,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480851617",
+      "created_at": "2026-11-05T13:12:33Z",
+      "body": "pre 部分仍由 plan 替换；post 在官方 decoder 内联，而本轮要求官方三个 HF 文件不改，所以训练 decoder 保留独立 post 边界，并按共享算子的布局转置 mix。",
+      "disposition": "inline thread mapped to T23"
+    },
+    {
+      "id": 5785460281,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785460281",
+      "created_at": "2026-11-05T13:12:33Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480852017,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480852017",
+      "created_at": "2026-11-05T13:12:36Z",
+      "body": "初始化函数保留 HF guarded nn.init 调用，确保部分加载时不覆盖已加载的 HC 和 router 状态。已用真实 HF safetensors 的缺项场景验证加载值保持。",
+      "disposition": "inline thread mapped to T24"
+    },
+    {
+      "id": 5785460832,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785460832",
+      "created_at": "2026-11-05T13:12:36Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480852410,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480852410",
+      "created_at": "2026-11-05T13:12:39Z",
+      "body": "非 EP 路径继续保留 HF ModuleList 循环。EP 当前只承诺已验 grouped 路径，检查改为公共 forward_expert_major 能力而非具体类名；公共非 grouped loop 要求另一套 stacked 权重布局与加载契约，本次不新增未经完整验证的开关。",
+      "disposition": "inline thread mapped to T25"
+    },
+    {
+      "id": 5785461367,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785461367",
+      "created_at": "2026-11-05T13:12:39Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480852724,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480852724",
+      "created_at": "2026-11-05T13:12:40Z",
+      "body": "目前这部分除打包外还验证来源专家、共享权重、hooks/buffer、shape 和激活策略，并提供可逆 checkpoint 映射；矩阵执行仍复用公共 GroupedExperts。现有公共 EP 能力尚不覆盖全部 ModuleList 转换契约，后续可随公共能力成熟再收敛。",
+      "disposition": "inline thread mapped to T26"
+    },
+    {
+      "id": 5785461764,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785461764",
+      "created_at": "2026-11-05T13:12:40Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480853210,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480853210",
+      "created_at": "2026-11-05T13:12:43Z",
+      "body": "目前 `_validate_expert_weights` 已从第一组 gate weight 的 shape 读取 intermediate_size 和 hidden_size，再对配置及其他专家权重做一致性检查，避免不一致时静默打包。",
+      "disposition": "inline thread mapped to T27"
+    },
+    {
+      "id": 5785462415,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785462415",
+      "created_at": "2026-11-05T13:12:43Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480853657,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480853657",
+      "created_at": "2026-11-05T13:12:46Z",
+      "body": "已在 fdce1a9a 回退 `_precision.py` 的文档差异，该公共文件相对本 PR 原基线不再有改动；训练侧继续复用既有 helper。",
+      "disposition": "inline thread mapped to T28"
+    },
+    {
+      "id": 5785463065,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785463065",
+      "created_at": "2026-11-05T13:12:46Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4480854025,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4480854025",
+      "created_at": "2026-11-05T13:12:48Z",
+      "body": "已在 fdce1a9a 将 Router、MLP 和 MoE 训练适配合并到 training.py，旧 moe.py 已删除；其余 import 与 provider 已同步调整。",
+      "disposition": "inline thread mapped to T29"
+    },
+    {
+      "id": 5785463594,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5785463594",
+      "created_at": "2026-11-05T13:12:48Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 6661346538,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6661346538",
+      "created_at": "2026-11-05T15:03:51Z",
+      "body": "本轮追加commit **fdce1a9a**（8文件 +258/−343），原6个提交及全部检视意见保留，29个thread逐项复核，14条补充回复已发布，未自动resolve检视。\n\n单卡MF1500→HP1501–2500完整1000步、四卡FSDP/EP2/CP2DP2/TP2CP2/仅主干重计算各1000步已完成并独立复算通过；LOSS与raw MTPLOSS各自abs(mean signed delta)≤0.005，正负自然出现。恢复、实际样本、日程、全窗口和最终单卡checkpoint读回证据已核验。详情包含MAE/最大差/正负数及可复算CSV。\n\n[完整证据与网站图片](https://github.com/xingleixu123/hyper-parallel/blob/704d00fa66185ecf28e98decb19468a0a9044db3/reports/xing4-fdce-full-precision-20261105/README.md)；总跟踪 [hf1s#353](https://github.com/hf1s/hyper-parallel/issues/353) 已按优先级和依赖区分待合入、已吸收、已合入及条件PR。正式运行是manifest 7dd9613c…的复合源码，不是裸master；当前FSDP是从连续基线1500恢复的replay。PR仍Draft，CI/检视批准单独等待。\n\n<!-- xing4-fdce-full-acceptance-20261105 -->\n",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 6661371855,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#issuecomment-6661371855",
+      "created_at": "2026-11-05T15:04:57Z",
+      "body": "/check-pr\n\n<!-- check-pr head=fdce1a9a2285f1ab76f4c73d4e68b620b134eaea body_sha256=80d319ec563d66a51a96730ca4bca6fb8c0ce8c39246fd0531f9b55ef3250a88 -->",
+      "disposition": "status, historical validation or CI/CLA command; no independent new source-change instruction"
+    },
+    {
+      "id": 4486127122,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4486127122",
+      "created_at": "2026-11-05T21:12:23Z",
+      "body": "开源的代码推理Xing4_0Attention 是不需要max-logits的\n所以这似乎是训练的必须语义？",
+      "disposition": "inline thread mapped to T30"
+    },
+    {
+      "id": 5792202823,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5792202823",
+      "created_at": "2026-11-05T21:12:28Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4486603546,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4486603546",
+      "created_at": "2026-11-05T22:02:54Z",
+      "body": "这校验是不是有点非必要",
+      "disposition": "inline thread mapped to T31"
+    },
+    {
+      "id": 4487055012,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4487055012",
+      "created_at": "2026-11-05T22:56:00Z",
+      "body": "但是代码里面没有地方引用到",
+      "disposition": "inline thread mapped to T12"
+    },
+    {
+      "id": 4487803057,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4487803057",
+      "created_at": "2026-11-06T00:46:54Z",
+      "body": "这个写法似乎有点问题：\nexpert里面，因为mlp.expert本来就要被grouped GEMM 替换\n剩下dense层和shared_experts里面要用swiglu的 可以靠plan overrides做\n这也导致了module replacements里面 _expert_weights进行了额外的奇怪校验",
+      "disposition": "inline thread mapped to T32"
+    },
+    {
+      "id": 5792781189,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5792781189",
+      "created_at": "2026-11-06T01:39:34Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4488289341,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4488289341",
+      "created_at": "2026-11-06T02:09:44Z",
+      "body": " 因为框架的 GroupedExperts.__init__ 收的是\"已经打包好\"的源,而这里的源是 64个独立专家的 nn.ModuleList\n所以需要这一套",
+      "disposition": "inline thread mapped to T33"
+    },
+    {
+      "id": 5794834089,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5794834089",
+      "created_at": "2026-11-06T02:09:49Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4488362832,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4488362832",
+      "created_at": "2026-11-06T02:22:53Z",
+      "body": "放开头",
+      "disposition": "inline thread mapped to T34"
+    },
+    {
+      "id": 4488367376,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4488367376",
+      "created_at": "2026-11-06T02:23:46Z",
+      "body": "特别是要合并training和module_replacement之后",
+      "disposition": "inline thread mapped to T32"
+    },
+    {
+      "id": 4488389399,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4488389399",
+      "created_at": "2026-11-06T02:27:38Z",
+      "body": "<!-- Failed to upload \"image.png\" -->\n\n源代码写法 我们重写了这两个module",
+      "disposition": "inline thread mapped to T24"
+    },
+    {
+      "id": 5794927037,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5794927037",
+      "created_at": "2026-11-06T02:29:18Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4489698765,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4489698765",
+      "created_at": "2026-11-06T06:31:55Z",
+      "body": "还需要molude replacement吗\n似乎训练就应该直接确定使用/or not",
+      "disposition": "inline thread mapped to T35"
+    },
+    {
+      "id": 4489822122,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4489822122",
+      "created_at": "2026-11-06T06:52:55Z",
+      "body": "如果不看护非grouped loop分支，在modeling_xing4_0.py中的MoE部分请直接按照grouped-GEMM实现",
+      "disposition": "inline thread mapped to T25"
+    },
+    {
+      "id": 5796755653,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5796755653",
+      "created_at": "2026-11-06T06:52:56Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4489956136,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4489956136",
+      "created_at": "2026-11-06T07:14:01Z",
+      "body": "这个写法有点奇怪？",
+      "disposition": "inline thread mapped to T36"
+    },
+    {
+      "id": 4490093737,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490093737",
+      "created_at": "2026-11-06T07:35:07Z",
+      "body": "祥宇&佳琪后续考虑正式方案",
+      "disposition": "inline thread mapped to T37"
+    },
+    {
+      "id": 4490182677,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490182677",
+      "created_at": "2026-11-06T07:48:15Z",
+      "body": "尝试给这个回退，model inint dtype 用 fp 32。优化器有个配置 main_param == fp32；model inint dtype直接删掉",
+      "disposition": "inline thread mapped to T38"
+    },
+    {
+      "id": 4490231387,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490231387",
+      "created_at": "2026-11-06T07:55:10Z",
+      "body": "直接干掉",
+      "disposition": "inline thread mapped to T39"
+    },
+    {
+      "id": 4490271564,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490271564",
+      "created_at": "2026-11-06T08:00:58Z",
+      "body": "开了TP 和 EP的场景下会漏掉TP域的同步，即获取的不是完整序列",
+      "disposition": "inline thread mapped to T40"
+    },
+    {
+      "id": 5797333438,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5797333438",
+      "created_at": "2026-11-06T08:01:05Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4490278065,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490278065",
+      "created_at": "2026-11-06T08:01:59Z",
+      "body": "@townwish4git 下来确认下",
+      "disposition": "inline thread mapped to T19"
+    },
+    {
+      "id": 5796599282,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5796599282",
+      "created_at": "2026-11-06T08:03:06Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4490286623,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490286623",
+      "created_at": "2026-11-06T08:03:12Z",
+      "body": "既然是特定模型，直接这个文件不要。改在modeling中",
+      "disposition": "inline thread mapped to T41"
+    },
+    {
+      "id": 4490363221,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490363221",
+      "created_at": "2026-11-06T08:14:07Z",
+      "body": "拿到完整序列计算",
+      "disposition": "inline thread mapped to T40"
+    },
+    {
+      "id": 4490410837,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490410837",
+      "created_at": "2026-11-06T08:20:55Z",
+      "body": "这个不应该走模块替换",
+      "disposition": "inline thread mapped to T42"
+    },
+    {
+      "id": 4490415486,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490415486",
+      "created_at": "2026-11-06T08:21:34Z",
+      "body": "这个尝试不走模块替换 但是如果因为和hf权重行为不一致 走不通，再看看是不是这样",
+      "disposition": "inline thread mapped to T43"
+    },
+    {
+      "id": 5797102591,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5797102591",
+      "created_at": "2026-11-06T08:39:45Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    },
+    {
+      "id": 4490623406,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#discussion_r4490623406",
+      "created_at": "2026-11-06T08:49:49Z",
+      "body": "aux-loss使用的通信与不应该放在这里，删除",
+      "disposition": "inline thread mapped to T44"
+    },
+    {
+      "id": 5797786142,
+      "url": "https://github.com/mindspore-ai/hyper-parallel/pull/1439#pullrequestreview-5797786142",
+      "created_at": "2026-11-06T08:50:30Z",
+      "body": "",
+      "disposition": "review event metadata; empty body; preserve remote state"
+    }
+  ],
+  "public_followups": [
+    {
+      "pr": 363,
+      "url": "https://github.com/hf1s/hyper-parallel/pull/363",
+      "number": 363,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "head": "3475d4944d18f823d301c893330077a87252a9eb",
+      "base": "eb1121470917789ce641e3f12b4b6bad65b6ba54",
+      "changed_files": 1,
+      "commits": 1,
+      "issue": "https://github.com/mindspore-ai/hyper-parallel/issues/1456",
+      "scope": "Two-line rejection of unsupported nonempty SwiGLU policies; null-policy fixture unchanged; not full activation support; absent from accepted single source."
+    },
+    {
+      "pr": 364,
+      "url": "https://github.com/hf1s/hyper-parallel/pull/364",
+      "number": 364,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "head": "3b76915e6c87f4d1eb7d3383b3558b0439146a90",
+      "base": "eb1121470917789ce641e3f12b4b6bad65b6ba54",
+      "changed_files": 7,
+      "commits": 1,
+      "issue": "https://github.com/hf1s/hyper-parallel/issues/338",
+      "review_threads": [
+        "T40",
+        "T44"
+      ],
+      "scope": "Resolved token-partition statistics and CP adapter ownership; 12-pair real NPU router/boundary probe; not full MoE/FSDP/training validation; independent of355/1441; absent from accepted single source."
+    }
+  ]
+}
