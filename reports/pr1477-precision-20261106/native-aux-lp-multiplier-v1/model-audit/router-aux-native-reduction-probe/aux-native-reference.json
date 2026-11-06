@@ -1,0 +1,77 @@
+{
+  "status": "CPU_independent_FP64_fixture_not_device_acceptance",
+  "assets_sha256": "a035d1bbb9afe561dc4a62f93586ae20653aa9a2f12d05d8760d7d4758e35d54",
+  "assets_bytes": 61768528,
+  "source_manifest_sha256": "4967881062f63d8144bd8c4214b60c16f9ca7495b7f241a6701d04a630e08d34",
+  "old_fixture_helper_sha256": "29fc81bfaca7d77483d308589b0a882f24ad582390455fd04e4d7a5eb8da2c0c",
+  "input_sha256": "bdb03dae74136c1895d198c3ed7f94657d71790ababc17cd5c24510e4ff6350a",
+  "weight_sha256": "d35c5a37e7a349e38f9f360eace5ac0fbbefd7cf9324eefce861c957ef6b9b91",
+  "bias_sha256": "18be19baa66c028a30fe9eca462cdb454e599fd6eeb6dcc4123611798dd9d587",
+  "provenance": {
+    "kind": "deterministic_synthetic_activations",
+    "seed": 147720261106,
+    "not_MF_training_samples": true
+  },
+  "materialized_by_torch": "2.12.0+cpu",
+  "old_12case_fixture_recipe_reused_not_old_materialized_bytes": true,
+  "not_MF_training_samples": true,
+  "dimensions": {
+    "experts": 64,
+    "hidden": 3584,
+    "top_k": 4,
+    "sequence": 4096,
+    "DP": 1,
+    "CP": 2,
+    "TP": 2,
+    "GA": 4,
+    "safe_padding": 64
+  },
+  "micro_sample_indices": [
+    0,
+    1,
+    0,
+    1
+  ],
+  "foundation_counts_global": [
+    833,
+    422,
+    722,
+    1678
+  ],
+  "step_foundation_denominator": 3655,
+  "foundation_counts_CP": [
+    [
+      93,
+      740
+    ],
+    [
+      111,
+      311
+    ],
+    [
+      222,
+      500
+    ],
+    [
+      444,
+      1234
+    ]
+  ],
+  "mask_scope": "Stored actual nonprefix masks with deliberately unequal CP counts; no valid_count-to-prefix inference",
+  "raw_aux_fp64_by_fixture_sample": [
+    1.0105424561616991,
+    1.247360567111671
+  ],
+  "aux_coefficient": 0.0005,
+  "independent_weighted_objective": 0.0005733037907340564,
+  "reference_gradient_dtype": "torch.float64",
+  "reference_gradient_l2": 6.767933266957011e-06,
+  "reference_gradient_sha256": "c8303f90a3723134953f1249255770b023ace929b3332526cc440ed37497f501",
+  "reference_equation": "coeff * sum_micro(n_global_micro / N_step * E*sum_e(f_e*mean_token(P_e)))",
+  "hypotheses": {
+    "LP_false": "1x target if native source SUM+DP*CP*TP division matches the declared replica objective",
+    "LP_true": "Compare both 1x and 2x; hypothesis2x concerns independent AUX injection, not main LP CE"
+  },
+  "predeclared_reference_relative_l2_tolerance": 0.0005,
+  "scope": "No HP balance helper; direct FP64 sigmoid, unbiased topk, per-sequence counts/probabilities and autograd. Router counts all real tokens; foundation masks only set Trainer weights."
+}

@@ -1,0 +1,435 @@
+diff --git a/hyper_parallel/components/functional/router_balance_loss.py b/hyper_parallel/components/functional/router_balance_loss.py
+new file mode 100644
+index 00000000..b09bc457
+--- /dev/null
++++ b/hyper_parallel/components/functional/router_balance_loss.py
+@@ -0,0 +1,87 @@
++# Copyright 2026 Huawei Technologies Co., Ltd
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++# http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++# ============================================================================
++"""Sequence-wise router balancing across token-partition process groups."""
++
++import math
++from typing import Any
++
++import torch
++import torch.distributed as dist
++
++from hyper_parallel.core.utils.communication import differentiable_all_reduce
++
++
++def sequence_load_balancing_loss(
++        scores: torch.Tensor,
++        selected_experts: torch.Tensor,
++        sequence_ids: torch.Tensor,
++        num_sequences: int,
++        token_mask: torch.Tensor | None = None,
++        sequence_partition_groups: tuple[Any, ...] = (),
++        *,
++        score_epsilon: float = 0.0,
++) -> torch.Tensor:
++    """Average ``E * sum_i(fraction_i * mean_probability_i)`` over sequences.
++
++    Args:
++        scores: Nonnegative, unbiased scores for all experts, shaped ``[T, E]``.
++        selected_experts: Top-K experts selected from unbiased scores, shaped ``[T, K]``.
++        sequence_ids: Logical sample index of each token, shaped ``[T]``.
++        num_sequences: Global number of samples shared by the token-partition ranks.
++        token_mask: Optional boolean ``[T]`` mask; true tokens contribute.
++        sequence_partition_groups: Independent axes partitioning the same
++            sequences' tokens. Never include a data-parallel/expert-dispatch
++            group. Probability sums use a differentiable SUM all-reduce;
++            callers must account for replicated losses in gradient reduction.
++        score_epsilon: Additive affinity-normalization epsilon.
++
++    Returns:
++        Unweighted mean over nonempty sequences. Empty or fully masked inputs
++        return a differentiable zero, including when a local shard is empty.
++    """
++    if scores.ndim != 2 or selected_experts.ndim != 2 or scores.shape[0] != selected_experts.shape[0]:
++        raise ValueError("scores and selected_experts must have shapes [T, E] and [T, K]")
++    if not math.isfinite(score_epsilon) or score_epsilon < 0:
++        raise ValueError("score_epsilon must be finite and nonnegative")
++    num_tokens, num_experts = scores.shape
++    if num_sequences <= 0 or sequence_ids.shape != (num_tokens,) or sequence_ids.dtype != torch.long:
++        raise ValueError("sequence_ids must be int64 [T] and num_sequences must be positive")
++    top_k = selected_experts.shape[1]
++    if not 0 < top_k <= num_experts:
++        raise ValueError("top_k must be positive and no greater than num_experts")
++    if token_mask is not None and (token_mask.shape != (num_tokens,) or token_mask.dtype != torch.bool):
++        raise ValueError("token_mask must be a boolean tensor with shape [T]")
++    scores = scores.float()
++    denominator = scores.sum(dim=-1, keepdim=True)
++    if score_epsilon:
++        denominator = denominator + score_epsilon
++    probabilities = scores / denominator.clamp_min(torch.finfo(torch.float32).tiny)
++    valid = torch.ones(num_tokens, device=scores.device, dtype=torch.float32)
++    if token_mask is not None:
++        valid = token_mask.to(dtype=torch.float32)
++    indices = sequence_ids.unsqueeze(-1) * num_experts + selected_experts
++    counts = scores.new_zeros(num_sequences * num_experts).scatter_add(
++        0, indices.reshape(-1), valid.unsqueeze(-1).expand(-1, top_k).reshape(-1),
++    ).view(num_sequences, num_experts)
++    probability_sum = scores.new_zeros(num_sequences, num_experts).index_add(
++        0, sequence_ids, probabilities * valid.unsqueeze(-1),
++    )
++    for group in sequence_partition_groups:
++        dist.all_reduce(counts, group=group)
++        probability_sum = differentiable_all_reduce(probability_sum, "sum", group)
++    assignments = counts.sum(dim=-1, keepdim=True)
++    token_count = (assignments / top_k).clamp_min(1.0)
++    losses = num_experts * ((counts / assignments.clamp_min(1.0)) * (probability_sum / token_count)).sum(-1)
++    return losses.sum() / (assignments > 0).sum().clamp_min(1)
+diff --git a/hyper_parallel/distributed/_builder/rule_resolver.py b/hyper_parallel/distributed/_builder/rule_resolver.py
+index 6c46e1eb..16c06060 100644
+--- a/hyper_parallel/distributed/_builder/rule_resolver.py
++++ b/hyper_parallel/distributed/_builder/rule_resolver.py
+@@ -25,6 +25,7 @@ import fnmatch
+ import functools
+ import inspect
+ import logging
++from types import MappingProxyType
+ from typing import Any, Dict, List, Optional, Tuple
+ 
+ from hyper_parallel.core.dtensor.placement_types import Placement
+@@ -617,8 +618,16 @@ def _require_region_dispatch(spec, *, source):
+             "remove it")
+ 
+ 
++def _resolved_input_placements(spec):
++    """Snapshot the enclosing boundary's resolved input destinations."""
++    return MappingProxyType({
++        name: MappingProxyType(copy.deepcopy(named))
++        for name, named in spec.in_dst.items()
++    })
++
++
+ def _build_local_compute_factory(factory, module, mesh, mesh_dim_names,
+-                                 expert_mesh, *, configured=None, source):
++                                 expert_mesh, *, configured=None, source, input_placements=None):
+     """Build a ``@local_compute`` factory into the region compute_fn (apply-time).
+ 
+     The factory is invoked ONCE with the framework context filled BY NAME per
+@@ -632,6 +641,8 @@ def _build_local_compute_factory(factory, module, mesh, mesh_dim_names,
+     The returned compute fn is validated against the module's forward
+     signature (validate_local_compute_signature: params must match the
+     original forward) and bound to *module* by the caller.
++    Optional ``input_placements`` is a read-only snapshot of the enclosing
++    boundary's resolved input destinations, keyed by input and mesh-axis names.
+     """
+     # Lazy imports: applier and forward_rewriter both import rule_resolver
+     # at module level — importing them here at module level would cycle.
+@@ -649,6 +660,7 @@ def _build_local_compute_factory(factory, module, mesh, mesh_dim_names,
+         "tp_mesh": _get_tp_submesh(mesh, mesh_dim_names),
+         "cp_mesh": _get_cp_submesh(mesh, mesh_dim_names),
+         "ep_mesh": expert_mesh,
++        "input_placements": input_placements,
+     }
+     build_kwargs = fill_context_kwargs(
+         meta, context, configured or {}, source=source)
+@@ -717,7 +729,8 @@ def _resolve_local_compute_fn(module, spec, mesh, mesh_dim_names,
+             configured = None
+         compute_fn = _build_local_compute_factory(
+             factory, module, mesh, mesh_dim_names, expert_mesh,
+-            configured=configured, source=source)
++            configured=configured, source=source,
++            input_placements=_resolved_input_placements(spec))
+         return functools.partial(compute_fn, module)
+     if spec.region_dispatch is False and spec.inner_wrapper is None:
+         return module.forward
+@@ -841,6 +854,7 @@ def _resolve_inner_wrapper(module, spec, cp_mesh, mesh, tp_mesh=None,
+         "tp_mesh": tp_mesh,
+         "cp_mesh": cp_mesh,
+         "ep_mesh": ep_mesh,
++        "input_placements": _resolved_input_placements(spec),
+     }
+     if _is_delayed_target(custom):
+         return _resolve_delayed_inner_wrapper(
+diff --git a/hyper_parallel/distributed/recipe_spec.py b/hyper_parallel/distributed/recipe_spec.py
+index 817a61bd..0f43ca2a 100644
+--- a/hyper_parallel/distributed/recipe_spec.py
++++ b/hyper_parallel/distributed/recipe_spec.py
+@@ -515,8 +515,8 @@ INNER_WRAPPER = "inner_wrapper"        # inner-forward wrapper
+ # Reserved framework-context names per kind (declaring one means the
+ # framework fills it by name; configuring a key with the same name errors)
+ _MESH_FAMILY = frozenset({"mesh", "tp_mesh", "cp_mesh", "ep_mesh"})
+-FACTORY_CONTEXT = frozenset({"module"}) | _MESH_FAMILY
+-WRAPPER_CONTEXT = frozenset({"target_module"}) | _MESH_FAMILY
++FACTORY_CONTEXT = frozenset({"module", "input_placements"}) | _MESH_FAMILY
++WRAPPER_CONTEXT = frozenset({"target_module", "input_placements"}) | _MESH_FAMILY
+ 
+ # Required context per kind (the decorators enforce full declaration --
+ # the mesh family is always passed by the framework and the user merely
+diff --git a/hyper_parallel/models/deepseek_v41/aux_loss.py b/hyper_parallel/models/deepseek_v41/aux_loss.py
+index e46b93bf..ff6a9c8d 100644
+--- a/hyper_parallel/models/deepseek_v41/aux_loss.py
++++ b/hyper_parallel/models/deepseek_v41/aux_loss.py
+@@ -19,66 +19,9 @@ from __future__ import annotations
+ from typing import Any
+ 
+ import torch  # pylint: disable=forbidden-backend-import
+-import torch.distributed as dist  # pylint: disable=forbidden-backend-import
+ 
+ from hyper_parallel.core.dtensor.dtensor import DTensor, SkipDTensorDispatch, distribute_tensor
+-from hyper_parallel.core.utils.communication import differentiable_all_reduce
+-
+-
+-def sequence_load_balancing_loss(
+-        scores: torch.Tensor,
+-        selected_experts: torch.Tensor,
+-        sequence_ids: torch.Tensor,
+-        num_sequences: int,
+-        token_mask: torch.Tensor | None = None,
+-        sequence_partition_groups: tuple[Any, ...] = (),
+-) -> torch.Tensor:
+-    """Average ``E * sum_i(fraction_i * mean_probability_i)`` over sequences.
+-
+-    Args:
+-        scores: Nonnegative, unbiased scores for all experts, shaped ``[T, E]``.
+-        selected_experts: Top-K experts selected from unbiased scores, shaped ``[T, K]``.
+-        sequence_ids: Logical sample index of each token, shaped ``[T]``.
+-        num_sequences: Global number of samples shared by the token-partition ranks.
+-        token_mask: Optional boolean ``[T]`` mask; true tokens contribute.
+-        sequence_partition_groups: Independent axes partitioning the same
+-            sequences' tokens. Never include a data-parallel/expert-dispatch
+-            group. Probability sums use a differentiable SUM all-reduce;
+-            callers must account for replicated losses in gradient reduction.
+-
+-    Returns:
+-        Unweighted mean over nonempty sequences. Empty or fully masked inputs
+-        return a differentiable zero, including when a local shard is empty.
+-    """
+-    if scores.ndim != 2 or selected_experts.ndim != 2 or scores.shape[0] != selected_experts.shape[0]:
+-        raise ValueError("scores and selected_experts must have shapes [T, E] and [T, K]")
+-    num_tokens, num_experts = scores.shape
+-    if num_sequences <= 0 or sequence_ids.shape != (num_tokens,) or sequence_ids.dtype != torch.long:
+-        raise ValueError("sequence_ids must be int64 [T] and num_sequences must be positive")
+-    top_k = selected_experts.shape[1]
+-    if not 0 < top_k <= num_experts:
+-        raise ValueError("top_k must be positive and no greater than num_experts")
+-    if token_mask is not None and (token_mask.shape != (num_tokens,) or token_mask.dtype != torch.bool):
+-        raise ValueError("token_mask must be a boolean tensor with shape [T]")
+-    scores = scores.float()
+-    probabilities = scores / scores.sum(dim=-1, keepdim=True).clamp_min(torch.finfo(torch.float32).tiny)
+-    valid = torch.ones(num_tokens, device=scores.device, dtype=torch.float32)
+-    if token_mask is not None:
+-        valid = token_mask.to(dtype=torch.float32)
+-    indices = sequence_ids.unsqueeze(-1) * num_experts + selected_experts
+-    counts = scores.new_zeros(num_sequences * num_experts).scatter_add(
+-        0, indices.reshape(-1), valid.unsqueeze(-1).expand(-1, top_k).reshape(-1),
+-    ).view(num_sequences, num_experts)
+-    probability_sum = scores.new_zeros(num_sequences, num_experts).index_add(
+-        0, sequence_ids, probabilities * valid.unsqueeze(-1),
+-    )
+-    for group in sequence_partition_groups:
+-        dist.all_reduce(counts, group=group)
+-        probability_sum = differentiable_all_reduce(probability_sum, "sum", group)
+-    assignments = counts.sum(dim=-1, keepdim=True)
+-    token_count = (assignments / top_k).clamp_min(1.0)
+-    losses = num_experts * ((counts / assignments.clamp_min(1.0)) * (probability_sum / token_count)).sum(-1)
+-    return losses.sum() / (assignments > 0).sum().clamp_min(1)
++from hyper_parallel.components.functional.router_balance_loss import sequence_load_balancing_loss
+ 
+ 
+ class _AccumulateRouterLoad(torch.autograd.Function):
+diff --git a/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py b/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py
+index 3cecd898..4a37c6fa 100644
+--- a/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py
++++ b/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py
+@@ -32,7 +32,7 @@ from hyper_parallel.distributed.context_parallel.mla_context_parallel import MLA
+ from hyper_parallel.distributed.recipe_spec import inner_wrapper
+ from hyper_parallel.models.deepseek_v3.adapter.distributed.context_parallel import mla_cp_wrapper
+ from hyper_parallel.models.replacement import method_replacement
+-from hyper_parallel.models.xing_4.modeling_xing4_0 import Xing4MoE, fusion_attention_with_logit_maxima
++from hyper_parallel.models.xing_4.modeling_xing4_0 import fusion_attention_with_logit_maxima
+ 
+ 
+ def _rotary(tensor: torch.Tensor, positions: tuple[torch.Tensor, torch.Tensor] | None,
+@@ -87,15 +87,6 @@ def xing4_mla_cp_wrapper(target_module: nn.Module, mesh: Any, tp_mesh: Any,
+     return requests
+ 
+ 
+-@inner_wrapper
+-def xing4_moe_cp_wrapper(target_module: Xing4MoE, mesh: Any, tp_mesh: Any,
+-                         cp_mesh: Any, ep_mesh: Any) -> list:
+-    """Bind sequence-wise router statistics without replacing the MoE computation."""
+-    del mesh, tp_mesh, ep_mesh
+-    target_module.gate.aux_loss_cp_group = cp_mesh.get_group()
+-    return []
+-
+-
+ def _cp_mesh(context: Mapping[str, Any]) -> Any:
+     """Resolve the same mesh used by TextParallelBatch's contiguous CP sharder."""
+     mesh = context["mesh_context"].cp_mesh
+diff --git a/hyper_parallel/models/xing_4/modeling_xing4_0.py b/hyper_parallel/models/xing_4/modeling_xing4_0.py
+index 91653070..11ad315a 100644
+--- a/hyper_parallel/models/xing_4/modeling_xing4_0.py
++++ b/hyper_parallel/models/xing_4/modeling_xing4_0.py
+@@ -41,7 +41,6 @@ from functools import partial
+ from typing import Any
+ 
+ import torch
+-import torch.distributed as dist
+ import torch.nn.functional as F
+ import torch_npu
+ from torch import nn
+@@ -56,6 +55,7 @@ from hyper_parallel.components.functional.mhc_pre import mhc_pre
+ from hyper_parallel.components.functional.npu_fusion_attention import (
+     _prepare_fusion_attention_context, PACKED_SEQUENCE_ARGUMENTS,
+ )
++from hyper_parallel.components.functional.router_balance_loss import sequence_load_balancing_loss
+ from hyper_parallel.components.functional.rotary_embedding import (
+     apply_rotary_pos_emb_interleave as fused_rotary,
+ )
+@@ -65,12 +65,12 @@ from hyper_parallel.components.modules.mla_attention import MLAAttention
+ from hyper_parallel.components.modules.mtp import MTPLayer, build_mtp
+ from hyper_parallel.components.modules.rms_norm import RMSNorm
+ from hyper_parallel.core.activation_memory.recompute_state import is_recomputing
++from hyper_parallel.core.dtensor.placement_types import Shard
+ from hyper_parallel.core.multicore.modules._precision import preserve_fp32_parameters
+-from hyper_parallel.core.utils.communication import differentiable_all_reduce
+ from hyper_parallel.data.constants import IGNORE_INDEX
+ from hyper_parallel.distributed.expert_parallel.experts import SHARED_MERGE_MODES
+ from hyper_parallel.distributed.expert_parallel.recipes import build_ep_compute
+-from hyper_parallel.distributed.recipe_spec import local_compute
++from hyper_parallel.distributed.recipe_spec import inner_wrapper, local_compute
+ from hyper_parallel.models import HyperAutoModelForCausalLM
+ from hyper_parallel.models.materialization import register_rebuildable_buffer
+ from hyper_parallel.models.xing_4.transformer.configuration_xing4_0 import Xing4_0Config
+@@ -85,6 +85,7 @@ __all__ = [
+     "build_model",
+     "create_config",
+     "xing4_ep_compute_fn",
++    "xing4_router_statistics",
+ ]
+ 
+ # MindFormers recipe options this model does not implement. Nothing here reads
+@@ -187,7 +188,7 @@ class Xing4Router(Xing4_0TopkRouter):
+         self.e_score_correction_bias = source.e_score_correction_bias
+         self.padding = config.n_routed_experts if config.use_pad_tokens else 0
+         self.aux_loss_coeff = config.moe_aux_loss_coeff
+-        self.aux_loss_cp_group = None
++        self.aux_loss_groups = ()
+         self.register_buffer("_token_counts", torch.zeros(self.num_experts, dtype=torch.int64))
+         self.input_jitter_eps = config.moe_input_jitter_eps
+         self.last_aux_loss = None
+@@ -276,25 +277,21 @@ class Xing4Router(Xing4_0TopkRouter):
+         # Hash routing, the load bias and group limiting all leave the auxiliary
+         # statistics on the raw affinities; only forced balance replaces them.
+         selected = (indices if self.force_expert_balance
+-                    else scores.topk(self.top_k, dim=-1, sorted=False).indices).reshape(batch_size, -1)
+-        counts = scores.new_zeros(batch_size, self.num_experts).scatter_add_(
+-            1, selected, torch.ones_like(selected, dtype=scores.dtype))
+-        if self.aux_loss_cp_group is None:
++                    else scores.topk(self.top_k, dim=-1, sorted=False).indices)
++        if self.aux_loss_groups:
++            sequence_ids = torch.arange(batch_size, device=scores.device).repeat_interleave(
++                scores.shape[0] // batch_size)
++            loss = sequence_load_balancing_loss(
++                scores, selected, sequence_ids, batch_size,
++                sequence_partition_groups=self.aux_loss_groups, score_epsilon=1e-20)
++        else:
++            selected = selected.reshape(batch_size, -1)
++            counts = scores.new_zeros(batch_size, self.num_experts).scatter_add_(
++                1, selected, torch.ones_like(selected, dtype=scores.dtype))
+             load = counts / selected.shape[1]
+             affinity = (scores / (scores.sum(dim=-1, keepdim=True) + 1e-20)).reshape(
+                 batch_size, -1, self.num_experts).mean(dim=1)
+-        else:
+-            normalized = (scores / (scores.sum(dim=-1, keepdim=True) + 1e-20)).reshape(
+-                batch_size, -1, self.num_experts)
+-            group = self.aux_loss_cp_group
+-            with torch.no_grad():
+-                counts = counts.detach()
+-                dist.all_reduce(counts, group=group)
+-                tokens = counts.new_tensor(normalized.shape[1])
+-                dist.all_reduce(tokens, group=group)
+-            load = counts / (tokens * self.top_k)
+-            affinity = differentiable_all_reduce(normalized.sum(dim=1), "sum", group) / tokens
+-        loss = (affinity * load).sum(dim=-1).mean() * self.num_experts
++            loss = (affinity * load).sum(dim=-1).mean() * self.num_experts
+         self.last_aux_loss = loss.detach()
+         return aux_loss_auto_scale(weights, loss * self.aux_loss_coeff)
+ 
+@@ -616,9 +613,31 @@ class Xing4ForCausalLM(Xing4_0ForCausalLM):
+         return self.model.mean_loss(loss_sum, count)
+ 
+ 
++def _bind_router_statistics(module: Xing4MoE, input_placements: Mapping[str, Any],
++                            tp_mesh: Any, cp_mesh: Any) -> None:
++    """Pool only axes that still partition this sequence at the router boundary."""
++    hidden_layout, = input_placements.values()
++    module.gate.aux_loss_groups = tuple(
++        axis.get_group() for name, axis in (("cp", cp_mesh), ("tp", tp_mesh))
++        if axis is not None and axis.size() > 1
++        and isinstance(hidden_layout.get(name), Shard) and hidden_layout[name].dim % 3 == 1
++    )
++    if any(group is None for group in module.gate.aux_loss_groups):
++        raise ValueError("Router statistics require explicit sequence-partition process groups")
++
++
++@inner_wrapper
++def xing4_router_statistics(target_module: Xing4MoE, mesh: Any, tp_mesh: Any,
++                            cp_mesh: Any, ep_mesh: Any, input_placements: Mapping[str, Any]) -> list:
++    """Bind sequence statistics independently of attention or expert dispatch."""
++    del mesh, ep_mesh
++    _bind_router_statistics(target_module, input_placements, tp_mesh, cp_mesh)
++    return []
++
++
+ @local_compute
+ def xing4_ep_compute_fn(*, module: Any, mesh: Any, tp_mesh: Any, cp_mesh: Any,
+-                        ep_mesh: Any, fix_router: bool = False) -> Callable:
++                        ep_mesh: Any, input_placements: Mapping[str, Any], fix_router: bool = False) -> Callable:
+     """Dispatch routed experts while retaining local shared experts and router state.
+ 
+     ``fix_router`` balances dispatch indices for benchmarks; safe-token padding
+@@ -630,12 +649,14 @@ def xing4_ep_compute_fn(*, module: Any, mesh: Any, tp_mesh: Any, cp_mesh: Any,
+         tp_mesh: Tensor parallel mesh, or None.
+         cp_mesh: Context parallel mesh, or None.
+         ep_mesh: Expert parallel mesh owning the routed experts.
++        input_placements: Resolved input destinations of this boundary.
+         fix_router: Benchmark-only balanced destinations.
+ 
+     Returns:
+         The MoE forward that the rewriter binds to the module.
+     """
+-    del mesh, tp_mesh, cp_mesh
++    del mesh
++    _bind_router_statistics(module, input_placements, tp_mesh, cp_mesh)
+     module.ep_executor = build_ep_compute(
+         module, ep_mesh, router_fn=type(module).route, archetype_key="xing4",
+         expected_attrs=["gate", "experts", "shared_experts"], combine=SHARED_MERGE_MODES["none"],
+diff --git a/tests/ut/auto_models/models/deepseek_v41/test_deepseek_v41_aux_loss.py b/tests/ut/auto_models/models/deepseek_v41/test_deepseek_v41_aux_loss.py
+index bd4c619a..e7a6853b 100644
+--- a/tests/ut/auto_models/models/deepseek_v41/test_deepseek_v41_aux_loss.py
++++ b/tests/ut/auto_models/models/deepseek_v41/test_deepseek_v41_aux_loss.py
+@@ -109,7 +109,7 @@ class TestSequenceLoadBalancingLoss(unittest.TestCase):
+             indices = torch.zeros(tokens, 2, dtype=torch.long)
+             ids = torch.zeros(tokens, dtype=torch.long)
+             group = object()
+-            module = "hyper_parallel.models.deepseek_v41.aux_loss"
++            module = "hyper_parallel.components.functional.router_balance_loss"
+             with patch(f"{module}.dist.all_reduce") as reduce_counts, patch(
+                     f"{module}.differentiable_all_reduce", side_effect=lambda tensor, *args: tensor,
+             ) as reduce_probs:
+@@ -144,7 +144,7 @@ class TestSequenceLoadBalancingLoss(unittest.TestCase):
+             remote_sum = torch.zeros(2, 3).index_add(
+                 0, remote_ids, functional.normalize(values[remote_slice], p=1, dim=-1),
+             )
+-            module = "hyper_parallel.models.deepseek_v41.aux_loss"
++            module = "hyper_parallel.components.functional.router_balance_loss"
+             with (
+                 patch(f"{module}.dist.all_reduce",
+                       side_effect=lambda tensor, counts=remote_counts, **kwargs: tensor.add_(counts)),

@@ -1,0 +1,17 @@
+{
+  "source_name": "router_boundary_compare_worker.py",
+  "source_sha256": "46539704da9d486c197d741d1d64a566eacf230036750a226612a605b4875f47",
+  "scope": "Historical12case explicitly averaged TP gradients; not current native LP proof.",
+  "excerpts": [
+    {
+      "start_line": 204,
+      "end_line": 217,
+      "text": "              (() if router.aux_loss_cp_group is None else (router.aux_loss_cp_group,)))\n    gradient = router.weight.grad.detach().clone()\n    mean_gradient = gradient.clone()\n    dist.all_reduce(mean_gradient,group=tp_group)\n    mean_gradient.div_(TP_SIZE)\n    counts = router._token_counts.detach().clone()\n    combined_counts = counts.clone()\n    dist.all_reduce(combined_counts,group=tp_group)\n    if not need_tp:\n        combined_counts.div_(TP_SIZE,rounding_mode=\"floor\")\n    local_aux_ref,local_grad_ref,local_counts_ref = independent_reference(router_input,weight,bias,cfg,args.external_scale)\n    from safetensors.torch import save_file\n    gradient_path = out/(name+\"-gradients.safetensors\")\n    save_file({\"actual_local\":gradient.cpu(),\"actual_tp_mean\":mean_gradient.cpu(),"
+    },
+    {
+      "start_line": 255,
+      "end_line": 262,
+      "text": "    parser.add_argument(\"--execute\",action=\"store_true\")\n    parser.add_argument(\"--device\",choices=(\"cpu\",\"npu\"),default=\"cpu\")\n    parser.add_argument(\"--dp-size\",type=int,default=2)\n    parser.add_argument(\"--external-scale\",type=float,default=.5)\n    parser.add_argument(\"--assets\",type=Path)\n    args = parser.parse_args()\n    if not args.execute and args.device!=\"cpu\":\n        parser.error(\"Metadata mode is CPU only\")"
+    }
+  ]
+}

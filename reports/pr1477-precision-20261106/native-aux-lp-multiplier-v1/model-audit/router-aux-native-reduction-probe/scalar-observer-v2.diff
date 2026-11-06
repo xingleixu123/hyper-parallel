@@ -1,0 +1,14 @@
+--- native_aux_lp_worker.py
++++ native_aux_lp_worker_v2.py
+@@ -237,9 +237,10 @@
+             zero_sum = output.float().sum() * 0.
+             foundation = mean_cp(zero_sum, count)
+             aux.bind_aux_loss_scale(foundation)
++            state_object = aux._AUX_LOSS_STATE.get()
+             def scalar_hook(gradient):
+                 observed['bound_foundation_multiplier'] = float(gradient.detach())
+-                observed['actual_aux_context_scale'] = float(aux._AUX_LOSS_STATE.get().scale)
++                observed['actual_aux_context_scale'] = float(state_object.scale)
+             def sum_hook(gradient):
+                 observed['native_CP_loss_sum_multiplier'] = float(gradient.detach())
+             handles = [foundation.register_hook(scalar_hook), zero_sum.register_hook(sum_hook)]

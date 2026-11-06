@@ -1,0 +1,20 @@
+--- native_aux_lp_worker_v2.py
++++ native_aux_lp_worker_candidate.py
+@@ -24,7 +24,7 @@
+ from safetensors.torch import load_file, save_file
+ 
+ SOURCE = Path('/work/source')
+-SOURCE_SHA = '4967881062f63d8144bd8c4214b60c16f9ca7495b7f241a6701d04a630e08d34'
++SOURCE_SHA = '3292a5b93c7b62d4f97c3edf42572aeaca91a475057bb3540ca6bcf1b9eae245'
+ ASSET_SHA = 'a035d1bbb9afe561dc4a62f93586ae20653aa9a2f12d05d8760d7d4758e35d54'
+ REFERENCE_SHA = 'ccda55fcad2ca45a64b5f07af98dfc5e8f232ff4ff25f2af945d25c52e14056f'
+ RANK = int(os.environ['RANK'])
+@@ -232,7 +232,7 @@
+         require(int(count) == reference['foundation_counts_CP'][micro][meshes.cp_rank], 'actual CP mask/count differs')
+         configure_fsdp_gradient_sync([net], fsdp, meshes.dp_replicate_size, micro, 4)
+         observed = {}
+-        with aux.aux_loss_scale_context():
++        with aux.aux_loss_scale_context(loss_parallel=meshes.loss_parallel, tp_size=meshes.tp_size):
+             output = net(hidden)
+             zero_sum = output.float().sum() * 0.
+             foundation = mean_cp(zero_sum, count)
