@@ -1,0 +1,66 @@
+{
+  "status": "closed_full1000_statistics_and_progress_independently_verified",
+  "model_optimizer_cpu_readback": "verified; see single-acceptance.json",
+  "source_manifest": "49bffc6761d24e79ab59af1758b028145ba2bcc3c09030fec7b840cc9e005f85",
+  "inputs_compared": 8000,
+  "min_valid_labels_per_microbatch": 12,
+  "steps": 1000,
+  "range": [
+    1501,
+    2500
+  ],
+  "all_optimizer_step_progress_and_uncompressed_lr_schedule_match": true,
+  "same_normalized_actual_inputs": true,
+  "metric_contract": {
+    "aux": "raw sequence aux, mean over exactly two routers, then mean over GA2 microsteps",
+    "aux_coefficient_per_router": 0.0005,
+    "mtp_factor": 0.1,
+    "outer_objective": "legacy microbatch-equal; world1 only"
+  },
+  "mf_ledger_sha256": "74a58b792d59c6a934c6030c12675c6f0dd79b746ecf6c0157817ce37a055c44",
+  "hp_ledger_sha256": "14ed00f2b024d4c9f8def02e75fecbc5d45049ec1e5c4363e4d1ffa2dd2fb250",
+  "metrics": {
+    "LOSS": {
+      "signed_mean": -0.00014291787147521973,
+      "abs_mean": 0.00014291787147521973,
+      "positive": 472,
+      "negative": 528,
+      "zero": 0,
+      "MAE": 0.003993175745010376,
+      "max_abs": 0.028119802474975586,
+      "max_step": 2001,
+      "required_threshold": 0.005
+    },
+    "MTPLOSS": {
+      "signed_mean": 0.0003695532977581024,
+      "abs_mean": 0.0003695532977581024,
+      "positive": 537,
+      "negative": 463,
+      "zero": 0,
+      "MAE": 0.0038067377507686614,
+      "max_abs": 0.02406024932861328,
+      "max_step": 2249,
+      "required_threshold": 0.005
+    },
+    "AUXLOSS": {
+      "signed_mean": -0.00020188993215560912,
+      "abs_mean": 0.00020188993215560912,
+      "positive": 499,
+      "negative": 501,
+      "zero": 0,
+      "MAE": 0.0031050047278404235,
+      "max_abs": 0.016387343406677246,
+      "max_step": 2459,
+      "required_threshold": null
+    }
+  },
+  "files": {
+    "controller.json": "50d908414fe1be585114cfab8f000952408f8e6bd3bd93c9eeb3e72b53ddb1bb",
+    "restore-verification.json": "a40778e32a0578f469193ee7061c59391157f62d2ed71876a8eaa4c67aff5149",
+    "checkpoint-2500-complete.json": "1e592f02caa25cb8f901aae6faa15fb69b5f0c2be83a06f32bc44b7b09a55453",
+    "final-live-state.json": "11e6130c150322f4bac35164d836e6a9c3f4156b689c6627b848b103d76d910e",
+    "runner-report.json": "d152b1c1cd39c0bb77d40710bec3cc21bed993fa0e7e0a57ee5de02c97c31d9c",
+    "window-complete.json": "bcec20cf688dce5fdcd26972c8037385675c10aba8db3eae68516359c07622e1"
+  },
+  "cpu_readback_sha256": "9d0fdd0434377fe0d73053d6c4f94b3b6eb4ebce05b4be773a9b4f14cf1d3ecb"
+}

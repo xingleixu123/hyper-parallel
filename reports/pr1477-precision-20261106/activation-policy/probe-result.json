@@ -1,0 +1,24 @@
+{
+  "status": "passed_boundary_regression",
+  "scope": "Exact create_config AST and actual bundled HF config; no NPU/forward/performance claim",
+  "frozen_config_equal": true,
+  "frozen_field_count": 112,
+  "cases": [
+    {
+      "field": "swiglu_limit",
+      "requested": 1.0,
+      "before": "silently accepted without consumer",
+      "after": "rejected before model construction",
+      "error": "Xing4 training implements one fixed recipe; unsupported options: ['swiglu_limit']"
+    },
+    {
+      "field": "swiglu_compute_dtype",
+      "requested": "float32",
+      "before": "silently accepted without consumer",
+      "after": "rejected before model construction",
+      "error": "Xing4 training implements one fixed recipe; unsupported options: ['swiglu_compute_dtype']"
+    }
+  ],
+  "original_sha256": "d74428d0973492be71e32e4c67c577243f104daee31ced8b04b6f131a5f6f0cd",
+  "candidate_sha256": "7a4d0be6488a013da89bd65e6eb6782338e49e29d698d0d95d27013a81f4c0fd"
+}

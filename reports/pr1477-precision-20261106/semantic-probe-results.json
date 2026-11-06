@@ -1,0 +1,1329 @@
+{
+  "torch_version": "2.12.0+cpu",
+  "python": "/home/xxl/.cache/codex/hp-mf-master-sixpr-20261102-venv/bin/python",
+  "explicit_repo": "/home/xxl/codes-github/hp-pr1477-validation-20261106",
+  "package_import_policy": "No hyper_parallel package imported",
+  "aux": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/components/functional/aux_loss.py",
+        "sha256": "6c6e97278b0fdbeec6113cfecefe231876e86d1ee2867c2bb38d441cfb833700"
+      },
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/trainer/runtime/metrics.py",
+        "sha256": "83202395a352a7d7c4d27ed5f346c59fa69a1700e29affeb73966b1f6b7d71fb"
+      },
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/trainer/base.py",
+        "sha256": "57218aa7963b37b28fbcdbd4db3d94859de5df9ef27d36f13fed622348d0fa18"
+      }
+    ],
+    "single_rank_plumbing": "all_reduce identity; no DTensors, FSDP, NPU or distributed claim",
+    "objective": "Independent backbone/MTP aux each get external 1/GA, never internal MTP factor 0.1",
+    "cases": [
+      {
+        "gradient_accumulation": 1,
+        "loss_mapping_order": "lm_then_mtp",
+        "binding": "actual_pr1477",
+        "backbone_aux_gradient": 0.0005000000237487257,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.0005,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 30.400001525878906,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 1.0
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 1.0
+          }
+        ],
+        "logged_lm": 16.0,
+        "logged_weighted_mtp": 14.40000057220459
+      },
+      {
+        "gradient_accumulation": 1,
+        "loss_mapping_order": "lm_then_mtp",
+        "binding": "all_foundation_candidate",
+        "backbone_aux_gradient": 0.0005000000237487257,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.0005,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 30.400001525878906,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 1.0
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 1.0
+          }
+        ],
+        "logged_lm": 16.0,
+        "logged_weighted_mtp": 14.40000057220459
+      },
+      {
+        "gradient_accumulation": 1,
+        "loss_mapping_order": "mtp_then_lm",
+        "binding": "actual_pr1477",
+        "backbone_aux_gradient": 0.0005000000237487257,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.0005,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 30.400001525878906,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 1.0
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 1.0
+          }
+        ],
+        "logged_lm": 16.0,
+        "logged_weighted_mtp": 14.40000057220459
+      },
+      {
+        "gradient_accumulation": 1,
+        "loss_mapping_order": "mtp_then_lm",
+        "binding": "all_foundation_candidate",
+        "backbone_aux_gradient": 0.0005000000237487257,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.0005,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 30.400001525878906,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 1.0
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 1.0
+          }
+        ],
+        "logged_lm": 16.0,
+        "logged_weighted_mtp": 14.40000057220459
+      },
+      {
+        "gradient_accumulation": 2,
+        "loss_mapping_order": "lm_then_mtp",
+        "binding": "actual_pr1477",
+        "backbone_aux_gradient": 0.0002500000118743628,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.00025,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 2.0000000949949026,
+        "main_parameter_gradient": 15.200000762939453,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.5
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.5
+          }
+        ],
+        "logged_lm": 8.0,
+        "logged_weighted_mtp": 7.200000286102295
+      },
+      {
+        "gradient_accumulation": 2,
+        "loss_mapping_order": "lm_then_mtp",
+        "binding": "all_foundation_candidate",
+        "backbone_aux_gradient": 0.0002500000118743628,
+        "mtp_aux_gradient": 0.0002500000118743628,
+        "expected_independent_aux_gradient": 0.00025,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 15.200000762939453,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.5
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0002500000118743628
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.5
+          }
+        ],
+        "logged_lm": 8.0,
+        "logged_weighted_mtp": 7.200000286102295
+      },
+      {
+        "gradient_accumulation": 2,
+        "loss_mapping_order": "mtp_then_lm",
+        "binding": "actual_pr1477",
+        "backbone_aux_gradient": 0.0002500000118743628,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.00025,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 2.0000000949949026,
+        "main_parameter_gradient": 15.200000762939453,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.5
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.5
+          }
+        ],
+        "logged_lm": 8.0,
+        "logged_weighted_mtp": 7.200000286102295
+      },
+      {
+        "gradient_accumulation": 2,
+        "loss_mapping_order": "mtp_then_lm",
+        "binding": "all_foundation_candidate",
+        "backbone_aux_gradient": 0.0002500000118743628,
+        "mtp_aux_gradient": 0.0002500000118743628,
+        "expected_independent_aux_gradient": 0.00025,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 15.200000762939453,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.5
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0002500000118743628
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.5
+          }
+        ],
+        "logged_lm": 8.0,
+        "logged_weighted_mtp": 7.200000286102295
+      },
+      {
+        "gradient_accumulation": 4,
+        "loss_mapping_order": "lm_then_mtp",
+        "binding": "actual_pr1477",
+        "backbone_aux_gradient": 0.0001250000059371814,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.000125,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 4.000000189989805,
+        "main_parameter_gradient": 7.600000381469727,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.25
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.25
+          }
+        ],
+        "logged_lm": 4.0,
+        "logged_weighted_mtp": 3.6000001430511475
+      },
+      {
+        "gradient_accumulation": 4,
+        "loss_mapping_order": "lm_then_mtp",
+        "binding": "all_foundation_candidate",
+        "backbone_aux_gradient": 0.0001250000059371814,
+        "mtp_aux_gradient": 0.0001250000059371814,
+        "expected_independent_aux_gradient": 0.000125,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 7.600000381469727,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.25
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0001250000059371814
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.25
+          }
+        ],
+        "logged_lm": 4.0,
+        "logged_weighted_mtp": 3.6000001430511475
+      },
+      {
+        "gradient_accumulation": 4,
+        "loss_mapping_order": "mtp_then_lm",
+        "binding": "actual_pr1477",
+        "backbone_aux_gradient": 0.0001250000059371814,
+        "mtp_aux_gradient": 0.0005000000237487257,
+        "expected_independent_aux_gradient": 0.000125,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 4.000000189989805,
+        "main_parameter_gradient": 7.600000381469727,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.25
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0005000000237487257
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.25
+          }
+        ],
+        "logged_lm": 4.0,
+        "logged_weighted_mtp": 3.6000001430511475
+      },
+      {
+        "gradient_accumulation": 4,
+        "loss_mapping_order": "mtp_then_lm",
+        "binding": "all_foundation_candidate",
+        "backbone_aux_gradient": 0.0001250000059371814,
+        "mtp_aux_gradient": 0.0001250000059371814,
+        "expected_independent_aux_gradient": 0.000125,
+        "backbone_aux_ratio_to_expected": 1.0000000474974513,
+        "mtp_aux_ratio_to_expected": 1.0000000474974513,
+        "main_parameter_gradient": 7.600000381469727,
+        "backward_events": [
+          {
+            "event": "foundation_loss/mtp",
+            "incoming_multiplier": 0.25
+          },
+          {
+            "event": "mtp_aux",
+            "incoming_gradient": 0.0001250000059371814
+          },
+          {
+            "event": "foundation_loss",
+            "incoming_multiplier": 0.25
+          }
+        ],
+        "logged_lm": 4.0,
+        "logged_weighted_mtp": 3.6000001430511475
+      }
+    ]
+  },
+  "mhc": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/components/functional/mhc_post.py",
+        "sha256": "19ef32de7c92a8b13fe675e558c4fec037171158a43a183cd8c71d5f595891ba"
+      },
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/xing_4/modeling_xing4_0.py",
+        "sha256": "d74428d0973492be71e32e4c67c577243f104daee31ced8b04b6f131a5f6f0cd"
+      }
+    ],
+    "scope": "CPU post boundary only; NPU pre and post kernels require independent hardware evidence",
+    "matrix_asymmetry_max": 1.5116507006097863,
+    "candidate_vs_Hx": {
+      "output_max_abs": 0.0,
+      "gradient_max_abs": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "without_transpose_vs_Hx": {
+      "output_max_abs": 2.212871588550767,
+      "gradient_max_abs": [
+        0.0,
+        2.8988867442433324,
+        0.0,
+        3.01652125890297
+      ]
+    }
+  },
+  "muon": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/xing_4/adapter/optim/muon_layout.py",
+        "sha256": "bd3065833de3217fa18c30fc01ad547b0be42e02f89c6da4c86718f72f5a6d4b"
+      }
+    ],
+    "scope": "Logical boundary and reversible layout probe, not a Newton-Schulz/optimizer numerical parity test",
+    "cases": [
+      {
+        "name": "model.layers.1.self_attn.linear_qkv.weight",
+        "shape": [
+          7,
+          4
+        ],
+        "logical_shapes": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        "reshape_shares_storage": true,
+        "identity_restore_max_abs": null,
+        "logical_matrix_values": [
+          [
+            [
+              0.0,
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0,
+              7.0
+            ]
+          ],
+          [
+            [
+              8.0,
+              9.0,
+              10.0,
+              11.0
+            ],
+            [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ],
+            [
+              16.0,
+              17.0,
+              18.0,
+              19.0
+            ]
+          ],
+          [
+            [
+              20.0,
+              21.0,
+              22.0,
+              23.0
+            ],
+            [
+              24.0,
+              25.0,
+              26.0,
+              27.0
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "mtp.layers.0.mtp_block.self_attn.linear_qkv.weight",
+        "shape": [
+          7,
+          4
+        ],
+        "logical_shapes": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        "reshape_shares_storage": true,
+        "identity_restore_max_abs": null,
+        "logical_matrix_values": [
+          [
+            [
+              0.0,
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0,
+              7.0
+            ]
+          ],
+          [
+            [
+              8.0,
+              9.0,
+              10.0,
+              11.0
+            ],
+            [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ],
+            [
+              16.0,
+              17.0,
+              18.0,
+              19.0
+            ]
+          ],
+          [
+            [
+              20.0,
+              21.0,
+              22.0,
+              23.0
+            ],
+            [
+              24.0,
+              25.0,
+              26.0,
+              27.0
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "model.layers.0.mlp.linear_fc1.weight",
+        "shape": [
+          12,
+          4
+        ],
+        "logical_shapes": [
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "reshape_shares_storage": true,
+        "identity_restore_max_abs": null,
+        "logical_matrix_values": [
+          [
+            [
+              0.0,
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0,
+              7.0
+            ],
+            [
+              8.0,
+              9.0,
+              10.0,
+              11.0
+            ],
+            [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ],
+            [
+              16.0,
+              17.0,
+              18.0,
+              19.0
+            ],
+            [
+              20.0,
+              21.0,
+              22.0,
+              23.0
+            ]
+          ],
+          [
+            [
+              24.0,
+              25.0,
+              26.0,
+              27.0
+            ],
+            [
+              28.0,
+              29.0,
+              30.0,
+              31.0
+            ],
+            [
+              32.0,
+              33.0,
+              34.0,
+              35.0
+            ],
+            [
+              36.0,
+              37.0,
+              38.0,
+              39.0
+            ],
+            [
+              40.0,
+              41.0,
+              42.0,
+              43.0
+            ],
+            [
+              44.0,
+              45.0,
+              46.0,
+              47.0
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "model.layers.1.mlp.shared_experts.linear_fc1.weight",
+        "shape": [
+          6,
+          4
+        ],
+        "logical_shapes": [
+          [
+            3,
+            4
+          ],
+          [
+            3,
+            4
+          ]
+        ],
+        "reshape_shares_storage": true,
+        "identity_restore_max_abs": null,
+        "logical_matrix_values": [
+          [
+            [
+              0.0,
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0,
+              7.0
+            ],
+            [
+              8.0,
+              9.0,
+              10.0,
+              11.0
+            ]
+          ],
+          [
+            [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ],
+            [
+              16.0,
+              17.0,
+              18.0,
+              19.0
+            ],
+            [
+              20.0,
+              21.0,
+              22.0,
+              23.0
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "model.layers.1.mlp.experts.gate_up_proj",
+        "shape": [
+          3,
+          4,
+          6
+        ],
+        "logical_shapes": [
+          [
+            3,
+            4,
+            3
+          ],
+          [
+            3,
+            4,
+            3
+          ]
+        ],
+        "reshape_shares_storage": true,
+        "identity_restore_max_abs": null,
+        "logical_matrix_values": [
+          [
+            [
+              [
+                0.0,
+                1.0,
+                2.0
+              ],
+              [
+                6.0,
+                7.0,
+                8.0
+              ],
+              [
+                12.0,
+                13.0,
+                14.0
+              ],
+              [
+                18.0,
+                19.0,
+                20.0
+              ]
+            ],
+            [
+              [
+                24.0,
+                25.0,
+                26.0
+              ],
+              [
+                30.0,
+                31.0,
+                32.0
+              ],
+              [
+                36.0,
+                37.0,
+                38.0
+              ],
+              [
+                42.0,
+                43.0,
+                44.0
+              ]
+            ],
+            [
+              [
+                48.0,
+                49.0,
+                50.0
+              ],
+              [
+                54.0,
+                55.0,
+                56.0
+              ],
+              [
+                60.0,
+                61.0,
+                62.0
+              ],
+              [
+                66.0,
+                67.0,
+                68.0
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                3.0,
+                4.0,
+                5.0
+              ],
+              [
+                9.0,
+                10.0,
+                11.0
+              ],
+              [
+                15.0,
+                16.0,
+                17.0
+              ],
+              [
+                21.0,
+                22.0,
+                23.0
+              ]
+            ],
+            [
+              [
+                27.0,
+                28.0,
+                29.0
+              ],
+              [
+                33.0,
+                34.0,
+                35.0
+              ],
+              [
+                39.0,
+                40.0,
+                41.0
+              ],
+              [
+                45.0,
+                46.0,
+                47.0
+              ]
+            ],
+            [
+              [
+                51.0,
+                52.0,
+                53.0
+              ],
+              [
+                57.0,
+                58.0,
+                59.0
+              ],
+              [
+                63.0,
+                64.0,
+                65.0
+              ],
+              [
+                69.0,
+                70.0,
+                71.0
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "mtp.layers.0.mtp_block.mlp.experts.gate_up_proj",
+        "shape": [
+          3,
+          4,
+          6
+        ],
+        "logical_shapes": [
+          [
+            3,
+            4,
+            3
+          ],
+          [
+            3,
+            4,
+            3
+          ]
+        ],
+        "reshape_shares_storage": true,
+        "identity_restore_max_abs": null,
+        "logical_matrix_values": [
+          [
+            [
+              [
+                0.0,
+                1.0,
+                2.0
+              ],
+              [
+                6.0,
+                7.0,
+                8.0
+              ],
+              [
+                12.0,
+                13.0,
+                14.0
+              ],
+              [
+                18.0,
+                19.0,
+                20.0
+              ]
+            ],
+            [
+              [
+                24.0,
+                25.0,
+                26.0
+              ],
+              [
+                30.0,
+                31.0,
+                32.0
+              ],
+              [
+                36.0,
+                37.0,
+                38.0
+              ],
+              [
+                42.0,
+                43.0,
+                44.0
+              ]
+            ],
+            [
+              [
+                48.0,
+                49.0,
+                50.0
+              ],
+              [
+                54.0,
+                55.0,
+                56.0
+              ],
+              [
+                60.0,
+                61.0,
+                62.0
+              ],
+              [
+                66.0,
+                67.0,
+                68.0
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                3.0,
+                4.0,
+                5.0
+              ],
+              [
+                9.0,
+                10.0,
+                11.0
+              ],
+              [
+                15.0,
+                16.0,
+                17.0
+              ],
+              [
+                21.0,
+                22.0,
+                23.0
+              ]
+            ],
+            [
+              [
+                27.0,
+                28.0,
+                29.0
+              ],
+              [
+                33.0,
+                34.0,
+                35.0
+              ],
+              [
+                39.0,
+                40.0,
+                41.0
+              ],
+              [
+                45.0,
+                46.0,
+                47.0
+              ]
+            ],
+            [
+              [
+                51.0,
+                52.0,
+                53.0
+              ],
+              [
+                57.0,
+                58.0,
+                59.0
+              ],
+              [
+                63.0,
+                64.0,
+                65.0
+              ],
+              [
+                69.0,
+                70.0,
+                71.0
+              ]
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "model.layers.1.self_attn.q_b_proj.weight",
+        "shape": [
+          8,
+          2
+        ],
+        "logical_shapes": [
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            2
+          ]
+        ],
+        "reshape_shares_storage": null,
+        "identity_restore_max_abs": 0.0,
+        "logical_matrix_values": [
+          [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              2.0,
+              3.0
+            ],
+            [
+              8.0,
+              9.0
+            ],
+            [
+              10.0,
+              11.0
+            ]
+          ],
+          [
+            [
+              4.0,
+              5.0
+            ],
+            [
+              6.0,
+              7.0
+            ],
+            [
+              12.0,
+              13.0
+            ],
+            [
+              14.0,
+              15.0
+            ]
+          ]
+        ]
+      },
+      {
+        "name": "model.layers.1.self_attn.kv_b_proj.weight",
+        "shape": [
+          10,
+          3
+        ],
+        "logical_shapes": [
+          [
+            4,
+            3
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        "reshape_shares_storage": null,
+        "identity_restore_max_abs": 0.0,
+        "logical_matrix_values": [
+          [
+            [
+              0.0,
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0,
+              5.0
+            ],
+            [
+              15.0,
+              16.0,
+              17.0
+            ],
+            [
+              18.0,
+              19.0,
+              20.0
+            ]
+          ],
+          [
+            [
+              6.0,
+              7.0,
+              8.0
+            ],
+            [
+              9.0,
+              10.0,
+              11.0
+            ],
+            [
+              12.0,
+              13.0,
+              14.0
+            ],
+            [
+              21.0,
+              22.0,
+              23.0
+            ],
+            [
+              24.0,
+              25.0,
+              26.0
+            ],
+            [
+              27.0,
+              28.0,
+              29.0
+            ]
+          ]
+        ]
+      }
+    ]
+  },
+  "legacy_weighting": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/trainer/runtime/metrics.py",
+        "sha256": "83202395a352a7d7c4d27ed5f346c59fa69a1700e29affeb73966b1f6b7d71fb"
+      },
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/trainer/text_trainer.py",
+        "sha256": "aa504de6cab60ef1178654c233c73334d26d162eab82b0db8c7a6cf7ebef8202"
+      }
+    ],
+    "microbatch_counts": [
+      93,
+      740
+    ],
+    "microbatch_mean_loss_slopes": [
+      1.0,
+      9.0
+    ],
+    "actual_reported_loss": 5.0,
+    "actual_gradient": 5.0,
+    "microbatch_equal_mean_reference": 5.0,
+    "whole_step_token_reference": 8.106842737094837
+  },
+  "router_domains": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/xing_4/modeling_xing4_0.py",
+        "sha256": "d74428d0973492be71e32e4c67c577243f104daee31ced8b04b6f131a5f6f0cd"
+      },
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/xing_4/adapter/distributed/context_parallel.py",
+        "sha256": "a4e1179d9441517d5181a65b5e0f347c189e99f0fef70c08a1d36a8a1eb7e83c"
+      }
+    ],
+    "scope": "Real router auxiliary formula on CPU; CP collective execution is not simulated",
+    "one_global_sequence": {
+      "raw_aux": 1.125,
+      "normalized_aux_gradient": [
+        [
+          0.025000015273690224,
+          -0.22499996423721313
+        ],
+        [
+          0.04999997094273567,
+          -0.20000001788139343
+        ],
+        [
+          0.07500001788139343,
+          -0.17499996721744537
+        ],
+        [
+          0.22499997913837433,
+          -0.02500000037252903
+        ]
+      ]
+    },
+    "two_tp_replicas": [
+      1.125,
+      1.125
+    ],
+    "two_sequence_shards_without_tp_pooling": [
+      {
+        "raw_aux": 1.7000000476837158,
+        "normalized_aux_gradient": [
+          [
+            0.10000000149011612,
+            -0.8999999761581421
+          ],
+          [
+            0.20000000298023224,
+            -0.800000011920929
+          ]
+        ]
+      },
+      {
+        "raw_aux": 1.0,
+        "normalized_aux_gradient": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ]
+      }
+    ],
+    "mean_of_separate_sequence_shards": 1.350000023841858,
+    "two_independent_dp_sequences": {
+      "raw_aux": 1.350000023841858,
+      "normalized_aux_gradient": [
+        [
+          0.05000000074505806,
+          -0.44999998807907104
+        ],
+        [
+          0.10000000149011612,
+          -0.4000000059604645
+        ],
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    "interpretation": "TP-replicated full sequences need no TP pooling. TP-sharded sequence chunks require pooling; DP sequences remain separate sequence objectives."
+  },
+  "config_options": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/xing_4/modeling_xing4_0.py",
+        "sha256": "d74428d0973492be71e32e4c67c577243f104daee31ced8b04b6f131a5f6f0cd"
+      },
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/xing_4/transformer/configuration_xing4_0.py",
+        "sha256": "8012e9b83bad20b95f7815ddd458c7e721509285fd76b7fef38dd4adaef618c7"
+      }
+    ],
+    "requested": {
+      "swiglu_limit": 1.0,
+      "swiglu_compute_dtype": "float32"
+    },
+    "accepted": true,
+    "retained_config_fields": {
+      "swiglu_limit": 1.0,
+      "swiglu_compute_dtype": "float32"
+    },
+    "note": "The actual create_config accepts both fields; current model/GroupedExperts have no policy consumer. This is outside the MF baseline where both fields are None."
+  },
+  "fp32_buffer_validation": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/core/multicore/modules/_precision.py",
+        "sha256": "2a22c45c7ec7b9461bff3edaa957ab45578cb30ae8c05fadd9a11f8c1a11c970"
+      },
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/_transformers/model_builder.py",
+        "sha256": "f7a9ba90352588de689f767f23f735457b0e4e3cd9a340de760fd8c6ff55afc3"
+      }
+    ],
+    "bfloat16_target_error": "Model initialization dtype validation failed for: e_score_correction_bias",
+    "protected_buffer_dtype": "torch.float32",
+    "float32_target_passed": true,
+    "scope": "Demonstrates BF16 initialization/declared-FP32-buffer validation boundary; required MF continuation uses FP32 initialization and is unaffected."
+  },
+  "hf_init_guard": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/models/xing_4/modeling_xing4_0.py",
+        "sha256": "d74428d0973492be71e32e4c67c577243f104daee31ced8b04b6f131a5f6f0cd"
+      },
+      {
+        "path": "/home/xxl/.cache/codex/hp-mf-master-sixpr-20261102-venv/lib/python3.12/site-packages/transformers/initialization.py",
+        "sha256": "a2392653161633d4f8aefb473e776113ec5df8844acdba892569407ca56c2d6a"
+      }
+    ],
+    "loaded_hc_parameter_differences": {
+      "hc_fn": 0.0,
+      "hc_scale": 0.0,
+      "hc_base": 0.0
+    },
+    "direct_tensor_zero_bypasses_guard": true,
+    "scope": "Exact training initializer on HC-shaped parameters inside actual installed Transformers guard; does not claim official HF full-load support."
+  },
+  "swap_failfast": {
+    "sources": [
+      {
+        "path": "/home/xxl/codes-github/hp-pr1477-validation-20261106/hyper_parallel/core/optimizer/swap_optimizer_base.py",
+        "sha256": "9ca12b4d11dc183ad7b2f4e52a557195c9a6d588f3db6e48fa51985fe8be302f"
+      }
+    ],
+    "preexisting_leaf_post_hook_error": "Optimizer-state swap does not support step hooks; disable swap before wrapping",
+    "scope": "Exact wrapper check rejects before constructing swap runtime or offloading; no swap execution claim."
+  }
+}
