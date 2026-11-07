@@ -1,0 +1,129 @@
+{
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "torch": "2.12.0+cpu",
+  "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "source_sha256": {
+    "base": "752d19acd1a84f52fa10c93d3878bc8136b5146bd880d8d6b5ad6f89e24de3bb",
+    "head": "aab1762324a05db73e824f47deb5e65f2c6ea7e93685eeed58e2839b287b71ee"
+  },
+  "initializer_ast_sha256": {
+    "base": "9e113e93c3302231c52440f4a030e2cbc4511ed35fdc3a2d07447a347cb7ca3e",
+    "head": "110cd7a3b4db960367b97fef309e9a05b7100b82044fb762009cfa455315b6c8"
+  },
+  "method_only_delta": "head guard, checked via AST",
+  "batch_iterations": 200,
+  "batches_per_variant": 12,
+  "units": "nanoseconds per construction",
+  "cases": {
+    "AdamW": {
+      "first_construction_ns_ordered_base_then_head": {
+        "base": 8156901,
+        "head": 16030
+      },
+      "after_semantics_check_ns": {
+        "base": 12210,
+        "head": 7691
+      },
+      "samples_ns_per_construction": {
+        "base": [
+          4640.93,
+          2877.365,
+          3040.89,
+          2942.805,
+          5619.24,
+          2382.145,
+          2444.725,
+          2503.04,
+          2789.96,
+          3358.435,
+          3597.635,
+          5155.11
+        ],
+        "head": [
+          2609.98,
+          2847.955,
+          3085.31,
+          5425.85,
+          4223.84,
+          2857.545,
+          2169.265,
+          2613.34,
+          3109.195,
+          3684.03,
+          3682.295,
+          5558.645
+        ]
+      },
+      "summary": {
+        "base": {
+          "median": 2991.8475,
+          "p95_nearest_rank": 5619.24,
+          "min": 2382.145,
+          "max": 5619.24
+        },
+        "head": {
+          "median": 3097.2525,
+          "p95_nearest_rank": 5558.645,
+          "min": 2169.265,
+          "max": 5558.645
+        }
+      },
+      "semantic_checks": "base accepts pre-hook, head rejects pre-hook, no-hook both succeed; CPU parameter unchanged and state empty"
+    },
+    "Muon": {
+      "first_construction_ns_ordered_base_then_head": {
+        "base": 21253,
+        "head": 12659
+      },
+      "after_semantics_check_ns": {
+        "base": 7921,
+        "head": 5081
+      },
+      "samples_ns_per_construction": {
+        "base": [
+          2558.92,
+          3612.1,
+          2734.94,
+          3566.34,
+          2858.21,
+          3052.97,
+          3507.85,
+          3256.47,
+          3817.29,
+          3769.275,
+          4058.92,
+          4327.34
+        ],
+        "head": [
+          2843.76,
+          4235.1,
+          2887.385,
+          3182.43,
+          2941.49,
+          3100.825,
+          3418.085,
+          3779.565,
+          3955.415,
+          4348.61,
+          4267.2,
+          4472.125
+        ]
+      },
+      "summary": {
+        "base": {
+          "median": 3537.0950000000003,
+          "p95_nearest_rank": 4327.34,
+          "min": 2558.92,
+          "max": 4327.34
+        },
+        "head": {
+          "median": 3598.825,
+          "p95_nearest_rank": 4472.125,
+          "min": 2843.76,
+          "max": 4472.125
+        }
+      },
+      "semantic_checks": "base accepts pre-hook, head rejects pre-hook, no-hook both succeed; CPU parameter unchanged and state empty"
+    }
+  }
+}
