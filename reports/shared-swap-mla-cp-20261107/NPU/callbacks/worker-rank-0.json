@@ -1,0 +1,828 @@
+{
+  "mode": "callbacks",
+  "rank": 0,
+  "local_rank": 0,
+  "python": "3.12.14",
+  "torch": "2.12.0+cpu",
+  "torch_npu": "2.12.0.post3",
+  "import_path": "/work/source/hyper_parallel/__init__.py",
+  "device_count": 4,
+  "device_name": "Ascend910B3",
+  "result": [
+    {
+      "tp": 2,
+      "cp": 2,
+      "ulysses": 2,
+      "strategy": "expanded_ulysses",
+      "overlap": false,
+      "custom_callbacks": false,
+      "packed": false,
+      "microbatches": 2,
+      "checkpoint": "non-reentrant",
+      "gradient_relative_l2": 0.003766233196632289,
+      "output_max_abs": 0.00390625,
+      "input_grad_max_abs": 1.9073486328125e-06,
+      "loss_max_abs": 9.804964065551758e-06,
+      "attention_calls": [],
+      "rotary_calls": []
+    },
+    {
+      "tp": 2,
+      "cp": 2,
+      "ulysses": 2,
+      "strategy": "expanded_ulysses",
+      "overlap": false,
+      "custom_callbacks": true,
+      "packed": false,
+      "microbatches": 2,
+      "checkpoint": "non-reentrant",
+      "gradient_relative_l2": 0.0037766396137583385,
+      "output_max_abs": 0.00390625,
+      "input_grad_max_abs": 1.9073486328125e-06,
+      "loss_max_abs": 1.6689300537109375e-06,
+      "attention_calls": [
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            1,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            1,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        }
+      ],
+      "rotary_calls": [
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        }
+      ]
+    },
+    {
+      "tp": 2,
+      "cp": 2,
+      "ulysses": 2,
+      "strategy": "expanded_ulysses",
+      "overlap": true,
+      "custom_callbacks": true,
+      "packed": false,
+      "microbatches": 2,
+      "checkpoint": "non-reentrant",
+      "gradient_relative_l2": 0.0037766396137583385,
+      "output_max_abs": 0.00390625,
+      "input_grad_max_abs": 1.9073486328125e-06,
+      "loss_max_abs": 1.7285346984863281e-06,
+      "attention_calls": [
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            1,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            1,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        }
+      ],
+      "rotary_calls": [
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        }
+      ]
+    },
+    {
+      "tp": 2,
+      "cp": 2,
+      "ulysses": 2,
+      "strategy": "latent_kv_head",
+      "overlap": true,
+      "custom_callbacks": true,
+      "packed": true,
+      "microbatches": 2,
+      "checkpoint": "non-reentrant",
+      "gradient_relative_l2": 0.003976614784545177,
+      "output_max_abs": 0.00390625,
+      "input_grad_max_abs": 1.9073486328125e-06,
+      "loss_max_abs": 1.0371208190917969e-05,
+      "attention_calls": [
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            1,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            1,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 4,
+          "computed_heads": 2,
+          "q_shape": [
+            1,
+            2,
+            64,
+            192
+          ],
+          "k_shape": [
+            1,
+            2,
+            64,
+            192
+          ]
+        }
+      ],
+      "rotary_calls": [
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            4,
+            64
+          ],
+          "interleaved": false
+        }
+      ]
+    },
+    {
+      "tp": 1,
+      "cp": 4,
+      "ulysses": 2,
+      "strategy": "latent_kv_head",
+      "overlap": true,
+      "custom_callbacks": true,
+      "packed": false,
+      "microbatches": 2,
+      "checkpoint": "non-reentrant",
+      "gradient_relative_l2": 0.003973124282468164,
+      "output_max_abs": 0.0,
+      "input_grad_max_abs": 9.5367431640625e-07,
+      "loss_max_abs": 0.0,
+      "attention_calls": [
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            2,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            2,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 4,
+          "q_shape": [
+            2,
+            4,
+            32,
+            192
+          ],
+          "k_shape": [
+            2,
+            4,
+            32,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 4,
+          "q_shape": [
+            2,
+            4,
+            32,
+            192
+          ],
+          "k_shape": [
+            2,
+            4,
+            32,
+            192
+          ]
+        },
+        {
+          "role": "reference",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 8,
+          "q_shape": [
+            2,
+            8,
+            64,
+            192
+          ],
+          "k_shape": [
+            2,
+            8,
+            64,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 4,
+          "q_shape": [
+            2,
+            4,
+            32,
+            192
+          ],
+          "k_shape": [
+            2,
+            4,
+            32,
+            192
+          ]
+        },
+        {
+          "role": "parallel",
+          "offset": 0,
+          "local_heads": 8,
+          "computed_heads": 4,
+          "q_shape": [
+            2,
+            4,
+            32,
+            192
+          ],
+          "k_shape": [
+            2,
+            4,
+            32,
+            192
+          ]
+        }
+      ],
+      "rotary_calls": [
+        {
+          "shape": [
+            2,
+            16,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            2,
+            16,
+            8,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            2,
+            16,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            2,
+            16,
+            8,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            2,
+            16,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            2,
+            16,
+            8,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            2,
+            16,
+            1,
+            64
+          ],
+          "interleaved": false
+        },
+        {
+          "shape": [
+            2,
+            16,
+            8,
+            64
+          ],
+          "interleaved": false
+        }
+      ]
+    }
+  ],
+  "peak_allocated_bytes": 113275904,
+  "status": "passed"
+}
