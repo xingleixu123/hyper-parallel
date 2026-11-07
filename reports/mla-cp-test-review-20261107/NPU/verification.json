@@ -1,0 +1,71 @@
+{
+  "status": "native launcher and four rank test cases passed; controller failed in teardown and is not counted as a clean pass",
+  "receipt": "NPU-ST-typed\\run-cp-20261107T031000Z-3f612b0d\\receipt.json",
+  "receipt_sha256": "a59d9963f51a5e6dfab3d1f1783f5e4bbc8d014fb031be47e2992d9c5e3f7a0c",
+  "controller_status": "failed",
+  "worker_returncode": 0,
+  "stop_reason": "foreign_device_holder",
+  "launcher_passed": true,
+  "rank_tests_passed": 4,
+  "skips": 0,
+  "cases": [
+    {
+      "tp": 2,
+      "cp": 2,
+      "mesh_axes": [
+        "cp",
+        "tp"
+      ],
+      "strategy": "expanded_ulysses",
+      "dtype": "torch.bfloat16",
+      "packed": null,
+      "causal": true,
+      "overlap": false,
+      "ulysses_degree": 2,
+      "kv_exchange": "all_gather",
+      "gradient_relative_l2": 0.0037913018135992313,
+      "backward_passes": 2
+    },
+    {
+      "tp": 2,
+      "cp": 2,
+      "mesh_axes": [
+        "cp",
+        "tp"
+      ],
+      "strategy": "expanded_ulysses",
+      "dtype": "torch.bfloat16",
+      "packed": null,
+      "causal": true,
+      "overlap": true,
+      "ulysses_degree": 2,
+      "kv_exchange": "all_gather",
+      "gradient_relative_l2": 0.0037913018135992313,
+      "backward_passes": 2
+    },
+    {
+      "tp": 2,
+      "cp": 2,
+      "mesh_axes": [
+        "cp",
+        "tp"
+      ],
+      "strategy": "latent_kv_head",
+      "dtype": "torch.bfloat16",
+      "packed": null,
+      "causal": true,
+      "overlap": true,
+      "ulysses_degree": 2,
+      "kv_exchange": "all_gather",
+      "gradient_relative_l2": 0.00379561724947224,
+      "backward_passes": 2
+    }
+  ],
+  "reported_rank0_max_gradient_relative_l2": 0.00379561724947224,
+  "rank_log_hashes": {
+    "logs\\work\\source\\tests\\torch\\context_parallel\\_test_mla_cp.py\\test_mla_local_callbacks_npu_bfloat16\\none_ui307piu\\attempt_0\\0\\stdout.log": "3e4edb6d9b2fa475e1661268ae4905f562865aa3a67d009708400b933eb497de",
+    "logs\\work\\source\\tests\\torch\\context_parallel\\_test_mla_cp.py\\test_mla_local_callbacks_npu_bfloat16\\none_ui307piu\\attempt_0\\1\\stdout.log": "71d085d58708fb898ed32e02abd6c1f33e7cbae9ed26da9cba5e4de5da1e8a68",
+    "logs\\work\\source\\tests\\torch\\context_parallel\\_test_mla_cp.py\\test_mla_local_callbacks_npu_bfloat16\\none_ui307piu\\attempt_0\\2\\stdout.log": "9bc5a25961c129fad83ceb360a296bf3ca194dfc6656d27eed92847ed8b37f24",
+    "logs\\work\\source\\tests\\torch\\context_parallel\\_test_mla_cp.py\\test_mla_local_callbacks_npu_bfloat16\\none_ui307piu\\attempt_0\\3\\stdout.log": "7cdd7013f6237c16c0163976c5610473c20f324f40604afc6312345503defbf0"
+  }
+}
